@@ -1,0 +1,236 @@
+﻿@model List<ERP_DTO.JobInwardTransaction.ReceiptNoteItem_DTO>
+
+<div class="col table-fixed h-100">
+    <div class="w-12 table-responsive table-body table-body-f">
+
+        <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="ItemTable_P">
+
+            <!-- ================= HEADER ================= -->
+            <thead>
+                <tr class="table-info">
+                    <th class="px-2 text-center">
+                        <input type="checkbox" id="IndexAllCheckItem" class="form-check-input border-white">
+                    </th>
+
+                    <th>@Html.DisplayNameFor(m => m.First().PRS_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().Item_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().Description)</th>
+
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().OuterDia)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Thickness)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Length)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Width)</th>
+
+                    <th>@Html.DisplayNameFor(m => m.First().MaterialGrade)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().ItemGroup)</th>
+
+                    <th>@Html.DisplayNameFor(m => m.First().WH_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().UoM_Number)</th>
+
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Qty)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().UnitPrice)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Amount)</th>
+                </tr>
+            </thead>
+
+            <!-- ================= BODY ================= -->
+            <tbody id="TableBody_P">
+
+                <!-- 🔹 TEMPLATE ROW -->
+                <tr id="TempRow_P" style="display:none;">
+                    <td><input type="checkbox" class="CheckItem form-check-input"> </td>
+
+                    <td>
+                        <input id="PRS_Number" class="PRS_Number" type="hidden" />
+                        <input class="form-control PRS_Name" autocomplete="off" oninput="OnInputProcess(this)" id="prsnum" onfocus="OnFocusProcess(this)" />
+                        <div class="search-results card" style="display:none"></div>
+                    </td>
+
+                    <td>
+                        <input id="Item_Number" class="Item_Number" type="hidden" />
+                        <input id="Item_Index" class="Item_Index" type="hidden" />
+                        <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                        <div class="search-results card" style="display:none"></div>
+                    </td>
+
+                    <td><input class="form-control Description" readonly /></td>
+
+                    <td><input class="form-control OuterDia text-end" readonly /></td>
+                    <td><input class="form-control Thickness text-end" readonly /></td>
+                    <td><input class="form-control Length text-end" readonly /></td>
+                    <td><input class="form-control Width text-end" readonly /></td>
+
+                    <td><input class="form-control MaterialGrade" readonly /></td>
+                    <td><input class="form-control ItemGroup" readonly /></td>
+
+                    <td>
+                        <select class="form-select WH_Number" asp-items="@ViewBag.Warehouse"></select>
+                    </td>
+
+                    <td>
+                        <select class="form-select UoM_Number" asp-items="@ViewBag.UoM"></select>
+                    </td>
+
+                    <td>
+                        <input class="form-control Qty text-end" />
+                    </td>
+
+                    <td>
+                        <input class="form-control UnitPrice text-end" />
+                    </td>
+
+                    <td>
+                        <input class="form-control Amount text-end" readonly />
+                        <input type="hidden" class="IsDeleted" value="0" />
+                    </td>
+                </tr>
+
+                <!-- 🔹 EXISTING DATA -->
+                @if (Model != null)
+                {
+                    for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="NewRow" style="@(Model[i].IsDeleted == "true" ? "display:none;" : "")">
+
+                            <td>
+                                <input type="checkbox" class="CheckItem form-check-input">
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].PRS_Number"
+                                       class="form-control PRS_Number"
+                                       value="@Model[i].PRS_Number"
+                                       oninput="OnInputProcess(this)"
+                                       onfocus="OnFocusProcess(this)" autocomplete="off" />
+
+                                <div class="search-results card" style="display:none"></div>
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].Item_Number"
+                                       class="form-control Item_Number"
+                                       value="@Model[i].Item_Number"
+                                       oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                <div class="search-results card" style="display:none"></div>
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].Description"
+                                       class="form-control Description"
+                                       value="@Model[i].Description" readonly />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].OuterDia"
+                                       class="form-control OuterDia text-end"
+                                       value="@Model[i].OuterDia" readonly />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].Thickness"
+                                       class="form-control Thickness text-end"
+                                       value="@Model[i].Thickness" readonly />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].Length"
+                                       class="form-control Length text-end"
+                                       value="@Model[i].Length" readonly />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].Width"
+                                       class="form-control Width text-end"
+                                       value="@Model[i].Width" readonly />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].MaterialGrade"
+                                       class="form-control MaterialGrade"
+                                       value="@Model[i].MaterialGrade" readonly />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].ItemGroup"
+                                       class="form-control ItemGroup"
+                                       value="@Model[i].ItemGroup" readonly />
+                            </td>
+
+                            <td>
+                                <select name="Items[@i].WH_Number" class="form-select WH_Number">
+                                    @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
+                                    {
+                                        <option value="@w.Value"
+                                                selected="@(w.Value == Model[i]?.WH_Number)">
+                                            @w.Text
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+
+                            <td>
+                                <select name="Items[@i].UoM_Number" class="form-select UoM_Number">
+                                    @foreach (var u in (ViewBag.UoM as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
+                                    {
+                                        <option value="@u.Value"
+                                                selected="@(u.Value == Model[i]?.UoM_Number)">
+                                            @u.Text
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].Qty"
+                                       class="form-control Qty text-end"
+                                       value="@Model[i].Qty" />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].UnitPrice"
+                                       class="form-control UnitPrice text-end"
+                                       value="@Model[i].UnitPrice" />
+                            </td>
+
+                            <td>
+                                <input name="Items[@i].Amount"
+                                       class="form-control Amount text-end"
+                                       value="@Model[i].Amount" readonly />
+
+                                <input type="hidden"
+                                       name="Items[@i].IsDeleted"
+                                       class="IsDeleted"
+                                       value="@Model[i].IsDeleted" />
+                            </td>
+
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+            <!-- ================= FOOTER ================= -->
+            <tfoot>
+                <tr class="table-info">
+                    <td colspan="12" class="text-end">Total</td>
+                    <td>
+                        <input id="TotalQty" class="form-control text-end" readonly />
+                    </td>
+                    <td></td>
+                    <td>
+                        <input id="TotalAmount" class="form-control text-end" readonly />
+                    </td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </div>
+
+    <!-- ================= BUTTONS ================= -->
+    <div class="row mt-2">
+        <div class="col">
+            <button type="button" id="AddRowButton_P" class="btn btn-primary">Add Row</button>
+            <button type="button" class="btn btn-danger RowRemove">Delete Row</button>
+        </div>
+    </div>
+</div>

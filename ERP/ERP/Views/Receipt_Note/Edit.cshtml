@@ -1,0 +1,635 @@
+﻿@model ERP_DTO.JobInwardTransaction.ReceiptNoteHead_DTO;
+@{
+    ViewData["Title"] = "Receipt Note Create";
+}
+<form asp-action="CreateReceiptNote" class="h-100">
+    <!-- Alert Popup -->
+    <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header draggable-modal-header">
+                    <p class="modal-title mb-0">Warning</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body py-4 text-dark fs-6 text-center">
+                    <img src="~/img/danger.png" class="img-fluid mb-2" />
+                    <div id="AlertMessage">@Html.Raw(ViewBag.ErrorMessage)</div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-4" id="AlertOkay" data-bs-dismiss="modal">Ok</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Popup -->
+    <div class="modal modal-lg fade" id="IBatch" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border">
+                <div class="modal-header">
+                    <p class="modal-title w-100">
+                        Batch <span class="float-end">
+                        Line Item Qty : <span id="RNI_BATCHQty"></span>
+                        <button type="button" id="ExCloseButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </span>
+                </p>
+            </div>
+            <div class="modal-body p-0">
+                <div class="p-2 text-black h-100">
+                    <ul class="nav nav-tabs tab-header" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-tab-pane" type="button" role="tab" aria-controls="overview-tab-pane" aria-selected="true">Overview</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content tab-body">
+                        <div class="tab-pane fade show active border border-top-0 h-100 p-2" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
+                        
+                            <!--------------------------------------------batch--------------------------------------------->
+                            <div class="w-100 table-responsive">
+                                <table class="table table-bordered table-hover align-middle table-grid mb-0">
+                                    <thead>
+                                        <tr class="table-info">
+                                            <th class="datetype text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Date)</th>
+                                            <th>@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_No)</th>
+                                              <th class="table-width-xl text-center">Original Qty </th>
+                                            <th class="table-width-xl text-center">Used Qty</th>
+                                            <th class="table-width-xl text-center">Amend Qty</th>
+                                            <th class="table-width-xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_UnitPrice)</th>
+                                            <th class="table-width-3xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Value)</th>
+                                            <th class="action text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="IBatTableBody">
+                                        <tr id="IBatTempRow" style="display: none;">
+                                            <td class="datetype">
+                                                <input id="JIRNI_BCH_Number" class="JIRNI_BCH_Number" type="hidden" />
+                                                <input id="JIRNI_BCH_JIRNI_Number" class="JIRNI_BCH_JIRNI_Number" type="hidden" />
+                                                <input id="JIRNI_BCH_JIRNH_Number" class="JIRNI_BCH_JIRNH_Number" type="hidden" />
+                                                <input id="RNI_BCH_Item_Number" class="RNI_BCH_Item_Number" type="hidden" />
+                                                <input id="RNI_BCH_Item_Index" class="RNI_BCH_Item_Index" type="hidden" />
+                                                <input id="RNI_BCH_Item_WH" class="RNI_BCH_Item_WH" type="hidden" />
+                                                <input id="RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date text-center" autocomplete="off" />
+                                            </td>
+                                            <td>
+                                                <input id="RNI_BCH_No" class="form-control RNI_BCH_No" autocomplete="off" />
+                                            </td>
+                                            <td class="table-width-xl">
+                                                <input id="RNI_BCH_Qty" readonly class="form-control RNI_BCH_Qty  text-center decimal" value="0" autocomplete="off" />
+                                            </td>
+                                            <td class="table-width-xl">
+                                                <input id="RNI_BCH_UsedQty" readonly class="form-control RNI_BCH_UsedQty  text-center decimal" value="0" autocomplete="off" />
+                                            </td>
+                                            <td class="table-width-xl">
+                                                <input id="RNI_BCH_AmendQty" class="form-control RNI_BCH_AmendQty  text-center decimal" value="0" autocomplete="off" />
+                                            </td>
+                                            <td class="table-width-xl">
+                                                <input id="RNI_BCH_UnitPrice" value="0" class="form-control RNI_BCH_UnitPrice decimal text-end" autocomplete="off" />
+                                            </td>
+                                            <td class="table-width-3xl">
+                                                <input id="RNI_BCH_Value" class="form-control RNI_BCH_Value decimal text-end" readonly autocomplete="off" />
+                                            </td>
+                                            <td class="action text-center">
+                                                <input id="RNI_BCH_IsDeleted" type="hidden" name="RNI_BCH_IsDeleted" class="RNI_BCH_IsDeleted" value="false" />
+                                                <a class="IBatRowRemove text-danger p-0 icon-link shadow-none">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                                    </svg>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @if (Model != null)
+                                        {
+                                            @for (int i = 0; i < Model.ItemBatch.Count; i++)
+                                            {
+                                                <tr class="IBatNewRow" style="@(@Model.ItemBatch[i].RNI_BCH_IsDeleted == "true" ? "display: none;" : "")">
+                                                    <td class="datetype">
+
+                                                        <input id="RNI_BCH_Item_Number" name="ItemBatch[@i].RNI_BCH_Item_Number" class="RNI_BCH_Item_Number" type="hidden" value="@Model.ItemBatch[i].JIRNI_BCH_JIRNI_Number" />
+                                                        <input id="RNI_BCH_Item_WH" name="ItemBatch[@i].RNI_BCH_Item_WH" class="RNI_BCH_Item_WH" type="hidden" value="@Model.ItemBatch[i].WH_Number" />
+                                                        <input id="RNI_BCH_Date" name="ItemBatch[@i].RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date text-center" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Date" />
+                                                    </td>
+                                                    <td>
+                                                        <input id="RNI_BCH_No" name="ItemBatch[@i].RNI_BCH_No" class="form-control RNI_BCH_No" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_No" />
+                                                    </td>
+                                                    <td class="table-width-xl">
+                                                        <input id="RNI_BCH_Qty" name="ItemBatch[@i].RNI_BCH_Qty" class="form-control RNI_BCH_Qty text-center" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Qty" />
+                                                    </td>
+                                                    <td class="table-width-xl">
+                                                        <input id="RNI_BCH_UnitPrice" name="ItemBatch[@i].RNI_BCH_UnitPrice" readonly class="form-control RNI_BCH_UnitPrice decimal text-end" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_UnitPrice" />
+                                                    </td>
+                                                    <td class="table-width-3xl">
+                                                        <input id="RNI_BCH_Value" name="ItemBatch[@i].RNI_BCH_Value" readonly class="form-control RNI_BCH_Value decimal text-end" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Value" />
+                                                    </td>
+                                                    <td class="action text-center">
+                                                        @if (@Model.ItemBatch[i].RNI_BCH_No != 0)
+                                                        {
+                                                            <input name="ItemBatch[@i].RNI_BCH_No" type="hidden" class="Number" value="@Model.ItemBatch[i].RNI_BCH_No" />
+                                                        }
+                                                        <input type="hidden" id="RNI_BCH_IsDeleted" name="ItemBatch[@i].RNI_BCH_IsDeleted" class="RNI_BCH_IsDeleted" value="@Model.ItemBatch[i].RNI_BCH_IsDeleted" />
+                                                        <a class="IBatRowRemove text-danger p-0 icon-link shadow-none">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                                            </svg>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-info">
+                                            <td class="text-end" colspan="2">Total</td>
+                                            <td class="table-width-xl">
+                                                <input id="BatchTotalQty" class="form-control text-center" readonly />
+                                            </td>
+                                            <td class="table-width-xl">
+                                                <input id="BatchUsedQty" class="form-control text-center" readonly />
+                                            </td>
+                                            <td>  <input id="BatchQty" class="form-control text-center" readonly /></td>
+                                            <td></td>
+                                            <td class="table-width-3xl">
+                                                <input id="BatchTotalValue" class="form-control text-end" readonly />
+                                            </td>
+                                            <td></td>
+                                           
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!--------------------------------------------batch--------------------------------------------->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <a id="IBatNewRowButton" class="btn btn-primary">Add Row</a>
+                <button type="button" id="IBatCloseButton" class="btn btn-primary px-4" ref="always_focus" autofocus>Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row align-items-center panel-header gx-2">
+    <div class="col h-100 align-items-center">
+        <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+            Receipt Note
+            <a asp-controller="JobworkInward" asp-action="Index" class="float-end btn p-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row panel-body gx-2">
+    <div class="col-12 panel-card-fixed h-100">
+        <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
+            <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
+                <div class="card-body pb-0">
+                    <div class="row ps-2">
+                        @if (Model.JIRNH_Number != 0)
+                        {
+                            <input asp-for="JIRNH_Number" type="hidden" class="Number" />
+                        }
+                        <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+
+                                    <div class="modal-header draggable-modal-header">
+                                        <p class="modal-title mb-0">Warning</p>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+
+                                    <div class="modal-body py-4 text-dark fs-6 text-center">
+                                        <img src="~/img/danger.png" class="img-fluid mb-2" />
+                                        <div id="AlertMessage">@Html.Raw(ViewBag.ErrorMessage)</div>
+                                    </div>
+
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-primary px-4" id="AlertOkay" data-bs-dismiss="modal">Ok</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-auto left-menu text-black">
+                            <div class="row">
+                                <div class="col-12 col-md-3">
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <div class="col-md-6 col-lg-7">
+                                            <input asp-for="RN_No" class="form-control Key KeyDup" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="RN_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <div class="col-md-6 col-lg-7">
+                                            <input asp-for="RN_Date" class="form-control Key datepicker" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <div class="col-md-6 col-lg-7">
+                                            <input asp-for="JW_CustomerDC_No" class="form-control Key KeyDup" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="JW_CustomerDC_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <div class="col-md-6 col-lg-7">
+                                            <input asp-for="JW_CustomerDC_Date" class="form-control Key datepicker" autocomplete="off" />
+                                        </div>
+                                    </div>
+          
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <div class="col-md-6 col-lg-7">
+                                            <select asp-for="MS_Number" class="form-select MS_Number" asp-items="@ViewBag.MaterialSegregation"></select>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="JWC_Number" class="col-sm-5 col-form-label ps-0"></label>
+
+                                        <div class="col-sm-7 position-relative">
+
+                                            <input asp-for="JWC_Number" type="hidden" />
+
+                                            <input asp-for="JWC_Name" type="text"
+                                                   class="form-control"
+                                                   autocomplete="off"
+                                                   oninput="OnBuyerInput(this)"
+                                                   onfocus="OnBuyerFocus(this)" />
+
+                                            <div class="buyer-search-results"
+                                                 style="display:none;
+                                                position:absolute;
+                                                top:100%;
+                                                left:0;
+                                                width:100%;
+                                                z-index:9999;">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="Currency_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <input asp-for="Currency_Number" class="form-control" type="hidden" />
+                                        <div class="col-md-6 col-lg-7">
+                                            <input asp-for="Currency_Name" class="form-control Key KeyDup" autocomplete="off" readonly />
+                                        </div>
+                                    </div>
+      
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="WH_Number" class="col-sm-5 col-form-label ps-0"></label>
+                                        <div class="col-sm-7">
+                                            <select asp-for="WH_Number" class="form-select" asp-items="@ViewBag.Warehouse"></select>
+                                            @{
+                                                if (Model != null)
+                                                {
+                                                    // <input asp-for="SIH_HIDE_TCT_Number" class="form-control" type="hidden" value="@Model.Currency_Number" />
+                                                }
+                                            }
+                                            <div class="cluster-results dropdown-results search-results bg-primary p-2" style="display:none"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center px-2 mb-1">
+                                        <label asp-for="Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <div class="col-md-6 col-lg-7">
+                                            <input asp-for="Remarks" class="form-control Key KeyDup" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-auto right-menu text-center border-start">
+                            
+                                <input type="submit" name="Mode" id="btnSave" value="Update" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                            <a asp-controller="Receipt_Note"
+                                   asp-action="Edit"
+                                   asp-route-SI_No="@Context.Request.Query["SI_No"]"
+                                   class="btn btn-primary btn-sm px-2 w-100 mb-1">
+                                Clear All
+                            </a>
+  
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-0 bg-transparent shadow-none" id="CardBody">
+                <div class="card-body h-100">
+                    <div class="row h-100">
+                        <div class="col-auto left-menu h-100">
+                            <ul class="nav nav-tabs tab-header">
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page">Item</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark">Other</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content tab-body tab-body-h-o">
+                                <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" tabindex="0">
+                                    <div class="row h-100">
+                                        <!-------------------------item-------------------------------------------------------------------->
+                                        <div class="col table-fixed h-100">
+                                            <div class="w-12 table-responsive table-body table-body-f">
+
+                                                <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="ItemTable">
+
+                                                    <!-- ================= HEADER ================= -->
+                                                    <thead>
+                                                        <tr class="table-info">
+                                                            <th class="px-2 text-center">
+                                                                <input type="checkbox" id="IndexAllCheckItem" class="form-check-input border-white">
+                                                            </th>
+
+                                                            <th>@Html.DisplayNameFor(m => m.Items.First().PRS_Number)</th>
+                                                            <th>@Html.DisplayNameFor(m => m.Items.First().Item_Number)</th>
+                                                            <th>@Html.DisplayNameFor(m => m.Items.First().Description)</th>
+
+                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().OuterDia)</th>
+                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Thickness)</th>
+                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Length)</th>
+                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Width)</th>
+
+                                                            <th>@Html.DisplayNameFor(m => m.Items.First().MaterialGrade)</th>
+                                                            <th>@Html.DisplayNameFor(m => m.Items.First().ItemGroup)</th>
+
+                                                            <th>@Html.DisplayNameFor(m => m.Items.First().WH_Number)</th>
+                                                            <th>@Html.DisplayNameFor(m => m.Items.First().UoM_Number)</th>
+
+                                                       
+                                                            <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().OriginalQty)</th>
+                                                            <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().UsedQty)</th>
+                                                            <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().AmendQty)</th>
+                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().UnitPrice)</th>
+                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Amount)</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <!-- ================= BODY ================= -->
+                                                    <tbody id="TableBody">
+
+                                                        <!-- 🔹 TEMPLATE ROW -->
+                                                        <tr id="TempRow" style="display:none;">
+                                                            <td><input type="checkbox" class="CheckItem form-check-input"> </td>
+                                                            <td>
+                                                                <select class="form-select PRS_Number" asp-items="@ViewBag.PRS"></select>
+                                                            </td>
+
+                                                       
+                                                            <td>
+                                                                <input id="Item_Number" class="Item_Number" type="hidden" />
+                                                                <input id="JIRNI_Number" class="JIRNI_Number" type="hidden" />
+                                                                <input id="Item_Index" class="Item_Index" type="hidden" />
+                                                                <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                                                <div class="search-results card" style="display:none"></div>
+                                                            </td>
+
+                                                            <td><input class="form-control Description" readonly /></td>
+
+                                                            <td><input class="form-control OuterDia text-end" readonly /></td>
+                                                            <td><input class="form-control Thickness text-end" readonly /></td>
+                                                            <td><input class="form-control Length text-end" readonly /></td>
+                                                            <td><input class="form-control Width text-end" readonly /></td>
+
+                                                            <td><input class="form-control MaterialGrade" readonly /></td>
+                                                            <td><input class="form-control ItemGroup" readonly /></td>
+
+                                                            <td>
+                                                                <select class="form-select WH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                            </td>
+
+                                                            <td>
+                                                                <select class="form-select UoM_Number" asp-items="@ViewBag.UoM"></select>
+                                                            </td>
+                                                            <td>
+                                                                <input class="form-control OriginalQty text-center" readonly />
+                                                            </td>
+                                                            <td>
+                                                                <input class="form-control UsedQty text-center"  readonly/>
+                                                            </td>
+                                                            <td>
+                                                                <input class="form-control AmendQty text-center" />
+                                                            </td>
+
+                                                            <td>
+                                                                <input class="form-control UnitPrice text-end" />
+                                                            </td>
+
+                                                            <td>
+                                                                <input class="form-control Amount text-end" readonly />
+                                                                <input type="hidden" class="IsDeleted" value="0" />
+                                                            </td>
+                                                        </tr>
+
+                                                        <!-- 🔹 EXISTING DATA -->
+                                                        @if (Model != null)
+                                                        {
+                                                            for (int i = 0; i < Model.Items.Count; i++)
+                                                            {
+                                                                <tr class="NewRow" style="@(Model.Items[i].IsDeleted == "true" ? "display:none;" : "")">
+
+                                                                    <td>
+                                                                        <input type="checkbox" class="CheckItem form-check-input">
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].PRS_Number"
+                                                                               class="form-control PRS_Number"
+                                                                               value="@Model.Items[i].PRS_Number"
+                                                                               oninput="OnInputProcess(this)"
+                                                                               onfocus="OnFocusProcess(this)" autocomplete="off" />
+
+                                                                        <div class="search-results card" style="display:none"></div>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].Item_Number"
+                                                                               class="form-control Item_Number"
+                                                                               value="@Model.Items[i].Item_Number"
+                                                                               oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                                                        <div class="search-results card" style="display:none"></div>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].Description"
+                                                                               class="form-control Description"
+                                                                               value="@Model.Items[i].Description" readonly />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].OuterDia"
+                                                                               class="form-control OuterDia text-end"
+                                                                               value="@Model.Items[i].OuterDia" readonly />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].Thickness"
+                                                                               class="form-control Thickness text-end"
+                                                                               value="@Model.Items[i].Thickness" readonly />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].Length"
+                                                                               class="form-control Length text-end"
+                                                                               value="@Model.Items[i].Length" readonly />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].Width"
+                                                                               class="form-control Width text-end"
+                                                                               value="@Model.Items[i].Width" readonly />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].MaterialGrade"
+                                                                               class="form-control MaterialGrade"
+                                                                               value="@Model.Items[i].MaterialGrade" readonly />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].ItemGroup"
+                                                                               class="form-control ItemGroup"
+                                                                               value="@Model.Items[i].ItemGroup" readonly />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <select name="Items[@i].WH_Number" class="form-select WH_Number">
+                                                                            @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
+                                                                            {
+                                                                                <option value="@w.Value"
+                                                                                        selected="@(w.Value == Model.Items[i]?.WH_Number)">
+                                                                                    @w.Text
+                                                                                </option>
+                                                                            }
+                                                                        </select>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <select name="Items[@i].UoM_Number" class="form-select UoM_Number">
+                                                                            @foreach (var u in (ViewBag.UoM as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
+                                                                            {
+                                                                                <option value="@u.Value"
+                                                                                        selected="@(u.Value == Model.Items[i]?.UoM_Number)">
+                                                                                    @u.Text
+                                                                                </option>
+                                                                            }
+                                                                        </select>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input name="Items[@i].OriginalQty"
+                                                                               class="form-control OriginalQty text-center"
+                                                                               value="@Model.Items[i].OriginalQty" />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].UsedQty"
+                                                                               class="form-control UsedQty text-center"
+                                                                               value="@Model.Items[i].UsedQty" />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].AmendQty"
+                                                                               class="form-control AmendQty text-center"
+                                                                               value="@Model.Items[i].AmendQty" />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].UnitPrice"
+                                                                               class="form-control UnitPrice text-end"
+                                                                               value="@Model.Items[i].UnitPrice" />
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input name="Items[@i].Amount"
+                                                                               class="form-control Amount text-end"
+                                                                               value="@Model.Items[i].Amount" readonly />
+
+                                                                        <input type="hidden"
+                                                                               name="Items[@i].IsDeleted"
+                                                                               class="IsDeleted"
+                                                                               value="@Model.Items[i].IsDeleted" />
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
+                                                        }
+
+                                                    </tbody>
+
+                                                    <!-- ================= FOOTER ================= -->
+                                                    <tfoot>
+                                                        <tr class="table-info">
+                                                            <td colspan="12" class="text-end">Total</td>
+                                                              <td></td>
+                                                            <td></td>
+                                                            <td>
+                                                                <input id="TotalQty" class="form-control text-center" readonly />
+                                                            </td>
+                                                            <td></td>
+                                                            <td>
+                                                                <input id="TotalAmount" class="form-control text-end" readonly />
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+
+                                                </table>
+                                            </div>
+
+                                            <!-- ================= BUTTONS ================= -->
+                                            <div class="row mt-2">
+                                                <div class="col">
+                                                    <button type="button" id="AddRowButton" class="btn btn-primary mb-2">Add Row</button>
+                                                    <button type="button" id="RemoveItemRowButton" class="btn btn-primary mb-2 RowRemove">Delete Row</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-------------------item----------------------------------------------------------->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto right-menu text-center border-start">
+                            
+                            <a class="ItemBatch btn btn-sm btn-primary px-2 mb-2 w-100 OneItemMode" disabled>
+                                Batch
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+       
+        </div>
+    </div>
+</div>
+</form>
+
+                            
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
+    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+
+    <script src="~/js/receiptnote/receiptnote_Edit.js" asp-append-version="true"></script>
+    <script src="~/js/receiptnote/receiptnote_batchEdit.js" asp-append-version="true"></script>
+
+ 
+}
