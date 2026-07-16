@@ -2,6 +2,217 @@
 @{
     ViewData["Title"] = "Receipt Note Create";
 }
+ 
+<style>
+    
+    .buyer-search-results {
+        width: 500px !important; /* Change to your desired width */
+        max-width: 600px;
+    }
+    /* Equal spacing for all form rows */
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    /* Labels */
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+    }
+
+    /* Input containers */
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Inputs, Selects & Textarea */
+    .form-control,
+    .form-select {
+        border-radius: 4px;
+    }
+    /* Make all labels in the form use the same width */
+    .col-form-label {
+        white-space: nowrap;
+    }
+
+    /* Force label columns to the same width */
+    .row > .col-md-6.col-lg-5.col-form-label,
+    .row > .col-sm-5.col-form-label {
+        flex: 0 0 42%;
+        max-width: 42%;
+    }
+
+    .row > .col-md-6.col-lg-7,
+    .row > .col-sm-7 {
+        flex: 0 0 58%;
+        max-width: 58%;
+    }
+    /* Apply rounded corners to all form controls */
+    .col-form-label {
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+        max-width: 30% !important;
+    }
+
+    .form-control,
+    .flatpickr-input,
+    .form-select,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px !important;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        
+        resize: vertical; /* or both */
+        overflow: auto;
+    }
+
+    textarea.form-control {
+        min-height: 60px !important;
+    }
+    /* Receipt Note No */
+
+    
+    /* Receipt Note Date */
+    #RN_Date + input {
+        width: 15ch !important;
+        max-width: 15ch !important;
+        padding-right: 30px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px 16px;
+        cursor: pointer;
+    }
+
+    input.flatpickr-input.form-control {
+        width: 20ch !important;
+    }
+
+   
+
+    
+    /* Customer DC Date */
+    #JW_CustomerDC_Date + input {
+        width: 15ch !important;
+        max-width: 15ch !important;
+        padding-right: 30px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px 16px;
+        cursor: pointer;
+    }
+
+    /* Material Segregation */
+    #MS_Number {
+        width: 20ch !important;
+        max-width: 100%;
+    }
+
+    /* Job Work Customer */
+    #JWC_Name {
+        width: 40ch !important;
+        max-width: 75ch;
+    }
+
+    #JWC_Name {
+        width: 40ch !important;
+        max-width: 350ch;
+        padding-right: 24px; /* Space for the triangle */
+
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+    }
+    /* Currency */
+    #Currency_Name {
+        width: 10ch !important;
+        max-width: 100%;
+    }
+
+    /* Warehouse */
+    #WH_Number {
+        width: 20ch !important;
+        max-width: 100%;
+    }
+
+    /* Remarks */
+    #Remarks {
+        width: 45ch !important;
+        max-width: 85ch;
+    }
+
+    
+
+  
+</style>
+
+
+<style>
+    .PRS_Number + .select2-container .select2-selection--single {
+        height: 28px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .PRS_Number + .select2-container .select2-selection__rendered {
+        line-height: normal;
+        padding: 0 6px;
+        font-size: 12px;
+        text-align: left;
+        transform: translateY(-3px);
+    }
+
+    .PRS_Number + .select2-container .select2-selection__arrow {
+        height: 28px;
+        top: 0;
+    }
+
+    
+
+    .PRS_Number,
+    td.PRS_Number {
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+        overflow: hidden;
+    }
+</style>
+<style>
+    #ItemTable th,
+    #ItemTable td {
+        height: 27px;
+        padding-top: 0;
+        padding-bottom: 0;
+        vertical-align: middle;
+    }
+</style>
+<style>
+.match-row td{
+    color:blue !important;
+    font-weight:600;
+}
+
+.current-row td{
+    background:#dbeafe !important;
+}
+    </style>
+    <style>
+ .batchPopup thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+    </style>
 <form asp-action="CreateReceiptNote" class="h-100">
     <!-- Alert Popup -->
     <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
@@ -64,7 +275,7 @@
                                             <th class="table-width-xl text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Qty)</th>
                                             <th class="table-width-xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_UnitPrice)</th>
                                             <th class="table-width-3xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Value)</th>
-                                            <th class="action text-center">Action</th>
+                                            <th class="action text-center align-middle">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="IBatTableBody">
@@ -87,7 +298,7 @@
                                             <td class="table-width-3xl">
                                                 <input id="RNI_BCH_Value" class="form-control RNI_BCH_Value decimal text-end" readonly autocomplete="off" />
                                             </td>
-                                            <td class="action text-center">
+                                            <td class="action text-center align-middle">
                                                 <input id="RNI_BCH_IsDeleted" type="hidden" name="RNI_BCH_IsDeleted" class="RNI_BCH_IsDeleted" value="false" />
                                                 <a class="IBatRowRemove text-danger p-0 icon-link shadow-none">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
@@ -119,7 +330,7 @@
                                                     <td class="table-width-3xl">
                                                         <input id="RNI_BCH_Value" name="ItemBatch[@i].RNI_BCH_Value" readonly class="form-control RNI_BCH_Value decimal text-end" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Value" />
                                                     </td>
-                                                    <td class="action text-center">
+                                                    <td class="action text-center align-middle">
                                                         @if (@Model.ItemBatch[i].RNI_BCH_No != 0)
                                                         {
                                                             <input name="ItemBatch[@i].RNI_BCH_No" type="hidden" class="Number" value="@Model.ItemBatch[i].RNI_BCH_No" />
@@ -178,13 +389,13 @@
     </div>
 </div>
 
-<div class="row panel-body gx-2">
+<div class="row panel-body gx-2  ">
     <div class="col-12 panel-card-fixed h-100">
         <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
               <!-- HEADER -->
             
             <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
-                <div class="card-body pb-0">
+                <div class="card-body pb-0" style="margin-top: -10px !important;">
                     <div class="row ps-2">
                         @if (Model.JIRNH_Number != 0)
                         {
@@ -214,41 +425,41 @@
 
                         <div class="col-auto left-menu text-black">
                             <div class="row">
-                                <div class="col-12 col-md-3">
-                                    <div class="row align-items-center px-2 mb-1">
+                                <div class="col-12 col-md-4">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="RN_No" class="form-control Key KeyDup" autocomplete="off" />
+                                            <input asp-for="RN_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="RN_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="RN_Date" class="form-control Key datepicker" autocomplete="off" />
+                                            <input asp-for="RN_Date" class="form-control Key datepicker" style="width:20ch !important;" autocomplete="off" />
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2 ">
                                         <label asp-for="JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="JW_CustomerDC_No" class="form-control Key KeyDup" autocomplete="off" />
+                                            <input asp-for="JW_CustomerDC_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="JW_CustomerDC_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="JW_CustomerDC_Date" class="form-control Key datepicker" autocomplete="off" />
+                                            <input asp-for="JW_CustomerDC_Date" class="form-control Key datepicker" style="width:20ch !important;" autocomplete="off" />
                                         </div>
                                     </div>
           
                                 </div>
-                                <div class="col-12 col-md-3">
-                                    <div class="row align-items-center px-2 mb-1">
+                                <div class="col-12 col-md-4">
+                                    <div class="row align-items-center gx-2 mb-0">
                                         <label asp-for="MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
                                             <select asp-for="MS_Number" class="form-select MS_Number" asp-items="@ViewBag.MaterialSegregation"></select>
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2 mb-0">
                                         <label asp-for="JWC_Number" class="col-sm-5 col-form-label ps-0"></label>
 
                                         <div class="col-sm-7 position-relative">
@@ -266,15 +477,16 @@
                                                 position:absolute;
                                                 top:100%;
                                                 left:0;
-                                                width:100%;
+                                                min-width:500px;
+                                                max-width:500px;
                                                 z-index:9999;">
                                             </div>
 
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-3">
-                                    <div class="row align-items-center px-2 mb-1">
+                                <div class="col-12 col-md-4">
+                                    <div class="row align-items-center gx-2 mb-0">
                                         <label asp-for="Currency_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <input asp-for="Currency_Number" class="form-control" type="hidden" />
                                         <div class="col-md-6 col-lg-7">
@@ -282,7 +494,7 @@
                                         </div>
                                     </div>
       
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2 mb-0">
                                         <label asp-for="WH_Number" class="col-sm-5 col-form-label ps-0"></label>
                                         <div class="col-sm-7">
                                             <select asp-for="WH_Number" class="form-select" asp-items="@ViewBag.Warehouse"></select>
@@ -295,10 +507,13 @@
                                             <div class="cluster-results dropdown-results search-results bg-primary p-2" style="display:none"></div>
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2 mb-0">
                                         <label asp-for="Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="Remarks" class="form-control Key KeyDup" autocomplete="off" />
+                                            <textarea asp-for="Remarks" maxlength="250"
+                                                      class="form-control Key KeyDup"
+                                                      rows="2"
+                                                      autocomplete="off"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -332,12 +547,23 @@
                 <div class="card-body h-100">
                     <div class="row h-100">
                         <div class="col-auto left-menu h-100">
-                            <ul class="nav nav-tabs tab-header">
+                            <ul class="nav nav-tabs tab-header d-flex align-items-end">
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page">Item</a>
+                                    <a class="nav-link active">Item</a>
                                 </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link text-dark">Other</a>
+                                </li>
+
+                                <li class="ms-auto me-2 mb-2">
+                                    <button type="button" id="AddRowButton" class="btn btn-primary btn-sm me-2">
+                                        Add Row
+                                    </button>
+
+                                    <button type="button" id="RemoveItemRowButton" class="btn btn-danger btn-sm RowRemove">
+                                        Delete Row
+                                    </button>
                                 </li>
                             </ul>
                             <div class="tab-content tab-body tab-body-h-o">
@@ -345,7 +571,7 @@
                                     <div class="row h-100">
                                      <!-------------------------item-------------------------------------------------------------------->
                                         <div class="col table-fixed h-100">
-                                            <div class="w-12 table-responsive table-body table-body-f"   style="max-height:450px; overflow-y:auto;">
+                                            <div class="w-12 table-responsive table-body table-body-f"   style="height:528px;">
 
                                                 <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="ItemTable">
 
@@ -357,7 +583,7 @@
                                                             </th>
 
                                                             <th>@Html.DisplayNameFor(m => m.Items.First().PRS_Number)</th>
-                                                            <th>@Html.DisplayNameFor(m => m.Items.First().Item_Number)</th>
+                                                            <th>Item Number</th>
                                                             <th>@Html.DisplayNameFor(m => m.Items.First().Description)</th>
 
                                                             <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().OuterDia)</th>
@@ -369,7 +595,7 @@
                                                             <th>@Html.DisplayNameFor(m => m.Items.First().ItemGroup)</th>
 
                                                             <th>@Html.DisplayNameFor(m => m.Items.First().WH_Number)</th>
-                                                            <th>@Html.DisplayNameFor(m => m.Items.First().UoM_Number)</th>
+                                                            <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().UoM_Number)</th>
 
                                                             <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().Qty)</th>
                                                             <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().UnitPrice)</th>
@@ -392,7 +618,9 @@
                                                                 <input id="Item_Number" class="Item_Number" type="hidden" />
                                                                 <input id="Item_Index" class="Item_Index" type="hidden" />
                                                                 <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
-                                                                <div class="search-results card" style="display:none"></div>
+                                                                <div class="search-results card"
+                                                                     style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
+                                                                </div>
                                                             </td>
 
                                                             <td><input class="form-control Description" readonly /></td>
@@ -409,7 +637,7 @@
                                                                 <select class="form-select WH_Number" asp-items="@ViewBag.Warehouse"></select>
                                                             </td>
 
-                                                            <td>
+                                                            <td class="text-center">
                                                                 <select class="form-select UoM_Number" asp-items="@ViewBag.UoM"></select>
                                                             </td>
 
@@ -510,7 +738,7 @@
                                                                         </select>
                                                                     </td>
 
-                                                                    <td>
+                                                                    <td class="text-center">
                                                                         <select name="Items[@i].UoM_Number" class="form-select UoM_Number">
                                                                             @foreach (var u in (ViewBag.UoM as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                                                             {
@@ -569,12 +797,7 @@
                                             </div>
 
                                             <!-- ================= BUTTONS ================= -->
-                                            <div class="row mt-2">
-                                                <div class="col">
-                                                    <button type="button" id="AddRowButton" class="btn btn-primary mb-2">Add Row</button>
-                                                    <button type="button" id="RemoveItemRowButton" class="btn btn-primary mb-2 RowRemove">Delete Row</button>
-                                                </div>
-                                            </div>
+                                         
                                         </div>
 
                                      <!-------------------item----------------------------------------------------------->
@@ -602,10 +825,13 @@
 @section Scripts {
 
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/code/ItemGrid.js" asp-append-version="true"></script>
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote_batch.js" asp-append-version="true"></script>
+
 
  
 }

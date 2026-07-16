@@ -2,6 +2,165 @@
 @{
     ViewData["Title"] = "Jobwork Invoice Create";
 }
+<!-----search logic highlight---->
+
+<style>
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
+
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
+<style>
+    .batchPopup thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+</style>
+<style>
+
+    .jwcustomer-search-results {
+        width: 500px !important;
+        max-width: 600px;
+    }
+
+    /* Equal spacing for all form rows */
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    /* Labels */
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+    }
+
+    /* Input containers */
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Column 1 (Label = col-md-3, Input = col-md-7) */
+    .row > .col-md-3.col-form-label {
+        flex: 0 0 30%;
+        max-width: 30%;
+    }
+
+    .row > .col-md-7 {
+        flex: 0 0 70%;
+        max-width: 70%;
+    }
+
+    /* Column 2 (Label = col-sm-4, Input = col-sm-7) */
+    .row > .col-sm-4.col-form-label {
+        flex: 0 0 35%;
+        max-width: 35%;
+    }
+
+        .row > .col-sm-4.col-form-label + .col-sm-7 {
+            flex: 0 0 65%;
+            max-width: 65%;
+        }
+
+    /* Inputs, Selects & Textarea */
+    .form-control,
+    .flatpickr-input,
+    .form-select,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        resize: vertical;
+        overflow: auto;
+    }
+
+    /* Textarea */
+    textarea.form-control {
+        min-height: 60px !important;
+    }
+
+    /* Invoice No */
+   
+
+    /* Invoice Date (Flatpickr) */
+    #Header_JISVIH_InvoiceDate,
+    #Header_JISVIH_InvoiceDate + input,
+    input.flatpickr-input.form-control {
+        width: 20ch !important;
+        max-width: 20ch !important;
+    }
+
+    /* Material Segregation */
+    #Header_JISVIH_MS_Number {
+        width: 20ch !important;
+        max-width: 100%;
+    }
+
+    /* Job Work Customer */
+    #Header_JISVIH_JW_Customer_Name {
+        width: 40ch !important;
+        max-width: 100%;
+        padding-right: 24px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+    }
+
+    /* Hidden Customer Number */
+    #Header_JISVIH_JW_Customer_Number {
+        display: none;
+    }
+
+    /* Currency */
+    #Header_JISVIH_Currency_Number {
+        width: 10ch !important;
+        max-width: 100%;
+    }
+
+    /* Transaction Type */
+    #Header_JISVIH_TCT_Number {
+        width: 20ch !important;
+        max-width: 100%;
+    }
+
+    /* Payment Terms */
+    #Header_JISVIH_PaymentTerms {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+    /* Payment Method */
+    #Header_JISVIH_PaymentMethod {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+    /* Remarks */
+    #Header_JISVIH_Remarks {
+        width: 45ch !important;
+        max-width: 100%;
+        min-height: 60px !important;
+        resize: vertical;
+    }
+</style>
+
+
 <form asp-action="JobworkInvoiceCreate" method="post" id="JobworkInvoiceCreateForm">
     <!-- GST Popup -->
     <div class="modal modal-lg fade" id="GSTView" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -234,7 +393,7 @@
                 <div class="card rounded-0 bg-transparent shadow-none"
                      id="CardHeader">
 
-                    <div class="card-body pb-0">
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
                         
                         <div class="row ps-2">
 
@@ -243,31 +402,31 @@
                     
                             <div class="col-auto left-menu text-black">
 
-                                <div class="row">
+                                <div class="row"  >
 
                                     <!-- COLUMN 1 -->
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-12 col-md-4">
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_InvoiceNo"
-                                                   class="col-md-6 col-lg-5 col-form-label ps-0">
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
 
                                                 <input asp-for="Header.JISVIH_InvoiceNo"
-                                                       class="form-control Key KeyDup"
+                                                       class="form-control Key KeyDup" maxlength="25"
                                                        autocomplete="off" />
 
                                             </div>
 
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_InvoiceDate"
-                                                   class="col-md-6 col-lg-5 col-form-label ps-0">
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
@@ -279,10 +438,10 @@
                                             </div>
 
                                         </div>
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_MS_Number"
-                                                   class="col-md-6 col-lg-5 col-form-label ps-0">
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
@@ -296,10 +455,10 @@
 
                                         </div>
  
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_JW_Customer_Number"
-                                                   class="col-md-6 col-lg-5 col-form-label ps-0">
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
@@ -328,12 +487,12 @@
                                     </div>
 
                                     <!-- COLUMN 2 -->
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-12 col-md-3" >
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_Currency_Number"
-                                                   class="col-sm-5 col-form-label ps-0">
+                                                   class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
@@ -347,10 +506,10 @@
 
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_TCT_Number"
-                                                   class="col-sm-5 col-form-label ps-0">
+                                                   class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
@@ -363,32 +522,32 @@
 
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_PaymentTerms"
-                                                   class="col-sm-5 col-form-label ps-0">
+                                                   class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
 
                                                 <input asp-for="Header.JISVIH_PaymentTerms"
-                                                       class="form-control"
+                                                       class="form-control" maxlength="50"
                                                        autocomplete="off" />
 
                                             </div>
 
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_PaymentMethod"
-                                                   class="col-sm-5 col-form-label ps-0">
+                                                   class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
 
                                                 <input asp-for="Header.JISVIH_PaymentMethod"
-                                                       class="form-control"
+                                                       class="form-control" maxlength="50"
                                                        autocomplete="off" />
 
                                             </div>
@@ -404,14 +563,14 @@
 
                                  
 
-                                        <div class="row align-items-start px-2 mb-1">
+                                        <div class="row align-items-start gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_Remarks" class="col-sm-5 col-form-label ps-0">
+                                            <label asp-for="Header.JISVIH_Remarks" class="col-sm-2 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
 
-                                                <textarea asp-for="Header.JISVIH_Remarks" class="form-control"
+                                                <textarea asp-for="Header.JISVIH_Remarks" class="form-control" maxlength="250"
                                                           rows="2"></textarea>
 
                                             </div>
@@ -723,7 +882,7 @@
     </script>
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
-
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
     <script src="~/js/jw_invoice/JW_Invoice.js" asp-append-version="true"></script>
 
         

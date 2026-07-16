@@ -21,6 +21,14 @@ function BindHeader(h) {
     $("#WH_Number").val(h.JIRNH_WH_Number).trigger("change");
 
     $("#Remarks").val(h.JIRNH_Remarks || "");
+    fitInputWidth("RN_No",20);
+    fitInputWidth("JW_CustomerDC_No", 20);
+    fitInputWidth("Remarks", 40, 80);
+   
+    fitInputWidth("MS_Number", 20);
+    fitInputWidth("Currency_Name", 10);
+    fitInputWidth("WH_Number", 20);
+    
 }
 
 function BindItems_Edit(items) {
@@ -142,46 +150,41 @@ function BindItemBatches_RN(itemBatches) {
 
         let rowId = index + 1;
 
-        let jirniNumber = row.find(".JIRNI_Number").val();
-        let Item_Number = row.find(".Item_Number").val();
-        let WH_Number = row.find(".WH_Number").val();
-        console.log(JSON.stringify(itemBatches) + ':itemBatches');
-     
-        console.log(jirniNumber +':jirniNumber')
+        let jirniNumber = parseInt(row.find(".JIRNI_Number").val()) || 0;
+        let itemNumber = parseInt(row.find(".Item_Number").val()) || 0;
+        let whNumber = parseInt(row.find(".WH_Number").val()) || 0;
+
+        console.log("Row JIRNI :", jirniNumber);
+
         let batches = itemBatches
-            .filter(x => x.JIRNI_BCH_JIRNI_Number == jirniNumber)
-            .map(function (batch) {
+            .filter(batch => (parseInt(batch.JIRNI_BCH_JIRNI_Number) || 0) === jirniNumber)
+            .map(batch => ({
+                JIRNI_Number: parseInt(batch.JIRNI_BCH_JIRNI_Number) || 0,
 
-                return {
-                    JIRNI_Number: batch.JIRNI_BCH_JIRNI_Number,
+                RNI_BCH_Date: batch.JIRNI_BCH_BatchDate,
+                RNI_BCH_No: batch.JIRNI_BCH_BatchNo,
+                RNI_BCH_Number: parseInt(batch.JIRNI_BCH_Number) || 0,
+                RNI_BCH_Item_Number: itemNumber,
+                RNI_BCH_WH_Number: whNumber,
 
-                    RNI_BCH_Date: batch.JIRNI_BCH_BatchDate,
-                    RNI_BCH_No: batch.JIRNI_BCH_BatchNo,
-                    RNI_BCH_Number: batch.JIRNI_BCH_Number,
-                    RNI_BCH_Item_Number: Item_Number,
-                    RNI_BCH_WH_Number: WH_Number,
-                    RNI_BCH_Qty: batch.JIRNI_BCH_BatchQty,
-                    RNI_BCH_UnitPrice: batch.JIRNI_BCH_BatchUnitPrice,
-                    RNI_BCH_Value: batch.JIRNI_BCH_BatchValue,
+                RNI_BCH_Qty: parseFloat(batch.JIRNI_BCH_BatchQty) || 0,
+                RNI_BCH_UnitPrice: parseFloat(batch.JIRNI_BCH_BatchUnitPrice) || 0,
+                RNI_BCH_Value: parseFloat(batch.JIRNI_BCH_BatchValue) || 0,
 
-                    RNI_BCH_UsedQty: batch.UsedQty,
-                    RNI_BCH_AmendQty: (parseFloat(batch.JIRNI_BCH_BatchQty) || 0) - (parseFloat(batch.UsedQty) || 0)
-                };
-
-            });
+                RNI_BCH_UsedQty: parseFloat(batch.UsedQty) || 0,
+                RNI_BCH_AmendQty:
+                    (parseFloat(batch.JIRNI_BCH_BatchQty) || 0) -
+                    (parseFloat(batch.UsedQty) || 0)
+            }));
 
         batchMismatchData_RN.push({
-
             rowId: rowId,
-
             batchValues: batches
-
         });
 
     });
 
-    console.log("batchMismatchData_RN", batchMismatchData_RN);
-
+    console.log(batchMismatchData_RN);
 }
 
 //#region COMMON FUNCTIONS
@@ -246,57 +249,198 @@ $("#RemoveItemRowButton").on("click", function () {
         $("#ItemTable tbody tr.NewRow:visible")
             .has(".CheckItem:checked");
 
-    // minimum one row should exist
     let totalVisibleRows =
         $("#ItemTable tbody tr.NewRow:visible").length;
 
     if (checkedRows.length === 0) {
-
-        alert("Please select row.");
+        alert("Please select at least one row.");
         return;
     }
 
-    if ((totalVisibleRows - checkedRows.length) < 0) {
-
-        alert("At least one row required.");
+    // Keep at least one row
+    if ((totalVisibleRows - checkedRows.length) < 1) {
+        alert("At least one row is required.");
         return;
     }
-    if (checkedRows.length > 1) {
-        alert("Please select only one row");
-        return false;
+
+    // Confirmation
+    if (!confirm("Are you sure you want to delete the selected row(s)?")) {
+        return;
     }
-    checkedRows.each(function () {
 
-        let currentRow = $(this);
+    checkedRows.remove();
 
-        // visible row index
-        let ItemGridindex =
-            currentRow.index(
-                "#ItemTable tbody tr.NewRow:visible"
-            ) + 1;
-
-
-
-
-
-        currentRow.remove();
-        calculateTotal_rn();
-
-    });
-
-
+    calculateTotal_rn();
 
 });
 //#endregion remove checked rows
 
-$(document).ready(function () {
-    $(document).on("focusout", ".UnitPrice", function () {
-        let value = $(this).val();
-        $(this).val(formatIndianCurrency(value));
+function HighlightRow(rows, index) {
+
+    rows.removeClass("current-row");
+
+    if (index < 0 || index >= rows.length)
+        return;
+
+    $(rows[index]).addClass("current-row");
+
+    rows[index].scrollIntoView({
+        block: "nearest"
     });
+}
+
+function ApplyFieldWidths() {
+
+    const fields = [
+        { cls: ".PRS_Number", min: 15, max: 25, align: "left" },
+        { cls: ".Item_Code", min: 15, max: 15, align: "left" },
+        { cls: ".Description", min: 30, max: 100, align: "left" },
+
+        { cls: ".OuterDia", min: 10, max: 10, align: "center" },
+        { cls: ".Thickness", min: 10, max: 10, align: "center" },
+        { cls: ".Length", min: 10, max: 10, align: "center" },
+        { cls: ".Width", min: 10, max: 10, align: "center" },
+
+        { cls: ".MaterialGrade", min: 15, max: 25, align: "left" },
+        { cls: ".ItemGroup", min: 15, max: 30, align: "left" },
+        { cls: ".WH_Number", min: 15, max: 25, align: "left" },
+
+        { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
+
+        { cls: ".Qty", min: 8, max: null, align: "center" },
+        { cls: ".UnitPrice", min: 8, max: null, align: "right" },
+        { cls: ".Amount", min: 12, max: null, align: "right" }
+    ];
+
+    fields.forEach(f => {
+
+        const css = {
+            minWidth: f.min + "ch",
+            textAlign: f.align
+        };
+
+        if (f.max !== null)
+            css.maxWidth = f.max + "ch";
+
+        $(f.cls).css(css);
+    });
+}
+function AutoFit() {
+    fitInputWidth("RN_No", 20, 30);
+    fitInputWidth("JW_CustomerDC_No", 20, 30);
+    fitInputWidth("Remarks", 40, 80);
+
+    fitInputWidth("RN_Date", 15, 15);
+    fitInputWidth("MS_Number", 20, 20);
+    fitInputWidth("Currency_Name", 10, 15);
+    fitInputWidth("WH_Number", 20, 20);
+}
+$(document).ready(function () {
+    AutoFit();
+    $(document).on("input keyup", "#RN_No, #JW_CustomerDC_No", function () {
+        fitInputWidth(this, 20, 30);
+    });
+    $(document).on("change", "#MS_Number, #WH_Number", function () {
+        fitInputWidth(this, 20, 20);
+    });
+    ApplyFieldWidths();
+    //#region  search logic highlight
+
+    $(document).on("keydown", "#JWC_Name", function (e) {
+
+        let input = $(this);
+        let resultsDiv = input.siblings(".buyer-search-results");
+        let rows = resultsDiv.find("tbody tr");
+
+        if (!resultsDiv.is(":visible") || rows.length === 0)
+            return;
+
+        let selectedIndex = input.data("selectedIndex");
+
+        let firstMatch = input.data("firstMatch");
+        let lastMatch = input.data("lastMatch");
+
+        switch (e.key) {
+
+            case "ArrowDown":
+
+                e.preventDefault();
+
+                if (selectedIndex == null) {
+
+                    if (lastMatch >= 0)
+                        selectedIndex = lastMatch;
+                    else
+                        selectedIndex = rows.length - 1;
+                }
+                else if (selectedIndex < rows.length - 1) {
+
+                    selectedIndex++;
+                }
+
+                break;
+
+            case "ArrowUp":
+
+                e.preventDefault();
+
+                if (selectedIndex == null) {
+
+                    if (firstMatch >= 0)
+                        selectedIndex = firstMatch;
+                    else
+                        selectedIndex = 0;
+                }
+                else if (selectedIndex > 0) {
+
+                    selectedIndex--;
+                }
+
+                break;
+
+            case "Enter":
+
+                e.preventDefault();
+
+                if (selectedIndex != null)
+                    $(rows[selectedIndex]).trigger("click");
+
+                return;
+
+            case "Escape":
+
+                e.preventDefault();
+
+                resultsDiv.hide();
+
+                input.removeData("selectedIndex");
+
+                return;
+
+            default:
+                return;
+        }
+
+        HighlightRow(rows, selectedIndex);
+
+        input.data("selectedIndex", selectedIndex);
+    });
+
+    //#endregion
+    $(document).on("focusout", ".UnitPrice", function () {
+        let value = removeCommas($(this).val());
+
+        $(this)
+            .attr("data-value", value)
+            .val(formatIndianCurrency(value));
+    });
+
     $(document).on("focusout", ".AmendQty", function () {
-        let value = $(this).val();
-        $(this).val(formatIndianQty(value));
+        let value = removeCommas($(this).val());
+
+        $(this)
+            .attr("data-value", value)
+            .val(formatIndianQty(value));
     });
  
     $(document).on("focusout", ".AmendQty", function () {
@@ -319,20 +463,28 @@ $(document).ready(function () {
 
             return;
         }
-
         $(this).val(formatIndianQty(amendQty));
+        let value = removeCommas($(this).val());
+
+        $(this)
+            .attr("data-value", value)
+            .val(formatIndianQty(value));
+
+       
     });
     $("#AddRowButton").trigger("click");
     $(document).on("keyup change", ".AmendQty, .UnitPrice", function () {
 
         let row = $(this).closest("tr");
 
-        let qty = parseFloat((row.find(".AmendQty").val() || "0").replace(/,/g, "")) || 0;
-        let unitPrice = parseFloat((row.find(".UnitPrice").val() || "0").replace(/,/g, "")) || 0;
+        let qty = parseFloat(row.find(".AmendQty").attr("data-value")) || 0;
+        let unitPrice = parseFloat(row.find(".UnitPrice").attr("data-value")) || 0;
 
         let amount = qty * unitPrice;
 
-        row.find(".Amount").val(formatIndianCurrency(amount));
+        row.find(".Amount")
+            .val(formatIndianCurrency(amount))
+            .attr("data-value", amount);
 
         calculateTotal_rn();
     });
@@ -423,6 +575,11 @@ $(document).ready(function () {
         LoadReceiptNote(receiptNo);
         JIRNH_Number_Global = receiptNo;
     }
+
+
+    $(document).on("input", "#RN_No, #JW_CustomerDC_No", function () {
+        fitInputWidth(this,20);
+    });
 
 });
 var JIRNH_Number_Global;
@@ -520,19 +677,25 @@ function GetItems_Edit() {
         if (row.find(".IsDeleted").val() === "1")
             return;
 
-        items.push({
-            Item_Index: itemIndex++,
+        let itemNumber = row.find(".Item_Number").val();
 
-            JIRNI_Number: row.find(".JIRNI_Number").val() || 0,
-            Item_Number: row.find(".Item_Number").val(),
-            PRS_Number: row.find(".PRS_Number").val(),
-            WH_Number: row.find(".WH_Number").val(),
-            UoM_Number: row.find(".UoM_Number").val(),
-            Qty: (row.find(".AmendQty").val() || "").replace(/,/g, ""),
-            UnitPrice: (row.find(".UnitPrice").val() || "").replace(/,/g, ""),
-            Amount: (row.find(".Amount").val() || "").replace(/,/g, ""),
-            IsDeleted: "0"
-        });
+        if (itemNumber && itemNumber.trim() !== "") {
+            items.push({
+                Item_Index: itemIndex++,
+
+                JIRNI_Number: row.find(".JIRNI_Number").val() || 0,
+                Item_Number: itemNumber,
+                PRS_Number: row.find(".PRS_Number").val(),
+                WH_Number: row.find(".WH_Number").val(),
+                UoM_Number: row.find(".UoM_Number").val(),
+
+                Qty: String(row.find(".AmendQty").attr("data-value") || "0"),
+                UnitPrice: String(row.find(".UnitPrice").attr("data-value") || "0"),
+                Amount: String(row.find(".Amount").attr("data-value") || "0"),
+
+                IsDeleted: "0"
+            });
+        }
     });
 
     return items;
@@ -1215,6 +1378,54 @@ function searchItemJIDNI(inputElement) {
                 // CLOSE BUTTON
               
                 resultsDiv.append(table);
+                //#region search logic highlight
+
+                // Store all rows
+                let rows = resultsDiv.find("tbody tr");
+
+                // Clear previous styles
+                rows.removeClass("match-row current-row");
+
+                $(inputElement).removeData("selectedIndex");
+
+                let searchText = itemCode.trim().toLowerCase();
+
+                let firstMatch = -1;
+                let lastMatch = -1;
+
+                rows.each(function (i) {
+
+                    let code = $(this).find("td:first").text().trim().toLowerCase();
+
+                    if (searchText !== "" && code.startsWith(searchText)) {
+
+                        $(this).addClass("match-row");
+
+                        if (firstMatch === -1)
+                            firstMatch = i;
+
+                        lastMatch = i;   // <-- IMPORTANT
+                    }
+                });
+
+                if (firstMatch >= 0) {
+
+                    // Don't select any row initially.
+                    rows.removeClass("current-row");
+
+                    $(inputElement).data("firstMatch", firstMatch);
+                    $(inputElement).data("lastMatch", lastMatch);
+
+                    $(inputElement).removeData("selectedIndex");
+                }
+                else {
+
+                    $(inputElement).removeData("firstMatch");
+                    $(inputElement).removeData("lastMatch");
+                    $(inputElement).removeData("selectedIndex");
+                }
+                //#endregion search logic highlight
+                ApplyFieldWidths();
 
             } else {
 
@@ -1307,12 +1518,59 @@ function SearchBuyer(inputElement) {
                         $("#WH_Number").val(cust.cuS_WH_Number);
 
                         resultsDiv.hide();
+                       
                     });
 
                 });
 
                 
                 resultsDiv.append(table);
+                //#region search logic highlight
+                // Store all rows
+                let rows = resultsDiv.find("tbody tr");
+
+                // Clear previous styles
+                rows.removeClass("match-row current-row");
+
+                $(inputElement).removeData("selectedIndex");
+
+                let searchText = buyer.trim().toLowerCase();
+
+                let firstMatch = -1;
+                let lastMatch = -1;
+
+                rows.each(function (i) {
+
+                    let customer = $(this).find("td:first").text().trim().toLowerCase();
+
+                    if (searchText !== "" && customer.startsWith(searchText)) {
+
+                        $(this).addClass("match-row");
+
+                        if (firstMatch === -1)
+                            firstMatch = i;
+
+                        lastMatch = i;
+                    }
+                });
+
+                if (firstMatch >= 0) {
+
+                    rows.removeClass("current-row");
+
+                    $(inputElement).data("firstMatch", firstMatch);
+                    $(inputElement).data("lastMatch", lastMatch);
+
+                    $(inputElement).removeData("selectedIndex");
+                }
+                else {
+
+                    $(inputElement).removeData("firstMatch");
+                    $(inputElement).removeData("lastMatch");
+                    $(inputElement).removeData("selectedIndex");
+                }
+
+                //#endregion
 
             } else {
                 resultsDiv.hide().empty();

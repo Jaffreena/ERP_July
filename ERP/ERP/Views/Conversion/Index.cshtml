@@ -3,6 +3,127 @@
 @{
     ViewData["Title"] = "Conversion";
 }
+<!-----search logic highlight---->
+
+<style>
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
+
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
+<style>
+    .batchPopup thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+</style>
+<style>
+
+    /* Search Results */
+    .jwcustomer-search-results {
+        width: 500px !important;
+        max-width: 600px;
+    }
+
+    /* Form row spacing */
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    /* Labels */
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+    }
+
+    /* Control containers */
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Label/Input ratio (45% / 55%) */
+    .row > .col-md-6.col-form-label {
+        flex: 0 0 45%;
+        max-width: 45%;
+    }
+
+    .row > .col-md-6.col-form-label + .col-md-6 {
+        flex: 0 0 55%;
+        max-width: 55%;
+    }
+
+    /* Controls */
+    .form-control,
+    .form-select,
+    .flatpickr-input,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+    }
+
+    textarea.form-control {
+        min-height: 60px !important;
+        resize: vertical;
+    }
+
+   
+
+    /* Delivery Note Date */
+    #Header_JIDNH_DN_Date,
+    #Header_JIDNH_DN_Date + input {
+        width: 20ch !important;
+        max-width: 20ch !important;
+    }
+
+    /* Material Segregation */
+    #Header_JIDNH_MS_Number {
+        width: 20ch !important;
+        max-width: 100%;
+    }
+
+    /* Shift */
+    #Header_JIDNH_Shift_Number {
+        width: 20ch !important;
+        max-width: 100%;
+    }
+
+    /* Work Centre */
+    #Header_JIDNH_WC_Number {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+    /* Process */
+    #Header_JIDNH_PRS_Number {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+    /* Operator */
+    #Header_JIDNH_Operator_Number {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+</style>
 
 <style>
 
@@ -605,7 +726,7 @@
                 <div class="card rounded-0 bg-transparent shadow-none"
                      id="CardHeader">
 
-                    <div class="card-body pb-0">
+              <div class="card-body pb-0" style="margin-top: -10px !important;">
                         
                         <div class="row ps-2">
 
@@ -619,7 +740,7 @@
                                     <!-- COLUMN 1 -->
                                     <div class="col-12 col-md-3">
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JIDNH_DN_No"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0">
@@ -628,7 +749,7 @@
                                             <div class="col-md-6 col-lg-7">
 
                                                 <input asp-for="Header.JIDNH_DN_No"
-                                                       class="form-control Key KeyDup"
+                                                       class="form-control Key KeyDup" maxlength="25"
                                                        autocomplete="off"
                                                         />
 
@@ -636,7 +757,7 @@
 
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JIDNH_DN_Date"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0">
@@ -652,7 +773,7 @@
 
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JIDNH_MS_Number"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0">
@@ -677,7 +798,7 @@
                                     <!-- COLUMN 2 -->
                                     <div class="col-12 col-md-3">
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JIDNH_Shift_Number"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0">
@@ -696,7 +817,7 @@
 
                                     
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JIDNH_WC_Number"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0">
@@ -713,7 +834,7 @@
 
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JIDNH_PRS_Number"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0">
@@ -735,7 +856,7 @@
                                     <!-- COLUMN 1 -->
                                     <div class="col-12 col-md-3">
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JIDNH_Operator_Number"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0">
@@ -2089,6 +2210,6 @@
 
          <script src="~/js/conversion/conversion_ItemScrap.js" asp-append-version="true"></script>
       <script src="~/js/conversion/conversion_ItemScrapBatch.js" asp-append-version="true"></script>
-
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
  
 }

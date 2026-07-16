@@ -224,11 +224,11 @@ function StoreWrongBatchMismatch_RN(rowId) {
 
                 RNI_BCH_WH_Number: whNumber,
 
-                RNI_BCH_Qty: $(this).find(".RNI_BCH_Qty").attr("data-value") || 0,
+                RNI_BCH_Qty: parseFloat(removeCommas($(this).find(".RNI_BCH_Qty").attr("data-value"))) || 0,
 
-                RNI_BCH_UnitPrice: $(this).find(".RNI_BCH_UnitPrice").attr("data-value") || 0,
+                RNI_BCH_UnitPrice: parseFloat(removeCommas($(this).find(".RNI_BCH_UnitPrice").attr("data-value"))) || 0,
 
-                RNI_BCH_Value: $(this).find(".RNI_BCH_Value").attr("data-value") || 0,
+                RNI_BCH_Value: parseFloat(removeCommas($(this).find(".RNI_BCH_Value").attr("data-value"))) || 0,
 
                 RNI_BCH_IsDeleted: $(this).find(".RNI_BCH_IsDeleted").val()
             });
@@ -290,12 +290,11 @@ function StoreBatchMismatch_RN(rowId) {
                 RNI_BCH_Item_Number: itemNumber,
 
                 RNI_BCH_WH_Number: whNumber,
+                RNI_BCH_Qty: parseFloat($(this).find(".RNI_BCH_Qty").attr("data-value")) || 0,
 
-                RNI_BCH_Qty: $(this).find(".RNI_BCH_Qty").attr("data-value") || 0,
+                RNI_BCH_UnitPrice: parseFloat($(this).find(".RNI_BCH_UnitPrice").attr("data-value")) || 0,
 
-                RNI_BCH_UnitPrice: $(this).find(".RNI_BCH_UnitPrice").attr("data-value") || 0,
-
-                RNI_BCH_Value: $(this).find(".RNI_BCH_Value").attr("data-value") || 0,
+                RNI_BCH_Value: parseFloat($(this).find(".RNI_BCH_Value").attr("data-value")) || 0,
 
                 RNI_BCH_IsDeleted: $(this).find(".RNI_BCH_IsDeleted").val()
 

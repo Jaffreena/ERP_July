@@ -16,3 +16,6 @@ function formatIndianCurrency(amount) {
         maximumFractionDigits: 2
     }).format(Number(amount));
 }
+function removeCommas(value) {
+    return (value || "").toString().replace(/,/g, "").trim();
+}

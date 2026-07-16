@@ -3,6 +3,184 @@
 @{
     ViewData["Title"] = "Service Order";
 }
+ <!-----search logic highlight---->
+
+<style>
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
+
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
+<style>
+    .batchPopup thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    </style>
+<style>
+
+    .jwcustomer-search-results {
+        width: 500px !important;
+        max-width: 600px;
+    }
+
+    /* Equal spacing */
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    /* Labels */
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+    }
+
+    /* Input containers */
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Column 1 (Label = col-md-6, Input = col-md-6) */
+    .row > .col-md-6.col-form-label {
+        flex: 0 0 45%;
+        max-width: 45%;
+    }
+
+    .row > .col-md-6.col-form-label + .col-md-6 {
+        flex: 0 0 55%;
+        max-width: 55%;
+    }
+
+    /* Column 2 & 3 (Label = col-sm-5, Input = col-sm-7) */
+    .row > .col-sm-5.col-form-label {
+        flex: 0 0 40%;
+        max-width: 40%;
+    }
+
+    .row > .col-sm-5.col-form-label + .col-sm-7 {
+        flex: 0 0 60%;
+        max-width: 60%;
+    }
+
+    /* Controls */
+    .form-control,
+    .flatpickr-input,
+    .form-select,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        resize: vertical;
+        overflow: auto;
+    }
+
+    textarea.form-control {
+        min-height: 60px !important;
+    }
+
+   
+
+    /* Registration Date */
+    #Header_JISVOH_RegDate,
+    #Header_JISVOH_RegDate + input,
+    input.flatpickr-input.form-control {
+        width: 20ch !important;
+        max-width: 20ch !important;
+    }
+
+   
+
+    /* Service Order Date */
+    #Header_JISVOH_ServiceOrderDate,
+    #Header_JISVOH_ServiceOrderDate + input {
+        width: 20ch !important;
+        max-width: 20ch !important;
+    }
+
+    /* Material Segregation */
+    #Header_JISVOH_MS_Number {
+        width: 20ch !important;
+        max-width: 100%;
+    }
+
+    /* Job Work Customer */
+    #Header_JISVOH_JW_Customer_Name {
+        width: 40ch !important;
+        max-width: 100%;
+        padding-right: 24px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+    }
+
+    /* Hide Customer Number */
+    #Header_JISVOH_JW_Customer_Number {
+        display: none;
+    }
+
+    /* Currency */
+    #Header_JISVOH_Currency_Number {
+        width: 10ch !important;
+        max-width: 100%;
+    }
+
+    /* Payment Terms */
+    #Header_JISVOH_PaymentTerms {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+    /* Delivery Terms */
+    #Header_JISVOH_DeliveryTerms {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+    /* Delivery Mode */
+    #Header_JISVOH_DeliveryMode {
+        width: 25ch !important;
+        max-width: 100%;
+    }
+
+    /* Tax */
+    #Header_JISVOH_Tax {
+        width: 15ch !important;
+        max-width: 100%;
+    }
+
+    /* TDC */
+    #Header_JISVOH_TDC {
+        width: 15ch !important;
+        max-width: 100%;
+    }
+
+    /* Remarks */
+    #Header_JISVOH_Remarks {
+        width: 45ch !important;
+        max-width: 100%;
+        min-height: 60px !important;
+        resize: vertical;
+    }
+
+</style>
+ 
 <form asp-action="SaveServiceOrder"
       method="post"
       id="ServiceOrderForm">
@@ -51,7 +229,7 @@
                  id="BodyHeight">
                 <!-- HEADER -->
                 <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
-                    <div class="card-body pb-0">
+                  <div class="card-body pb-0" style="margin-top: -10px !important;">
                         <div class="row ps-2">
 
                             <div class="col-auto left-menu text-black">
@@ -60,18 +238,18 @@
                                     <!-- COLUMN 1 -->
                                     <div class="col-12 col-md-3">
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <input type="hidden" id="Header_JISVOH_Number" name="Header.JISVOH_Number" value="0" />
                                             <label asp-for="Header.JISVOH_RegNo"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input asp-for="Header.JISVOH_RegNo"
+                                                <input asp-for="Header.JISVOH_RegNo" maxlength="25"
                                                        class="form-control Key KeyDup"
                                                        autocomplete="off" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_RegDate"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
@@ -80,16 +258,16 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_ServiceOrderNo"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input asp-for="Header.JISVOH_ServiceOrderNo"
+                                                <input asp-for="Header.JISVOH_ServiceOrderNo" maxlength="25"
                                                        class="form-control" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_ServiceOrderDate"
                                                    class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
@@ -102,7 +280,7 @@
 
                                     <!-- COLUMN 2 -->
                                     <div class="col-12 col-md-3">
-                                        <div class="row align-items-center px-2 mb-1 d-none">
+                                        <div class="row align-items-center gx-2 mb-0 d-none">
                                             <label asp-for="Header.JISVOH_MS_Number"
                                                    class="col-sm-5 col-form-label ps-0">
                                             </label>
@@ -115,7 +293,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_JW_Customer_Number"
                                                    class="col-sm-5 col-form-label ps-0"></label>
 
@@ -133,7 +311,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_Currency_Number"
                                                    class="col-sm-5 col-form-label ps-0"></label>
 
@@ -145,20 +323,20 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_PaymentTerms"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
-                                                <input asp-for="Header.JISVOH_PaymentTerms"
+                                                <input asp-for="Header.JISVOH_PaymentTerms" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_DeliveryTerms"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
-                                                <input asp-for="Header.JISVOH_DeliveryTerms"
+                                                <input asp-for="Header.JISVOH_DeliveryTerms" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
@@ -168,7 +346,7 @@
                                     <!-- COLUMN 3 -->
                                     <div class="col-12 col-md-3">
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_DeliveryMode"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
@@ -177,29 +355,29 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_Tax"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
-                                                <input asp-for="Header.JISVOH_Tax"
+                                                <input asp-for="Header.JISVOH_Tax" maxlength="250"
                                                        class="form-control" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center px-2 mb-1">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_TDC"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
-                                                <input asp-for="Header.JISVOH_TDC"
+                                                <input asp-for="Header.JISVOH_TDC" maxlength="250"
                                                        class="form-control" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-start px-2 mb-1">
+                                        <div class="row align-items-start gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_Remarks"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
-                                                <textarea asp-for="Header.JISVOH_Remarks"
+                                                <textarea asp-for="Header.JISVOH_Remarks" maxlength="250"
                                                           class="form-control"
                                                           rows="2"></textarea>
                                             </div>
@@ -454,7 +632,7 @@
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
-
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
    
     <script src="~/js/jw_serviceorder/JW_ServiceOrderEdit.js" asp-append-version="true"></script>
 

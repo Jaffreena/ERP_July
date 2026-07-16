@@ -57,7 +57,107 @@ function UnitDecimalRupees(value, UnitDecimalPlaces) {
 var DeliveryNoteMap = {};
 let ItemGSTMap = {};
 let CurrentGSTRow = null;
+function HighlightRow(rows, index) {
+
+    rows.removeClass("current-row");
+
+    if (index < 0 || index >= rows.length)
+        return;
+
+    $(rows[index]).addClass("current-row");
+
+    rows[index].scrollIntoView({
+        block: "nearest"
+    });
+}
+function AutoFit() {
+    fitInputWidth("Header_JISVIH_InvoiceNo", 20, 30);
+
+}
 $(document).ready(function () {
+    AutoFit();
+    $(document).on("input keyup", "#Header_JISVIH_InvoiceNo", function () {
+        fitInputWidth(this, 20, 30);
+    });
+    $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
+
+        let input = $(this);
+        let resultsDiv = input.siblings(".jwcustomer-search-results");
+        let rows = resultsDiv.find("tbody tr");
+
+        if (!resultsDiv.is(":visible") || rows.length === 0)
+            return;
+
+        let selectedIndex = input.data("selectedIndex");
+
+        let firstMatch = input.data("firstMatch");
+        let lastMatch = input.data("lastMatch");
+
+        switch (e.key) {
+
+            case "ArrowDown":
+
+                e.preventDefault();
+
+                if (selectedIndex == null) {
+
+                    if (lastMatch >= 0)
+                        selectedIndex = lastMatch;
+                    else
+                        selectedIndex = rows.length - 1;
+                }
+                else if (selectedIndex < rows.length - 1) {
+
+                    selectedIndex++;
+                }
+
+                break;
+
+            case "ArrowUp":
+
+                e.preventDefault();
+
+                if (selectedIndex == null) {
+
+                    if (firstMatch >= 0)
+                        selectedIndex = firstMatch;
+                    else
+                        selectedIndex = 0;
+                }
+                else if (selectedIndex > 0) {
+
+                    selectedIndex--;
+                }
+
+                break;
+
+            case "Enter":
+
+                e.preventDefault();
+
+                if (selectedIndex != null)
+                    $(rows[selectedIndex]).trigger("click");
+
+                return;
+
+            case "Escape":
+
+                e.preventDefault();
+
+                resultsDiv.hide();
+
+                input.removeData("selectedIndex");
+
+                return;
+
+            default:
+                return;
+        }
+
+        HighlightRow(rows, selectedIndex);
+
+        input.data("selectedIndex", selectedIndex);
+    });
   
     //#region JISVII_JISVOH_Number focus
     $(document).on("focus", ".JISVII_JISVOH_Number", function () {
@@ -837,6 +937,52 @@ async function SearchJWCustomer(inputElement) {
 
                 
                 resultsDiv.append(table);
+                //#region search logic highlight
+                // Store all rows
+                let rows = resultsDiv.find("tbody tr");
+
+                // Clear previous styles
+                rows.removeClass("match-row current-row");
+
+                $(inputElement).removeData("selectedIndex");
+
+                let searchText = JWCustomer.trim().toLowerCase();
+
+                let firstMatch = -1;
+                let lastMatch = -1;
+
+                rows.each(function (i) {
+
+                    let customer = $(this).find("td:first").text().trim().toLowerCase();
+
+                    if (searchText !== "" && customer.startsWith(searchText)) {
+
+                        $(this).addClass("match-row");
+
+                        if (firstMatch === -1)
+                            firstMatch = i;
+
+                        lastMatch = i;
+                    }
+                });
+
+                if (firstMatch >= 0) {
+
+                    rows.removeClass("current-row");
+
+                    $(inputElement).data("firstMatch", firstMatch);
+                    $(inputElement).data("lastMatch", lastMatch);
+
+                    $(inputElement).removeData("selectedIndex");
+                }
+                else {
+
+                    $(inputElement).removeData("firstMatch");
+                    $(inputElement).removeData("lastMatch");
+                    $(inputElement).removeData("selectedIndex");
+                }
+
+                //#endregion
 
             } else {
                 resultsDiv.hide();

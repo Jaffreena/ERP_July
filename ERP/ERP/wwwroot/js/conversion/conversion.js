@@ -1,6 +1,14 @@
 ﻿var addressIndex = 0;
+function AutoFit() {
+    fitInputWidth("Header_JIDNH_DN_No", 20, 30);
+     
 
+}
 $(document).ready(function () {
+    AutoFit();
+    $(document).on("input keyup", "#Header_JIDNH_DN_No", function () {
+        fitInputWidth(this, 20, 30);
+    });
    
     console.log("ItemProduction ready");
 

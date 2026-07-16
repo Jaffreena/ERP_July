@@ -56,8 +56,108 @@ function UnitDecimalRupees(value, UnitDecimalPlaces) {
 }
 //#endregion COMMON FUNCTIONS
 
+function HighlightRow(rows, index) {
+
+    rows.removeClass("current-row");
+
+    if (index < 0 || index >= rows.length)
+        return;
+
+    $(rows[index]).addClass("current-row");
+
+    rows[index].scrollIntoView({
+        block: "nearest"
+    });
+}
+function AutoFit() {
+    fitInputWidth("Header_JIDNH_DN_No", 20, 30);
+
+}
 $(document).ready(function () {
- 
+    AutoFit();
+    $(document).on("input keyup", "#Header_JIDNH_DN_No", function () {
+        fitInputWidth(this, 20, 30);
+    });
+    $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
+
+        let input = $(this);
+        let resultsDiv = input.siblings(".jwcustomer-search-results");
+        let rows = resultsDiv.find("tbody tr");
+
+        if (!resultsDiv.is(":visible") || rows.length === 0)
+            return;
+
+        let selectedIndex = input.data("selectedIndex");
+
+        let firstMatch = input.data("firstMatch");
+        let lastMatch = input.data("lastMatch");
+
+        switch (e.key) {
+
+            case "ArrowDown":
+
+                e.preventDefault();
+
+                if (selectedIndex == null) {
+
+                    if (lastMatch >= 0)
+                        selectedIndex = lastMatch;
+                    else
+                        selectedIndex = rows.length - 1;
+                }
+                else if (selectedIndex < rows.length - 1) {
+
+                    selectedIndex++;
+                }
+
+                break;
+
+            case "ArrowUp":
+
+                e.preventDefault();
+
+                if (selectedIndex == null) {
+
+                    if (firstMatch >= 0)
+                        selectedIndex = firstMatch;
+                    else
+                        selectedIndex = 0;
+                }
+                else if (selectedIndex > 0) {
+
+                    selectedIndex--;
+                }
+
+                break;
+
+            case "Enter":
+
+                e.preventDefault();
+
+                if (selectedIndex != null)
+                    $(rows[selectedIndex]).trigger("click");
+
+                return;
+
+            case "Escape":
+
+                e.preventDefault();
+
+                resultsDiv.hide();
+
+                input.removeData("selectedIndex");
+
+                return;
+
+            default:
+                return;
+        }
+
+        HighlightRow(rows, selectedIndex);
+
+        input.data("selectedIndex", selectedIndex);
+    });
+
   
     //#region JIDNI_JW_InvoiceTracking change
 
@@ -600,8 +700,8 @@ function calculateTotal() {
     });
 
     // Footer totals
-    $("#TotalQty").val(totalQty.toFixed(2));
-    $("#TotalAmount").val(totalAmount.toFixed(2));
+    $("#TotalQty").val(formatIndianQty(totalQty));
+    $("#TotalAmount").val(formatIndianCurrency(totalAmount));
 }
 //#endregion Calculate Total
 
@@ -729,6 +829,52 @@ async function SearchEditJWCustomer(inputElement) {
                
 
                 resultsDiv.append(table);
+                //#region search logic highlight
+                // Store all rows
+                let rows = resultsDiv.find("tbody tr");
+
+                // Clear previous styles
+                rows.removeClass("match-row current-row");
+
+                $(inputElement).removeData("selectedIndex");
+
+                let searchText = JWCustomer.trim().toLowerCase();
+
+                let firstMatch = -1;
+                let lastMatch = -1;
+
+                rows.each(function (i) {
+
+                    let customer = $(this).find("td:first").text().trim().toLowerCase();
+
+                    if (searchText !== "" && customer.startsWith(searchText)) {
+
+                        $(this).addClass("match-row");
+
+                        if (firstMatch === -1)
+                            firstMatch = i;
+
+                        lastMatch = i;
+                    }
+                });
+
+                if (firstMatch >= 0) {
+
+                    rows.removeClass("current-row");
+
+                    $(inputElement).data("firstMatch", firstMatch);
+                    $(inputElement).data("lastMatch", lastMatch);
+
+                    $(inputElement).removeData("selectedIndex");
+                }
+                else {
+
+                    $(inputElement).removeData("firstMatch");
+                    $(inputElement).removeData("lastMatch");
+                    $(inputElement).removeData("selectedIndex");
+                }
+
+                //#endregion
 
             } else {
 
@@ -2182,7 +2328,12 @@ function UpdateDeliveryNote(model) {
         success: function (response) {
 
             if (response.success) {
+             
                 showAlert('Record Updated')
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1000); // 1000 ms = 1 second
+              
                 //  window.location.href = response.redirectUrl;
                 console.log(JSON.stringify(model));
             }
@@ -2535,7 +2686,7 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
 
     var ADTPNumber = currentRow.find('.JIDNA_ADTP_Number').val();
     var Buyer = $('#Header_JIDNH_JW_Customer_Number').val(); // keep if same field exists
-
+    var ADDAddress_ID = currentRow.find('.JIDNA_Address_ID');
     var ADDAddress = currentRow.find('.JIDNA_Address');
     var ADDCity = currentRow.find('.JIDNA_City');
     var ADDState = currentRow.find('.JIDNA_State');
@@ -2559,28 +2710,11 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
 
             var AddressID = data.buyerAddressId;
             var AddressDefault = data.buyerAddress;
-
-            var $AddressDropdown = currentRow.find('.JIDNA_Address_ID');
-
-            // reset dropdown
-            $AddressDropdown.empty();
-            $AddressDropdown.append($('<option>', {
-                value: '',
-                text: ''
-            }));
-
-            // fill address list
-            AddressID.forEach(function (item) {
-                $AddressDropdown.append($('<option>', {
-                    value: item.buY_ADD_AddressID,
-                    text: item.buY_ADD_AddressID
-                }));
-            });
-
+ 
             // set default + fill fields
             if (AddressDefault != null) {
-                $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
-
+              //  $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
+                ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
                 ADDAddress.val(AddressDefault.buY_ADD_Address);
                 ADDCity.val(AddressDefault.buY_ADD_City);
                 ADDState.val(AddressDefault.buY_ADD_State);
@@ -2593,6 +2727,44 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
 });
 //#endregion CHANGE ADDRESS TYPE
 
+
+
+//#region clear all
+function ClearAll() {
+    $(".left-menu")
+        .find("input, textarea, select")
+        .each(function () {
+
+            if ($(this).is(":hidden")) {
+                $(this).val("");
+            }
+            else if ($(this).is("select")) {
+                $(this).prop("selectedIndex", 0);
+            }
+            else {
+                $(this).val("");
+            }
+        });
+    $("#ItemTable tbody").empty();
+    $(".jwcustomer-search-results").hide().html("");
+
+}
+//#endregion
+
+//#region datebind
+function DateBind() {
+    var today = new Date();
+
+    var day = String(today.getDate()).padStart(2, '0');
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    var formattedDate = day + "-" + months[today.getMonth()] + "-" + today.getFullYear();
+
+    var fp = document.getElementById("Header_JIDNH_DN_Date")._flatpickr;
+    if (fp) fp.setDate(formattedDate, true, "d-M-Y");
+}
+//#endregion
 
 function addAddressRow_Edit() {
 
@@ -2845,7 +3017,7 @@ function LoadJWCAddress() {
                             row = $("#AddTableBody tr.AddNewRow:first");
                         }
                         else {
-                            addAddressRow();
+                            addAddressRow_Edit();
                             row = $("#AddTableBody tr.AddNewRow:last");
                         }
 
@@ -2857,8 +3029,8 @@ function LoadJWCAddress() {
                             .trigger("change");
 
                         row.find(".JIDNA_Address_ID")
-                            .val(addr.jwC_ADD_Address_ID)
-                            .trigger("change");
+                            .val(addr.jwC_ADD_Address_ID);
+                          
 
 
                         row.find(".JIDNA_Address")

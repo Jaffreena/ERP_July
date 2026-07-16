@@ -514,3 +514,26 @@ tr:has(input[type="checkbox"]:checked) {
     max-width: 400px;
     width: auto;
 }
+ /*---------item grid css---------*/
+
+#ItemTable .form-control,
+#ItemTable .flatpickr-input,
+#ItemTable .form-select,
+#ItemTable textarea.form-control {
+    height: 25px !important;
+    min-height: 25px !important;
+    border-radius: 4px !important;
+    font-size: 13px !important;
+    font-family: Arial, sans-serif;
+    font-weight: 400;
+    resize: vertical; /* or both */
+    overflow: auto;
+}
+#ItemTable .col-form-label {
+    font-family: Arial, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    border: none !important;
+    text-decoration: none !important;
+    max-width: 30% !important;
+}

@@ -738,7 +738,7 @@ function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
 
     var currentItemGridSelectedRow = GetCheckedRowId_RN_Edit();
 
-    // ApplyBatchValues_RN(currentItemGridSelectedRow);
+    ApplyBatchValues_RN_Edit(currentItemGridSelectedRow);
 
     setTimeout(function () {
 

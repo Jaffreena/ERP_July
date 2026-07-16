@@ -142,155 +142,144 @@ namespace ERP.Controllers.JobworkInward
                     ModelState.Clear();
                     S_Head_DTO.Items = ITM_DTO;
 
-                    IsValid = TryValidateModel(S_Head_DTO);
-
-                    if (IsValid)
-                    {
-                        // if (BatchValidation(ITM_DTO))
-                        {
-                            using (var transaction = new TransactionScope(TransactionScopeOption.Required,
-      new TransactionOptions
-      {
-          IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted
-      }))
-
-                            {
-                                try
-                                {
-                                    string SIHOrderNoOld = S_DTO.RN_No;
-
-                                    String SIHOrderNoNew = SIHOrderNoOld;
-                                    
-                                    //OnReceiptNoteNumber(Convert.ToInt32(Convert.ToDateTime(S_DTO.RN_Date).ToString("yyyyMMdd")));
-
-                                    // =========================
-                                    // 🔹 HEADER INSERT
-                                    // =========================
-                                    SI_DTO.JIRNH_RN_Date = Convert.ToDateTime(S_DTO.RN_Date);
-                                    SI_DTO.JIRNH_RN_No = SIHOrderNoOld;
-                                    SI_DTO.JIRNH_JWC_Number = Convert.ToInt64(S_DTO.JWC_Number);
-                                    SI_DTO.JIRNH_Currency_Number = Convert.ToInt64(S_DTO.Currency_Number);
-                                    SI_DTO.JIRNH_JW_CustomerDC_No = Convert.ToString(S_DTO.JW_CustomerDC_No);
-                                    SI_DTO.JIRNH_JW_CustomerDC_Date = Convert.ToDateTime(S_DTO.JW_CustomerDC_Date);
-                                    SI_DTO.JIRNH_MS_Number = Convert.ToInt64(S_DTO.MS_Number);
-                                    SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.Remarks);
-                                    SI_DTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.WH_Number);
-                                    SI_DTO.JIRN_Id = 21;
-
-                                    DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
-
-
-                                    if (DS == null || DS.Tables.Count == 0 || DS.Tables[0].Rows.Count == 0)
-                                        throw new Exception("Header insert failed");
-
-                                    long headerId = Convert.ToInt64(DS.Tables[0].Rows[0][0]);
-
-                                    // =========================================
-                                    // ITEM INSERT
-                                    // =========================================
-
-                                    Dictionary<int, long> itemIdMap = new Dictionary<int, long>();
-
-                                    int itemIndex = 0;
-                                    Dictionary<int, long> itemWHMap = new Dictionary<int, long>();
-                                    Dictionary<int, long> itemNumberMap = new Dictionary<int, long>();
-                                    foreach (var Item in ITM_DTO)
-                                    {
-                                        var itemDTO = new ReceiptNote_DTO();
-
-                                        itemDTO.JIRNH_Number = headerId;
-                                        itemDTO.JIRNI_Item_Number = Convert.ToInt64(Item.Item_Number);
-                                        itemDTO.JIRNI_WH_Number = Convert.ToInt64(Item.WH_Number);
-                                        itemDTO.JIRNI_UoM_Number = Convert.ToInt64(Item.UoM_Number);
-                                        itemDTO.JIRNI_Qty = Convert.ToDouble(Item.Qty);
-                                        itemDTO.JIRNI_UnitPrice = Convert.ToDouble(Item.UnitPrice);
-                                        itemDTO.JIRNI_Amount = Convert.ToDouble(Item.Amount);
-                                        itemDTO.JIRNI_PRS_Number = Convert.ToInt64(Item.PRS_Number);
-                                        itemDTO.JIRN_Id = 22;
-
-                                        var itemResult = SI_DAO.JI_ReceiptNoteDB(itemDTO);
-
-                                        if (itemResult == null || itemResult.Tables.Count == 0 || itemResult.Tables[0].Rows.Count == 0)
-                                            throw new Exception("Item insert failed");
-
-                                        long itemID = Convert.ToInt64(itemResult.Tables[0].Rows[0][0]);
-
-                                        itemIdMap.Add(itemIndex, itemID);
-                                        itemWHMap.Add(itemIndex, Convert.ToInt64(Item.WH_Number));
-
-                                        itemNumberMap.Add(itemIndex,Convert.ToInt64(Item.Item_Number));
-                                        itemIndex++;
-                                    }
-
-                                    // =========================================
-                                    // BATCH INSERT
-                                    // =========================================
-
-                                    foreach (var batch in BCH_DTO)
-                                    {
-                                        var batchDTO = new ReceiptNote_DTO();
-
-                                        batchDTO.JIRNI_BCH_Number = batch.RNI_BCH_No;
-                                        batchDTO.JIRNH_Number = headerId;
-
-                                        // Map batch to inserted item using Item_Index
-                                        batchDTO.JIRNI_Number = itemIdMap[Convert.ToInt32(batch.RNI_BCH_Item_Index)-1];
-                                        batchDTO.JIRNI_Item_Number= itemNumberMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
-                                        batchDTO.JIRNI_BCH_BatchDate = DateTime.Now;
-                                        batchDTO.JIRNI_BCH_BatchNo = batch.RNI_BCH_Number;
-                                        batchDTO.JIRNI_BCH_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
-                                        batchDTO.JIRNI_BCH_BatchQty = Convert.ToDouble(batch.RNI_BCH_Qty);
-                                        batchDTO.JIRNI_BCH_BatchUnitPrice = Convert.ToDouble(batch.RNI_BCH_UnitPrice);
-                                        batchDTO.JIRNI_BCH_BatchValue = Convert.ToDouble(batch.RNI_BCH_Value);
-                                        batchDTO.JIRNI_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
-                                        batchDTO.JIRNH_WH_Number =Convert.ToInt32( S_DTO.WH_Number);
-                                        batchDTO.JIRN_Id = 23;
-
-                                        SI_DAO.JI_ReceiptNoteDB(batchDTO);
-                                    }
-
-                                    // =========================================
-                                    // COMMIT
-                                    // =========================================
-
-                                    transaction.Complete();
-                                    // =========================
-                                    // 🔹 CLEANUP
-                                    // =========================
-                                    S_Head_DTO.Reset();
-                                    ITM_DTO = null;
-                                    S_DTO.Reset();
-                                    Original_DTO = Help.JsonClone(S_DTO);
-
-                                    if (SIHOrderNoOld != SIHOrderNoNew)
-                                    {
-                                        ViewBag.ErrorCode = 2;
-                                        ViewBag.ErrorMessage =
-                                            "Receipt Note number " + SIHOrderNoOld + " changed to " + SIHOrderNoNew;
-                                    }
-                                      
-                                }
-                                catch (Exception ex)
-                                {
-                                    ViewBag.ErrorCode = 2;
-                                    ViewBag.ErrorMessage = Valid.CatchValid(ex.Message);
-                                    throw;
-                                }
-                            }
-                        }
-
-                    }
-                    else
+                    if (!TryValidateModel(S_Head_DTO))
                     {
                         var errors = ModelState
-     .SelectMany(x => x.Value!.Errors)
-     .Select(x => x.ErrorMessage);
+                            .Where(x => x.Value.Errors.Count > 0)
+                            .SelectMany(x => x.Value.Errors)
+                            .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage)
+                                ? e.Exception?.Message
+                                : e.ErrorMessage)
+                            .Where(e => !string.IsNullOrWhiteSpace(e))
+                            .ToList();
 
                         return Json(new
                         {
                             success = false,
-                            message = string.Join("<br/>", errors)
+                            message = "Validation failed.",
+                            errors = errors
                         });
+                    }
+
+                    // if (BatchValidation(ITM_DTO))
+                    {
+                        using (var transaction = new TransactionScope(
+                            TransactionScopeOption.Required,
+                            new TransactionOptions
+                            {
+                                IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted
+                            }))
+                        {
+                            try
+                            {
+                                string SIHOrderNoOld = S_DTO.RN_No;
+                                string SIHOrderNoNew = SIHOrderNoOld;
+
+                                // =========================
+                                // HEADER INSERT
+                                // =========================
+                                SI_DTO.JIRNH_RN_Date = Convert.ToDateTime(S_DTO.RN_Date);
+                                SI_DTO.JIRNH_RN_No = SIHOrderNoOld;
+                                SI_DTO.JIRNH_JWC_Number = Convert.ToInt64(S_DTO.JWC_Number);
+                                SI_DTO.JIRNH_Currency_Number = Convert.ToInt64(S_DTO.Currency_Number);
+                                SI_DTO.JIRNH_JW_CustomerDC_No = Convert.ToString(S_DTO.JW_CustomerDC_No);
+                                SI_DTO.JIRNH_JW_CustomerDC_Date = Convert.ToDateTime(S_DTO.JW_CustomerDC_Date);
+                                SI_DTO.JIRNH_MS_Number = Convert.ToInt64(S_DTO.MS_Number);
+                                SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.Remarks);
+                                SI_DTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.WH_Number);
+                                SI_DTO.JIRN_Id = 21;
+
+                                DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
+
+                                if (DS == null || DS.Tables.Count == 0 || DS.Tables[0].Rows.Count == 0)
+                                    throw new Exception("Header insert failed");
+
+                                long headerId = Convert.ToInt64(DS.Tables[0].Rows[0][0]);
+
+                                // =========================
+                                // ITEM INSERT
+                                // =========================
+                                Dictionary<int, long> itemIdMap = new Dictionary<int, long>();
+                                Dictionary<int, long> itemWHMap = new Dictionary<int, long>();
+                                Dictionary<int, long> itemNumberMap = new Dictionary<int, long>();
+
+                                int itemIndex = 0;
+
+                                foreach (var Item in ITM_DTO)
+                                {
+                                    var itemDTO = new ReceiptNote_DTO();
+
+                                    itemDTO.JIRNH_Number = headerId;
+                                    itemDTO.JIRNI_Item_Number = Convert.ToInt64(Item.Item_Number);
+                                    itemDTO.JIRNI_WH_Number = Convert.ToInt64(Item.WH_Number);
+                                    itemDTO.JIRNI_UoM_Number = Convert.ToInt64(Item.UoM_Number);
+                                    itemDTO.JIRNI_Qty = Convert.ToDouble(Item.Qty);
+                                    itemDTO.JIRNI_UnitPrice = Convert.ToDouble(Item.UnitPrice);
+                                    itemDTO.JIRNI_Amount = Convert.ToDouble(Item.Amount);
+                                    itemDTO.JIRNI_PRS_Number = Convert.ToInt64(Item.PRS_Number);
+                                    itemDTO.JIRN_Id = 22;
+
+                                    var itemResult = SI_DAO.JI_ReceiptNoteDB(itemDTO);
+
+                                    if (itemResult == null || itemResult.Tables.Count == 0 || itemResult.Tables[0].Rows.Count == 0)
+                                        throw new Exception("Item insert failed");
+
+                                    long itemID = Convert.ToInt64(itemResult.Tables[0].Rows[0][0]);
+
+                                    itemIdMap.Add(itemIndex, itemID);
+                                    itemWHMap.Add(itemIndex, Convert.ToInt64(Item.WH_Number));
+                                    itemNumberMap.Add(itemIndex, Convert.ToInt64(Item.Item_Number));
+
+                                    itemIndex++;
+                                }
+
+                                // =========================
+                                // BATCH INSERT
+                                // =========================
+                                foreach (var batch in BCH_DTO)
+                                {
+                                    var batchDTO = new ReceiptNote_DTO();
+
+                                    batchDTO.JIRNI_BCH_Number = batch.RNI_BCH_No;
+                                    batchDTO.JIRNH_Number = headerId;
+                                    batchDTO.JIRNI_Number = itemIdMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
+                                    batchDTO.JIRNI_Item_Number = itemNumberMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
+                                    batchDTO.JIRNI_BCH_BatchDate = DateTime.Now;
+                                    batchDTO.JIRNI_BCH_BatchNo = batch.RNI_BCH_Number;
+                                    batchDTO.JIRNI_BCH_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
+                                    batchDTO.JIRNI_BCH_BatchQty = Convert.ToDouble(batch.RNI_BCH_Qty);
+                                    batchDTO.JIRNI_BCH_BatchUnitPrice = Convert.ToDouble(batch.RNI_BCH_UnitPrice);
+                                    batchDTO.JIRNI_BCH_BatchValue = Convert.ToDouble(batch.RNI_BCH_Value);
+                                    batchDTO.JIRNI_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
+                                    batchDTO.JIRNH_WH_Number = Convert.ToInt32(S_DTO.WH_Number);
+                                    batchDTO.JIRN_Id = 23;
+
+                                    SI_DAO.JI_ReceiptNoteDB(batchDTO);
+                                }
+
+                                // =========================
+                                // COMMIT
+                                // =========================
+                                transaction.Complete();
+
+                                S_Head_DTO.Reset();
+                                ITM_DTO = null;
+                                S_DTO.Reset();
+                                Original_DTO = Help.JsonClone(S_DTO);
+
+                                if (SIHOrderNoOld != SIHOrderNoNew)
+                                {
+                                    ViewBag.ErrorCode = 2;
+                                    ViewBag.ErrorMessage = "Receipt Note number " + SIHOrderNoOld + " changed to " + SIHOrderNoNew;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ViewBag.ErrorCode = 2;
+                                ViewBag.ErrorMessage = Valid.CatchValid(ex.Message);
+                                throw;
+                            }
+                        }
                     }
                 }
             }
