@@ -115,7 +115,6 @@ function chToPx(ch, element) {
 
     return Math.ceil(ch * oneCh);
 }
-
 function ApplyFieldWidths(container = "#ItemTable") {
 
     const fields = [
@@ -135,7 +134,7 @@ function ApplyFieldWidths(container = "#ItemTable") {
         { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
 
         { cls: ".Qty", min: 15, max: 15, align: "center" },
-        { cls: ".UnitPrice", min: 15, max:15, align: "right" },
+        { cls: ".UnitPrice", min: 15, max: 15, align: "right" },
         { cls: ".Amount", min: 15, max: 15, align: "right" }
     ];
 
@@ -160,11 +159,13 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
     fields.forEach(f => {
 
-        // Only table row controls (ignore popup contents)
+        // Get only the actual row controls and skip anything inside .search-results
         const controls = $container.find(
             "#TempRow " + f.cls +
             ", #TableBody > tr.NewRow " + f.cls
-        );
+        ).filter(function () {
+            return $(this).closest(".search-results").length === 0;
+        });
 
         if (!controls.length)
             return;
@@ -211,12 +212,16 @@ function ApplyFieldWidths(container = "#ItemTable") {
                 textAlign: f.align
             });
 
-            // Apply same width to the table cell only
-            $(this).closest("td").css({
-                width: requiredWidth + "px",
-                minWidth: minWidth + "px",
-                maxWidth: maxWidth + "px"
-            });
+            // Apply width only to the main table cell, not popup table cells
+            const td = $(this).closest("td");
+
+            if (td.closest(".search-results").length === 0) {
+                td.css({
+                    width: requiredWidth + "px",
+                    minWidth: minWidth + "px",
+                    maxWidth: maxWidth + "px"
+                });
+            }
         });
     });
 }
