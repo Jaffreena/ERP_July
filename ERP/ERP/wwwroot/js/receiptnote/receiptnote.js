@@ -35,6 +35,7 @@ function QtyDecimalRupees(value, decimalPlaces) {
 }
 //#region Auto Add Row on Last Row
 
+
 $(document).on("focusout", ".Qty, .UnitPrice", function () {
 
     let $row = $(this).closest("tr");
@@ -89,11 +90,36 @@ function HighlightRow(rows, index) {
         block: "nearest"
     });
 }
+function getTextWidth(text, element) {
+
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    return Math.ceil(ctx.measureText(text).width);
+}
+
+// Converts characters (ch) to pixels
+// 1ch = width of the "0" character in the current font
+function chToPx(ch, element) {
+
+    const canvas = chToPx.canvas || (chToPx.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    const oneCh = ctx.measureText("0").width;
+
+    return Math.ceil(ch * oneCh);
+}
 
 function ApplyFieldWidths(container = "#ItemTable") {
 
     const fields = [
-        { cls: ".PRS_Number", min: 15, max: 25, align: "left" },
+        { cls: ".PRS_Number", min: 15, max: 50, align: "left" },
         { cls: ".Item_Code", min: 18, max: 18, align: "left" },
         { cls: ".Description", min: 30, max: 100, align: "left" },
 
@@ -108,51 +134,108 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
         { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
 
-        { cls: ".Qty", min: 8, max: 8, align: "center" },
-        { cls: ".UnitPrice", min: 8, max: 8, align: "right" },
-        { cls: ".Amount", min: 12, max: 12, align: "right" }
+        { cls: ".Qty", min: 15, max: 15, align: "center" },
+        { cls: ".UnitPrice", min: 15, max:15, align: "right" },
+        { cls: ".Amount", min: 15, max: 15, align: "right" }
     ];
 
     const $container = $(container);
 
+    // Checkbox column width
+    const checkWidth = 40;
+
+    $container.find("thead th:first-child, tfoot td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
+    $container.find("tbody > tr > td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
     fields.forEach(f => {
 
-        let longest = f.min;
+        // Only table row controls (ignore popup contents)
+        const controls = $container.find(
+            "#TempRow " + f.cls +
+            ", #TableBody > tr.NewRow " + f.cls
+        );
 
-        // Find the longest value only within the specified container
-        $container.find(f.cls).each(function () {
+        if (!controls.length)
+            return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
 
             let text = "";
 
-            if ($(this).is("input, textarea, select")) {
-                text = ($(this).val() || "").toString().trim();
-            } else {
-                text = $(this).text().trim();
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            }
+            else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            }
+            else {
+                text = this.textContent || "";
             }
 
-            longest = Math.max(longest, text.length);
+            text = text.trim();
+
+            requiredWidth = Math.max(
+                requiredWidth,
+                getTextWidth(text, this)
+            );
         });
 
-        if (f.max != null)
-            longest = Math.min(longest, f.max);
+        requiredWidth = Math.min(requiredWidth, maxWidth);
 
-        // Apply width only within the specified container
-        $container.find(f.cls).css({
-            width: longest + "ch",
-            minWidth: f.min + "ch",
-            maxWidth: f.max != null ? f.max + "ch" : "",
-            textAlign: f.align
+        controls.each(function () {
+
+            $(this).css({
+                width: requiredWidth + "px",
+                minWidth: minWidth + "px",
+                maxWidth: maxWidth + "px",
+                textAlign: f.align
+            });
+
+            // Apply same width to the table cell only
+            $(this).closest("td").css({
+                width: requiredWidth + "px",
+                minWidth: minWidth + "px",
+                maxWidth: maxWidth + "px"
+            });
         });
     });
 }
 
- 
-
 $(document).ready(function () {
+    $(document).on("keyup change", ".Qty, .UnitPrice", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+
+
+
+    $(document).on("change", "#ItemTable select", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+
     $(document).on("focus", ".PRS_Number", function () {
         this.click();
     });
-    ApplyFieldWidths();
+    ApplyFieldWidths("#ItemTable");
     $(document).on("keydown", "#JWC_Name", function (e) {
 
         let input = $(this);
@@ -1114,7 +1197,7 @@ $("#AddRowButton").on("click", function () {
     // Recalculate footer
     calculateTotal_rn();
     SetTableHeight();
-    ApplyFieldWidths();
+    ApplyFieldWidths("#ItemTable");
 });
 
 //#endregion
@@ -1303,6 +1386,9 @@ function searchItemJIDNI(inputElement) {
                     $(inputElement).removeData("selectedIndex");
                 }
                 //#endregion search logic highlight
+                setTimeout(function () {
+                    ApplyFieldWidths("#ItemTable");
+                }, 100);
 
               
 

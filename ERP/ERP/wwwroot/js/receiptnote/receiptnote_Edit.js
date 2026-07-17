@@ -289,42 +289,6 @@ function HighlightRow(rows, index) {
     });
 }
 
-function ApplyFieldWidths() {
-
-    const fields = [
-        { cls: ".PRS_Number", min: 15, max: 25, align: "left" },
-        { cls: ".Item_Code", min: 15, max: 15, align: "left" },
-        { cls: ".Description", min: 30, max: 100, align: "left" },
-
-        { cls: ".OuterDia", min: 10, max: 10, align: "center" },
-        { cls: ".Thickness", min: 10, max: 10, align: "center" },
-        { cls: ".Length", min: 10, max: 10, align: "center" },
-        { cls: ".Width", min: 10, max: 10, align: "center" },
-
-        { cls: ".MaterialGrade", min: 15, max: 25, align: "left" },
-        { cls: ".ItemGroup", min: 15, max: 30, align: "left" },
-        { cls: ".WH_Number", min: 15, max: 25, align: "left" },
-
-        { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
-
-        { cls: ".Qty", min: 8, max: null, align: "center" },
-        { cls: ".UnitPrice", min: 8, max: null, align: "right" },
-        { cls: ".Amount", min: 12, max: null, align: "right" }
-    ];
-
-    fields.forEach(f => {
-
-        const css = {
-            minWidth: f.min + "ch",
-            textAlign: f.align
-        };
-
-        if (f.max !== null)
-            css.maxWidth = f.max + "ch";
-
-        $(f.cls).css(css);
-    });
-}
 function AutoFit() {
     fitInputWidth("RN_No", 20, 30);
     fitInputWidth("JW_CustomerDC_No", 20, 30);
@@ -343,7 +307,7 @@ $(document).ready(function () {
     $(document).on("change", "#MS_Number, #WH_Number", function () {
         fitInputWidth(this, 20, 20);
     });
-    ApplyFieldWidths();
+ 
     //#region  search logic highlight
 
     $(document).on("keydown", "#JWC_Name", function (e) {
@@ -1425,7 +1389,7 @@ function searchItemJIDNI(inputElement) {
                     $(inputElement).removeData("selectedIndex");
                 }
                 //#endregion search logic highlight
-                ApplyFieldWidths();
+              
 
             } else {
 
