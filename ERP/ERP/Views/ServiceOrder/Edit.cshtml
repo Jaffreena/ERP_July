@@ -416,12 +416,21 @@
                     <div class="card-body h-100">
                         <div class="row h-100">
                             <div class="col-auto left-menu h-100">
-                                <ul class="nav nav-tabs tab-header">
+                                <ul class="nav nav-tabs tab-header d-flex align-items-end">
                                     <li class="nav-item">
                                         <a class="nav-link active" aria-current="page">Item</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link text-dark">Other</a>
+                                    </li>
+                                    <li class="ms-auto me-2 mb-2">
+                                        <button type="button" id="AddRowButton" class="btn btn-primary btn-sm me-2">
+                                            Add Row
+                                        </button>
+
+                                        <button type="button" id="RemoveItemRowButton" class="btn btn-danger btn-sm RowRemove">
+                                            Delete Row
+                                        </button>
                                     </li>
                                 </ul>
                                 <div class="tab-content tab-body tab-body-h-o">
@@ -429,7 +438,7 @@
                                         <div class="row h-100">
                                             <!-------------------------item-------------------------------------------------------------------->
                                             <div class="col table-fixed h-100">
-                                                <div class="w-12 table-responsive table-body table-body-f" style="max-height:450px; overflow-y:auto;">
+                                                <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
 
 
 
@@ -443,23 +452,23 @@
                                                                                            class="IndexAllCheckItem form-check-input border-white">
                                                                                 </th>
 
-                                                                                <th>Process</th>
-                                                                                <th>Item Code</th>
-                                                                                <th>Description</th>
-                                                                                <th>Outer Dia</th>
-                                                                                <th>Thickness</th>
-                                                                                <th>Length</th>
-                                                                                <th>Width</th>
-                                                                                <th>Material Grade</th>
-                                                                                <th>Item Group</th>
-                                                                                <th>UOM</th>
-                                                                                <th>SVO Qty</th>
-                                                                                <th>Invoiced Qty</th>
-                                                                                <th>Invoice to be raised</th>
-                                                                                <th>Amend Qty</th>
-                                                                                <th>Unit Price</th>
-                                                                                <th>Amount</th>
-                                                                                <th>Delivery Date</th>
+                                                                <th style="text-align:left;">Process</th>
+                                                                <th style="text-align:left;">Item Code</th>
+                                                                <th style="text-align:left;">Description</th>
+                                                                <th style="text-align:center;">Outer Dia</th>
+                                                                <th style="text-align:center;">Thickness</th>
+                                                                <th style="text-align:center;">Length</th>
+                                                                <th style="text-align:center;">Width</th>
+                                                                <th style="text-align:left;">Material Grade</th>
+                                                                <th style="text-align:left;">Item Group</th>
+                                                                <th style="text-align:center;">UOM</th>
+                                                                <th style="text-align:center;">SVO Qty</th>
+                                                                <th style="text-align:center;">Invoiced Qty</th>
+                                                                <th style="text-align:center;">Invoice to be raised</th>
+                                                                <th style="text-align:center;">Amend Qty</th>
+                                                                <th style="text-align:right;">Unit Price</th>
+                                                                <th style="text-align:right;">Amount</th>
+                                                                <th style="text-align:center;">Delivery Date</th>
                                                                             </tr>
                                                                         </thead>
 
@@ -499,14 +508,17 @@
                                                                                            oninput="OnInputItem(this)"
                                                                                            onfocus="OnFocusItem(this)" />
 
-                                                                                    <div class="search-results card" style="display:none"></div>
+                                                                    <div class="search-results card" style="display:none; min-height:100px; max-height:600px; overflow-y:auto;"></div>
                                                                                 </td>
 
-                                                                                <td><input name="Items[0].Description" class="form-control Description" readonly /></td>
-                                                                                <td><input name="Items[0].OuterDia" class="form-control OuterDia text-end" readonly /></td>
-                                                                                <td><input name="Items[0].Thickness" class="form-control Thickness text-end" readonly /></td>
-                                                                                <td><input name="Items[0].Length" class="form-control Length text-end" readonly /></td>
-                                                                                <td><input name="Items[0].Width" class="form-control Width text-end" readonly /></td>
+                                                                                <td><textarea name="Items[0].Description"
+                                                                              class="form-control Description"
+                                                                              rows="2"
+                                                                              readonly></textarea></td>
+                                                                                <td><input name="Items[0].OuterDia" class="form-control OuterDia text-center" readonly /></td>
+                                                                                <td><input name="Items[0].Thickness" class="form-control Thickness text-center" readonly /></td>
+                                                                                <td><input name="Items[0].Length" class="form-control Length text-center" readonly /></td>
+                                                                                <td><input name="Items[0].Width" class="form-control Width text-center" readonly /></td>
                                                                                 <td><input name="Items[0].MaterialGrade" class="form-control MaterialGrade" readonly /></td>
                                                                                 <td><input name="Items[0].ItemGroup" class="form-control ItemGroup" readonly /></td>
 
@@ -519,23 +531,23 @@
 
                                                                                 <td>
                                                                                     <input name="Items[0].SVO_Qty"
-                                                                                           class="form-control SVO_Qty text-end"
+                                                                                           class="form-control SVO_Qty text-center"
                                                                                            readonly />
                                                                                 </td>
 
                                                                                 <td>
                                                                                     <input name="Items[0].InvoicedQty"
-                                                                                           class="form-control InvoicedQty text-end"
+                                                                                           class="form-control InvoicedQty text-center"
                                                                                            readonly />
                                                                                 </td>
                                                                                 <td>
                                                                                     <input name="Items[0].InvoiceToBeRaised"
-                                                                                           class="form-control InvoiceToBeRaised text-end"
+                                                                                           class="form-control InvoiceToBeRaised text-center"
                                                                                            readonly />
                                                                                 </td>
                                                                                 <td>
                                                                                     <input name="Items[0].JISVOI_Qty"
-                                                                                           class="form-control JISVOI_Qty text-end" />
+                                                                                           class="form-control JISVOI_Qty text-center" />
                                                                                 </td>
 
                                                                                 <td>
@@ -552,7 +564,7 @@
                                                                                 <td>
                                                                                     <input name="Items[0].JISVOI_DeliveryDate"
                                                                                            type="date"
-                                                                                           class="form-control JISVOI_DeliveryDate" />
+                                                                                           class="form-control JISVOI_DeliveryDate text-center" />
                                                                                 </td>
 
                                                                             </tr>
@@ -590,23 +602,7 @@
 
                                                                     </table>
                                                 </div>
-
-                                                <!-- ================= BUTTONS ================= -->
-                                                <div class="row mt-2">
-                                                    <div class="col">
-
-                                                                        <a id="AddRowButton"
-                                                                               class="btn btn-primary mb-2">
-                                                                            Add Row
-                                                                        </a>
-
-                                                                        <a id="RemoveItemRowButton"
-                                                                               class="RowRemove btn btn-primary mb-2">
-                                                                            Delete Row
-                                                                        </a>
-
-                                                    </div>
-                                                </div>
+ 
                                             </div>
 
                                             <!-------------------item----------------------------------------------------------->

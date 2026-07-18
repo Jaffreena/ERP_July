@@ -627,12 +627,19 @@
                     <div class="card-body h-100">
                         <div class="row h-100">
                             <div class="col-auto left-menu h-100">
-                                <ul class="nav nav-tabs tab-header">
+                                <ul class="nav nav-tabs tab-header d-flex align-items-end">
                                     <li class="nav-item">
                                         <a class="nav-link active" aria-current="page">Item</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link text-dark">Other</a>
+                                    </li>
+                                    <li class="ms-auto me-2 mb-2">
+                                       
+
+                                        <button type="button" id="RemoveItemRowButton" class="btn btn-danger btn-sm RowRemove">
+                                            Delete Row
+                                        </button>
                                     </li>
                                 </ul>
                                 <div class="tab-content tab-body tab-body-h-o">
@@ -640,7 +647,7 @@
                                         <div class="row h-100">
                                             <!-------------------------item-------------------------------------------------------------------->
                                             <div class="col table-fixed h-100">
-                                                <div class="w-12 table-responsive table-body table-body-f" style="max-height:450px; overflow-y:auto;">
+                                                <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
 
                                                     <table class="table table-one table-striped table-bordered table-hover align-middle w-100"
                                                            id="ItemTable">
@@ -714,27 +721,28 @@
 
                                                                 <!-- DESCRIPTION -->
                                                                 <td>
-                                                                    <input class="form-control JISVII_ItemDescription" readonly />
+                                                                    <textarea class="form-control JISVII_ItemDescription" rows="2" readonly></textarea>
+                                                                 
                                                                 </td>
 
                                                                 <!-- OUTER DIA -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_OuterDia text-end" readonly />
+                                                                    <input class="form-control JISVII_OuterDia" readonly />
                                                                 </td>
 
                                                                 <!-- THICKNESS -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_Thickness text-end" readonly />
+                                                                    <input class="form-control JISVII_Thickness" readonly />
                                                                 </td>
 
                                                                 <!-- LENGTH -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_Length text-end" readonly />
+                                                                    <input class="form-control JISVII_Length" readonly />
                                                                 </td>
 
                                                                 <!-- WIDTH -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_Width text-end" readonly />
+                                                                    <input class="form-control JISVII_Width" readonly />
                                                                 </td>
 
                                                                 <!-- MATERIAL GRADE -->
@@ -749,34 +757,34 @@
 
                                                                 <!-- UOM -->
                                                                 <td class="table-width-md">
-                                                                    <select class="form-select JISVII_UoM text-center" asp-items="@ViewBag.UOM"></select>
+                                                                    <select class="form-select JISVII_UoM" asp-items="@ViewBag.UOM"></select>
                                                                 </td>
                                                                 <!-- DELIVERED QTY -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control DeliveredQty text-end"
+                                                                    <input class="form-control DeliveredQty"
                                                                            autocomplete="off"
                                                                            readonly />
                                                                 </td>
 
                                                                 <!-- PREVIOUSLY INVOICED QTY -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control PreviouslyInvoicedQty text-end"
+                                                                    <input class="form-control PreviouslyInvoicedQty"
                                                                            autocomplete="off"
                                                                            readonly />
                                                                 </td>
                                                                 <!-- QTY -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_Qty text-end" autocomplete="off" />
+                                                                    <input class="form-control JISVII_Qty" autocomplete="off" />
                                                                 </td>
 
                                                                 <!-- UNIT PRICE -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_UnitPrice text-end" autocomplete="off" />
+                                                                    <input class="form-control JISVII_UnitPrice" autocomplete="off" />
                                                                 </td>
 
                                                                 <!-- AMOUNT -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_Amount text-end" readonly />
+                                                                    <input class="form-control JISVII_Amount" readonly />
                                                                 </td>
 
                                                                 <!-- SAC -->
@@ -786,7 +794,7 @@
 
                                                                 <!-- GST AMOUNT -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control JISVII_GST_Amount text-end" readonly />
+                                                                    <input class="form-control JISVII_GST_Amount" readonly />
                                                                 </td>
 
                                                             </tr>
@@ -801,15 +809,15 @@
                                                                     <span class="float-end pe-3">Total</span>
                                                                 </td>
                                                                 <td>
-                                                                    <input id="TotalDeliveredQty" class="form-control text-end" readonly />
+                                                                    <input id="TotalDeliveredQty" class="form-control text-center" readonly />
                                                                 </td>
                                                                 <td>
-                                                                    <input id="TotalPrevInvoiceQty" class="form-control text-end" readonly />
+                                                                    <input id="TotalPrevInvoiceQty" class="form-control text-center" readonly />
                                                                 </td>
 
 
                                                                 <td>
-                                                                    <input id="TotalQty" class="form-control text-end" readonly />
+                                                                    <input id="TotalQty" class="form-control text-center" readonly />
                                                                 </td>
 
                                                                 <td></td>
@@ -832,17 +840,7 @@
                                                        
                                                 </div>
 
-                                                <!-- ================= BUTTONS ================= -->
-                                                <div class="row mt-2">
-                                                    <div class="col"> 
-
-                                                        <a id="RemoveItemRowButton" class="RowRemove btn btn-primary  mb-2">
-
-                                                            Delete Row
-
-                                                        </a>
-                                                    </div>
-                                                </div>
+                                             
                                             </div>
 
                                             <!-------------------item----------------------------------------------------------->
@@ -880,6 +878,7 @@
         var sonList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.SON));
         console.log("sonList from cshtml:", sonList);
     </script>
+    <script src="~/js/code/ItemGrid.js" asp-append-version="true"></script>
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>

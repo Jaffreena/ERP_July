@@ -1,4 +1,196 @@
-﻿//#region COMMON FUNCTIONS
+﻿//#region item grid alignment
+// Converts characters (ch) to pixels
+// 1ch = width of the "0" character in the current font
+function chToPx(ch, element) {
+
+    const canvas = chToPx.canvas || (chToPx.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    const oneCh = ctx.measureText("0").width;
+
+    return Math.ceil(ch * oneCh);
+}
+function getTextWidth(text, element) {
+
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    return Math.ceil(ctx.measureText(text).width);
+}
+function ApplyFieldWidths(container = "#ItemTable") {
+
+    const fields = [
+        { cls: ".JISVII_JISVOH_Number", min: 15, max: 30, align: "left" },
+        { cls: ".JISVII_DN_No", min: 15, max: 30, align: "left" },
+        { cls: ".JISVII_Process", min: 15, max: 30, align: "left" },
+        { cls: ".JISVII_ItemCode", min: 18, max: 18, align: "left" },
+        { cls: ".JISVII_ItemDescription", min: 30, max: 45, align: "left" },
+
+        { cls: ".JISVII_OuterDia", min: 10, max: 10, align: "center" },
+        { cls: ".JISVII_Thickness", min: 10, max: 10, align: "center" },
+        { cls: ".JISVII_Length", min: 10, max: 10, align: "center" },
+        { cls: ".JISVII_Width", min: 10, max: 10, align: "center" },
+
+        { cls: ".JISVII_MaterialGrade", min: 15, max: 25, align: "left" },
+        { cls: ".JISVII_ItemGroup", min: 15, max: 30, align: "left" },
+        { cls: ".JISVII_UoM", min: 10, max: 15, align: "center" },
+
+        { cls: ".DeliveredQty", min: 11, max: 20, align: "center" },
+        { cls: ".PreviouslyInvoicedQty", min: 11, max: 20, align: "center" },
+        { cls: ".JISVII_Qty", min: 11, max: 20, align: "center" },
+        { cls: ".JISVII_UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JISVII_Amount", min: 13, max: 25, align: "right" },
+
+        { cls: ".JISVII_SAC_Number", min: 10, max: 15, align: "left" },
+        { cls: ".JISVII_GST_Amount", min: 13, max: 25, align: "right" }
+    ];
+
+    const $container = $(container);
+
+    // Checkbox column width
+    const checkWidth = 40;
+
+    $container.find("thead th:first-child, tfoot td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
+    $container.find("tbody > tr > td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
+    fields.forEach(f => {
+
+        // Skip controls inside popup search table (#tblsearch)
+        const controls = $container.find("#TableBody " + f.cls);
+
+        if (!controls.length)
+            return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            }
+            else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            }
+            else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(
+                requiredWidth,
+                getTextWidth(text, this)
+            );
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        // Extra space so the last digit is not clipped
+        if (f.cls === ".JISVII_UnitPrice" || f.cls === ".JISVII_Amount") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            $(this).css({
+                width: requiredWidth + "px",
+                minWidth: minWidth + "px",
+                maxWidth: maxWidth + "px",
+                textAlign: f.align,
+                padding: "2px"
+            });
+
+            if (f.cls === ".JISVII_ItemDescription" && this.tagName === "TEXTAREA") {
+
+                const charsPerLine = 20;
+                const lines = Math.max(1, Math.ceil(this.value.length / charsPerLine));
+
+                const lineHeight = parseFloat(window.getComputedStyle(this).lineHeight);
+                const extraHeight = 12;
+
+                this.style.height = (lines * lineHeight + extraHeight) + "px";
+                this.style.setProperty("resize", "none", "important");
+                this.style.setProperty("overflow", "hidden", "important");
+            }
+
+            // Apply width only to main ItemTable cells
+            const td = $(this).closest("td");
+
+         
+                td.css({
+                    width: requiredWidth + "px",
+                    minWidth: minWidth + "px",
+                    maxWidth: maxWidth + "px",
+                    padding: "2px"
+                });
+          
+        });
+    });
+
+    ApplyHeaderAlignment("#ItemTable");
+}
+function ApplyHeaderAlignment(container = "#ItemTable") {
+
+    const fields = [
+        { cls: ".JISVII_JISVOH_Number", align: "left" },
+        { cls: ".JISVII_DN_No", align: "left" },
+        { cls: ".JISVII_Process", align: "left" },
+        { cls: ".JISVII_ItemCode", align: "left" },
+        { cls: ".JISVII_ItemDescription", align: "left" },
+
+        { cls: ".JISVII_OuterDia", align: "center" },
+        { cls: ".JISVII_Thickness", align: "center" },
+        { cls: ".JISVII_Length", align: "center" },
+        { cls: ".JISVII_Width", align: "center" },
+
+        { cls: ".JISVII_MaterialGrade", align: "left" },
+        { cls: ".JISVII_ItemGroup", align: "left" },
+        { cls: ".JISVII_UoM", align: "center" },
+
+        { cls: ".DeliveredQty", align: "center" },
+        { cls: ".PreviouslyInvoicedQty", align: "center" },
+        { cls: ".JISVII_Qty", align: "center" },
+        { cls: ".JISVII_UnitPrice", align: "right" },
+        { cls: ".JISVII_Amount", align: "right" },
+
+        { cls: ".JISVII_SAC_Number", align: "left" },
+        { cls: ".JISVII_GST_Amount", align: "right" }
+    ];
+
+    fields.forEach(f => {
+        $(container)
+            .find("thead th." + f.cls.substring(1))
+            .css("text-align", f.align);
+    });
+}
+//#endregion
+//#region COMMON FUNCTIONS
 function removeCommas(value) {
     return (value || '').toString().replace(/,/g, '');
 }
@@ -72,6 +264,13 @@ function AutoFit() {
 
 }
 $(document).ready(function () {
+    //#region item grid alignment
+    ApplyFieldWidths("#ItemTable");
+
+    $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+    //#endregion
     AutoFit();
     $(document).on("input keyup", "#Header_JISVIH_InvoiceNo", function () {
         fitInputWidth(this, 20, 30);
@@ -2126,10 +2325,10 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
             class="JISVII_ServiceOrderHidden" />`;
 
                 let unitPriceCell = item.hasServiceOrder == 1
-                    ? `<label class="form-control JISVII_UnitPriceLabel text-end">${item.jisvoI_UnitPrice ?? 0} </label>
+                    ? `<label class="form-control JISVII_UnitPriceLabel">${item.jisvoI_UnitPrice ?? 0} </label>
        <input name="Items[${rowCount}].ServiceOrderId" type="hidden" value="${item.serviceOrderId ?? 0}" class="ServiceOrderId" />
        <input name="Items[${rowCount}].JISVII_UnitPrice" type="hidden" value="${item.jisvoI_UnitPrice ?? 0}" class="JISVII_UnitPrice" />`
-         : `<input name="Items[${rowCount}].JISVII_UnitPrice" value="${item.jisvoI_UnitPrice ?? 0}" class="form-control JISVII_UnitPrice text-end" />`;
+         : `<input name="Items[${rowCount}].JISVII_UnitPrice" value="${item.jisvoI_UnitPrice ?? 0}" class="form-control JISVII_UnitPrice" />`;
                 //#endregion
 
 
@@ -2238,7 +2437,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
         <input name="Items[${rowCount}].JISVII_OuterDia"
                value="${item.outerDia ?? ''}"
-               class="form-control JISVII_OuterDia text-end"
+               class="form-control JISVII_OuterDia"
                readonly />
 
     </td>
@@ -2248,7 +2447,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
         <input name="Items[${rowCount}].JISVII_Thickness"
                value="${item.thickness ?? ''}"
-               class="form-control JISVII_Thickness text-end"
+               class="form-control JISVII_Thickness"
                readonly />
 
     </td>
@@ -2258,7 +2457,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
         <input name="Items[${rowCount}].JISVII_Length"
                value="${item.length ?? ''}"
-               class="form-control JISVII_Length text-end"
+               class="form-control JISVII_Length"
                readonly />
 
     </td>
@@ -2268,7 +2467,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
         <input name="Items[${rowCount}].JISVII_Width"
                value="${item.itm_Width ?? ''}"
-               class="form-control JISVII_Width text-end"
+               class="form-control JISVII_Width"
                readonly />
 
     </td>
@@ -2310,7 +2509,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
                type="hidden"
                value="${item.jidnI_Qty ?? 0}" />
 
-        <label class="form-control text-end JISVII_DeliveredQty">
+        <label class="form-control JISVII_DeliveredQty">
 
            ${item.jidnI_Qty ?? 0}
 
@@ -2325,7 +2524,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
                type="hidden"
                value="${item.invoicedQty}" />
 
-        <label class="form-control text-end JISVII_PrevInvoiceQty">
+        <label class="form-control JISVII_PrevInvoiceQty">
 
             ${item.invoicedQty}
 
@@ -2338,7 +2537,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
         <input name="Items[${rowCount}].JISVII_Qty"
                value="${currentInvoiceQty}"
-               class="form-control JISVII_Qty text-end" />
+               class="form-control JISVII_Qty" />
 
     </td>
 
@@ -2352,7 +2551,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
         <input name="Items[${rowCount}].JISVII_Amount"
                value="${0}"
-               class="form-control JISVII_Amount text-end"
+               class="form-control JISVII_Amount"
                readonly />
 
     </td>
@@ -2361,9 +2560,9 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
     <td>
      <input name="Items[${rowCount}].SAC_Number"
                value="${item.saC_Number ?? 0}"   type="hidden"
-               class="form-control SAC_Number text-end" />
+               class="form-control SAC_Number" />
 
-        <label class="form-control text-end SAC">
+        <label class="form-control SAC">
 
             ${item.sac ?? 0}
 
@@ -2376,7 +2575,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
         <input name="Items[${rowCount}].JISVII_GST_Amount"
                value="0"
-               class="form-control JISVII_GST_Amount text-end"
+               class="form-control JISVII_GST_Amount"
                readonly />
 
     </td>
@@ -2390,7 +2589,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
             $("#TableBody .JISVII_Qty").trigger("change");
             $("#TableBody .JISVII_UnitPrice").trigger("change");
             CalculateTotals();
-
+            ApplyFieldWidths();
         }
 
     });

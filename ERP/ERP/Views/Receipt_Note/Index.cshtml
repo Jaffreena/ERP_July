@@ -3,6 +3,7 @@
     ViewData["Title"] = "Receipt Note Create";
 }
  
+ 
 <style>
   
 
@@ -523,11 +524,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link active">Item</a>
                                 </li>
-
                                 <li class="nav-item">
                                     <a class="nav-link text-dark">Other</a>
                                 </li>
-
                                 <li class="ms-auto me-2 mb-2">
                                     <button type="button" id="AddRowButton" class="btn btn-primary btn-sm me-2">
                                         Add Row
@@ -554,24 +553,61 @@
                                                                 <input type="checkbox" id="IndexAllCheckItem" class="form-check-input border-white">
                                                             </th>
 
-                                                            <th>@Html.DisplayNameFor(m => m.Items.First().PRS_Number)</th>
-                                                            <th>Item Number</th>
-                                                            <th>@Html.DisplayNameFor(m => m.Items.First().Description)</th>
+                                                            <th class="PRS_Number">
+                                                                @Html.DisplayNameFor(m => m.Items.First().PRS_Number)
+                                                            </th>
 
-                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().OuterDia)</th>
-                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Thickness)</th>
-                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Length)</th>
-                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Width)</th>
+                                                            <th class="Item_Code">
+                                                                Item Number
+                                                            </th>
 
-                                                            <th>@Html.DisplayNameFor(m => m.Items.First().MaterialGrade)</th>
-                                                            <th>@Html.DisplayNameFor(m => m.Items.First().ItemGroup)</th>
+                                                            <th class="Description">
+                                                                @Html.DisplayNameFor(m => m.Items.First().Description)
+                                                            </th>
 
-                                                            <th>@Html.DisplayNameFor(m => m.Items.First().WH_Number)</th>
-                                                            <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().UoM_Number)</th>
+                                                            <th class="OuterDia">
+                                                                @Html.DisplayNameFor(m => m.Items.First().OuterDia)
+                                                            </th>
 
-                                                            <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().Qty)</th>
-                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().UnitPrice)</th>
-                                                            <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Amount)</th>
+                                                            <th class="Thickness">
+                                                                @Html.DisplayNameFor(m => m.Items.First().Thickness)
+                                                            </th>
+
+                                                            <th class="Length">
+                                                                @Html.DisplayNameFor(m => m.Items.First().Length)
+                                                            </th>
+
+                                                            <th class="Width">
+                                                                @Html.DisplayNameFor(m => m.Items.First().Width)
+                                                            </th>
+
+                                                            <th class="MaterialGrade">
+                                                                @Html.DisplayNameFor(m => m.Items.First().MaterialGrade)
+                                                            </th>
+
+                                                            <th class="ItemGroup">
+                                                                @Html.DisplayNameFor(m => m.Items.First().ItemGroup)
+                                                            </th>
+
+                                                            <th class="WH_Number">
+                                                                @Html.DisplayNameFor(m => m.Items.First().WH_Number)
+                                                            </th>
+
+                                                            <th class="UoM_Number">
+                                                                @Html.DisplayNameFor(m => m.Items.First().UoM_Number)
+                                                            </th>
+
+                                                            <th class="Qty">
+                                                                @Html.DisplayNameFor(m => m.Items.First().Qty)
+                                                            </th>
+
+                                                            <th class="UnitPrice">
+                                                                @Html.DisplayNameFor(m => m.Items.First().UnitPrice)
+                                                            </th>
+
+                                                            <th class="Amount">
+                                                                @Html.DisplayNameFor(m => m.Items.First().Amount)
+                                                            </th>
                                                         </tr>
                                                     </thead>
 
@@ -595,7 +631,9 @@
                                                                 </div>
                                                             </td>
 
-                                                            <td><input class="form-control Description" readonly /></td>
+                                                            <td>
+                                                                <textarea class="form-control Description" rows="2" readonly></textarea>
+                                                            </td>
 
                                                             <td><input class="form-control OuterDia text-end" readonly /></td>
                                                             <td><input class="form-control Thickness text-end" readonly /></td>
@@ -657,9 +695,10 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].Description"
-                                                                               class="form-control Description"
-                                                                               value="@Model.Items[i].Description" readonly />
+                                                                        <textarea name="Items[@i].Description"
+                                                                                  class="form-control Description"
+                                                                                  rows="2"
+                                                                                  readonly>@Model.Items[i].Description</textarea>
                                                                     </td>
 
                                                                     <td>

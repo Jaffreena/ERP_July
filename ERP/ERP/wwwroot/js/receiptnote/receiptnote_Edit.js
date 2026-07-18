@@ -1,4 +1,230 @@
-﻿//#region clear all
+﻿//#region item grid alignment
+
+function ApplyHeaderAlignment(container = "#ItemTable") {
+
+    const fields = [
+        { cls: ".PRS_Number", min: 15, max: 30, align: "left" },
+        { cls: ".Item_Code", min: 18, max: 18, align: "left" },
+        { cls: ".Description", min: 30, max: 45, align: "left" },
+
+        { cls: ".OuterDia", min: 10, max: 10, align: "center" },
+        { cls: ".Thickness", min: 10, max: 10, align: "center" },
+        { cls: ".Length", min: 10, max: 10, align: "center" },
+        { cls: ".Width", min: 10, max: 10, align: "center" },
+
+        { cls: ".MaterialGrade", min: 15, max: 25, align: "left" },
+        { cls: ".ItemGroup", min: 15, max: 30, align: "left" },
+        { cls: ".WH_Number", min: 15, max: 25, align: "left" },
+
+        { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
+
+       
+        { cls: ".OriginalQty", min: 11, max: 20, align: "center" },
+        { cls: ".UsedQty", min: 11, max: 20, align: "center" },
+        { cls: ".AmendQty", min: 11, max: 20, align: "center" },
+
+        { cls: ".UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".Amount", min: 13, max: 25, align: "right" }
+    ];
+
+    fields.forEach(f => {
+
+        const header = $(container)
+            .find("thead th")
+            .filter(function () {
+                return $(this).hasClass(f.cls.replace(".", ""));
+            });
+
+        header.css("text-align", f.align);
+
+    });
+}
+
+function getTextWidth(text, element) {
+
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    return Math.ceil(ctx.measureText(text).width);
+}
+// Converts characters (ch) to pixels
+// 1ch = width of the "0" character in the current font
+function chToPx(ch, element) {
+
+    const canvas = chToPx.canvas || (chToPx.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    const oneCh = ctx.measureText("0").width;
+
+    return Math.ceil(ch * oneCh);
+}
+function ApplyFieldWidths(container = "#ItemTable") {
+
+    const fields = [
+        { cls: ".PRS_Number", min: 15, max: 30, align: "left" },
+        { cls: ".Item_Code", min: 18, max: 18, align: "left" },
+        { cls: ".Description", min: 30, max: 45, align: "left" },
+
+        { cls: ".OuterDia", min: 10, max: 10, align: "center" },
+        { cls: ".Thickness", min: 10, max: 10, align: "center" },
+        { cls: ".Length", min: 10, max: 10, align: "center" },
+        { cls: ".Width", min: 10, max: 10, align: "center" },
+
+        { cls: ".MaterialGrade", min: 15, max: 25, align: "left" },
+        { cls: ".ItemGroup", min: 15, max: 30, align: "left" },
+        { cls: ".WH_Number", min: 15, max: 25, align: "left" },
+
+        { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
+
+      
+        { cls: ".OriginalQty", min: 11, max: 20, align: "center" },
+        { cls: ".UsedQty", min: 11, max: 20, align: "center" },
+        { cls: ".AmendQty", min: 11, max: 20, align: "center" },
+
+        { cls: ".UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".Amount", min: 13, max: 25, align: "right" }
+    ];
+
+    const $container = $(container);
+
+    // Checkbox column width
+    const checkWidth = 40;
+
+    $container.find("thead th:first-child, tfoot td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
+    $container.find("tbody > tr > td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
+    fields.forEach(f => {
+
+        const controls = $container.find(
+            "#TempRow " + f.cls +
+            ", #TableBody > tr.NewRow " + f.cls
+        ).filter(function () {
+            return $(this).closest("#tblsearch").length === 0;
+        });
+
+        if (!controls.length)
+            return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            }
+            else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            }
+            else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(
+                requiredWidth,
+                getTextWidth(text, this)
+            );
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        // Extra space for numeric fields
+        if (
+            f.cls === ".UnitPrice" ||
+            f.cls === ".Amount" ||
+            f.cls === ".Qty" ||
+            f.cls === ".OriginalQty" ||
+            f.cls === ".UsedQty" ||
+            f.cls === ".AmendQty"
+        ) {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            $(this).css({
+                width: requiredWidth + "px",
+                minWidth: minWidth + "px",
+                maxWidth: maxWidth + "px",
+                textAlign: f.align,
+                padding: "4px"
+            });
+
+            // Auto height for Description textarea
+            if (f.cls === ".Description" && this.tagName === "TEXTAREA") {
+
+                const charsPerLine = 20;
+                const lines = Math.max(
+                    1,
+                    Math.ceil(this.value.length / charsPerLine)
+                );
+
+                const lineHeight = parseFloat(
+                    window.getComputedStyle(this).lineHeight
+                );
+
+                const extraHeight = 12;
+
+                this.style.height =
+                    (lines * lineHeight + extraHeight) + "px";
+
+                this.style.setProperty(
+                    "resize",
+                    "none",
+                    "important"
+                );
+
+                this.style.setProperty(
+                    "overflow",
+                    "hidden",
+                    "important"
+                );
+            }
+
+            // Apply width to table cell only
+            const td = $(this).closest("td");
+
+            if (td.closest("#tblsearch").length === 0) {
+
+                td.css({
+                    width: requiredWidth + "px",
+                    minWidth: minWidth + "px",
+                    maxWidth: maxWidth + "px",
+                    padding: "4px"
+                });
+            }
+        });
+    });
+
+    ApplyHeaderAlignment("#ItemTable");
+}
 
 
 //#endregion
@@ -300,6 +526,16 @@ function AutoFit() {
     fitInputWidth("WH_Number", 20, 20);
 }
 $(document).ready(function () {
+    //#region item grid alignment
+    ApplyFieldWidths("#ItemTable");
+
+    $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+    $(document).on("focusin", ".Amount", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+    //#endregion
     AutoFit();
     $(document).on("input keyup", "#RN_No, #JW_CustomerDC_No", function () {
         fitInputWidth(this, 20, 30);
@@ -1200,7 +1436,7 @@ $("#AddRowButton").on("click", function () {
 
     // Recalculate footer
     calculateTotal_rn();
-
+   // ApplyFieldWidths("#ItemTable");
 });
 
 //#endregion
@@ -1269,13 +1505,13 @@ function searchItemJIDNI(inputElement) {
                 resultsDiv.show();
 
                 let table = $(`
-                    <div class="card-body batchPopup modal-content p-0 table-responsive">
-                        <table class="table table-bordered table-hover table-fixed mb-0 table-grid">
+                    <div class="card-body batchPopup modal-content p-0 table-responsive" style="max-height:500px;">
+                        <table class="table table-bordered table-hover table-fixed mb-0 table-grid" id="tblsearch">
                             <thead>
-                                <tr class="table-info">
+                                <tr class="table-info" style="height:32px;">
                                     <th>Item Code</th>
                                     <th>Description</th>
-                                    <th>Item Group</th>
+                                   <th style="text-align:center;">Item Group</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -1332,7 +1568,9 @@ function searchItemJIDNI(inputElement) {
 
                         qtyInput.val(formatIndianQty(qtyVal));
                         qtyUnitprice.val(formatIndianCurrency(qtyUnitpriceVal));
-
+                       
+                            ApplyFieldWidths("#ItemTable");
+                        
                         resultsDiv.hide();
                     });
 

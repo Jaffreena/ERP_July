@@ -497,17 +497,26 @@
                     </div>
                 </div>
             </div>
-
+                <!-- BODY has ITEM -->
             <div class="card rounded-0 bg-transparent shadow-none" id="CardBody">
                 <div class="card-body h-100">
                     <div class="row h-100">
                         <div class="col-auto left-menu h-100">
-                            <ul class="nav nav-tabs tab-header">
+                            <ul class="nav nav-tabs tab-header d-flex align-items-end">
                                 <li class="nav-item">
                                     <a class="nav-link active" aria-current="page">Item</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark">Other</a>
+                                </li>
+                                <li class="ms-auto me-2 mb-2">
+                                    <button type="button" id="AddRowButton" class="btn btn-primary btn-sm me-2">
+                                        Add Row
+                                    </button>
+
+                                    <button type="button" id="RemoveItemRowButton" class="btn btn-danger btn-sm RowRemove">
+                                        Delete Row
+                                    </button>
                                 </li>
                             </ul>
                             <div class="tab-content tab-body tab-body-h-o">
@@ -515,7 +524,7 @@
                                     <div class="row h-100">
                                         <!-------------------------item-------------------------------------------------------------------->
                                         <div class="col table-fixed h-100">
-                                            <div class="w-12 table-responsive table-body table-body-f" style="max-height:450px; overflow-y:auto;">
+                                            <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
 
                                                 <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="ItemTable">
 
@@ -566,10 +575,15 @@
                                                                 <input id="JIRNI_Number" class="JIRNI_Number" type="hidden" />
                                                                 <input id="Item_Index" class="Item_Index" type="hidden" />
                                                                 <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
-                                                                <div class="search-results card" style="display:none"></div>
+                                                               
+                                                                <div class="search-results card"
+                                                                     style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
+                                                                </div>
                                                             </td>
 
-                                                            <td><input class="form-control Description" readonly /></td>
+                                                            <td>
+                                                                <textarea class="form-control Description" rows="2" readonly></textarea>
+                                                            </td>
 
                                                             <td><input class="form-control OuterDia text-end" readonly /></td>
                                                             <td><input class="form-control Thickness text-end" readonly /></td>
@@ -636,9 +650,10 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].Description"
-                                                                               class="form-control Description"
-                                                                               value="@Model.Items[i].Description" readonly />
+                                                                        <textarea name="Items[@i].Description"
+                                                                                  class="form-control Description"
+                                                                                  rows="2"
+                                                                                  readonly>@Model.Items[i].Description</textarea>
                                                                     </td>
 
                                                                     <td>
@@ -760,13 +775,7 @@
                                                 </table>
                                             </div>
 
-                                            <!-- ================= BUTTONS ================= -->
-                                            <div class="row mt-2">
-                                                <div class="col">
-                                                    <button type="button" id="AddRowButton" class="btn btn-primary mb-2">Add Row</button>
-                                                    <button type="button" id="RemoveItemRowButton" class="btn btn-primary mb-2 RowRemove">Delete Row</button>
-                                                </div>
-                                            </div>
+                                        
                                         </div>
 
                                         <!-------------------item----------------------------------------------------------->

@@ -115,12 +115,13 @@ function chToPx(ch, element) {
 
     return Math.ceil(ch * oneCh);
 }
-function ApplyFieldWidths(container = "#ItemTable") {
 
+
+function ApplyHeaderAlignment(container = "#ItemTable") {
     const fields = [
         { cls: ".PRS_Number", min: 15, max: 50, align: "left" },
         { cls: ".Item_Code", min: 18, max: 18, align: "left" },
-        { cls: ".Description", min: 30, max: 100, align: "left" },
+        { cls: ".Description", min: 30, max: 45, align: "left" },
 
         { cls: ".OuterDia", min: 10, max: 10, align: "center" },
         { cls: ".Thickness", min: 10, max: 10, align: "center" },
@@ -133,9 +134,45 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
         { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
 
-        { cls: ".Qty", min: 15, max: 15, align: "center" },
-        { cls: ".UnitPrice", min: 15, max: 15, align: "right" },
-        { cls: ".Amount", min: 15, max: 15, align: "right" }
+        { cls: ".Qty", min: 11, max: 20, align: "center" },
+        { cls: ".UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".Amount", min: 13, max: 25, align: "right" }
+    ];
+
+    fields.forEach(f => {
+
+        const header = $(container)
+            .find("thead th")
+            .filter(function () {
+                return $(this).hasClass(f.cls.replace(".", ""));
+            });
+
+        header.css("text-align", f.align);
+
+    });
+}
+
+function ApplyFieldWidths(container = "#ItemTable") {
+
+    const fields = [
+        { cls: ".PRS_Number", min: 15, max: 50, align: "left" },
+        { cls: ".Item_Code", min: 18, max: 18, align: "left" },
+        { cls: ".Description", min: 30, max: 45, align: "left" },
+
+        { cls: ".OuterDia", min: 10, max: 10, align: "center" },
+        { cls: ".Thickness", min: 10, max: 10, align: "center" },
+        { cls: ".Length", min: 10, max: 10, align: "center" },
+        { cls: ".Width", min: 10, max: 10, align: "center" },
+
+        { cls: ".MaterialGrade", min: 15, max: 25, align: "left" },
+        { cls: ".ItemGroup", min: 15, max: 30, align: "left" },
+        { cls: ".WH_Number", min: 15, max: 25, align: "left" },
+
+        { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
+
+        { cls: ".Qty", min: 11, max: 20, align: "center" },
+        { cls: ".UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".Amount", min: 13, max: 25, align: "right" }
     ];
 
     const $container = $(container);
@@ -159,12 +196,12 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
     fields.forEach(f => {
 
-        // Get only the actual row controls and skip anything inside .search-results
+        // Skip controls inside popup search table (#tblsearch)
         const controls = $container.find(
             "#TempRow " + f.cls +
             ", #TableBody > tr.NewRow " + f.cls
         ).filter(function () {
-            return $(this).closest(".search-results").length === 0;
+            return $(this).closest("#tblsearch").length === 0;
         });
 
         if (!controls.length)
@@ -203,39 +240,63 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
         requiredWidth = Math.min(requiredWidth, maxWidth);
 
+        // Extra space so the last digit is not clipped
+        if (f.cls === ".UnitPrice" || f.cls === ".Amount") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
         controls.each(function () {
 
             $(this).css({
                 width: requiredWidth + "px",
                 minWidth: minWidth + "px",
                 maxWidth: maxWidth + "px",
-                textAlign: f.align
+                textAlign: f.align,
+                padding: "2px"
             });
+          
 
-            // Apply width only to the main table cell, not popup table cells
+            if (f.cls === ".Description" && this.tagName === "TEXTAREA") {
+
+                const charsPerLine = 20; // same as your width (20ch)
+                const lines = Math.max(1, Math.ceil(this.value.length / charsPerLine));
+
+              
+
+                const lineHeight = parseFloat(window.getComputedStyle(this).lineHeight);
+                const extraHeight = 12;
+
+                this.style.height = (lines * lineHeight + extraHeight) + "px";
+                this.style.setProperty("resize", "none", "important");
+                this.style.setProperty("overflow", "hidden", "important");
+            }
+
+            // Apply width only to main ItemTable cells
             const td = $(this).closest("td");
 
-            if (td.closest(".search-results").length === 0) {
+            if (td.closest("#tblsearch").length === 0) {
                 td.css({
                     width: requiredWidth + "px",
                     minWidth: minWidth + "px",
-                    maxWidth: maxWidth + "px"
+                    maxWidth: maxWidth + "px",
+                    padding: "2px"
                 });
             }
         });
     });
+    ApplyHeaderAlignment("#ItemTable");
 }
 
+
 $(document).ready(function () {
-    $(document).on("keyup change", ".Qty, .UnitPrice", function () {
+    $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
         ApplyFieldWidths("#ItemTable");
     });
 
-
-
-    $(document).on("change", "#ItemTable select", function () {
+    $(document).on("focusin", ".Amount", function () {
         ApplyFieldWidths("#ItemTable");
     });
+ 
 
     $(document).on("focus", ".PRS_Number", function () {
         this.click();
@@ -1279,7 +1340,7 @@ function searchItemJIDNI(inputElement) {
 
                 let table = $(`
                     <div class="card-body batchPopup modal-content p-0 table-responsive" style="max-height:500px;">
-                        <table class="table table-bordered table-hover table-fixed mb-0 table-grid">
+                        <table class="table table-bordered table-hover table-fixed mb-0 table-grid" id="tblsearch">
                             <thead>
                                 <tr class="table-info" style="height:32px;">
                                     <th>Item Code</th>
@@ -1335,6 +1396,10 @@ function searchItemJIDNI(inputElement) {
 
                         qtyInput.val(formatIndianQty(qtyInput.val()));
                         qtyUnitprice.val(formatIndianCurrency(qtyUnitprice.val()));
+                    
+                           
+                   
+
 
                         resultsDiv.hide();
                     });
@@ -1391,10 +1456,7 @@ function searchItemJIDNI(inputElement) {
                     $(inputElement).removeData("selectedIndex");
                 }
                 //#endregion search logic highlight
-                setTimeout(function () {
-                    ApplyFieldWidths("#ItemTable");
-                }, 100);
-
+              
               
 
             } else {

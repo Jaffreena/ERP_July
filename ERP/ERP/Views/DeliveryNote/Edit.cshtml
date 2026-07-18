@@ -918,16 +918,8 @@
                                                                oninput="OnEditJWCustomerInput(this)"
                                                                onfocus="OnEditJWCustomerFocus(this)" />
 
-                                              
-                                                  @*   <div class="jwcustomer-search-results"
-                                                         style="display:none;
-                                                        position:absolute;
-                                                        top:100%;
-                                                        left:0;
-                                                        min-width:500px;
-                                                        max-width:500px;
-                                                        z-index:9999;">
-                                                    </div> *@
+                                                 
+                                                 
                                                         <div class="jwcustomer-search-results bg-primary card"
                                                          style="display:none;z-index:9999; position:absolute;">
                                                         </div>
@@ -1133,12 +1125,21 @@
                 <div class="card-body h-100">
                     <div class="row h-100">
                         <div class="col-auto left-menu h-100">
-                            <ul class="nav nav-tabs tab-header">
+                            <ul class="nav nav-tabs tab-header d-flex align-items-end">
                                 <li class="nav-item">
                                     <a class="nav-link active" aria-current="page">Item</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark">Other</a>
+                                </li>
+                                <li class="ms-auto me-2 mb-2">
+                                    <button type="button" id="EditAddRowButton" class="btn btn-primary btn-sm me-2">
+                                        Add Row
+                                    </button>
+
+                                    <button type="button" id="RemoveItemRowButton_Edit" class="btn btn-danger btn-sm RowRemove">
+                                        Delete Row
+                                    </button>
                                 </li>
                             </ul>
                             <div class="tab-content tab-body tab-body-h-o">
@@ -1146,7 +1147,7 @@
                                     <div class="row h-100">
                                         <!-------------------------item-------------------------------------------------------------------->
                                         <div class="col table-fixed h-100">
-                                            <div class="table-responsive" style="max-height:430px; overflow-y:auto;">
+                                            <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
 
 
                                                                     <table class="table table-one table-striped table-bordered table-hover align-middle w-100"
@@ -1218,19 +1219,21 @@
                                                                                                class="form-control JIDNI_Item_Code"
                                                                                                oninput="OnEditInputItem(this)"
                                                                                                onfocus="OnEditFocusItem(this)" />
-                                                                                        <div class="search-results bg-primary card"
-                                                                                             style="display:none">
-                                                                                        </div>
+                                                                    <div class="search-results bg-primary card"
+                                                         style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
+                                                    </div>
+                                                                                    
 
                                                                                     </td>
 
                                                                                     <!-- DESCRIPTION -->
                                                                                     <td>
-
-                                                                                        <input asp-for="Items[i].JIDNI_Item_Description"
-                                                                                               class="form-control JIDNI_Item_Description"
-                                                                                               readonly />
-
+                                                                    <textarea name="Items[0].JIDNI_Item_Description"
+                                                                              class="form-control JIDNI_Item_Description"
+                                                                              rows="2"
+                                                                              readonly></textarea>
+                                                                 
+                                                            
                                                                                     </td>
 
                                                                                     <!-- OD -->
@@ -1392,25 +1395,7 @@
 
                                             </div>
 
-                                            <!-- ================= BUTTONS ================= -->
-                                            <div class="row mt-2">
-                                                <div class="col">
-
-                                                                        <a id="EditAddRowButton"
-                                                                               class="btn btn-primary mb-2">
-
-                                                                            Add Row
-
-                                                                        </a>
-
-                                                                        <a id="RemoveItemRowButton_Edit" class="RowRemove btn btn-primary mb-2">
-
-                                                                            Delete Row
-
-                                                                        </a>
-
-                                                </div>
-                                            </div>
+                                          
                                         </div>
 
                                         <!-------------------item----------------------------------------------------------->

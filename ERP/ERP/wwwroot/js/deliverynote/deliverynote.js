@@ -1,5 +1,199 @@
 ﻿var addressIndex = 0;
 
+
+//#region item grid alignment
+// Converts characters (ch) to pixels
+// 1ch = width of the "0" character in the current font
+function chToPx(ch, element) {
+
+    const canvas = chToPx.canvas || (chToPx.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    const oneCh = ctx.measureText("0").width;
+
+    return Math.ceil(ch * oneCh);
+}
+function getTextWidth(text, element) {
+
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+
+    const style = window.getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    return Math.ceil(ctx.measureText(text).width);
+}
+function ApplyFieldWidths(container = "#ItemTable") {
+
+    const fields = [
+        { cls: ".JIDNI_PRS_Number", min: 15, max: 30, align: "left" },
+        { cls: ".JIDNI_Item_Code", min: 18, max: 18, align: "left" },
+        { cls: ".JIDNI_Item_Description", min: 30, max: 45, align: "left" },
+
+        { cls: ".JIDNI_OuterDia", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_Thickness", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_Length", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_Width", min: 10, max: 10, align: "center" },
+
+        { cls: ".JIDNI_MaterialGrade", min: 15, max: 25, align: "left" },
+        { cls: ".JIDNI_ItemGroup", min: 15, max: 30, align: "left" },
+        { cls: ".JIDNI_WH_Number", min: 15, max: 25, align: "left" },
+
+        { cls: ".JIDNI_UoM_Number", min: 10, max: 15, align: "center" },
+
+        { cls: ".JIDNI_Qty", min: 11, max: 20, align: "center" },
+        { cls: ".JIDNI_UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JIDNI_Amount", min: 13, max: 25, align: "right" },
+
+        { cls: ".JIDNI_JW_InvoiceTracking", min: 5, max: 5, align: "center" },
+        { cls: ".JISVOH_Number", min: 15, max: 30, align: "left" }
+    ];
+
+    const $container = $(container);
+
+    // Checkbox column width
+    const checkWidth = 40;
+
+    $container.find("thead th:first-child, tfoot td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
+    $container.find("tbody > tr > td:first-child").css({
+        width: checkWidth + "px",
+        minWidth: checkWidth + "px",
+        maxWidth: checkWidth + "px",
+        textAlign: "center"
+    });
+
+    fields.forEach(f => {
+
+        const controls = $container.find(
+            "#TempRow " + f.cls +
+            ", #TableBody > tr.NewRow " + f.cls
+        ).filter(function () {
+            return $(this).closest("#tblsearch").length === 0;
+        });
+
+        if (!controls.length)
+            return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            }
+            else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            }
+            else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(
+                requiredWidth,
+                getTextWidth(text, this)
+            );
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        if (f.cls === ".JIDNI_UnitPrice" || f.cls === ".JIDNI_Amount") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            $(this).css({
+                width: requiredWidth + "px",
+                minWidth: minWidth + "px",
+                maxWidth: maxWidth + "px",
+                textAlign: f.align,
+                padding: "2px"
+            });
+
+            if (f.cls === ".JIDNI_Item_Description" && this.tagName === "TEXTAREA") {
+
+                const charsPerLine = 20;
+                const lines = Math.max(1, Math.ceil(this.value.length / charsPerLine));
+
+                const lineHeight = parseFloat(window.getComputedStyle(this).lineHeight);
+                const extraHeight = 12;
+
+                this.style.height = (lines * lineHeight + extraHeight) + "px";
+                this.style.setProperty("resize", "none", "important");
+                this.style.setProperty("overflow", "hidden", "important");
+            }
+
+            const td = $(this).closest("td");
+
+            if (td.closest("#tblsearch").length === 0) {
+                td.css({
+                    width: requiredWidth + "px",
+                    minWidth: minWidth + "px",
+                    maxWidth: maxWidth + "px",
+                    padding: "2px"
+                });
+            }
+        });
+    });
+
+    ApplyHeaderAlignment("#ItemTable");
+}
+function ApplyHeaderAlignment(container = "#ItemTable") {
+
+    const fields = [
+        { cls: ".JIDNI_PRS_Number", align: "left" },
+        { cls: ".JIDNI_Item_Code", align: "left" },
+        { cls: ".JIDNI_Item_Description", align: "left" },
+
+        { cls: ".JIDNI_OuterDia", align: "center" },
+        { cls: ".JIDNI_Thickness", align: "center" },
+        { cls: ".JIDNI_Length", align: "center" },
+        { cls: ".JIDNI_Width", align: "center" },
+
+        { cls: ".JIDNI_MaterialGrade", align: "left" },
+        { cls: ".JIDNI_ItemGroup", align: "left" },
+        { cls: ".JIDNI_WH_Number", align: "left" },
+
+        { cls: ".JIDNI_UoM_Number", align: "center" },
+
+        { cls: ".JIDNI_Qty", align: "center" },
+        { cls: ".JIDNI_UnitPrice", align: "right" },
+        { cls: ".JIDNI_Amount", align: "right" },
+
+        { cls: ".JIDNI_JW_InvoiceTracking", align: "center" },
+        { cls: ".JISVOH_Number", align: "left" }
+    ];
+
+    fields.forEach(f => {
+
+        $(container)
+            .find("thead th." + f.cls.substring(1))
+            .css("text-align", f.align);
+
+    });
+}
+//#endregion
+
 function HighlightRow(rows, index) {
 
     rows.removeClass("current-row");
@@ -19,6 +213,14 @@ function AutoFit() {
   
 }
 $(document).ready(function () {
+    //#region item grid alignment
+    ApplyFieldWidths("#ItemTable");
+
+    $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+    //#endregion
+
     AutoFit();
     $(document).on("input keyup", "#Header_JIDNH_DN_No", function () {
         fitInputWidth(this, 20, 30);
@@ -336,7 +538,7 @@ $(document).ready(function () {
         //);
 
         //#endregion
-      
+        ApplyFieldWidths("#ItemTable");
       
     });
     //#endregion add row item grid
@@ -1402,7 +1604,7 @@ function searchItemJIDNI(inputElement) {
 
                 let table = $(`
                     <div class="card-body batchPopup modal-content p-0 table-responsive">
-                        <table class="table table-bordered table-hover table-fixed mb-0 table-grid">
+                        <table class="table table-bordered table-hover table-fixed mb-0 table-grid" id="tblsearch">
                             <thead>
                                 <tr class="table-info">
                                     <th>Item Code</th>
@@ -1465,7 +1667,9 @@ function searchItemJIDNI(inputElement) {
                         let qtyUnitpriceVal = qtyUnitprice.val();
                         qtyInput.val(formatIndianQty(qtyVal));
                         qtyUnitprice.val(formatIndianCurrency(qtyUnitpriceVal));
-
+                    
+                         
+                       
                         resultsDiv.hide();
                     });
 
