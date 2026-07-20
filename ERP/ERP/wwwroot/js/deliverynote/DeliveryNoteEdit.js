@@ -1,7 +1,257 @@
 ﻿let deletedRows = [];
 var G_JINI_Number = 0;
 var G_JINH_Number = 0;
+//#region batch grid alignment
+function GetTableWidth(container = "#DeliveryNoteBatchList") {
 
+    const $table = $(container);
+    let totalWidth = 0;
+
+    $table.find("thead th").each(function (index) {
+
+        let maxWidth = getTextWidth($(this).text().trim(), this);
+
+        $table.find("tbody tr:visible").each(function () {
+
+            const cell = this.cells[index];
+            if (!cell) return;
+
+            const control = $(cell).find("input, select, textarea")[0];
+
+            let text = "";
+
+            if (control) {
+                if (control.tagName === "SELECT")
+                    text = control.options[control.selectedIndex]?.text || "";
+                else
+                    text = control.value || "";
+
+                maxWidth = Math.max(maxWidth, getTextWidth(text, control));
+            } else {
+                text = cell.textContent || "";
+                maxWidth = Math.max(maxWidth, getTextWidth(text, cell));
+            }
+        });
+
+        // Add some padding for the cell
+        totalWidth += maxWidth + 23;
+    });
+
+    return totalWidth;
+}
+function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
+
+    const fields = [
+        { cls: ".JIDNI_BCH_WH_Name", min: 15, max: 30, align: "left" },
+        { cls: ".JIDNI_BCH_BatchDate", min: 12, max: 12, align: "center" },
+        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 35, align: "left" },
+        { cls: ".JIDNI_BCH_QtyAvailable", min: 11, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyReserved", min: 11, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyInvoice", min: 11, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
+    ];
+
+    const $container = $(container);
+
+    fields.forEach(f => {
+
+        const controls = $container.find(
+            "#DeliveryNoteBatchTableBody > #DeliveryNoteBatchTemplateRow " + f.cls +
+            ", #DeliveryNoteBatchTableBody > tr.DeliveryNoteBatchNewRow " + f.cls
+        );
+
+        if (!controls.length) return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            } else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            } else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(requiredWidth, getTextWidth(text, this));
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        if (
+            f.cls === ".JIDNI_BCH_BatchUnitPrice" ||
+            f.cls === ".JIDNI_BCH_BatchValue"
+        ) {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            this.style.removeProperty("padding");
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("min-width", "100%", "important");
+            this.style.setProperty("max-width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+            td.style.setProperty("text-align", f.align, "important");
+            td.style.setProperty("padding", "2px", "important");
+
+            const th = $container.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+                th.style.setProperty("text-align", f.align, "important");
+                th.style.setProperty("padding", "2px", "important");
+
+            }
+        });
+    });
+
+    const tableWidth = GetTableWidth("#DeliveryNoteBatchList");
+    SetDeliveryNoteBatchModalWidth(tableWidth);
+}
+function SetDeliveryNoteBatchModalWidth(tableWidth) {
+
+    const dialog = document.querySelector("#DeliveryNoteBatchModal .modal-dialog");
+
+    if (!dialog) return;
+
+    // Add space for modal padding and borders
+    const width = (tableWidth + 40) + "px";
+
+    dialog.style.setProperty("width", width, "important");
+    dialog.style.setProperty("max-width", width, "important");
+    dialog.style.setProperty("height", "528px", "important");
+    dialog.style.setProperty("max-height", "528px", "important");
+}
+
+function ApplyOtherBatchFieldWidths(container = "#DeliveryNoteOtherBatchList") {
+
+    const fields = [
+        { cls: ".JIDNI_BCH_WH_Name", min: 15, max: 30, align: "left" },
+        { cls: ".JIDNI_BCH_BatchDate", min: 12, max: 12, align: "center" },
+        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 35, align: "left" },
+        { cls: ".JIDNI_BCH_AvailableQty", min: 11, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
+    ];
+
+    const $container = $(container);
+
+    fields.forEach(f => {
+
+        const controls = $container.find(
+            "#DeliveryNoteOtherBatchTableBody > #DeliveryNoteOtherBatchTemplateRow " + f.cls +
+            ", #DeliveryNoteOtherBatchTableBody > tr.DeliveryNoteOtherBatchNewRow " + f.cls
+        );
+
+        if (!controls.length) return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            }
+            else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            }
+            else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(requiredWidth, getTextWidth(text, this));
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        if (
+            f.cls === ".JIDNI_BCH_BatchUnitPrice" ||
+            f.cls === ".JIDNI_BCH_BatchValue"
+        ) {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            this.style.removeProperty("padding");
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("min-width", "100%", "important");
+            this.style.setProperty("max-width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+            td.style.setProperty("text-align", f.align, "important");
+            td.style.setProperty("padding", "2px", "important");
+
+            const th = $container.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+                th.style.setProperty("text-align", f.align, "important");
+                th.style.setProperty("padding", "2px", "important");
+            }
+        });
+    });
+
+    const tableWidth = GetTableWidth("#DeliveryNoteOtherBatchList");
+    SetDeliveryNoteOtherBatchModalWidth(tableWidth);
+}
+function SetDeliveryNoteOtherBatchModalWidth(tableWidth) {
+
+    const dialog = document.querySelector("#DeliveryNoteOtherBatchModal .modal-dialog");
+
+    if (!dialog) return;
+
+    // Add space for modal padding and borders
+    const width = (tableWidth + 40) + "px";
+
+    dialog.style.setProperty("width", width, "important");
+    dialog.style.setProperty("max-width", width, "important");
+    dialog.style.setProperty("height", "528px", "important");
+    dialog.style.setProperty("max-height", "528px", "important");
+}
+
+
+//#endregion 
 //#region item grid alignment
 // Converts characters (ch) to pixels
 // 1ch = width of the "0" character in the current font
@@ -264,10 +514,34 @@ function HighlightRow(rows, index) {
     });
 }
 function AutoFit() {
-    fitInputWidth("Header_JIDNH_DN_No", 20, 30);
-
+    fitInputWidth("Header_JIDNH_DN_No", 20, 25);
+    fitInputWidth("Header_JIDNH_MS_Number", 20, 30);
+    fitInputWidth("Header_JIDNH_JW_Customer_Name", 40, 75);
+    fitInputWidth("Header_JIDNH_Currency_Number", 10, 10);
+    fitInputWidth("Header_JIDNH_WH_Number", 20, 25);
+    fitInputWidth("Header_JIDNH_PaymentTerms", 25, 30);
+    fitInputWidth("Header_JIDNH_DeliveryTerms", 25, 30);
+    fitInputWidth("Header_JIDNH_DeliveryMode", 25, 30);
+    fitInputWidth("Header_JIDNH_DespatchDocumentNo", 25, 30);
+    fitInputWidth("Header_JIDNH_DespatchedThrough", 25, 30);
+    fitInputWidth("Header_JIDNH_Remarks", 35, 45);
 }
 $(document).ready(function () {
+    //#region batch grid alignment
+    $(document).on("input change blur", "#DeliveryNoteBatchList input, #DeliveryNoteBatchList textarea, #DeliveryNoteBatchList select", function () {
+        ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+    });
+    ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+    $(document).on(
+        "input change blur",
+        "#DeliveryNoteOtherBatchList input, #DeliveryNoteOtherBatchList textarea, #DeliveryNoteOtherBatchList select",
+        function () {
+            ApplyOtherBatchFieldWidths("#DeliveryNoteOtherBatchList");
+        }
+    );
+
+    ApplyOtherBatchFieldWidths("#DeliveryNoteOtherBatchList");
+    //#endregion
     //#region item grid alignment
     ApplyFieldWidths("#ItemTable");
 
@@ -276,9 +550,31 @@ $(document).ready(function () {
     });
     //#endregion
     AutoFit();
-    $(document).on("input keyup", "#Header_JIDNH_DN_No", function () {
-        fitInputWidth(this, 20, 30);
-    });
+    //#region Header AutoFit - KeyUp
+
+    $(document).on("keyup change input",
+        "#Header_JIDNH_DN_No, #Header_JIDNH_MS_Number, #Header_JIDNH_JW_Customer_Name, #Header_JIDNH_Currency_Number, #Header_JIDNH_WH_Number, #Header_JIDNH_PaymentTerms, #Header_JIDNH_DeliveryTerms, #Header_JIDNH_DeliveryMode, #Header_JIDNH_DespatchDocumentNo, #Header_JIDNH_DespatchedThrough, #Header_JIDNH_Remarks",
+        function () {
+
+            const widths = {
+                Header_JIDNH_DN_No: [20, 25],
+                Header_JIDNH_MS_Number: [20, 30],
+                Header_JIDNH_JW_Customer_Name: [40, 75],
+                Header_JIDNH_Currency_Number: [10, 10],
+                Header_JIDNH_WH_Number: [20, 25],
+                Header_JIDNH_PaymentTerms: [25, 30],
+                Header_JIDNH_DeliveryTerms: [25, 30],
+                Header_JIDNH_DeliveryMode: [25, 30],
+                Header_JIDNH_DespatchDocumentNo: [25, 30],
+                Header_JIDNH_DespatchedThrough: [25, 30],
+                Header_JIDNH_Remarks: [35, 45]
+            };
+
+            const [min, max] = widths[this.id];
+            fitInputWidth(this, min, max);
+        });
+
+    //#endregion
     $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
 
         let input = $(this);

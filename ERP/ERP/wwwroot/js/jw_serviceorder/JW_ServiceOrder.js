@@ -199,6 +199,16 @@ function HighlightRow(rows, index) {
 function AutoFit() {
     fitInputWidth("Header_JISVOH_RegNo", 20, 30);
     fitInputWidth("Header_JISVOH_ServiceOrderNo", 20, 30);
+    
+    fitInputWidth("Header_JISVOH_MS_Number", 20, 30);
+    fitInputWidth("Header_JISVOH_JW_Customer_Name", 40, 75);
+    fitInputWidth("Header_JISVOH_Currency_Number", 10, 10);
+    fitInputWidth("Header_JISVOH_PaymentTerms", 25, 30);
+    fitInputWidth("Header_JISVOH_DeliveryTerms", 25, 30);
+    fitInputWidth("Header_JISVOH_DeliveryMode", 25, 30);
+    fitInputWidth("Header_JISVOH_Tax", 15, 25);
+    fitInputWidth("Header_JISVOH_TDC", 15, 25);
+    fitInputWidth("Header_JISVOH_Remarks", 35, 45);
 }
 $(document).ready(function () {
     //#region item grid alignment
@@ -210,12 +220,31 @@ $(document).ready(function () {
     //#endregion
   
     AutoFit();
-    $(document).on("input keyup", "#Header_JISVOH_RegNo", function () {
-        fitInputWidth(this, 20, 30);
-    });
-    $(document).on("input keyup", "#Header_JISVOH_ServiceOrderNo", function () {
-        fitInputWidth(this, 20, 30);
-    });
+    //#region Header AutoFit - KeyUp
+
+    $(document).on("keyup change input",
+        "#Header_JISVOH_RegNo, #Header_JISVOH_ServiceOrderNo, #Header_JISVOH_MS_Number, #Header_JISVOH_JW_Customer_Name, #Header_JISVOH_Currency_Number, #Header_JISVOH_PaymentTerms, #Header_JISVOH_DeliveryTerms, #Header_JISVOH_DeliveryMode, #Header_JISVOH_Tax, #Header_JISVOH_TDC, #Header_JISVOH_Remarks",
+        function () {
+
+            const widths = {
+                Header_JISVOH_RegNo: [20, 30],
+                Header_JISVOH_ServiceOrderNo: [20, 30],
+                Header_JISVOH_MS_Number: [20, 30],
+                Header_JISVOH_JW_Customer_Name: [40, 75],
+                Header_JISVOH_Currency_Number: [10, 10],
+                Header_JISVOH_PaymentTerms: [25, 30],
+                Header_JISVOH_DeliveryTerms: [25, 30],
+                Header_JISVOH_DeliveryMode: [25, 30],
+                Header_JISVOH_Tax: [15, 25],
+                Header_JISVOH_TDC: [15, 25],
+                Header_JISVOH_Remarks: [35, 45]
+            };
+
+            const [min, max] = widths[this.id];
+            fitInputWidth(this, min, max);
+        });
+
+    //#endregion
 
     $(document).on("keydown", "#Header_JISVOH_JW_Customer_Name", function (e) {
 

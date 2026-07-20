@@ -131,40 +131,18 @@
         cursor: pointer;
     }
 
-    /* Material Segregation */
-    #MS_Number {
-        width: 20ch !important;
-        max-width: 100%;
-    }
+   
 
     /* Job Work Customer */
     #JWC_Name {
-        width: 40ch !important;
-        max-width: 350ch;
+      
         padding-right: 24px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 8px center;
     }
 
-    /* Currency */
-    #Currency_Name {
-        width: 10ch !important;
-        max-width: 100%;
-    }
-
-    /* Warehouse */
-    #WH_Number {
-        width: 20ch !important;
-        max-width: 100%;
-    }
-
-    /* Remarks */
-    #Remarks {
-        width: 45ch !important;
-        max-width: 85ch;
-        line-height:1;
-    }
+  
 
     
 </style>
@@ -198,12 +176,20 @@
             <div class="modal-content border">
                 <div class="modal-header">
                     <p class="modal-title w-100">
-                        Batch <span class="float-end">
-                        Line Item Qty : <span id="RNI_BATCHQty"></span>
-                        <button type="button" id="ExCloseButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <span style="font-size:14px;font-weight:bold">Receipt Note Batch</span>      <span class="float-end">
+                        <span style="font-size:14px"> Line Item Qty : </span>    <span style="font-size:14px" id="RNI_BATCHQty"></span>
+                        <button type="button"
+                                id="ExCloseButton"
+                                style="position:relative; left:6px; top:-6px; width:25px; height:10px; font-size:12px; padding:0;"
+                                class="btn bg-transparent text-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                            ✕
+                        </button>
                     </span>
                 </p>
             </div>
+                
             <div class="modal-body p-0">
                 <div class="p-2 text-black h-100">
                     <ul class="nav nav-tabs tab-header" role="tablist">
@@ -216,7 +202,7 @@
                         
                             <!--------------------------------------------batch--------------------------------------------->
                             <div class="w-100 table-responsive">
-                                <table class="table table-bordered table-hover align-middle table-grid mb-0">
+                                <table class="table table-bordered table-hover align-middle table-grid mb-0" id="BatchTable">
                                     <thead>
                                         <tr class="table-info">
                                             <th class="datetype text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Date)</th>
@@ -458,7 +444,7 @@
       
                                     <div class="row align-items-center px-2 mb-1">
                                         <label asp-for="WH_Number" class="col-sm-2 col-form-label ps-0"></label>
-                                        <div class="col-sm-10">
+                                        <div class="col-sm-8">
                                             <select asp-for="WH_Number" class="form-select" asp-items="@ViewBag.Warehouse"></select>
                                             @{
                                                 if (Model != null)

@@ -49,12 +49,12 @@ function ValidateBatchQty() {
         }).get()
         .reduce((sum, qty) => sum + qty, 0);
 
-    console.log("InvoiceQty :", InvoiceQty);
-    console.log("BatchQty :", BatchQty);
+    //console.log("InvoiceQty :", InvoiceQty);
+    //console.log("BatchQty :", BatchQty);
 
     let rowId = GetCheckedRowId_RN_Edit();
 
-    console.log("Selected Item :", rowId);
+   // console.log("Selected Item :", rowId);
 
     // Always store the current batch details
     StoreBatchMismatch_RN(rowId);
@@ -77,7 +77,7 @@ function RemoveWrongBatchMismatch_RN(rowId) {
 
     batchWrongMismatchData_RN = batchWrongMismatchData_RN.filter(x => x.rowId != rowId);
 
-    console.log(batchWrongMismatchData_RN);
+  //  console.log(batchWrongMismatchData_RN);
 }
 function CloseModal_RN() {
 
@@ -184,7 +184,7 @@ function StoreWrongBatchMismatch_RN_Edit(rowId) {
             batchValues: batchValues
         });
 
-    console.log(batchWrongMismatchData_RN);
+   // console.log(batchWrongMismatchData_RN);
 }
  
 
@@ -219,7 +219,12 @@ function StoreBatchMismatch_RN(rowId) {
 
             if ($(this).find(".RNI_BCH_IsDeleted").val() === "true")
                 return;
-
+            console.log({
+                Qty: $(this).find(".RNI_BCH_Qty").val(),
+                AmendQty: $(this).find(".RNI_BCH_AmendQty").val(),
+                UnitPrice: $(this).find(".RNI_BCH_UnitPrice").val(),
+                Value: $(this).find(".RNI_BCH_Value").val()
+            });
             batchValues.push({
                 JIRNI_Number: jirniNumber,
 
@@ -232,18 +237,12 @@ function StoreBatchMismatch_RN(rowId) {
                 RNI_BCH_Item_Number: itemNumber,
 
                 RNI_BCH_WH_Number: whNumber,
-
-                RNI_BCH_Qty: $(this).find(".RNI_BCH_Qty").val(),
-
-                RNI_BCH_UnitPrice: $(this).find(".RNI_BCH_UnitPrice").val(),
-
-                RNI_BCH_Value: $(this).find(".RNI_BCH_Value").val(),
-
-                RNI_BCH_OriginalQty: $(this).find(".RNI_BCH_OriginalQty").val(),
-
-                RNI_BCH_UsedQty: $(this).find(".RNI_BCH_UsedQty").val(),
-
-                RNI_BCH_AmendQty: $(this).find(".RNI_BCH_AmendQty").val(),
+                RNI_BCH_Qty: removeCommas($(this).find(".RNI_BCH_Qty").val()),
+                RNI_BCH_OriginalQty: removeCommas($(this).find(".RNI_BCH_OriginalQty").val()),
+                RNI_BCH_UsedQty: removeCommas($(this).find(".RNI_BCH_UsedQty").val()),
+                RNI_BCH_AmendQty: removeCommas($(this).find(".RNI_BCH_AmendQty").val()),
+                RNI_BCH_UnitPrice: removeCommas($(this).find(".RNI_BCH_UnitPrice").val()),
+                RNI_BCH_Value: removeCommas($(this).find(".RNI_BCH_Value").val()),
 
                 RNI_BCH_IsDeleted: $(this).find(".RNI_BCH_IsDeleted").val()
             });
@@ -259,8 +258,9 @@ function StoreBatchMismatch_RN(rowId) {
             rowId: rowId,
             batchValues: batchValues
         });
-
-    console.log(batchMismatchData_RN);
+    //console.log("Saving RowId :", rowId);
+    //console.log("Saved Batch Data:", JSON.stringify(batchMismatchData_RN));
+    //console.log("Saved Batch:", batchValues[batchValues.length - 1]);
 }
 
  
@@ -317,8 +317,8 @@ function ApplyBatchValues_RN_Edit(rowId) {
             .val(batch.RNI_BCH_Qty);
 
         row.find(".RNI_BCH_UnitPrice")
-            .val(batch.RNI_BCH_UnitPrice);
-
+            .val(batch.RNI_BCH_UnitPrice)
+            .attr("data-value", batch.RNI_BCH_UnitPrice);
         row.find(".RNI_BCH_Value")
             .val(batch.RNI_BCH_Value);
 
@@ -428,10 +428,18 @@ function IBatNewRow() {
 
     row.find("input.RNI_BCH_Qty")
         .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_Qty");
+    row.find("input.RNI_BCH_OriginalQty")
+        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_OriginalQty");
 
+    row.find("input.RNI_BCH_UsedQty")
+        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_UsedQty");
+
+    row.find("input.RNI_BCH_AmendQty")
+        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_AmendQty");
     row.find("input.RNI_BCH_UnitPrice")
         .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_UnitPrice")
         .val(unitPrice)
+        .attr("data-value", unitPrice)
         .prop("readonly", true);
 
     row.find("input.RNI_BCH_Value")
@@ -460,7 +468,7 @@ function SaveTempBatch() {
         CurrentBatchItemRow.index();
     let itemNumber =
         CurrentBatchItemRow.find(".Item_Number").val();
-    console.log("SAVE rowIndex:", rowIndex);
+   /* console.log("SAVE rowIndex:", rowIndex);*/
 
     let batchList = [];
 
@@ -515,13 +523,13 @@ function SaveTempBatch() {
         }
     });
 
-    console.log("batchList:", batchList);
+  //  console.log("batchList:", batchList);
 
     BatchMap[rowIndex] =
         batchList;
 
-    console.log("After Save:", BatchMap);
-
+    //console.log("After Save:", BatchMap);
+    //console.log("After SaveTempBatch:", batchMismatchData_RN);
     bootstrap.Modal
         .getInstance(document.getElementById("IBatch"))
         ?.hide();
@@ -530,12 +538,14 @@ function SaveTempBatch() {
  
 function CalculateBatchRow(row) {
 
-    let qty = parseFloat((row.find(".RNI_BCH_Qty").val() || "").replace(/,/g, "")) || 0;
+    let qty = parseFloat((row.find(".RNI_BCH_AmendQty").val() || "").replace(/,/g, "")) || 0;
+
     let unitPrice = parseFloat((row.find(".RNI_BCH_UnitPrice").val() || "").replace(/,/g, "")) || 0;
 
     let amount = qty * unitPrice;
 
-    row.find(".RNI_BCH_Value").val(amount === 0 ? "" : formatIndianCurrency(amount));
+    row.find(".RNI_BCH_Value")
+        .val(amount === 0 ? "" : formatIndianCurrency(amount));
 
     CalculateBatchFooter_Edit();
 }
@@ -546,17 +556,17 @@ $(function () {
 });
 
 $(document).ready(function () {
+    $(document).on("keyup change", ".RNI_BCH_AmendQty", function () {
+
+        CalculateBatchRow($(this).closest("tr"));
+
+    });
     $(document).on("focusout", ".RNI_BCH_AmendQty", function () {
         let value = $(this).val();
         $(this).val(formatIndianQty(value));
         CalculateBatchFooter_Edit();
     });
-    $(document).on("input", ".RNI_BCH_Qty, .RNI_BCH_UnitPrice", function () {
 
-        let row = $(this).closest("tr");
-
-        CalculateBatchRow(row);
-    });
    
     // ✅ Add Row Button
     $("#IBatNewRowButton").click(function () {
@@ -582,9 +592,10 @@ $(document).ready(function () {
 
             return false;
         }
-
+       // console.log("Before SaveTempBatch:", batchMismatchData_RN);
         SaveTempBatch();
     });
+
     $(document).on("click", ".ItemBatch", function () {
 
         let checkedRows =
@@ -612,25 +623,23 @@ $(document).ready(function () {
         CurrentBatchItemRow =
             selectedRow;
 
-        let rowIndex =
-            selectedRow.index();
+        let rowIndex = selectedRow.index();
+        let rowId = GetCheckedRowId_RN_Edit();
 
-        console.log("OPEN rowIndex:", rowIndex);
-        console.log("BatchMap:", BatchMap);
+        //console.log("OPEN rowIndex :", rowIndex);
+        //console.log("OPEN rowId    :", rowId);
+        //console.log("BatchMap :", BatchMap);
 
         $("#IBatTableBody")
             .find("tr.IBatNewRow")
             .remove();
+
         $("#RNI_BATCHQty").text(itemQty);
-        //=========================================================
-        // Load Batch Popup from batchMismatchData_RN
-        //=========================================================
 
         let batches = [];
 
         if (jirniNumber > 0) {
 
-            // Existing item - find by JIRNI_Number
             let item = batchMismatchData_RN.find(function (x) {
 
                 return x.batchValues.length > 0 &&
@@ -642,13 +651,16 @@ $(document).ready(function () {
         }
         else {
 
-            // New item - find by rowId
-            batches = GetBatchValues_RN(rowIndex);
+            // Use rowId instead of rowIndex
+            batches = GetBatchValues_RN(rowId);
 
         }
 
-        console.log("Fetched:", batches);
+        //console.log("Fetched Batches :", batches);
 
+        //console.log("Fetched:", batches);
+       // console.log("Fetched Count:", batches.length);
+      //  console.log("First Batch:", batches[0]);
         BindBatchPopup(
             batches,
             itemNumber,
@@ -660,12 +672,14 @@ $(document).ready(function () {
 
        
     });
+
+
     $(document).on("click", "#btnClearAll", function () {
         ClearAll();
     });
 });
 function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
-
+ 
     if (rowBatches.length === 0) {
 
         IBatNewRow();
@@ -677,6 +691,7 @@ function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
         $("#IBatTableBody tr.IBatNewRow:last")
             .find(".RNI_BCH_UnitPrice")
             .val(unitPrice == 0 ? "" : formatIndianCurrency(unitPrice))
+            .attr("data-value", unitPrice)
             .prop("readonly", true);
     }
     else {
@@ -699,46 +714,56 @@ function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
             newRow.find(".RNI_BCH_Number")
                 .val(batch.RNI_BCH_Number);
 
+            // Qty
             newRow.find(".RNI_BCH_Qty")
-                .val(batch.RNI_BCH_Qty == 0 ? "" : formatIndianQty(batch.RNI_BCH_Qty));
+                .val(batch.RNI_BCH_Qty ? formatIndianQty(batch.RNI_BCH_Qty) : "0");
 
+            // Unit Price
             newRow.find(".RNI_BCH_UnitPrice")
-                .val(batch.RNI_BCH_UnitPrice == 0 ? "" : formatIndianCurrency(batch.RNI_BCH_UnitPrice))
+                .val(batch.RNI_BCH_UnitPrice ? formatIndianCurrency(batch.RNI_BCH_UnitPrice) : "0.00")
+                .attr("data-value", batch.RNI_BCH_UnitPrice)
                 .prop("readonly", true);
 
             newRow.find(".RNI_BCH_Value")
-                .val(batch.RNI_BCH_Value == 0 ? "" : formatIndianCurrency(batch.RNI_BCH_Value));
+                .val(batch.RNI_BCH_Value ? formatIndianCurrency(batch.RNI_BCH_Value) : "0.00");
 
+            // Warehouse
             newRow.find(".RNI_BCH_Item_WH")
                 .val(batch.RNI_BCH_WH_Number);
 
-            // Hidden fields
+            // Hidden Fields
             newRow.find(".JIRNI_BCH_Number")
                 .val(batch.RNI_BCH_Number);
 
             newRow.find(".JIRNI_BCH_JIRNI_Number")
                 .val(batch.JIRNI_Number);
 
+            // Qty Details
             newRow.find(".RNI_BCH_OriginalQty")
-                .val(batch.RNI_BCH_OriginalQty == 0 ? "" : formatIndianQty(batch.RNI_BCH_OriginalQty));
+                .val(batch.RNI_BCH_OriginalQty ? formatIndianQty(batch.RNI_BCH_OriginalQty) : "0");
 
             newRow.find(".RNI_BCH_UsedQty")
-                .val(batch.RNI_BCH_UsedQty == 0 ? "" : formatIndianQty(batch.RNI_BCH_UsedQty));
+                .val(batch.RNI_BCH_UsedQty ? formatIndianQty(batch.RNI_BCH_UsedQty) : "0");
 
             newRow.find(".RNI_BCH_AmendQty")
-                .val(batch.RNI_BCH_OriginalQty == 0 ? "" : formatIndianQty(batch.RNI_BCH_OriginalQty));
+                .val(batch.RNI_BCH_AmendQty ? formatIndianQty(batch.RNI_BCH_AmendQty) : "0");
+
+        
         });
 
+        CalculateBatchFooter_Edit();
+        //console.log("Rows after binding:",
+        //    $("#IBatTableBody tr.IBatNewRow").length);
         CalculateBatchFooter_Edit();
     }
 
     let qtyPopup = selectedRow.find(".AmendQty").val();
 
+   
     $("#RNI_BATCHQty").text(qtyPopup);
-
     var currentItemGridSelectedRow = GetCheckedRowId_RN_Edit();
 
-    ApplyBatchValues_RN_Edit(currentItemGridSelectedRow);
+  //  ApplyBatchValues_RN_Edit(currentItemGridSelectedRow);
 
     setTimeout(function () {
 
@@ -747,8 +772,22 @@ function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
             .focus();
 
     }, 200);
+    console.log("No:",
+        $("#IBatTableBody tr.IBatNewRow:first .RNI_BCH_No").val());
+
+    console.log("AmendQty:",
+        $("#IBatTableBody tr.IBatNewRow:first .RNI_BCH_AmendQty").val());
 
     new bootstrap.Modal($("#IBatch")).show();
+    setTimeout(function () {
+
+        console.log("After Modal No:",
+            $("#IBatTableBody tr.IBatNewRow:first .RNI_BCH_No").val());
+
+        console.log("After Modal AmendQty:",
+            $("#IBatTableBody tr.IBatNewRow:first .RNI_BCH_AmendQty").val());
+
+    }, 100);
 }
 
 //#region clear all

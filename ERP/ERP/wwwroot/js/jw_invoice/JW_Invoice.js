@@ -261,7 +261,14 @@ let ItemGSTMap = {};
 let CurrentGSTRow = null;
 function AutoFit() {
     fitInputWidth("Header_JISVIH_InvoiceNo", 20, 30);
-
+    fitInputWidth("Header_JISVIH_MS_Number", 20, 30);
+    fitInputWidth("Header_JISVIH_JW_Customer_Name", 40, 75);
+ 
+    fitInputWidth("Header_JISVIH_Currency_Number", 10, 10);
+    fitInputWidth("Header_JISVIH_TCT_Number", 25, 30);
+    fitInputWidth("Header_JISVIH_PaymentTerms", 25, 30);
+    fitInputWidth("Header_JISVIH_PaymentMethod", 25, 30);
+    fitInputWidth("Header_JISVIH_Remarks", 35, 45);
 }
 $(document).ready(function () {
     //#region item grid alignment
@@ -272,9 +279,28 @@ $(document).ready(function () {
     });
     //#endregion
     AutoFit();
-    $(document).on("input keyup", "#Header_JISVIH_InvoiceNo", function () {
-        fitInputWidth(this, 20, 30);
-    });
+    //#region Header AutoFit - KeyUp
+
+    $(document).on("keyup change input",
+        "#Header_JISVIH_InvoiceNo, #Header_JISVIH_MS_Number, #Header_JISVIH_JW_Customer_Name, #Header_JISVIH_Currency_Number, #Header_JISVIH_TCT_Number, #Header_JISVIH_PaymentTerms, #Header_JISVIH_PaymentMethod, #Header_JISVIH_Remarks",
+        function () {
+
+            const widths = {
+                Header_JISVIH_InvoiceNo: [20, 30],
+                Header_JISVIH_MS_Number: [20, 30],
+                Header_JISVIH_JW_Customer_Name: [40, 75],
+                Header_JISVIH_Currency_Number: [10, 10],
+                Header_JISVIH_TCT_Number: [25, 30],
+                Header_JISVIH_PaymentTerms: [25, 30],
+                Header_JISVIH_PaymentMethod: [25, 30],
+                Header_JISVIH_Remarks: [35, 45]
+            };
+
+            const [min, max] = widths[this.id];
+            fitInputWidth(this, min, max);
+        });
+
+    //#endregion
     $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
 
         let input = $(this);

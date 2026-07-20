@@ -1,4 +1,104 @@
-﻿//#region item grid alignment
+﻿//#region batch grid alignment
+
+function ApplyBatchFieldWidths(container = "#BatchTable") {
+
+    const fields = [
+        { cls: ".RNI_BCH_Date", min: 12, max: 12, align: "center" },
+        { cls: ".RNI_BCH_No", min: 30, max: 50, align: "left" },
+        { cls: ".RNI_BCH_Qty", min: 11, max: 20, align: "center" },
+        { cls: ".RNI_BCH_UsedQty", min: 11, max: 20, align: "center" },
+        { cls: ".RNI_BCH_AmendQty", min: 11, max: 20, align: "center" },
+        { cls: ".RNI_BCH_UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".RNI_BCH_Value", min: 13, max: 25, align: "right" }
+    ];
+    const $container = $(container);
+
+
+
+    fields.forEach(f => {
+
+        const controls = $container.find(
+            "#IBatTableBody > #IBatTempRow " + f.cls +
+            ", #IBatTableBody > tr.IBatNewRow " + f.cls
+        );
+
+        if (!controls.length)
+            return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            }
+            else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            }
+            else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(
+                requiredWidth,
+                getTextWidth(text, this)
+            );
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        // Extra space so the last digit is not clipped
+        if (f.cls === ".RNI_BCH_UnitPrice" || f.cls === ".RNI_BCH_Value") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            // INPUT
+            this.style.removeProperty("padding");
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("min-width", "100%", "important");
+            this.style.setProperty("max-width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            // TD
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+            td.style.setProperty("text-align", f.align, "important");
+            td.style.setProperty("padding", "2px", "important");
+
+            // TH
+            const th = $container.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+                th.style.setProperty("text-align", f.align, "important");
+                th.style.setProperty("padding", "2px", "important");
+            }
+        });
+    });
+
+}
+
+//#endregion
+
+//#region item grid alignment
 
 function ApplyHeaderAlignment(container = "#ItemTable") {
 
@@ -38,6 +138,7 @@ function ApplyHeaderAlignment(container = "#ItemTable") {
         header.css("text-align", f.align);
 
     });
+  
 }
 
 function getTextWidth(text, element) {
@@ -67,7 +168,7 @@ function chToPx(ch, element) {
 function ApplyFieldWidths(container = "#ItemTable") {
 
     const fields = [
-        { cls: ".PRS_Number", min: 15, max: 30, align: "left" },
+        { cls: ".PRS_Number", min: 15, max: 50, align: "left" },
         { cls: ".Item_Code", min: 18, max: 18, align: "left" },
         { cls: ".Description", min: 30, max: 45, align: "left" },
 
@@ -82,11 +183,7 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
         { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
 
-      
-        { cls: ".OriginalQty", min: 11, max: 20, align: "center" },
-        { cls: ".UsedQty", min: 11, max: 20, align: "center" },
-        { cls: ".AmendQty", min: 11, max: 20, align: "center" },
-
+        { cls: ".Qty", min: 11, max: 20, align: "center" },
         { cls: ".UnitPrice", min: 11, max: 20, align: "right" },
         { cls: ".Amount", min: 13, max: 25, align: "right" }
     ];
@@ -96,22 +193,25 @@ function ApplyFieldWidths(container = "#ItemTable") {
     // Checkbox column width
     const checkWidth = 40;
 
-    $container.find("thead th:first-child, tfoot td:first-child").css({
-        width: checkWidth + "px",
-        minWidth: checkWidth + "px",
-        maxWidth: checkWidth + "px",
-        textAlign: "center"
+    // Header checkbox
+    $container.find("thead th:first-child, tfoot td:first-child").each(function () {
+        this.style.setProperty("width", checkWidth + "px", "important");
+        this.style.setProperty("min-width", checkWidth + "px", "important");
+        this.style.setProperty("max-width", checkWidth + "px", "important");
+        this.style.setProperty("text-align", "center", "important");
     });
 
-    $container.find("tbody > tr > td:first-child").css({
-        width: checkWidth + "px",
-        minWidth: checkWidth + "px",
-        maxWidth: checkWidth + "px",
-        textAlign: "center"
+    // Body checkbox
+    $container.find("tbody > tr > td:first-child").each(function () {
+        this.style.setProperty("width", checkWidth + "px", "important");
+        this.style.setProperty("min-width", checkWidth + "px", "important");
+        this.style.setProperty("max-width", checkWidth + "px", "important");
+        this.style.setProperty("text-align", "center", "important");
     });
 
     fields.forEach(f => {
 
+        // Skip controls inside popup search table (#tblsearch)
         const controls = $container.find(
             "#TempRow " + f.cls +
             ", #TableBody > tr.NewRow " + f.cls
@@ -155,77 +255,66 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
         requiredWidth = Math.min(requiredWidth, maxWidth);
 
-        // Extra space for numeric fields
-        if (
-            f.cls === ".UnitPrice" ||
-            f.cls === ".Amount" ||
-            f.cls === ".Qty" ||
-            f.cls === ".OriginalQty" ||
-            f.cls === ".UsedQty" ||
-            f.cls === ".AmendQty"
-        ) {
+        // Extra space so the last digit is not clipped
+        if (f.cls === ".UnitPrice" || f.cls === ".Amount") {
             requiredWidth = Math.min(requiredWidth + 8, maxWidth);
         }
 
         controls.each(function () {
 
-            $(this).css({
-                width: requiredWidth + "px",
-                minWidth: minWidth + "px",
-                maxWidth: maxWidth + "px",
-                textAlign: f.align,
-                padding: "4px"
-            });
+            // INPUT / SELECT / TEXTAREA
+            this.style.removeProperty("padding");
+            this.style.setProperty("width", requiredWidth + "px", "important");
+            this.style.setProperty("min-width", minWidth + "px", "important");
+            this.style.setProperty("max-width", maxWidth + "px", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
 
-            // Auto height for Description textarea
             if (f.cls === ".Description" && this.tagName === "TEXTAREA") {
 
                 const charsPerLine = 20;
-                const lines = Math.max(
-                    1,
-                    Math.ceil(this.value.length / charsPerLine)
-                );
+                const lines = Math.max(1, Math.ceil(this.value.length / charsPerLine));
 
-                const lineHeight = parseFloat(
-                    window.getComputedStyle(this).lineHeight
-                );
-
-                const extraHeight = 12;
-
-                this.style.height =
-                    (lines * lineHeight + extraHeight) + "px";
+                const lineHeight = parseFloat(window.getComputedStyle(this).lineHeight);
+                const extraHeight = 0;
 
                 this.style.setProperty(
-                    "resize",
-                    "none",
+                    "height",
+                    (lines * lineHeight + extraHeight) + "px",
                     "important"
                 );
-
-                this.style.setProperty(
-                    "overflow",
-                    "hidden",
-                    "important"
-                );
+                this.style.setProperty("resize", "none", "important");
+                this.style.setProperty("overflow", "hidden", "important");
             }
 
-            // Apply width to table cell only
-            const td = $(this).closest("td");
+            // Apply width only to main ItemTable cells
+            const td = $(this).closest("td")[0];
 
-            if (td.closest("#tblsearch").length === 0) {
+            if ($(td).closest("#tblsearch").length === 0) {
 
-                td.css({
-                    width: requiredWidth + "px",
-                    minWidth: minWidth + "px",
-                    maxWidth: maxWidth + "px",
-                    padding: "4px"
-                });
+                // TD
+                td.style.setProperty("width", requiredWidth + "px", "important");
+                td.style.setProperty("min-width", minWidth + "px", "important");
+                td.style.setProperty("max-width", maxWidth + "px", "important");
+                td.style.setProperty("text-align", f.align, "important");
+                td.style.setProperty("padding", "2px", "important");
+
+                // TH
+                const th = $container.find("thead th").eq(td.cellIndex)[0];
+                if (th) {
+                    th.style.setProperty("width", requiredWidth + "px", "important");
+                    th.style.setProperty("min-width", minWidth + "px", "important");
+                    th.style.setProperty("max-width", maxWidth + "px", "important");
+                    th.style.setProperty("text-align", f.align, "important");
+                    th.style.setProperty("padding", "2px", "important");
+                }
             }
         });
     });
 
     ApplyHeaderAlignment("#ItemTable");
 }
-
 
 //#endregion
 function BindHeader(h) {
@@ -301,6 +390,7 @@ function BindItems_Edit(items) {
     });
 
     calculateTotal_rn();
+    ApplyFieldWidths("#ItemTable");
 }
 function LoadReceiptNote(receiptNo) {
 
@@ -515,34 +605,37 @@ function HighlightRow(rows, index) {
     });
 }
 
-function AutoFit() {
-    fitInputWidth("RN_No", 20, 30);
-    fitInputWidth("JW_CustomerDC_No", 20, 30);
-    fitInputWidth("Remarks", 40, 80);
-
-    fitInputWidth("RN_Date", 15, 15);
-    fitInputWidth("MS_Number", 20, 20);
-    fitInputWidth("Currency_Name", 10, 15);
-    fitInputWidth("WH_Number", 20, 20);
+function AutoFitHeader() {
+    fitInputWidth("RN_No", 20, 25);
+    fitInputWidth("JW_CustomerDC_No", 20, 25);
+    fitInputWidth("MS_Number", 20, 30);
+    fitInputWidth("JWC_Name", 40, 75);
+    fitInputWidth("Currency_Name", 8, 10);
+    fitInputWidth("WH_Number", 20, 25);
+    fitInputWidth("Remarks", 35, 45);
 }
 $(document).ready(function () {
-    //#region item grid alignment
-    ApplyFieldWidths("#ItemTable");
+  
+    AutoFitHeader();
+    //#region Header AutoFit - KeyUp
 
-    $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
-        ApplyFieldWidths("#ItemTable");
+    $(document).on("keyup change input", "#RN_No, #JW_CustomerDC_No, #MS_Number, #JWC_Name, #Currency_Name, #WH_Number, #Remarks", function () {
+
+        const widths = {
+            RN_No: [20, 25],
+            JW_CustomerDC_No: [20, 25],
+            MS_Number: [20, 30],
+            JWC_Name: [40, 75],
+            Currency_Name: [8, 10],
+            WH_Number: [20, 25],
+            Remarks: [35, 45]
+        };
+
+        const [min, max] = widths[this.id];
+        fitInputWidth(this, min, max);
     });
-    $(document).on("focusin", ".Amount", function () {
-        ApplyFieldWidths("#ItemTable");
-    });
+
     //#endregion
-    AutoFit();
-    $(document).on("input keyup", "#RN_No, #JW_CustomerDC_No", function () {
-        fitInputWidth(this, 20, 30);
-    });
-    $(document).on("change", "#MS_Number, #WH_Number", function () {
-        fitInputWidth(this, 20, 20);
-    });
  
     //#region  search logic highlight
 
@@ -643,6 +736,7 @@ $(document).ready(function () {
             .val(formatIndianQty(value));
     });
  
+ 
     $(document).on("focusout", ".AmendQty", function () {
 
         let row = $(this).closest("tr");
@@ -673,17 +767,17 @@ $(document).ready(function () {
        
     });
     $("#AddRowButton").trigger("click");
-    $(document).on("keyup change", ".AmendQty, .UnitPrice", function () {
+    $(document).on("keyup", ".AmendQty, .UnitPrice", function () {
 
         let row = $(this).closest("tr");
 
-        let qty = parseFloat(row.find(".AmendQty").attr("data-value")) || 0;
-        let unitPrice = parseFloat(row.find(".UnitPrice").attr("data-value")) || 0;
+        let qty = parseFloat(removeCommas(row.find(".AmendQty").val())) || 0;
+        let unitPrice = parseFloat(removeCommas(row.find(".UnitPrice").val())) || 0;
 
         let amount = qty * unitPrice;
 
         row.find(".Amount")
-            .val(formatIndianCurrency(amount))
+            .val(amount === 0 ? "" : formatIndianCurrency(amount))
             .attr("data-value", amount);
 
         calculateTotal_rn();
@@ -780,6 +874,24 @@ $(document).ready(function () {
     $(document).on("input", "#RN_No, #JW_CustomerDC_No", function () {
         fitInputWidth(this,20);
     });
+    //#region batch grid alignment
+    $(document).on("input change blur", "#BatchTable input, #BatchTable textarea, #BatchTable select", function () {
+        ApplyBatchFieldWidths("#BatchTable");
+    });
+    ApplyBatchFieldWidths("#BatchTable");
+
+    //#endregion
+    //#region item grid alignment
+ 
+  
+
+    $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+    $(document).on("focusin", ".Amount", function () {
+        ApplyFieldWidths("#ItemTable");
+    });
+    //#endregion
 
 });
 var JIRNH_Number_Global;
@@ -1178,9 +1290,9 @@ function ValidateItemBatches_RN() {
                 return false;
             }
 
-            if ((parseFloat(batch.RNI_BCH_Qty) || 0) <= 0) {
+            if ((parseFloat(batch.RNI_BCH_AmendQty) || 0) <= 0) {
 
-                showAlert("Batch Qty should be greater than zero.");
+                showAlert("Batch Amend Qty should be greater than zero.");
                 return false;
             }
 
@@ -1569,7 +1681,7 @@ function searchItemJIDNI(inputElement) {
                         qtyInput.val(formatIndianQty(qtyVal));
                         qtyUnitprice.val(formatIndianCurrency(qtyUnitpriceVal));
                        
-                            ApplyFieldWidths("#ItemTable");
+                        
                         
                         resultsDiv.hide();
                     });

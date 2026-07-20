@@ -106,70 +106,23 @@
         width: 20ch !important;
     }
 
-    /* Material Segregation */
-    #Header_JIDNH_MS_Number {
-        width: 20ch !important;
-        max-width: 100%;
-    }
+    
 
     /* Job Work Customer */
     #Header_JIDNH_JW_Customer_Name {
-        width: 40ch !important;
-        max-width: 350ch;
+       
         padding-right: 24px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 8px center;
     }
 
-    /* Currency */
-    #Header_JIDNH_Currency_Number {
-        width: 10ch !important;
-        max-width: 100%;
-    }
+   
 
-    /* Warehouse */
-    #Header_JIDNH_WH_Number {
-        width: 20ch !important;
-        max-width: 100%;
-    }
-
-    /* Payment Terms */
-    #Header_JIDNH_PaymentTerms {
-        width: 25ch !important;
-        max-width: 100%;
-    }
-
-    /* Delivery Terms */
-    #Header_JIDNH_DeliveryTerms {
-        width: 25ch !important;
-        max-width: 100%;
-    }
-
-    /* Delivery Mode */
-    #Header_JIDNH_DeliveryMode {
-        width: 25ch !important;
-        max-width: 100%;
-    }
-
-    /* Despatch Document No */
-    #Header_JIDNH_DespatchDocumentNo {
-        width: 25ch !important;
-        max-width: 100%;
-    }
-
-    /* Despatched Through */
-    #Header_JIDNH_DespatchedThrough {
-        width: 25ch !important;
-        max-width: 100%;
-    }
-
-    /* Remarks */
-    #Header_JIDNH_Remarks {
-        width: 45ch !important;
-        max-width: 85ch;
-        min-height: 60px !important;
-    }
+  
+ 
+ 
+ 
 </style>
 
 <style>
@@ -357,7 +310,7 @@
     </div>
     
     <!-- Batch Popup -->
-    <div class="modal custom-modal-width fade"
+    <div class="modal fade"
      id="DeliveryNoteBatchModal"
      data-bs-backdrop="static"
      data-bs-keyboard="false"
@@ -373,8 +326,9 @@
                         <span style="font-size:14px;font-weight:bold"> Delivery Note Batch</span>      <span class="float-end">
                         <span style="font-size:14px"> Line Item Qty : </span>    <span style="font-size:14px" id="BatchPopupQty"></span>
                         <button type="button"
-                                id="DeliveryNoteBatchClose"
-                                class="btn bg-transparent text-white fw-bold"
+                                id="ExCloseButton"
+                                style="position:relative; left:6px; top:-6px; width:25px; height:10px; font-size:12px; padding:0;"
+                                class="btn bg-transparent text-white"
                                 data-bs-dismiss="modal"
                                 aria-label="Close">
                             ✕

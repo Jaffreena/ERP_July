@@ -2,7 +2,45 @@
 @{
     ViewData["Title"] = "Receipt Note Create";
 }
- 
+ <style>
+    #RightPane {
+        position: fixed;
+        top: 0;
+        right: calc(-50ch - 14px); /* 50ch + 12px gap + 2px border */
+        width: calc(50ch + 12px);
+        height: 100vh;
+        background: #c6e0e7;
+        border-left: 2px solid #6c757d;
+        box-sizing: border-box;
+        padding-left: 12px; /* Space between border and content */
+        z-index: 9999;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: right .2s ease, opacity .3s ease, visibility 0s linear .3s;
+    }
+
+        #RightPane.show {
+            right: 0;
+            opacity: 1;
+            visibility: visible;
+            transition: right .2s ease, opacity .3s ease, visibility 0s;
+        }
+
+#RightPane .p-2 {
+    padding: 0 !important;   /* Remove padding */
+    margin: 0;
+    height: 100%;
+}
+
+#RightPane .buyer-search-results {
+    display: none;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+}
+            
+ </style>
  
 <style>
   
@@ -114,45 +152,22 @@
         cursor: pointer;
     }
 
-    /* Material Segregation */
-    #MS_Number {
-        width: 20ch !important;
-        max-width: 100%;
-    }
-
-    /* Job Work Customer */
-    #JWC_Name {
-        width: 40ch !important;
-        max-width: 75ch;
-    }
+   
+    
 
     #JWC_Name {
-        width: 40ch !important;
-        max-width: 350ch;
+       
         padding-right: 24px; /* Space for the triangle */
 
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 8px center;
     }
-    /* Currency */
-    #Currency_Name {
-        width: 10ch !important;
-        max-width: 100%;
-    }
+    
 
-    /* Warehouse */
-    #WH_Number {
-        width: 20ch !important;
-        max-width: 100%;
-    }
+  
 
-    /* Remarks */
-    #Remarks {
-        width: 45ch !important;
-        max-width: 85ch;
-    }
-
+    
     
 
   
@@ -220,7 +235,8 @@
                         <span style="font-size:14px"> Line Item Qty : </span>    <span style="font-size:14px" id="RNI_BATCHQty"></span>
                         <button type="button"
                                 id="ExCloseButton"
-                                class="btn bg-transparent text-white fw-bold"
+                                style="position:relative; left:6px; top:-6px; width:25px; height:10px; font-size:12px; padding:0;"
+                                class="btn bg-transparent text-white"
                                 data-bs-dismiss="modal"
                                 aria-label="Close">
                             ✕
@@ -240,15 +256,15 @@
                         
   <!--------------------------------------------batch--------------------------------------------->
                             <div class="w-100 table-responsive">
-                                <table class="table table-bordered table-hover align-middle table-grid mb-0">
+                                <table class="table table-bordered table-hover align-middle table-grid mb-0" id="BatchTable">
                                     <thead>
                                         <tr class="table-info">
-                                            <th class="datetype text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Date)</th>
-                                            <th>@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_No)</th>
-                                            <th class="table-width-xl text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Qty)</th>
-                                            <th class="table-width-xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_UnitPrice)</th>
-                                            <th class="table-width-3xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Value)</th>
-                                            <th class="action text-center align-middle">Action</th>
+                                            <th class="datetype RNI_BCH_Date text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Date)</th>
+                                            <th class="RNI_BCH_No">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_No)</th>
+                                            <th class="table-width-xl RNI_BCH_Qty">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Qty)</th>
+                                            <th class="table-width-xl RNI_BCH_UnitPrice">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_UnitPrice)</th>
+                                            <th class="table-width-3xl RNI_BCH_Value">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Value)</th>
+                                            <th class="action align-middle">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="IBatTableBody">
@@ -257,19 +273,19 @@
                                                 <input id="RNI_BCH_Item_Number" class="RNI_BCH_Item_Number" type="hidden" />
                                                 <input id="RNI_BCH_Item_Index" class="RNI_BCH_Item_Index" type="hidden" />
                                                 <input id="RNI_BCH_Item_WH" class="RNI_BCH_Item_WH" type="hidden" />
-                                                <input id="RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date text-center" autocomplete="off" />
+                                                <input id="RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date" autocomplete="off" />
                                             </td>
                                             <td>
                                                 <input id="RNI_BCH_No" class="form-control RNI_BCH_No" autocomplete="off" />
                                             </td>
                                             <td class="table-width-xl">
-                                                <input id="RNI_BCH_Qty" class="form-control RNI_BCH_Qty  text-center decimal" value="0" autocomplete="off" />
+                                                <input id="RNI_BCH_Qty" class="form-control RNI_BCH_Qty decimal" value="0" autocomplete="off" />
                                             </td>
                                             <td class="table-width-xl">
-                                                <input id="RNI_BCH_UnitPrice" value="0" class="form-control RNI_BCH_UnitPrice decimal text-end"  autocomplete="off" />
+                                                <input id="RNI_BCH_UnitPrice" value="0" class="form-control RNI_BCH_UnitPrice decimal"  autocomplete="off" />
                                             </td>
-                                            <td class="table-width-3xl">
-                                                <input id="RNI_BCH_Value" class="form-control RNI_BCH_Value decimal text-end" readonly autocomplete="off" />
+                                            <td class="table-width-xl">
+                                                <input id="RNI_BCH_Value" class="form-control RNI_BCH_Value decimal" readonly autocomplete="off" />
                                             </td>
                                             <td class="action text-center align-middle">
                                                 <input id="RNI_BCH_IsDeleted" type="hidden" name="RNI_BCH_IsDeleted" class="RNI_BCH_IsDeleted" value="false" />
@@ -289,19 +305,19 @@
 
                                                         <input id="RNI_BCH_Item_Number" name="ItemBatch[@i].RNI_BCH_Item_Number" class="RNI_BCH_Item_Number" type="hidden" value="@Model.ItemBatch[i].JIRNI_BCH_JIRNI_Number" />
                                                         <input id="RNI_BCH_Item_WH" name="ItemBatch[@i].RNI_BCH_Item_WH" class="RNI_BCH_Item_WH" type="hidden" value="@Model.ItemBatch[i].WH_Number" />
-                                                        <input id="RNI_BCH_Date" name="ItemBatch[@i].RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date text-center" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Date" />
+                                                        <input id="RNI_BCH_Date" name="ItemBatch[@i].RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Date" />
                                                     </td>
                                                     <td>
                                                         <input id="RNI_BCH_No" name="ItemBatch[@i].RNI_BCH_No" class="form-control RNI_BCH_No" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_No" />
                                                     </td>
                                                     <td class="table-width-xl">
-                                                        <input id="RNI_BCH_Qty" name="ItemBatch[@i].RNI_BCH_Qty" class="form-control RNI_BCH_Qty text-center" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Qty" />
+                                                        <input id="RNI_BCH_Qty" name="ItemBatch[@i].RNI_BCH_Qty" class="form-control RNI_BCH_Qty" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Qty" />
                                                     </td>
                                                     <td class="table-width-xl">
-                                                        <input id="RNI_BCH_UnitPrice" name="ItemBatch[@i].RNI_BCH_UnitPrice" readonly class="form-control RNI_BCH_UnitPrice decimal text-end" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_UnitPrice" />
+                                                        <input id="RNI_BCH_UnitPrice" name="ItemBatch[@i].RNI_BCH_UnitPrice" readonly class="form-control RNI_BCH_UnitPrice decimal" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_UnitPrice" />
                                                     </td>
-                                                    <td class="table-width-3xl">
-                                                        <input id="RNI_BCH_Value" name="ItemBatch[@i].RNI_BCH_Value" readonly class="form-control RNI_BCH_Value decimal text-end" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Value" />
+                                                    <td class="table-width-xl">
+                                                        <input id="RNI_BCH_Value" name="ItemBatch[@i].RNI_BCH_Value" readonly class="form-control RNI_BCH_Value decimal" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Value" />
                                                     </td>
                                                     <td class="action text-center align-middle">
                                                         @if (@Model.ItemBatch[i].RNI_BCH_No != 0)
@@ -362,7 +378,7 @@
     </div>
 </div>
 
-<div class="row panel-body gx-2  ">
+<div class="row panel-body gx-2  position-relative">
     <div class="col-12 panel-card-fixed h-100">
         <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
               <!-- HEADER -->
@@ -442,18 +458,12 @@
                                             <input asp-for="JWC_Name"
                                                    class="form-control"
                                                    autocomplete="off"
+                                                   onselect="OnBuyerSelect(this)"
+                                                   onblur="OnBuyerBlur(this)"
                                                    oninput="OnBuyerInput(this)"
                                                    onfocus="OnBuyerFocus(this)" />
 
-                                            <div class="buyer-search-results"
-                                                 style="display:none;
-                                                position:absolute;
-                                                top:100%;
-                                                left:0;
-                                                min-width:500px;
-                                                max-width:500px;
-                                                z-index:9999;">
-                                            </div>
+                                           
 
                                         </div>
                                     </div>
@@ -827,6 +837,11 @@
             </div>
                
             <!-- BODY has ITEM -->
+        </div>
+    </div>
+    <div id="RightPane" >
+        <div class="p-2">
+            <div class="buyer-search-results"></div>
         </div>
     </div>
 </div>

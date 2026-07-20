@@ -64,16 +64,15 @@ $(document).on("click", ".IBatRowRemove", function () {
 
     CalculateBatchFooter();
 });
-$(document).on("keyup change", ".RNI_BCH_Qty, .RNI_BCH_UnitPrice", function () {
-
-    let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
-
-    $(this).attr("data-value", value);
+$(document).on("keyup", ".RNI_BCH_Qty, .RNI_BCH_UnitPrice", function () {
 
     let row = $(this).closest("tr");
 
-    let qty = parseFloat(row.find(".RNI_BCH_Qty").attr("data-value")) || 0;
-    let unitPrice = parseFloat(row.find(".RNI_BCH_UnitPrice").attr("data-value")) || 0;
+    let qty = parseFloat((row.find(".RNI_BCH_Qty").val() || "").replace(/,/g, "")) || 0;
+    let unitPrice = parseFloat((row.find(".RNI_BCH_UnitPrice").val() || "").replace(/,/g, "")) || 0;
+
+    row.find(".RNI_BCH_Qty").attr("data-value", qty);
+    row.find(".RNI_BCH_UnitPrice").attr("data-value", unitPrice);
 
     let amount = qty * unitPrice;
 
@@ -82,11 +81,10 @@ $(document).on("keyup change", ".RNI_BCH_Qty, .RNI_BCH_UnitPrice", function () {
         .attr("data-value", amount);
 
     if (row.is("#IBatTableBody tr:visible:last")) {
-
         IBatNewRow();
-
     }
 
+    CalculateBatchFooter();
 });
 $(document).on("focusout", ".RNI_BCH_Qty", function () {
 
@@ -370,13 +368,16 @@ function ApplyBatchValues_RN(rowId) {
             .val(batch.RNI_BCH_No);
 
         row.find(".RNI_BCH_Qty")
-            .val(batch.RNI_BCH_Qty);
+            .val(batch.RNI_BCH_Qty)
+            .attr("data-value", batch.RNI_BCH_Qty);
 
         row.find(".RNI_BCH_UnitPrice")
-            .val(batch.RNI_BCH_UnitPrice);
+            .val(batch.RNI_BCH_UnitPrice)
+            .attr("data-value", batch.RNI_BCH_UnitPrice);
 
         row.find(".RNI_BCH_Value")
-            .val(batch.RNI_BCH_Value);
+            .val(batch.RNI_BCH_Value)
+            .attr("data-value", batch.RNI_BCH_Value);
 
         row.find(".RNI_BCH_Item_WH")
             .val(batch.RNI_BCH_Item_WH);
@@ -396,12 +397,13 @@ function CalculateBatchFooter() {
 
     $("#IBatTableBody tr.IBatNewRow").each(function () {
 
+
         totalQty += parseFloat((
-            $(this).find(".RNI_BCH_Qty").val() || "0"
+          removeCommas($(this).find(".RNI_BCH_Qty").val()) || "0"
         ).replace(/,/g, "")) || 0;
 
         totalValue += parseFloat((
-            $(this).find(".RNI_BCH_Value").val() || "0"
+          removeCommas($(this).find(".RNI_BCH_Value").val()) || "0"
         ).replace(/,/g, "")) || 0;
 
     });
@@ -484,6 +486,7 @@ function IBatNewRow() {
 
     row.find("input.RNI_BCH_UnitPrice")
         .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_UnitPrice")
+        .attr("data-value", unitPrice)
         .val(unitPrice)
         .prop("readonly", true);
 
@@ -604,16 +607,16 @@ $(function () {
 });
 
 $(document).ready(function () {
-    $(document).on("input", ".RNI_BCH_Qty, .RNI_BCH_UnitPrice", function () {
+    //$(document).on("input", ".RNI_BCH_Qty, .RNI_BCH_UnitPrice", function () {
 
-        let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
+    //    let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
 
-        $(this).attr("data-value", value);
+    //    $(this).attr("data-value", value);
 
-        let row = $(this).closest("tr");
+    //    let row = $(this).closest("tr");
 
-        CalculateBatchRow(row);
-    });
+    //    CalculateBatchRow(row);
+    //});
    
     // ✅ Add Row Button
     $("#IBatNewRowButton").click(function () {
@@ -683,6 +686,7 @@ $(document).ready(function () {
                 .val(itemNumber);
             $("#IBatTableBody tr.IBatNewRow:last")
                 .find(".RNI_BCH_UnitPrice")
+                .attr("data-value", unitPrice)
                 .val(unitPrice)
                 .prop("readonly", true);
         }
@@ -709,6 +713,7 @@ $(document).ready(function () {
 
                 newRow.find(".RNI_BCH_UnitPrice")
                     .val(unitPrice)
+                    .attr("data-value", unitPrice)
                     .prop("readonly", true);
 
                 newRow.find(".RNI_BCH_Value")
@@ -726,7 +731,8 @@ $(document).ready(function () {
                 .val(itemNumber);
                 $("#IBatTableBody tr.IBatNewRow:last")
     .find(".RNI_BCH_UnitPrice")
-    .val(unitPrice)
+                    .val(unitPrice)
+                    .attr("data-value", unitPrice)
     .prop("readonly", true);
         }
 
@@ -759,7 +765,7 @@ $(document).ready(function () {
         let lastRow = $("#IBatTableBody tr.IBatNewRow:last");
 
         lastRow.find(".RNI_BCH_Item_Number").val(itemNumber);
-        lastRow.find(".RNI_BCH_UnitPrice").val(unitPrice).prop("readonly", true);
+        lastRow.find(".RNI_BCH_UnitPrice").val(unitPrice).attr("data-value", unitPrice).prop("readonly", true);
         CalculateBatchFooter();
         new bootstrap.Modal($("#IBatch")).show();
     });

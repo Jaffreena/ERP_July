@@ -151,7 +151,6 @@ function ApplyHeaderAlignment(container = "#ItemTable") {
 
     });
 }
-
 function ApplyFieldWidths(container = "#ItemTable") {
 
     const fields = [
@@ -180,18 +179,20 @@ function ApplyFieldWidths(container = "#ItemTable") {
     // Checkbox column width
     const checkWidth = 40;
 
-    $container.find("thead th:first-child, tfoot td:first-child").css({
-        width: checkWidth + "px",
-        minWidth: checkWidth + "px",
-        maxWidth: checkWidth + "px",
-        textAlign: "center"
+    // Header checkbox
+    $container.find("thead th:first-child, tfoot td:first-child").each(function () {
+        this.style.setProperty("width", checkWidth + "px", "important");
+        this.style.setProperty("min-width", checkWidth + "px", "important");
+        this.style.setProperty("max-width", checkWidth + "px", "important");
+        this.style.setProperty("text-align", "center", "important");
     });
 
-    $container.find("tbody > tr > td:first-child").css({
-        width: checkWidth + "px",
-        minWidth: checkWidth + "px",
-        maxWidth: checkWidth + "px",
-        textAlign: "center"
+    // Body checkbox
+    $container.find("tbody > tr > td:first-child").each(function () {
+        this.style.setProperty("width", checkWidth + "px", "important");
+        this.style.setProperty("min-width", checkWidth + "px", "important");
+        this.style.setProperty("max-width", checkWidth + "px", "important");
+        this.style.setProperty("text-align", "center", "important");
     });
 
     fields.forEach(f => {
@@ -247,48 +248,161 @@ function ApplyFieldWidths(container = "#ItemTable") {
 
         controls.each(function () {
 
-            $(this).css({
-                width: requiredWidth + "px",
-                minWidth: minWidth + "px",
-                maxWidth: maxWidth + "px",
-                textAlign: f.align,
-                padding: "2px"
-            });
-          
+            // INPUT / SELECT / TEXTAREA
+            this.style.removeProperty("padding");
+            this.style.setProperty("width", requiredWidth + "px", "important");
+            this.style.setProperty("min-width", minWidth + "px", "important");
+            this.style.setProperty("max-width", maxWidth + "px", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
 
             if (f.cls === ".Description" && this.tagName === "TEXTAREA") {
 
-                const charsPerLine = 20; // same as your width (20ch)
+                const charsPerLine = 20;
                 const lines = Math.max(1, Math.ceil(this.value.length / charsPerLine));
-
-              
 
                 const lineHeight = parseFloat(window.getComputedStyle(this).lineHeight);
                 const extraHeight = 12;
 
-                this.style.height = (lines * lineHeight + extraHeight) + "px";
+                this.style.setProperty(
+                    "height",
+                    (lines * lineHeight + extraHeight) + "px",
+                    "important"
+                );
                 this.style.setProperty("resize", "none", "important");
                 this.style.setProperty("overflow", "hidden", "important");
             }
 
             // Apply width only to main ItemTable cells
-            const td = $(this).closest("td");
+            const td = $(this).closest("td")[0];
 
-            if (td.closest("#tblsearch").length === 0) {
-                td.css({
-                    width: requiredWidth + "px",
-                    minWidth: minWidth + "px",
-                    maxWidth: maxWidth + "px",
-                    padding: "2px"
-                });
+            if ($(td).closest("#tblsearch").length === 0) {
+
+                // TD
+                td.style.setProperty("width", requiredWidth + "px", "important");
+                td.style.setProperty("min-width", minWidth + "px", "important");
+                td.style.setProperty("max-width", maxWidth + "px", "important");
+                td.style.setProperty("text-align", f.align, "important");
+                td.style.setProperty("padding", "2px", "important");
+
+                // TH
+                const th = $container.find("thead th").eq(td.cellIndex)[0];
+                if (th) {
+                    th.style.setProperty("width", requiredWidth + "px", "important");
+                    th.style.setProperty("min-width", minWidth + "px", "important");
+                    th.style.setProperty("max-width", maxWidth + "px", "important");
+                    th.style.setProperty("text-align", f.align, "important");
+                    th.style.setProperty("padding", "2px", "important");
+                }
             }
         });
     });
+
     ApplyHeaderAlignment("#ItemTable");
 }
 
 
+
+function ApplyBatchFieldWidths(container = "#BatchTable") {
+
+    const fields = [
+        { cls: ".RNI_BCH_Date", min: 12, max: 12, align: "center" },
+        { cls: ".RNI_BCH_No", min: 30, max: 50, align: "left" },
+        { cls: ".RNI_BCH_Qty", min: 11, max: 20, align: "center" },
+        { cls: ".RNI_BCH_UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".RNI_BCH_Value", min: 13, max: 25, align: "right" }
+    ];
+    const $container = $(container);
+
+   
+
+    fields.forEach(f => {
+
+        const controls = $container.find(
+            "#IBatTableBody > #IBatTempRow " + f.cls +
+            ", #IBatTableBody > tr.IBatNewRow " + f.cls
+        );
+
+        if (!controls.length)
+            return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            }
+            else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            }
+            else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(
+                requiredWidth,
+                getTextWidth(text, this)
+            );
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        // Extra space so the last digit is not clipped
+        if (f.cls === ".RNI_BCH_UnitPrice"  || f.cls === ".RNI_BCH_Value") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            // INPUT
+            this.style.removeProperty("padding");
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("min-width", "100%", "important");
+            this.style.setProperty("max-width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            // TD
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+            td.style.setProperty("text-align", f.align, "important");
+            td.style.setProperty("padding", "2px", "important");
+
+            // TH
+            const th = $container.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+                th.style.setProperty("text-align", f.align, "important");
+                th.style.setProperty("padding", "2px", "important");
+            }
+        });
+    });
+   
+}
+
 $(document).ready(function () {
+ 
+    
+     
+    console.log($("#RightPane .buyer-search-results").attr("style"));
     $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
         ApplyFieldWidths("#ItemTable");
     });
@@ -296,16 +410,22 @@ $(document).ready(function () {
     $(document).on("focusin", ".Amount", function () {
         ApplyFieldWidths("#ItemTable");
     });
- 
-
+    $(document).on("input change blur", "#BatchTable input, #BatchTable textarea, #BatchTable select", function () {
+        ApplyBatchFieldWidths("#BatchTable");
+    });
+     ApplyBatchFieldWidths("#BatchTable");
     $(document).on("focus", ".PRS_Number", function () {
         this.click();
     });
     ApplyFieldWidths("#ItemTable");
+
     $(document).on("keydown", "#JWC_Name", function (e) {
 
         let input = $(this);
-        let resultsDiv = input.siblings(".buyer-search-results");
+        $("#RightPane").addClass("show");
+        $("#RightPane .buyer-search-results").show();
+        let resultsDiv = $("#RightPane").find(".buyer-search-results");
+    
         let rows = resultsDiv.find("tbody tr");
 
         if (!resultsDiv.is(":visible") || rows.length === 0)
@@ -333,7 +453,8 @@ $(document).ready(function () {
 
                     selectedIndex++;
                 }
-
+                rows.removeClass("current-row");
+                $(rows[selectedIndex]).addClass("current-row");
                 break;
 
             case "ArrowUp":
@@ -351,26 +472,57 @@ $(document).ready(function () {
 
                     selectedIndex--;
                 }
-
+                rows.removeClass("current-row");
+                $(rows[selectedIndex]).addClass("current-row");
                 break;
 
             case "Enter":
 
                 e.preventDefault();
 
-                if (selectedIndex != null)
-                    $(rows[selectedIndex]).trigger("click");
+                // 1. If a row is highlighted, select it
+                let currentRow = rows.filter(".current-row");
 
+                if (currentRow.length) {
+                    currentRow.trigger("click");
+                    return;
+                }
+
+                let matchedRows = $("#RightPane tbody tr.match-row");
+
+                // 2. Only one match -> auto select
+                if (matchedRows.length == 1) {
+                    matchedRows.eq(0).trigger("click");
+                    return;
+                }
+
+                // 3. More than one match -> keep popup open and show message
+                if (matchedRows.length > 1) {
+
+                    $("#BuyerMessage")
+                        .text("Too many customers found. Please refine your search.")
+                        .show();
+
+                    $("#RightPane").addClass("show");
+                    $("#RightPane .buyer-search-results").show();
+
+                    return;
+                }
+
+                // 4. No matches
+                $("#RightPane .buyer-search-results").hide();
+                $("#RightPane").removeClass("show");
                 return;
 
             case "Escape":
 
                 e.preventDefault();
-
+                $("#RightPane .buyer-search-results").hide();
+                $("#RightPane").removeClass("show");
                 resultsDiv.hide();
 
                 input.removeData("selectedIndex");
-
+             
                 return;
 
             default:
@@ -381,6 +533,7 @@ $(document).ready(function () {
 
         input.data("selectedIndex", selectedIndex);
     });
+
     $(document).on("keydown", ".Item_Code", function (e) {
 
         let input = $(this);
@@ -523,9 +676,15 @@ $(document).ready(function () {
 
    
     $("#AddRowButton").trigger("click");
-    $(document).on("focusout", ".Qty, .UnitPrice", function () {
+    $(document).on("keyup", ".Qty, .UnitPrice", function () {
 
         let row = $(this).closest("tr");
+
+        row.find(".Qty")
+            .attr("data-value", removeCommas(row.find(".Qty").val()));
+
+        row.find(".UnitPrice")
+            .attr("data-value", removeCommas(row.find(".UnitPrice").val()));
 
         let qty = parseFloat(row.find(".Qty").attr("data-value")) || 0;
         let unitPrice = parseFloat(row.find(".UnitPrice").attr("data-value")) || 0;
@@ -621,24 +780,39 @@ $(document).ready(function () {
     //#endregion Initialize Flatpickr
 
     console.log($(".table-body-f tbody tr:first").outerHeight());
-    AutoFit();
-    $(document).on("input keyup", "#RN_No, #JW_CustomerDC_No", function () {
-        fitInputWidth(this, 20, 30);
+    AutoFitHeader();
+    //#region Header AutoFit - KeyUp
+
+    $(document).on("keyup change input", "#RN_No, #JW_CustomerDC_No, #MS_Number, #JWC_Name, #Currency_Name, #WH_Number, #Remarks", function () {
+
+        const widths = {
+            RN_No: [20, 25],
+            JW_CustomerDC_No: [20, 25],
+            MS_Number: [20, 30],
+            JWC_Name: [40, 75],
+            Currency_Name: [8, 10],
+            WH_Number: [15, 25],
+            Remarks: [35, 45]
+        };
+
+        const [min, max] = widths[this.id];
+        fitInputWidth(this, min, max);
     });
+
+    //#endregion
     $(document).on("change", "#MS_Number, #WH_Number", function () {
         fitInputWidth(this, 20, 20);
     });
   
 });
-function AutoFit() {
-    fitInputWidth("RN_No", 20,30);
-    fitInputWidth("JW_CustomerDC_No", 20,30);
-    fitInputWidth("Remarks", 40, 80);
-
-    fitInputWidth("RN_Date", 15, 15);
-    fitInputWidth("MS_Number", 20,20);
-    fitInputWidth("Currency_Name", 10,15);
-    fitInputWidth("WH_Number", 20,20);
+function AutoFitHeader() {
+    fitInputWidth("RN_No", 20,25);
+    fitInputWidth("JW_CustomerDC_No", 20, 25);
+    fitInputWidth("MS_Number", 20, 30);  
+    fitInputWidth("JWC_Name", 40, 75);  
+    fitInputWidth("Currency_Name", 8,10);
+    fitInputWidth("WH_Number", 15, 25);
+    fitInputWidth("Remarks", 35, 45);
 }
 function ValidateItemBatchMapping() {
 
@@ -1263,7 +1437,7 @@ $("#AddRowButton").on("click", function () {
     // Recalculate footer
     calculateTotal_rn();
     SetTableHeight();
-    ApplyFieldWidths("#ItemTable");
+   
 });
 
 //#endregion
@@ -1401,7 +1575,9 @@ function searchItemJIDNI(inputElement) {
                    
 
 
+                      
                         resultsDiv.hide();
+                        $("#RightPane").removeClass("show");
                     });
 
                     table.find("tbody").append(tr);
@@ -1478,27 +1654,77 @@ function searchItemJIDNI(inputElement) {
 
 
 //#region JW Customer Search Functions
+function OnBuyerBlur(inputElement) {
 
+    setTimeout(function () {
+
+        let matchedRows = $("#RightPane tbody tr.match-row");
+
+        if (matchedRows.length == 1) {
+
+            let cust = matchedRows.eq(0).data("customer");
+            SelectBuyer(cust);
+            return;
+        }
+
+        if (matchedRows.length > 1) {
+
+            $("#RightPane").addClass("show");
+            $("#RightPane .buyer-search-results").show();
+
+            $("#BuyerMessage")
+                .html("Too many Choices.<br/> Select any one.")
+                .show();
+
+            $(inputElement).focus();
+
+            return;
+        }
+
+        $("#RightPane").removeClass("show");
+
+    }, 150);
+}
+function OnBuyerSelect(inputElement) {
+    $("#RightPane").removeClass("show");
+    $("#RightPane").find(".buyer-search-results").hide();
+}
 function OnBuyerInput(inputElement) {
     SearchBuyer(inputElement);
 }
 
-function OnBuyerFocus(inputElement) {
-    var value = inputElement.value;
+function OnBuyerInput(inputElement) {
 
-    if (!value) {
-        SearchBuyer(inputElement);
-    } else {
-        $(inputElement).select();
+    // User is only selecting text
+    if (inputElement.selectionStart !== inputElement.selectionEnd) {
+        return;
     }
-}
 
+    SearchBuyer(inputElement);
+}
+function SelectBuyer(cust) {
+
+    // Customer
+    $("#JWC_Name").val(cust.cuS_Name);
+    $("#JWC_Number").val(cust.cuS_Number);
+
+    // Currency
+    $("#Currency_Name").val(cust.cuS_CUR_Name);
+    $("#Currency_Number").val(cust.cuS_CUR_Number);
+
+    // Warehouse
+    $("#WH_Number").val(cust.cuS_WH_Number);
+
+    $("#RightPane").removeClass("show");
+    $("#RightPane").find(".buyer-search-results").hide().empty();
+}
 function SearchBuyer(inputElement) {
 
     var buyer = inputElement.value;
+    buyer = buyer.trim();
     var rnDate = $("#RN_Date").val();
 
-    var resultsDiv = $(inputElement).siblings(".buyer-search-results");
+    var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
     $.ajax({
         url: '/jobinward/transactions/receipt-note/cutomer',
@@ -1510,19 +1736,20 @@ function SearchBuyer(inputElement) {
         success: function (data) {
 
             resultsDiv.empty();
-
+            $("#BuyerMessage").hide().text("");
             if (data && data.length > 0) {
 
+                $("#RightPane").addClass("show");   // <-- Add this line
                 resultsDiv.show();
                 let selectedIndex = -1;  
                 var table = $(`
-            <div class="card-body modal-content batchPopup p-0 position-relative start-0 top-100"
-     style="z-index:999; width:100%; max-width:500px;">
+<div class="card-body modal-content batchPopup p-0"
+     style="z-index:999; width:500px;">
                         <table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">
                             <thead>
                                 <tr class="table-info">
                                     <th>JW Customer Name</th>
-                                    <th class="text-center">Currency</th>
+                                 
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -1533,26 +1760,15 @@ function SearchBuyer(inputElement) {
                 $.each(data, function (i, cust) {
 
                     var row = $("<tr></tr>").css("height", "24px");
-
+                    row.data("customer", cust);
                     row.append("<td>" + cust.cuS_Name + "</td>");
-                    row.append("<td class='text-center'>" + cust.cuS_CUR_Name + "</td>");
+                  
 
                     table.find("tbody").append(row);
 
                     row.on("click", function () {
-
-                        // Customer
-                        $("#JWC_Name").val(cust.cuS_Name);
-                        $("#JWC_Number").val(cust.cuS_Number);
-
-                        // Currency
-                        $("#Currency_Name").val(cust.cuS_CUR_Name);
-                        $("#Currency_Number").val(cust.cuS_CUR_Number);
-
-                        // Warehouse
-                        $("#WH_Number").val(cust.cuS_WH_Number);
-
-                        resultsDiv.hide();
+                        $("#BuyerMessage").hide().text("");
+                        SelectBuyer(cust);
                     });
 
                 });
@@ -1571,7 +1787,17 @@ function SearchBuyer(inputElement) {
                 //});
 
                 //resultsDiv.append(closeButton);
+
+
                 resultsDiv.append(table);
+
+                resultsDiv.append(`
+<div id="BuyerMessage"
+     class="text-danger fw-bold text-center py-2"
+     style="display:none;">
+</div>
+`);
+
                 // Keyboard Navigation
                 //#region search logic highlight
                 // Store all rows
@@ -1622,6 +1848,7 @@ function SearchBuyer(inputElement) {
              
             } else {
                 resultsDiv.hide().empty();
+                $("#RightPane").removeClass("show");
             }
         },
         error: function () {
