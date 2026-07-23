@@ -20,6 +20,7 @@
         new DeliveryNoteAddress_DTO()
     };
 }
+ 
 <!-----search logic highlight---->
 
 <style>
@@ -810,7 +811,7 @@
                                         <div class="row">
 
                                             <!-- COLUMN 1 -->
-                                            <div class="col-12 col-md-4">
+                                            <div class="col-12 col-md-3">
 
                                                 <!-- DN NO -->
                                                 <div class="row align-items-center gx-2 mb-0">
@@ -865,38 +866,37 @@
 
                                                 </div>
 
-                                                <!-- CUSTOMER -->
-                                                <div class="row align-items-center gx-2 mb-0">
-
-                                                    <label asp-for="Header.JIDNH_JW_Customer_Number"
-                                                           class="col-md-4 col-form-label ps-0">
-                                                    </label>
-
-                                                    <div class="col-md-7">
-
-                                                        <input asp-for="Header.JIDNH_JW_Customer_Number"
-                                                               type="hidden" />
-
-                                                        <input asp-for="Header.JIDNH_JW_Customer_Name"
-                                                               class="form-control"
-                                                               autocomplete="off"
-                                                               oninput="OnEditJWCustomerInput(this)"
-                                                               onfocus="OnEditJWCustomerFocus(this)" />
-
-                                                 
-                                                 
-                                                        <div class="jwcustomer-search-results bg-primary card"
-                                                         style="display:none;z-index:9999; position:absolute;">
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
+                                    
 
                                             </div>
 
                                             <!-- COLUMN 2 -->
-                                            <div class="col-12 col-md-4">
+                                            <div class="col-12 col-md-3">
+                                            <!-- CUSTOMER -->
+                                            <div class="row align-items-center gx-2 mb-0">
+
+                                                <label asp-for="Header.JIDNH_JW_Customer_Number"
+                                                       class="col-md-3 col-form-label ps-0">
+                                                </label>
+
+                                                <div class="col-md-7">
+
+                                                    <input asp-for="Header.JIDNH_JW_Customer_Number"
+                                                           type="hidden" />
+
+                                                    <input asp-for="Header.JIDNH_JW_Customer_Name"
+                                                           class="form-control"
+                                                           autocomplete="off"
+                                                           onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                           oninput="OnBuyerInput(this)" />
+
+                                                 
+                                                 
+                                                     
+
+                                                </div>
+
+                                            </div>
 
                                                 <!-- CURRENCY -->
                                                 <div class="row align-items-center gx-2 mb-0">
@@ -934,50 +934,50 @@
 
                                                 </div>
 
-                                                <!-- PAYMENT TERMS -->
-                                                <div class="row align-items-center gx-2 mb-0">
+                                             
+                                            </div>
 
-                                                    <label asp-for="Header.JIDNH_PaymentTerms"
-                                                           class="col-md-3 col-form-label ps-0">
-                                                    </label>
+                                            <!-- COLUMN 3 -->
+                                            <div class="col-12 col-md-3">
+                                            <!-- PAYMENT TERMS -->
+                                            <div class="row align-items-center gx-2 mb-0">
 
-                                                    <div class="col-md-7">
+                                                <label asp-for="Header.JIDNH_PaymentTerms"
+                                                       class="col-md-3 col-form-label ps-0">
+                                                </label>
 
-                                                        <input asp-for="Header.JIDNH_PaymentTerms"
+                                                <div class="col-md-7">
+
+                                                    <input asp-for="Header.JIDNH_PaymentTerms"
                                                            class="form-control" maxlength="50"
-                                                               autocomplete="off" />
-
-                                                    </div>
-
-                                                </div>
-
-                                                <!-- DELIVERY TERMS -->
-                                                <div class="row align-items-center gx-2 mb-0">
-
-                                                    <label asp-for="Header.JIDNH_DeliveryTerms"
-                                                           class="col-md-3 col-form-label ps-0">
-                                                    </label>
-
-                                                    <div class="col-md-7">
-
-                                                        <input asp-for="Header.JIDNH_DeliveryTerms"
-                                                           class="form-control" maxlength="50"
-                                                               autocomplete="off" />
-
-                                                    </div>
+                                                           autocomplete="off" />
 
                                                 </div>
 
                                             </div>
 
-                                            <!-- COLUMN 3 -->
-                                            <div class="col-12 col-md-4">
+                                            <!-- DELIVERY TERMS -->
+                                            <div class="row align-items-center gx-2 mb-0">
+
+                                                <label asp-for="Header.JIDNH_DeliveryTerms"
+                                                       class="col-md-3 col-form-label ps-0">
+                                                </label>
+
+                                                <div class="col-md-7">
+
+                                                    <input asp-for="Header.JIDNH_DeliveryTerms"
+                                                           class="form-control" maxlength="50"
+                                                           autocomplete="off" />
+
+                                                </div>
+
+                                            </div>
 
                                                 <!-- DELIVERY MODE -->
                                                 <div class="row align-items-center gx-2 mb-0">
 
                                                     <label asp-for="Header.JIDNH_DeliveryMode"
-                                                           class="col-md-4 col-form-label ps-0">
+                                                       class="col-md-3 col-form-label ps-0">
                                                     </label>
 
                                                     <div class="col-md-7">
@@ -994,7 +994,7 @@
                                                 <div class="row align-items-center gx-2 mb-0">
 
                                                     <label asp-for="Header.JIDNH_DespatchDocumentNo"
-                                                           class="col-md-4 col-form-label ps-0 text-nowrap">
+                                                           class="col-md-3 col-form-label ps-0">
                                                     </label>
 
                                                     <div class="col-md-7">
@@ -1011,10 +1011,10 @@
                                                 <div class="row align-items-center gx-2 mb-0">
 
                                                     <label asp-for="Header.JIDNH_DespatchedThrough"
-                                                           class="col-md-4 col-form-label ps-0">
+                                                           class="col-md-3 col-lg-2 col-form-label ps-0">
                                                     </label>
 
-                                                    <div class="col-md-7">
+                                                <div class="col-md-7 col-lg-5">
 
                                                         <input asp-for="Header.JIDNH_DespatchedThrough"
                                                            class="form-control" maxlength="50"
@@ -1023,25 +1023,19 @@
                                                     </div>
 
                                                 </div>
-
-                                                <!-- REMARKS -->
-                                                <div class="row align-items-start gx-2 mb-0">
-
-                                                    <label asp-for="Header.JIDNH_Remarks"
-                                                           class="col-md-4 col-form-label ps-0">
-                                                    </label>
-
-                                                    <div class="col-md-7">
-
-                                                        <textarea asp-for="Header.JIDNH_Remarks"
-                                                              class="form-control" maxlength="250"
-                                                                  rows="2"></textarea>
-
-                                                    </div>
-
+                                        </div>
+                                        <div class="col-12 col-md-3">
+                                            <div class="row align-items-start gx-2 mb-0">
+                                                <label asp-for="Header.JIDNH_Remarks" class="col-sm-5 col-lg-3  col-form-label ps-0"></label>
+                                                <div class="col-sm-7 col-lg-5">
+                                                    <textarea asp-for="Header.JIDNH_Remarks"
+                                                              class="form-control"
+                                                              maxlength="250"
+                                                              rows="2"></textarea>
                                                 </div>
-
                                             </div>
+                                 
+                                        </div>
 
                                         </div>
 
@@ -1143,7 +1137,7 @@
                                                                                 <th>Amend Qty</th>
                                                                                 <th>Unit Price</th>
                                                                                 <th>Amount</th>
-                                                                                <th> JW Invoice Applicable</th>
+                                                                                <th> JI</th>
                                                                                 <th>Service Order No</th>
                                                                             </tr>
 
@@ -1183,11 +1177,8 @@
                                                                                                autocomplete="off"
                                                                                                class="form-control JIDNI_Item_Code"
                                                                                                oninput="OnEditInputItem(this)"
-                                                                                               onfocus="OnEditFocusItem(this)" />
-                                                                    <div class="search-results bg-primary card"
-                                                         style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
-                                                    </div>
-                                                                                    
+                                                                           onfocus="ShowItemPane();OnEditFocusItem(this)" />
+                                                                                     
 
                                                                                     </td>
 
@@ -1280,7 +1271,7 @@
 
                                                                                         <input asp-for="Items[i].JIDNI_Qty"
                                                                                                autocomplete="off" readonly
-                                                                                               class="form-control JIDNI_OriginalQty  text-end" />
+                                                                                               class="form-control JIDNI_OriginalQty" />
 
                                                                                     </td>
                                                 
@@ -1289,7 +1280,7 @@
 
                                                                                         <input asp-for="Items[i].JIDNI_Qty"
                                                                                                autocomplete="off"
-                                                                                               class="form-control JIDNI_Qty text-end" />
+                                                                                               class="form-control JIDNI_Qty" />
 
                                                                                     </td>
                                                                                     <!-- PRICE -->
@@ -1297,7 +1288,7 @@
 
                                                                                         <input asp-for="Items[i].JIDNI_UnitPrice"
                                                                                                autocomplete="off"
-                                                                                               class="form-control JIDNI_UnitPrice text-end" />
+                                                                                               class="form-control JIDNI_UnitPrice" />
 
                                                                                     </td>
 
@@ -1305,7 +1296,7 @@
                                                                                     <td>
 
                                                                                         <input asp-for="Items[i].JIDNI_Amount"
-                                                                                               class="form-control JIDNI_Amount text-end"
+                                                                                               class="form-control JIDNI_Amount"
                                                                                                readonly />
 
                                                                                     </td>
@@ -1387,7 +1378,16 @@
             </div>
 
         </div>
-
+        <div id="RightPane" >
+       <div class="p-2">
+           <div class="buyer-search-results"></div>
+       </div>
+   </div>
+    <div id="RightPane_Item">
+        <div class="p-2">
+            <div class="search-results"></div>
+        </div>
+    </div>
     </div>
 
    
@@ -1403,5 +1403,6 @@
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/deliverynote/DeliveryNoteEdit.js"
             asp-append-version="true"></script>
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
 
 }

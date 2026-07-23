@@ -2,6 +2,81 @@
 @{
     ViewData["Title"] = "Jobwork Invoice Create";
 }
+<style>
+    #RightPane {
+        position: fixed;
+        top: 80px;
+        bottom: 0; /* Touch bottom of viewport */
+        /* Hidden position */
+        right: calc(-(50ch +4px));
+        /* 50ch content + padding + border */
+        width: calc(50ch + 4px);
+        background: #c6e0e7;
+        border: 1px solid #6c757d;
+        box-sizing: border-box;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 9999;
+        transition: right .25s ease, opacity .25s ease;
+    }
+
+        #RightPane.show {
+            right: calc(2px);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #RightPane .p-2 {
+            padding: 0 !important; /* Remove Bootstrap padding */
+            margin: 0 !important;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        #RightPane .buyer-search-results {
+            background: #c6e0e7;
+            margin-left: -2px !important;
+            width: 50ch !important;
+            min-width: 50ch !important;
+            max-width: 50ch !important;
+            height: auto !important;
+            min-height: 100% !important;
+            max-height: none !important;
+            overflow: visible !important;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+            box-sizing: border-box !important;
+        }
+
+         
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td {
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                vertical-align: top;
+            }
+
+            #RightPane .buyer-search-results table,
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td,
+            #RightPane .buyer-search-results tr {
+                border: none !important;
+            }
+
+            #RightPane .buyer-search-results table {
+                width: 100%;
+                table-layout: fixed;
+                border-collapse: collapse;
+                margin-left: -2px !important;
+            }
+</style>
+
 <!-----search logic highlight---->
 
 <style>
@@ -454,6 +529,12 @@
 
                                         </div>
  
+                                  
+                                   
+                                    </div>
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-4">
                                         <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_JW_Customer_Number"
@@ -471,8 +552,8 @@
                                                 <input asp-for="Header.JISVIH_JW_Customer_Name"
                                                        class="form-control"
                                                        autocomplete="off"
-                                                       oninput="OnJWCustomerInput(this)"
-                                                       onfocus="OnJWCustomerFocus(this)" />
+                                                       onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                       oninput="OnBuyerInput(this)" />
 
                                                 <!-- SEARCH RESULT -->
                                                 <div class="jwcustomer-search-results bg-primary card"
@@ -482,19 +563,14 @@
                                             </div>
 
                                         </div>
-                                   
-                                    </div>
-
-                                    <!-- COLUMN 2 -->
-                                    <div class="col-12 col-md-3">
 
                                         <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_Currency_Number"
-                                                   class="col-sm-4 col-form-label ps-0">
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
-                                            <div class="col-sm-7">
+                                            <div class="col-md-6 col-lg-7">
 
                                                 <select asp-for="Header.JISVIH_Currency_Number"
                                                         class="form-select"
@@ -508,10 +584,10 @@
                                         <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_TCT_Number"
-                                                   class="col-sm-4 col-form-label ps-0">
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
-                                            <div class="col-sm-7">
+                                            <div class="col-md-6 col-lg-7">
 
                                                 <select asp-for="Header.JISVIH_TCT_Number"
                                                         class="form-select">
@@ -521,6 +597,13 @@
 
                                         </div>
 
+                                    
+                                    </div>
+
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3">
+
+                                  
                                         <div class="row align-items-center gx-2 mb-0">
 
                                             <label asp-for="Header.JISVIH_PaymentTerms"
@@ -553,18 +636,11 @@
 
                                         </div>
 
-                                    </div>
-
-                                    <!-- COLUMN 3 -->
-                                    <div class="col-12 col-md-3">
-
-                                  
-
                                  
 
-                                        <div class="row align-items-start gx-2 mb-0">
+                                        <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_Remarks" class="col-sm-5 col-form-label ps-0">
+                                            <label asp-for="Header.JISVIH_Remarks" class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
@@ -818,7 +894,7 @@
 
 
                                                                                 <td>
-                                                                                    <input id="TotalQty" class="form-control text-end" readonly />
+                                                                                    <input id="TotalQty" class="form-control text-center" readonly />
                                                                                 </td>
 
                                                                                 <td>   <input id="TotalAmendedQty" class="form-control text-end" readonly /></td>
@@ -883,7 +959,11 @@
             </div>
 
         </div>
-
+        <div id="RightPane">
+            <div class="p-2">
+                <div class="buyer-search-results"></div>
+            </div>
+        </div>
     </div>
 </form>
 @section Scripts {
@@ -897,6 +977,7 @@
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
     <script src="~/js/jw_invoice/JW_InvoiceEdit.js" asp-append-version="true"></script>
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
 
         
     

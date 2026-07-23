@@ -1,22 +1,26 @@
 ﻿@model ERP_DTO.JobInwardTransaction.ReceiptNoteHead_DTO;
 @{
-    ViewData["Title"] = "Receipt Note Create";
-} 
-<!-----search logic highlight---->
+    ViewData["Title"] = "Receipt Note Edit";
+}  
 <style>
-    /* Table font size */
     #ItemTable {
-       font-family:Arial;
+        table-layout: fixed;
+        border-collapse: collapse;
     }
 
-        /* Header font size */
-        #ItemTable thead th {
-            font-size: 12px;
+        #ItemTable td,
+        #ItemTable th {
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
-        /* Row font size */
-        #ItemTable tbody td {
-            font-size: 13px;
+        #ItemTable .form-control,
+        #ItemTable .form-select,
+        #ItemTable textarea {
+            display: block !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
         }
 </style>
 <style>
@@ -29,6 +33,7 @@
         background: #dbeafe !important;
     }
 </style>
+
 <style>
     .batchPopup thead th {
         position: sticky;
@@ -210,8 +215,8 @@
                                               <th class="table-width-xl text-center">Original Qty </th>
                                             <th class="table-width-xl text-center">Used Qty</th>
                                             <th class="table-width-xl text-center">Amend Qty</th>
-                                            <th class="table-width-xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_UnitPrice)</th>
-                                            <th class="table-width-3xl text-end">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Value)</th>
+                                            <th class="table-width-xl">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_UnitPrice)</th>
+                                            <th class="table-width-3xl">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Value)</th>
                                             <th class="action text-center align-middle">Action</th>
                                         </tr>
                                     </thead>
@@ -239,10 +244,10 @@
                                                 <input id="RNI_BCH_AmendQty" class="form-control RNI_BCH_AmendQty  text-center decimal" value="0" autocomplete="off" />
                                             </td>
                                             <td class="table-width-xl">
-                                                <input id="RNI_BCH_UnitPrice" value="0" class="form-control RNI_BCH_UnitPrice decimal text-end" autocomplete="off" />
+                                                <input id="RNI_BCH_UnitPrice" value="0" class="form-control RNI_BCH_UnitPrice decimal" autocomplete="off" />
                                             </td>
                                             <td class="table-width-3xl">
-                                                <input id="RNI_BCH_Value" class="form-control RNI_BCH_Value decimal text-end" readonly autocomplete="off" />
+                                                <input id="RNI_BCH_Value" class="form-control RNI_BCH_Value decimal" readonly autocomplete="off" />
                                             </td>
                                             <td class="action text-center align-middle">
                                                 <input id="RNI_BCH_IsDeleted" type="hidden" name="RNI_BCH_IsDeleted" class="RNI_BCH_IsDeleted" value="false" />
@@ -271,10 +276,10 @@
                                                         <input id="RNI_BCH_Qty" name="ItemBatch[@i].RNI_BCH_Qty" class="form-control RNI_BCH_Qty text-center" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Qty" />
                                                     </td>
                                                     <td class="table-width-xl">
-                                                        <input id="RNI_BCH_UnitPrice" name="ItemBatch[@i].RNI_BCH_UnitPrice" readonly class="form-control RNI_BCH_UnitPrice decimal text-end" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_UnitPrice" />
+                                                        <input id="RNI_BCH_UnitPrice" name="ItemBatch[@i].RNI_BCH_UnitPrice" readonly class="form-control RNI_BCH_UnitPrice decimal" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_UnitPrice" />
                                                     </td>
                                                     <td class="table-width-3xl">
-                                                        <input id="RNI_BCH_Value" name="ItemBatch[@i].RNI_BCH_Value" readonly class="form-control RNI_BCH_Value decimal text-end" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Value" />
+                                                        <input id="RNI_BCH_Value" name="ItemBatch[@i].RNI_BCH_Value" readonly class="form-control RNI_BCH_Value decimal" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Value" />
                                                     </td>
                                                     <td class="action text-center align-middle">
                                                         @if (@Model.ItemBatch[i].RNI_BCH_No != 0)
@@ -373,78 +378,70 @@
                         </div>
 
                         <div class="col-auto left-menu text-black">
-                            <div class="row">
-                                <div class="col-12 col-md-4">
-                                    <div class="row align-items-center px-2 mb-1">
+                            <div class="row  gx-1 gy-1">
+                                <div class="col-12 col-md-3">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
                                             <input asp-for="RN_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="RN_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
                                             <input asp-for="RN_Date" class="form-control Key datepicker" autocomplete="off" />
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
                                             <input asp-for="JW_CustomerDC_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="JW_CustomerDC_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
                                             <input asp-for="JW_CustomerDC_Date" class="form-control Key datepicker" autocomplete="off" />
                                         </div>
                                     </div>
-          
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="row align-items-center px-2 mb-1">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
                                             <select asp-for="MS_Number" class="form-select MS_Number" asp-items="@ViewBag.MaterialSegregation"></select>
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
-                                        <label asp-for="JWC_Number" class="col-sm-5 col-form-label ps-0"></label>
+          
+                                </div>
+                                <div class="col-12 col-md-4">
+                                  
+                                    <div class="row align-items-center gx-2">
+                                        <label asp-for="JWC_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
 
-                                        <div class="col-sm-7 position-relative">
+                                        <div class="col-sm-7 col-lg-5 position-relative">
 
                                             <input asp-for="JWC_Number" type="hidden" />
 
-                                            <input asp-for="JWC_Name" type="text"
+                                            <input asp-for="JWC_Name"
                                                    class="form-control"
                                                    autocomplete="off"
-                                                   oninput="OnBuyerInput(this)"
-                                                   onfocus="OnBuyerFocus(this)" />
+                                                   onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                   oninput="OnBuyerInput(this)" />
 
-                                            <div class="buyer-search-results"
-                                                 style="display:none;
-                                                position:absolute;
-                                                top:100%;
-                                                left:0;
-                                                width:100%;
-                                                z-index:9999;">
-                                            </div>
+                                          
 
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="row align-items-center px-2 mb-1">
-                                        <label asp-for="Currency_Number" class="col-sm-2 col-form-label ps-0"></label>
+                                    <div class="row align-items-center gx-2">
+                                        <label asp-for="Currency_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                         <input asp-for="Currency_Number" type="hidden" />
-                                        <div class="col-sm-10">
+                                        <div class="col-sm-7 col-lg-5">
                                             <input asp-for="Currency_Name" class="form-control Key KeyDup" autocomplete="off" readonly />
                                         </div>
                                     </div>
       
-                                    <div class="row align-items-center px-2 mb-1">
-                                        <label asp-for="WH_Number" class="col-sm-2 col-form-label ps-0"></label>
-                                        <div class="col-sm-8">
+                                    <div class="row align-items-center gx-2">
+                                        <label asp-for="WH_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <div class="col-sm-7 col-lg-5">
                                             <select asp-for="WH_Number" class="form-select" asp-items="@ViewBag.Warehouse"></select>
                                             @{
                                                 if (Model != null)
@@ -455,9 +452,13 @@
                                             <div class="cluster-results dropdown-results search-results bg-primary p-2" style="display:none"></div>
                                         </div>
                                     </div>
-                                    <div class="row align-items-center px-2 mb-1">
-                                        <label asp-for="Remarks" class="col-sm-2 col-form-label ps-0"></label>
-                                        <div class="col-sm-10">
+                             
+                                </div>
+                                <div class="col-12 col-md-4">
+                                       
+                                    <div class="row align-items-start gx-2">
+                                        <label asp-for="Remarks" class="col-sm-4 col-lg-2  col-form-label ps-0"></label>
+                                        <div class="col-sm-7 col-lg-5">
                                             <textarea asp-for="Remarks"
                                                       class="form-control Key KeyDup"
                                                       rows="2" maxlength="250"
@@ -560,21 +561,19 @@
                                                                 <input id="Item_Number" class="Item_Number" type="hidden" />
                                                                 <input id="JIRNI_Number" class="JIRNI_Number" type="hidden" />
                                                                 <input id="Item_Index" class="Item_Index" type="hidden" />
-                                                                <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                                                <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="ShowItemPane();OnFocus(this)" />
                                                                
-                                                                <div class="search-results card"
-                                                                     style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
-                                                                </div>
+                                                            
                                                             </td>
 
                                                             <td>
                                                                 <textarea class="form-control Description" rows="2" readonly></textarea>
                                                             </td>
 
-                                                            <td><input class="form-control OuterDia text-end" readonly /></td>
-                                                            <td><input class="form-control Thickness text-end" readonly /></td>
-                                                            <td><input class="form-control Length text-end" readonly /></td>
-                                                            <td><input class="form-control Width text-end" readonly /></td>
+                                                            <td><input class="form-control OuterDia" readonly /></td>
+                                                            <td><input class="form-control Thickness" readonly /></td>
+                                                            <td><input class="form-control Length" readonly /></td>
+                                                            <td><input class="form-control Width" readonly /></td>
 
                                                             <td><input class="form-control MaterialGrade" readonly /></td>
                                                             <td><input class="form-control ItemGroup" readonly /></td>
@@ -597,11 +596,11 @@
                                                             </td>
 
                                                             <td>
-                                                                <input class="form-control UnitPrice text-end" />
+                                                                <input class="form-control UnitPrice" />
                                                             </td>
 
                                                             <td>
-                                                                <input class="form-control Amount text-end" readonly />
+                                                                <input class="form-control Amount" readonly />
                                                                 <input type="hidden" class="IsDeleted" value="0" />
                                                             </td>
                                                         </tr>
@@ -624,7 +623,7 @@
                                                                                oninput="OnInputProcess(this)"
                                                                                onfocus="OnFocusProcess(this)" autocomplete="off" />
 
-                                                                        <div class="search-results card" style="display:none"></div>
+                                                                        
                                                                     </td>
 
                                                                     <td>
@@ -632,7 +631,7 @@
                                                                                class="form-control Item_Number"
                                                                                value="@Model.Items[i].Item_Number"
                                                                                oninput="OnInput(this)" onfocus="OnFocus(this)" />
-                                                                        <div class="search-results card" style="display:none"></div>
+                                                                     
                                                                     </td>
 
                                                                     <td>
@@ -644,25 +643,25 @@
 
                                                                     <td>
                                                                         <input name="Items[@i].OuterDia"
-                                                                               class="form-control OuterDia text-end"
+                                                                               class="form-control OuterDia"
                                                                                value="@Model.Items[i].OuterDia" readonly />
                                                                     </td>
 
                                                                     <td>
                                                                         <input name="Items[@i].Thickness"
-                                                                               class="form-control Thickness text-end"
+                                                                               class="form-control Thickness"
                                                                                value="@Model.Items[i].Thickness" readonly />
                                                                     </td>
 
                                                                     <td>
                                                                         <input name="Items[@i].Length"
-                                                                               class="form-control Length text-end"
+                                                                               class="form-control Length"
                                                                                value="@Model.Items[i].Length" readonly />
                                                                     </td>
 
                                                                     <td>
                                                                         <input name="Items[@i].Width"
-                                                                               class="form-control Width text-end"
+                                                                               class="form-control Width"
                                                                                value="@Model.Items[i].Width" readonly />
                                                                     </td>
 
@@ -721,13 +720,13 @@
 
                                                                     <td>
                                                                         <input name="Items[@i].UnitPrice"
-                                                                               class="form-control UnitPrice text-end"
+                                                                               class="form-control UnitPrice"
                                                                                value="@Model.Items[i].UnitPrice" />
                                                                     </td>
 
                                                                     <td>
                                                                         <input name="Items[@i].Amount"
-                                                                               class="form-control Amount text-end"
+                                                                               class="form-control Amount"
                                                                                value="@Model.Items[i].Amount" readonly />
 
                                                                         <input type="hidden"
@@ -753,7 +752,7 @@
                                                             </td>
                                                             <td></td>
                                                             <td>
-                                                                <input id="TotalAmount" class="form-control text-end" readonly />
+                                                                <input id="TotalAmount" style="text-align:right" class="form-control" readonly />
                                                             </td>
                                                         </tr>
                                                     </tfoot>
@@ -782,6 +781,16 @@
        
         </div>
     </div>
+    <div id="RightPane">
+        <div class="p-2">
+            <div class="buyer-search-results"></div>
+        </div>
+    </div>
+    <div id="RightPane_Item">
+        <div class="p-2">
+            <div class="search-results"></div>
+        </div>
+    </div>
 </div>
 </form>
 
@@ -792,9 +801,9 @@
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
-
+  
     <script src="~/js/receiptnote/receiptnote_Edit.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote_batchEdit.js" asp-append-version="true"></script>
-
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
  
 }

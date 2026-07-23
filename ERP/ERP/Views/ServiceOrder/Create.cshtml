@@ -3,6 +3,81 @@
 @{
     ViewData["Title"] = "Service Order";
 }
+<style>
+    #RightPane {
+        position: fixed;
+        top: 80px;
+        bottom: 0; /* Touch bottom of viewport */
+        /* Hidden position */
+        right: calc(-(50ch +4px));
+        /* 50ch content + padding + border */
+        width: calc(50ch + 4px);
+        background: #c6e0e7;
+        border: 1px solid #6c757d;
+        box-sizing: border-box;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 9999;
+        transition: right .25s ease, opacity .25s ease;
+    }
+
+        #RightPane.show {
+            right: calc(2px);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #RightPane .p-2 {
+            padding: 0 !important; /* Remove Bootstrap padding */
+            margin: 0 !important;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        #RightPane .buyer-search-results {
+            background: #c6e0e7;
+            margin-left: -2px !important;
+            width: 50ch !important;
+            min-width: 50ch !important;
+            max-width: 50ch !important;
+            height: auto !important;
+            min-height: 100% !important;
+            max-height: none !important;
+            overflow: visible !important;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+            box-sizing: border-box !important;
+        }
+
+         
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td {
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                vertical-align: top;
+            }
+
+            #RightPane .buyer-search-results table,
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td,
+            #RightPane .buyer-search-results tr {
+                border: none !important;
+            }
+
+            #RightPane .buyer-search-results table {
+                width: 100%;
+                table-layout: fixed;
+                border-collapse: collapse;
+                margin-left: -2px !important;
+            }
+</style>
+
  <!-----search logic highlight---->
 
 <style>
@@ -214,7 +289,7 @@
                                 <div class="row">
 
                                     <!-- COLUMN 1 -->
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-12 col-md-3 col-lg-3">
 
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_RegNo"
@@ -252,23 +327,22 @@
                                                         class="form-control datepicker" />
                                             </div>
                                         </div>
-
-                                    </div>
-
-                                    <!-- COLUMN 2 -->
-                                    <div class="col-12 col-md-5">
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_MS_Number"
-                                                   class="col-sm-5 col-form-label ps-0">
-                                            </label>
-
-                                            <div class="col-sm-7">
+                                                   class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            
+                                            <div class="col-md-6 col-lg-7">
                                                 <select asp-for="Header.JISVOH_MS_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.MaterialSegregation">
                                                 </select>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-3 col-lg-2">
+                                    
 
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_JW_Customer_Number"
@@ -277,14 +351,13 @@
                                             <div class="col-sm-7">
                                                 <input asp-for="Header.JISVOH_JW_Customer_Number" type="hidden" />
 
+                                               
+
                                                 <input asp-for="Header.JISVOH_JW_Customer_Name"
                                                        class="form-control"
                                                        autocomplete="off"
-                                                       oninput="OnJWCustomerInput(this)"
-                                                       onfocus="OnJWCustomerFocus(this)" />
-
-                                                <div class="jwcustomer-search-results bg-primary card"
-                                                     style="display:none"></div>
+                                                       onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                       oninput="OnBuyerInput(this)" />
                                             </div>
                                         </div>
 
@@ -300,6 +373,12 @@
                                             </div>
                                         </div>
 
+                                 
+
+                                    </div>
+
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3">
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_PaymentTerms"
                                                    class="col-sm-5 col-form-label ps-0"></label>
@@ -317,12 +396,6 @@
                                                        class="form-control" />
                                             </div>
                                         </div>
-
-                                    </div>
-
-                                    <!-- COLUMN 3 -->
-                                    <div class="col-12 col-md-3">
-
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_DeliveryMode"
                                                    class="col-sm-5 col-form-label ps-0"></label>
@@ -331,22 +404,29 @@
                                                        class="form-control" />
                                             </div>
                                         </div>
-
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_Tax"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
-                                                <input asp-for="Header.JISVOH_Tax" maxlength="250"
-                                                       class="form-control" />
+                                                
+                                                <textarea asp-for="Header.JISVOH_Tax"
+                                                          class="form-control" maxlength="250"
+                                                          rows="2"></textarea>
                                             </div>
                                         </div>
+                                       
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                     
 
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="Header.JISVOH_TDC"
                                                    class="col-sm-5 col-form-label ps-0"></label>
                                             <div class="col-sm-7">
-                                                <input asp-for="Header.JISVOH_TDC" maxlength="250"
-                                                       class="form-control" />
+                                               
+                                                <textarea asp-for="Header.JISVOH_TDC"
+                                                          class="form-control" maxlength="250"
+                                                          rows="2"></textarea>
                                             </div>
                                         </div>
 
@@ -360,7 +440,7 @@
                                             </div>
                                         </div>
 
-                                    </div>
+</div>
 
                                 </div>
                             </div>
@@ -477,11 +557,9 @@
                                                                                            autocomplete="off"
                                                                                            class="form-control JISVOI_Item_Code"
                                                                                            oninput="OnInputItem(this)"
-                                                                                           onfocus="OnFocusItem(this)" />
+                                                                           onfocus="ShowItemPane();OnFocusItem(this)" />
 
-                                                                             <div class="search-results card"
-       style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
-  </div>
+                                                                             
                                                                                 </td>
 
                                                                                 <td>
@@ -590,11 +668,9 @@
                                                                                            autocomplete="off"
                                                                                            class="form-control JISVOI_Item_Code"
                                                                                            oninput="OnInputItem(this)"
-                                                                                           onfocus="OnFocusItem(this)" />
+                                                                           onfocus="ShowItemPane();OnFocusItem(this)" />
 
-                                                                                     <div class="search-results card"
-       style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
-  </div>
+       
                                                                                 </td>
 
                                                                                 <td>
@@ -681,7 +757,7 @@
 
                                                                                 <td>
                                                                                     <input id="TotalQty"
-                                                                                           class="form-control text-end"
+                                                                                           class="form-control text-center"
                                                                                            readonly />
                                                                                 </td>
 
@@ -717,7 +793,16 @@
             </div>
 
         </div>
-
+        <div id="RightPane">
+            <div class="p-2">
+                <div class="buyer-search-results"></div>
+            </div>
+        </div>
+        <div id="RightPane_Item">
+            <div class="p-2">
+                <div class="search-results"></div>
+            </div>
+        </div>
     </div>
       </form>
 
@@ -729,5 +814,5 @@
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
     <script src="~/js/jw_serviceorder/JW_ServiceOrder.js" asp-append-version="true"></script>
-        
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
 }

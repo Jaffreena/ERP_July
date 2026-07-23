@@ -189,9 +189,9 @@ body {
 .table .form-control,
 .table .form-select {
     border: none !important;
-    padding: 0.1rem;
-    border-radius: 0;
-    /*background: transparent !important;*/
+    padding: 0.1rem !important;
+    border-radius: 0 !important;
+    /* background: transparent !important; */
 }
 
 .table tfoot .form-control,
@@ -523,7 +523,7 @@ tr:has(input[type="checkbox"]:checked) {
     height: 25px !important;
     min-height: 25px !important;
     border-radius: 4px !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
     font-family: Arial, sans-serif;
     font-weight: 400;
     resize: vertical; /* or both */
@@ -537,3 +537,165 @@ tr:has(input[type="checkbox"]:checked) {
     text-decoration: none !important;
     max-width: 30% !important;
 }
+ 
+    #ItemTable th[style*="text-align: left"] {
+        padding-left: -3px !important;
+        
+    }
+/*---------RightPane  css---------*/
+#RightPane {
+    position: fixed;
+    top: 80px;
+    bottom: 0; /* Touch bottom of viewport */
+    /* Hidden position */
+    right: calc(-(50ch +4px));
+    /* 50ch content + padding + border */
+    width: calc(50ch + 4px);
+    background: #c6e0e7;
+    border: 1px solid #6c757d;
+    box-sizing: border-box;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 9999;
+    transition: right .25s ease, opacity .25s ease;
+}
+
+    #RightPane.show {
+        right: calc(2px);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #RightPane .p-2 {
+        padding: 0 !important; /* Remove Bootstrap padding */
+        margin: 0 !important;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    #RightPane .buyer-search-results {
+        background: #c6e0e7;
+        margin-left: -2px !important;
+        width: 50ch !important;
+        min-width: 50ch !important;
+        max-width: 50ch !important;
+        height: auto !important;
+        min-height: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        box-sizing: border-box !important;
+    }
+
+
+        #RightPane .buyer-search-results th,
+        #RightPane .buyer-search-results td {
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            vertical-align: top;
+        }
+
+        #RightPane .buyer-search-results table,
+        #RightPane .buyer-search-results th,
+        #RightPane .buyer-search-results td,
+        #RightPane .buyer-search-results tr {
+            border: none !important;
+        }
+
+        #RightPane .buyer-search-results table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-left: -2px !important;
+        }
+
+/*---------RightPane  css---------*/
+#RightPane_Item {
+    position: fixed;
+    top: 80px;
+    bottom: 0;
+    right: calc(-(50ch + 4px));
+    width: calc(50ch + 4px);
+    background: #c6e0e7;
+    border: 1px solid #6c757d;
+    box-sizing: border-box;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 9999;
+    transition: right .25s ease, opacity .25s ease;
+}
+
+    #RightPane_Item.show {
+        right: 2px;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #RightPane_Item .p-2 {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    #RightPane_Item .search-results {
+        background: #c6e0e7;
+        margin-left: -2px !important;
+        width: 50ch !important;
+        min-width: 50ch !important;
+        max-width: 50ch !important;
+        height: auto !important;
+        min-height: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        box-sizing: border-box !important;
+    }
+
+        #RightPane_Item .search-results th,
+        #RightPane_Item .search-results td {
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            vertical-align: top;
+        }
+
+        #RightPane_Item .search-results table,
+        #RightPane_Item .search-results th,
+        #RightPane_Item .search-results td,
+        #RightPane_Item .search-results tr {
+            border: none !important;
+        }
+
+        #RightPane_Item .search-results table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-left: -2px !important;
+        }
+/* Hide resize handle for labels inside ItemTable */
+ 
+#ItemTable td {
+   
+    vertical-align: middle;
+}
+
+    #ItemTable td label {
+        resize: none !important;
+        text-align: center;
+        vertical-align: middle;
+        overflow: hidden;
+    }

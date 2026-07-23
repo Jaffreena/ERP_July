@@ -2,53 +2,12 @@
 @{
     ViewData["Title"] = "Receipt Note Create";
 }
- <style>
-    #RightPane {
-        position: fixed;
-        top: 0;
-        right: calc(-50ch - 14px); /* 50ch + 12px gap + 2px border */
-        width: calc(50ch + 12px);
-        height: 100vh;
-        background: #c6e0e7;
-        border-left: 2px solid #6c757d;
-        box-sizing: border-box;
-        padding-left: 12px; /* Space between border and content */
-        z-index: 9999;
-        overflow: hidden;
-        opacity: 0;
-        visibility: hidden;
-        transition: right .2s ease, opacity .3s ease, visibility 0s linear .3s;
-    }
 
-        #RightPane.show {
-            right: 0;
-            opacity: 1;
-            visibility: visible;
-            transition: right .2s ease, opacity .3s ease, visibility 0s;
-        }
 
-#RightPane .p-2 {
-    padding: 0 !important;   /* Remove padding */
-    margin: 0;
-    height: 100%;
-}
-
-#RightPane .buyer-search-results {
-    display: none;
-    height: 100% !important;
-    max-height: 100% !important;
-    overflow: hidden !important;
-}
-            
- </style>
- 
 <style>
   
 
-    .buyer-search-results {
-        width: 500px !important; /* Change to your desired width */
-        max-width: 600px;
-    }
+     
     /* Equal spacing for all form rows */
     .row.align-items-center {
         padding: 2px 0;
@@ -175,7 +134,7 @@
 
 
 
-<style>
+@* <style>
     #ItemTable th,
     #ItemTable td {
         height: 27px;
@@ -183,7 +142,7 @@
         padding-bottom: 0;
         vertical-align: middle;
     }
-</style>
+</style> *@
 <style>
 .match-row td{
     color:blue !important;
@@ -414,7 +373,7 @@
 
                         <div class="col-auto left-menu text-black">
                             <div class="row">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3 col-lg-3">
                                     <div class="row align-items-center gx-2">
                                         <label asp-for="RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
@@ -439,66 +398,69 @@
                                             <input asp-for="JW_CustomerDC_Date" class="form-control Key datepicker" style="width:20ch !important;" autocomplete="off" />
                                         </div>
                                     </div>
-          
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="row align-items-center gx-2 mb-0">
+                                    <div class="row align-items-center gx-2">
                                         <label asp-for="MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <select asp-for="MS_Number" class="form-select MS_Number" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            <select asp-for="MS_Number" class="form-select MS_Number" 
+                                           asp-items="@ViewBag.MaterialSegregation"></select>
                                         </div>
                                     </div>
-                                    <div class="row align-items-center gx-2 mb-0">
-                                        <label asp-for="JWC_Number" class="col-sm-5 col-form-label ps-0"></label>
-
-                                        <div class="col-sm-7 position-relative">
-
-                                            <input asp-for="JWC_Number" type="hidden" />
+          
+                                </div>
+                                <div class="col-12 col-md-3 col-lg-4">
+                                    <div class="row align-items-center gx-2">
+                                        <label asp-for="JWC_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <div class="col-sm-7 col-lg-5">
+                                             <input asp-for="JWC_Number" type="hidden" />
 
                                             <input asp-for="JWC_Name"
                                                    class="form-control"
                                                    autocomplete="off"
-                                                   onselect="OnBuyerSelect(this)"
-                                                   onblur="OnBuyerBlur(this)"
-                                                   oninput="OnBuyerInput(this)"
-                                                   onfocus="OnBuyerFocus(this)" />
-
-                                           
-
+                                                   onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                   oninput="OnBuyerInput(this)" />
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="row align-items-center gx-2 mb-0">
-                                        <label asp-for="Currency_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
-                                        <input asp-for="Currency_Number" class="form-control" type="hidden" />
-                                        <div class="col-md-6 col-lg-7">
-                                            <input asp-for="Currency_Name" class="form-control Key KeyDup" autocomplete="off" readonly />
+
+                                    <div class="row align-items-center gx-2">
+                                        <label asp-for="Currency_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <div class="col-sm-7 col-lg-5">
+                                            <input asp-for="Currency_Number" class="form-control" type="hidden" />
+                                            <input asp-for="Currency_Name"
+                                                   class="form-control Key KeyDup"
+                                                   autocomplete="off"
+                                                   readonly />
                                         </div>
                                     </div>
-      
-                                    <div class="row align-items-center gx-2 mb-0">
-                                        <label asp-for="WH_Number" class="col-sm-5 col-form-label ps-0"></label>
-                                        <div class="col-sm-7">
-                                            <select asp-for="WH_Number" class="form-select" asp-items="@ViewBag.Warehouse"></select>
-                                            @{
-                                                if (Model != null)
-                                                {
-                                                    // <input asp-for="SIH_HIDE_TCT_Number" class="form-control" type="hidden" value="@Model.Currency_Number" />
-                                                }
-                                            }
+                                    <div class="row align-items-center gx-2">
+                                        <label asp-for="WH_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <div class="col-sm-7 col-lg-5">
+                                            <select asp-for="WH_Number"
+                                                    class="form-select"
+                                                    asp-items="@ViewBag.Warehouse"></select>
+
+                                          
+
                                             <div class="cluster-results dropdown-results search-results bg-primary p-2" style="display:none"></div>
+
                                         </div>
                                     </div>
-                                    <div class="row align-items-center gx-2 mb-0">
-                                        <label asp-for="Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                
+          
+                                </div>
+                                
+                                
+                                    <div class="col-12 col-md-3 col-lg-3">
+                                    <div class="row align-items-start  gx-2">
+                                        <label asp-for="Remarks" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <textarea asp-for="Remarks" maxlength="250"
+                                             <textarea asp-for="Remarks" maxlength="250"
                                                       class="form-control Key KeyDup"
-                                                      rows="2"
+                                                   
                                                       autocomplete="off"></textarea>
                                         </div>
                                     </div>
+                                    
+                                
                                 </div>
                             </div>
                         </div>
@@ -635,14 +597,11 @@
                                                             <td>
                                                                 <input id="Item_Number" class="Item_Number" type="hidden" />
                                                                 <input id="Item_Index" class="Item_Index" type="hidden" />
-                                                                <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
-                                                                <div class="search-results card"
-                                                                     style="display:none; min-height:100px; max-height:600px; overflow-y:auto;">
-                                                                </div>
+                                                                <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="ShowItemPane();OnFocus(this)" />
+                                                              
                                                             </td>
-
                                                             <td>
-                                                                <textarea class="form-control Description" rows="2" readonly></textarea>
+                                                                <label class="form-control Description"></label>
                                                             </td>
 
                                                             <td><input class="form-control OuterDia text-end" readonly /></td>
@@ -693,7 +652,7 @@
                                                                                oninput="OnInputProcess(this)"
                                                                                onfocus="OnFocusProcess(this)" autocomplete="off" />
 
-                                                                        <div class="search-results card" style="display:none"></div>
+                                                                     
                                                                     </td>
 
                                                                     <td>
@@ -701,14 +660,13 @@
                                                                                class="form-control Item_Number"
                                                                                value="@Model.Items[i].Item_Number"
                                                                                oninput="OnInput(this)" onfocus="OnFocus(this)" />
-                                                                        <div class="search-results card" style="display:none"></div>
+                                                                        
                                                                     </td>
 
                                                                     <td>
-                                                                        <textarea name="Items[@i].Description"
-                                                                                  class="form-control Description"
-                                                                                  rows="2"
-                                                                                  readonly>@Model.Items[i].Description</textarea>
+                                                                        <label class="form-control Description">
+                                                                            @Model.Items[i].Description
+                                                                        </label>
                                                                     </td>
 
                                                                     <td>
@@ -803,13 +761,13 @@
                                                     <!-- ================= FOOTER ================= -->
                                                     <tfoot>
                                                         <tr class="table-info">
-                                                            <td colspan="12" class="text-end">Total</td>
+                                                            <td colspan="12" class="text-end" style="text-align:right">Total</td>
                                                             <td>
                                                                 <input id="TotalQty" class="form-control text-center" readonly />
                                                             </td>
                                                             <td></td>
                                                             <td>
-                                                                <input id="TotalAmount" class="form-control text-end" readonly />
+                                                                <input id="TotalAmount" style="text-align:right" class="form-control text-end" readonly />
                                                             </td>
                                                         </tr>
                                                     </tfoot>
@@ -844,6 +802,11 @@
             <div class="buyer-search-results"></div>
         </div>
     </div>
+    <div id="RightPane_Item">
+        <div class="p-2">
+            <div class="search-results"></div>
+        </div>
+    </div>
 </div>
 </form>
 
@@ -857,7 +820,7 @@
    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote_batch.js" asp-append-version="true"></script>
-
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
 
  
 }

@@ -1,5 +1,55 @@
 ﻿
 
+const ItemTableFields = [
+    { cls: ".JISVII_JISVOH_Number", min: 15, max: 30, align: "left" },
+    { cls: ".JISVII_DN_No", min: 15, max: 30, align: "left" },
+    { cls: ".JISVII_Process", min: 15, max: 30, align: "left" },
+    { cls: ".JISVII_ItemCode", min: 18, max: 18, align: "left" },
+    { cls: ".JISVII_ItemDescription", min: 30, max: 45, align: "left" },
+
+    { cls: ".JISVII_OuterDia", min: 10, max: 10, align: "center" },
+    { cls: ".JISVII_Thickness", min: 10, max: 10, align: "center" },
+    { cls: ".JISVII_Length", min: 10, max: 10, align: "center" },
+    { cls: ".JISVII_Width", min: 10, max: 10, align: "center" },
+
+    { cls: ".JISVII_MaterialGrade", min: 15, max: 25, align: "left" },
+    { cls: ".JISVII_ItemGroup", min: 15, max: 30, align: "left" },
+    { cls: ".JISVII_UoM", min: 10, max: 15, align: "center" },
+
+    { cls: ".DeliveredQty", min: 11, max: 20, align: "center" },
+    { cls: ".PreviouslyInvoicedQty", min: 11, max: 20, align: "center" },
+    { cls: ".JISVII_Qty", min: 11, max: 20, align: "center" },
+    { cls: ".JISVII_AmendQty", min: 11, max: 20, align: "center" },  
+    { cls: ".JISVII_UnitPrice", min: 11, max: 20, align: "right" },
+    { cls: ".JISVII_Amount", min: 13, max: 25, align: "right" },
+
+    { cls: ".JISVII_SAC_Number", min: 6, max: 6, align: "left" },
+    { cls: ".JISVII_GST_Amount", min: 13, max: 25, align: "right" }
+];
+$(window).on("load", function () {
+    setTimeout(function () {
+
+        ApplyFieldWidths({
+            fields: ItemTableFields,          // Only this column
+            container: "#ItemTable",
+            tableBody: "#TableBody"
+        });
+
+    }, 200);
+});
+function ResizeColumn(control) {
+
+    const field = ItemTableFields.find(f => $(control).is(f.cls));
+
+    if (!field)
+        return;
+
+    ApplyFieldWidths({
+        fields: [field],          // Only this column
+        container: "#ItemTable",
+        tableBody: "#TableBody"
+    });
+}
 //#region COMMON FUNCTIONS
 function removeCommas(value) {
     return (value || '').toString().replace(/,/g, '');
@@ -71,18 +121,47 @@ function HighlightRow(rows, index) {
     });
 }
 function AutoFit() {
-    fitInputWidth("Header_JISVIH_InvoiceNo", 20, 30);
+    fitInputWidth("Header_JISVIH_InvoiceNo", 20, 25);
     fitInputWidth("Header_JISVIH_MS_Number", 20, 30);
-    fitInputWidth("Header_JISVIH_JW_Customer_Name", 40, 75);
-
+    fitInputWidth("Header_JISVIH_JW_Customer_Name", 40, 50);
     fitInputWidth("Header_JISVIH_Currency_Number", 10, 10);
-    fitInputWidth("Header_JISVIH_TCT_Number", 25, 30);
-    fitInputWidth("Header_JISVIH_PaymentTerms", 25, 30);
-    fitInputWidth("Header_JISVIH_PaymentMethod", 25, 30);
-    fitInputWidth("Header_JISVIH_Remarks", 35, 45);
+    fitInputWidth("Header_JISVIH_TCT_Number", 20, 25);
+    fitInputWidth("Header_JISVIH_PaymentTerms", 30, 40);
+    fitInputWidth("Header_JISVIH_PaymentMethod", 30, 40);
+    fitInputWidth("Header_JISVIH_Remarks", 40, 40);
 }
 $(document).ready(function () {
+    $(document).on("input", "#ItemTable input", function () {
+        ResizeColumn(this);
+    });
+
+    $(document).on("change", "#ItemTable select", function () {
+        ResizeColumn(this);
+    });
     AutoFit();
+    $(document).on("focusout", "#Header_JISVIH_JW_Customer_Name", function () {
+
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#BuyerMessage",
+            "#RightPane",
+            "#RightPane .buyer-search-results"
+        );
+    });
+
+    $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane",
+            ".buyer-search-results",
+            "#BuyerMessage"
+        );
+    });
     //#region Header AutoFit - KeyUp
 
     $(document).on("keyup change input",
@@ -90,14 +169,14 @@ $(document).ready(function () {
         function () {
 
             const widths = {
-                Header_JISVIH_InvoiceNo: [20, 30],
+                Header_JISVIH_InvoiceNo: [20, 25],
                 Header_JISVIH_MS_Number: [20, 30],
-                Header_JISVIH_JW_Customer_Name: [40, 75],
+                Header_JISVIH_JW_Customer_Name: [40, 50],
                 Header_JISVIH_Currency_Number: [10, 10],
-                Header_JISVIH_TCT_Number: [25, 30],
-                Header_JISVIH_PaymentTerms: [25, 30],
-                Header_JISVIH_PaymentMethod: [25, 30],
-                Header_JISVIH_Remarks: [35, 45]
+                Header_JISVIH_TCT_Number: [20, 25],
+                Header_JISVIH_PaymentTerms: [30, 40],
+                Header_JISVIH_PaymentMethod: [30, 40],
+                Header_JISVIH_Remarks: [40, 40]
             };
 
             const [min, max] = widths[this.id];
@@ -736,10 +815,18 @@ function CalculateTotals() {
         ) || 0;
 
     });
+    setTimeout(function () {
 
-    $("#TotalDeliveredQty").val(totalDeliveredQty.toFixed(2));
-    $("#TotalPrevInvoiceQty").val(totalPrevInvoiceQty.toFixed(2));
-    $("#TotalQty").val(totalQty.toFixed(2));
+        ApplyFieldWidths({
+            fields: ItemTableFields,          // Only this column
+            container: "#ItemTable",
+            tableBody: "#TableBody"
+        });
+
+    }, 200);
+    $("#TotalDeliveredQty").val(totalDeliveredQty);
+    $("#TotalPrevInvoiceQty").val(totalPrevInvoiceQty);
+    $("#TotalQty").val(totalQty);
     $("#TotalAmount").val(totalAmount.toFixed(2));
     $("#TotalGSTAmount").val(totalGSTAmount.toFixed(2));
     $("#TotalAmendedQty").val(totalAmendedQty.toFixed(2));
@@ -870,28 +957,31 @@ function loadTaxCluster() {
     });
 }
 
+
 //#region customer Search Functions
-function OnJWCustomerInput(inputElement) {
-    // alert('hi')
-    SearchJWCustomer(inputElement);
+function OnBuyerSelectCall(inputElement) {
+
+    OnBuyerSelect(inputElement, "#RightPane", ".buyer-search-results");
+}
+function OnBuyerInput(inputElement) {
+    SearchBuyer(inputElement);
 }
 
-function OnJWCustomerFocus(inputElement) {
-    var value = inputElement.value;
+function OnBuyerInput(inputElement) {
 
-    if (!value) {
-        SearchJWCustomer(inputElement);
-    } else {
-        $(inputElement).select();
+    // User is only selecting text
+    if (inputElement.selectionStart !== inputElement.selectionEnd) {
+        return;
     }
+
+    SearchBuyer(inputElement);
 }
 
-async function SearchJWCustomer(inputElement) {
+function SearchBuyer(inputElement) {
 
     var JWCustomer = inputElement.value;
     var SIHDate = $("input[name='Header.JIDNH_DN_Date']").val();
-    var resultsDiv = $(inputElement).closest(".col-md-6, .col-lg-7")
-        .find(".jwcustomer-search-results");
+    var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
 
 
@@ -905,71 +995,103 @@ async function SearchJWCustomer(inputElement) {
         success: function (data) {
 
             resultsDiv.empty();
-
+            $("#BuyerMessage").hide().text("");
             if (data && data.length > 0) {
 
+                $("#RightPane").addClass("show");   // <-- Add this line
                 resultsDiv.show();
+                let selectedIndex = -1;
+                var table = $(
+                    '<div class="card-body modal-content batchPopup p-0" style="z-index:999;">' +
+                    '<table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">' +
+                    '<thead>' +
+                    '<tr class="table-info">' +
+                    '<th>JW Customer Name</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tbody></tbody>' +
+                    '</table>' +
+                    '</div>'
+                );
 
-                var table = $(`
-    <div class="card-body batchPopup modal-content p-0 w-100 position-absolute start-0 top-100"
-         style="z-index:999;">
-         
-        <table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">
-            <thead>
-                <tr class="table-info">
-                    <th>JW Customer Name</th>
-                    <th class="text-center">Currency</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-    </div>
-`);
-
-                data.forEach(function (cust) {
+                $.each(data, function (i, cust) {
 
                     var row = $("<tr></tr>").css("height", "24px");
+                    row.data("customer", cust);
+                    row.append("<td>" + cust.cuS_Name + "</td>");
 
-                    row.append('<td>' + cust.cuS_Name + '</td>');
-                    row.append('<td class="text-center">' + cust.cuS_CUR_Name + '</td>');
 
-                    table.find('tbody').append(row);
+                    table.find("tbody").append(row);
 
-                    row.on('click', function () {
-
-                        // DISPLAY VALUE
-                        $(inputElement).val(cust.cuS_Name);
-
-                        // HIDDEN FIELDS (CSHTML bindings)
+                    row.on("click", function () {
+                        $("#BuyerMessage").hide().text("");
+                        SelectBuyer(
+                            cust,
+                            "Header_JISVIH_JW_Customer_Name",
+                            "Header_JISVIH_JW_Customer_Number",
+                            "Header_JISVIH_Currency_Name",
+                            "Header_JISVIH_Currency_Number",
+                            "Header_JISVIH_WH_Number",
+                            "RightPane",
+                            ".buyer-search-results"
+                        );
                         $("#Header_JISVIH_JW_Customer_Number").val(cust.cuS_Number);
 
                         //   $("#Currency_Name").val(cust.cuS_CUR_Name);
                         $("#Header_JISVIH_Currency_Number").val(cust.cuS_CUR_Number);
 
-                        //   $("#Header_JIDNH_WH_Number").val(cust.cuS_WH_Number);
-                        //$("#SIH_BUY_LOC_Number").val(cust.cuS_LOC_Number);
-                        //$("#SIH_CUR_DecimalPlaces").val(cust.cuS_CUR_DecimalPlaces);
-                        //$("#SIH_WHT_Number").val(cust.cuS_WHT_Number);
 
-                        //$("#WH_Number").val(cust.cuS_WH_Number);
-                        LoadJobworkInvoiceAddress();
+                        // OTHER VALUES
+                        $("#Header_JISVIH_JW_Customer_Name")
+                            .val(cust.cuS_Name);
+
+                        $("#Header_JISVIH_Currency_Name")
+                            .val(cust.cuS_CUR_Number);
+
+
+
+
+                        $("#RightPane").hide();
+
                         resultsDiv.hide();
                         loadTaxCluster();
-                      
-                        //   LoadDeliveryNoteItems();
                     });
+
                 });
 
-                
+
+
                 resultsDiv.append(table);
+
+                resultsDiv.append(`
+<div id="BuyerMessage"
+     style="
+        display:none;
+        background:#bdbdbd;
+        border-top:1px solid #ced4da;
+        color:#dc3545;
+        font-weight:bold;
+        text-align:center;
+        padding:4px 52px;
+        font-size:18px;
+        position:absolute;
+        bottom:0;
+        left:-2px;
+        right:0;
+        z-index:10;
+        box-sizing:border-box;">
+</div>
+`);
+                // Keyboard Navigation
                 //#region search logic highlight
+
                 // Store all rows
                 let rows = resultsDiv.find("tbody tr");
 
                 // Clear previous styles
                 rows.removeClass("match-row current-row");
 
+                // No row selected initially
                 $(inputElement).removeData("selectedIndex");
 
                 let searchText = JWCustomer.trim().toLowerCase();
@@ -994,34 +1116,56 @@ async function SearchJWCustomer(inputElement) {
 
                 if (firstMatch >= 0) {
 
-                    rows.removeClass("current-row");
-
                     $(inputElement).data("firstMatch", firstMatch);
                     $(inputElement).data("lastMatch", lastMatch);
-
-                    $(inputElement).removeData("selectedIndex");
                 }
                 else {
 
                     $(inputElement).removeData("firstMatch");
                     $(inputElement).removeData("lastMatch");
-                    $(inputElement).removeData("selectedIndex");
                 }
 
                 //#endregion
 
             } else {
-                resultsDiv.hide();
-                resultsDiv.empty();
+                resultsDiv.append(`
+<div id="BuyerMessage"
+     style="
+        display:none;
+        background:#bdbdbd;
+        border-top:1px solid #ced4da;
+        color:#dc3545;
+        font-weight:bold;
+        text-align:center;
+        padding:4px 52px;
+        font-size:18px;
+        position:absolute;
+        bottom:0;
+        left:-2px;
+        right:0;
+        z-index:10;
+        box-sizing:border-box;">
+</div>
+`);
+
+                $("#BuyerMessage")
+                    .html("No records found")
+                    .show();
+
+                $("#RightPane").addClass("show");
+                $("#RightPane .buyer-search-results").show();
+
             }
         },
         error: function () {
-            resultsDiv.text('Error loading data.').show();
+            resultsDiv.text("Error loading data.").show();
         }
     });
 }
 
+
 //#endregion customer Search Functions
+
 
 //#region LOAD DELIVERY NOTE ITEMS
 $("#LoadDeliveryNote").click(function () {
@@ -1165,7 +1309,7 @@ function LoadDeliveryNoteItems() {
 
                     row.append('<td>' + DN.jidnH_DN_Date + '</td>');
 
-                    row.append('<td class="text-end">' + parseFloat(DN.totalQty).toFixed(2) + '</td>');
+                    row.append('<td class="text-center">' + parseFloat(DN.totalQty) + '</td>');
 
                     row.append(itemCheckboxCell);
 
@@ -2565,8 +2709,8 @@ function BindItems(items) {
 </tr>`;
 
         $("#TableBody").append(row);
-        $row.find(".JISVII_AmendQty").trigger("change");
-        $row.find(".JISVII_UnitPrice").trigger("change");
+        //row.find(".JISVII_AmendQty").trigger("change");
+        //row.find(".JISVII_UnitPrice").trigger("change");
     });
 
     CalculateTotals();
