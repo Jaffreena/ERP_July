@@ -1337,6 +1337,7 @@ function OnEditFocusItem(inputElement) {
     }
 }
 var ItemChanged = 0;
+
 function SearchEditItemJIDNI(inputElement) {
 
     let itemCode = inputElement.value;
@@ -1470,7 +1471,7 @@ function SearchEditItemJIDNI(inputElement) {
 
                     table.find("tbody").append(tr);
                 });
-
+                resultsDiv.append(table); 
                 resultsDiv.append(`
 <div id="ItemMessage"
      style="
@@ -1535,7 +1536,7 @@ function SearchEditItemJIDNI(inputElement) {
 
                 //#endregion
                 //resultsDiv.append(closeButton);
-                resultsDiv.append(table);
+              
 
             } else {
                 resultsDiv.append(`

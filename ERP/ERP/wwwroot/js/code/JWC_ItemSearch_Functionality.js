@@ -380,6 +380,8 @@ function ApplyFieldWidths({
 
                 // Actual TD Width
                 const actualWidth = td.getBoundingClientRect().width;
+                // Actual TD Width
+             
 
                 // Control
                 this.style.setProperty("width", "100%", "important");
@@ -387,9 +389,9 @@ function ApplyFieldWidths({
                 this.style.setProperty("max-width", "100%", "important");
                 this.style.setProperty("box-sizing", "border-box", "important");
 
-                this.style.setProperty("height", controlHeight + "px", "important");
-                this.style.setProperty("min-height", controlHeight + "px", "important");
-                this.style.setProperty("max-height", controlHeight + "px", "important");
+                this.style.setProperty("height", "100%", "important");
+                this.style.setProperty("min-height", "100%", "important");
+                this.style.setProperty("max-height", "100%", "important");
 
                 this.style.setProperty("box-sizing", "border-box", "important");
              //   this.style.setProperty("padding", "0", "important");

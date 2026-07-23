@@ -1,28 +1,29 @@
 ﻿ 
 const ItemTableFields = [
-    { cls: ".JISVII_JISVOH_Number", min: 15, max: 30, align: "left" },
-    { cls: ".JISVII_DN_No", min: 15, max: 30, align: "left" },
-    { cls: ".JISVII_Process", min: 15, max: 30, align: "left" },
-    { cls: ".JISVII_ItemCode", min: 18, max: 18, align: "left" },
-    { cls: ".JISVII_ItemDescription", min: 30, max: 45, align: "left" },
+    { cls: ".JISVII_JISVOH_Number", min: 20, max: 25, align: "left" },    // Service Order Number
+    { cls: ".JISVII_DN_No", min: 20, max: 25, align: "left" },    // Delivery Note Number
+    { cls: ".JISVII_Process", min: 10, max: 25, align: "left" },    // Process
+    { cls: ".JISVII_ItemCode", min: 10, max: 15, align: "left" },    // Item Code
+    { cls: ".JISVII_ItemDescription", min: 40, max: 40, align: "left" },    // Description
 
-    { cls: ".JISVII_OuterDia", min: 10, max: 10, align: "center" },
-    { cls: ".JISVII_Thickness", min: 10, max: 10, align: "center" },
-    { cls: ".JISVII_Length", min: 10, max: 10, align: "center" },
-    { cls: ".JISVII_Width", min: 10, max: 10, align: "center" },
+    { cls: ".JISVII_OuterDia", min: 8, max: 8, align: "center" },  // Outer Dia
+    { cls: ".JISVII_Thickness", min: 8, max: 8, align: "center" },  // Thickness
+    { cls: ".JISVII_Length", min: 8, max: 8, align: "center" },  // Length
+    { cls: ".JISVII_Width", min: 8, max: 8, align: "center" },  // Width
 
-    { cls: ".JISVII_MaterialGrade", min: 15, max: 25, align: "left" },
-    { cls: ".JISVII_ItemGroup", min: 15, max: 30, align: "left" },
-    { cls: ".JISVII_UoM", min: 10, max: 15, align: "center" },
+    { cls: ".JISVII_MaterialGrade", min: 10, max: 25, align: "left" },    // Material Grade
+    { cls: ".JISVII_ItemGroup", min: 10, max: 30, align: "left" },    // Item Group
+    { cls: ".JISVII_UoM", min: 10, max: 15, align: "center" },  // UoM
 
-    { cls: ".DeliveredQty", min: 11, max: 20, align: "center" },
-    { cls: ".PreviouslyInvoicedQty", min: 11, max: 20, align: "center" },
-    { cls: ".JISVII_Qty", min: 11, max: 20, align: "center" },
-    { cls: ".JISVII_UnitPrice", min: 11, max: 20, align: "right" },
-    { cls: ".JISVII_Amount", min: 13, max: 25, align: "right" },
+    { cls: ".DeliveredQty", min: 10, max: 20, align: "center" },  // Delivery Note Qty
+    { cls: ".PreviouslyInvoicedQty", min: 10, max: 20, align: "center" },  // Already Invoiced Qty
+    { cls: ".JISVII_Qty", min: 10, max: 20, align: "center" },  // Invoice Qty
 
-    { cls: ".JISVII_SAC_Number", min: 6, max: 6, align: "left" },
-    { cls: ".JISVII_GST_Amount", min: 13, max: 25, align: "right" }
+    { cls: ".JISVII_UnitPrice", min: 10, max: 20, align: "right" },   // Unit Price
+    { cls: ".JISVII_Amount", min: 13, max: 25, align: "right" },   // Amount
+
+    { cls: ".JISVII_SAC_Number", min: 8, max: 8, align: "left" },    // SAC
+    { cls: ".JISVII_GST_Amount", min: 13, max: 25, align: "right" }    // GST Amount
 ];
 $(window).on("load", function () {
     setTimeout(function () {
