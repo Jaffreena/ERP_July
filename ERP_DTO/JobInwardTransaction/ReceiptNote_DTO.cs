@@ -97,7 +97,7 @@ namespace ERP_DTO.JobInwardTransaction
 
         public string? PRS_Name { get; set; }
 
-        //[Display(Name = "Item Code")]
+        [Display(Name = "Item Code")]
         //[Required(ErrorMessage = "Item Code is Required")]
         public string? Item_Number { get; set; }
         public string? Item_Code { get; set; }

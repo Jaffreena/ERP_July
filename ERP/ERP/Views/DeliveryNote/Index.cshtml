@@ -161,7 +161,7 @@
       id="DeliveryNoteForm">
 
     <!-- Address Popup -->
-    <div class="modal modal-lg modal-xl fade"
+    <div class="modal modal-md modal-xl fade"
          id="BuyerAddress"
          data-bs-backdrop="static"
          data-bs-keyboard="false"
@@ -209,7 +209,7 @@
                              id="overview-tab-pane"
                              role="tabpanel">
 
-                            <table class="table table-bordered table-hover mb-0">
+                            <table class="table table-bordered table-hover mb-0" id="AddressTable">
 
                                 <thead>
                                     <tr class="table-info">
@@ -221,21 +221,21 @@
                                         <th>Country</th>
                                         <th>PIN</th>
                                         <th>GSTIN</th>
-                                        <th>Action</th>
+                                        <th style="text-align:center">Action</th>
                                     </tr>
                                 </thead>
 
                                 <tbody id="AddTableBody">
-
                                     <!-- 🔥 TEMPLATE ROW (USED FOR CLONE ONLY) -->
                                     <tr id="AddTempRow" style="display:none">
-
                                         <td>
-                                            <select class="form-select JIDNA_ADTP_Number"
-                                                    asp-items="@ViewBag.AddressType"></select>
+                                            <select class="form-select JIDNA_ADTP_Number"      asp-items="@ViewBag.AddressType"></select>
                                         </td>
-                                        <td><input class="form-control JIDNA_Address_ID" readonly></td>
-                                        <td style="width:auto; min-width:300px; max-width:500px;">
+                                        <td>                                            
+                                            <select class="form-select JIDNA_Address_ID" asp-items="@ViewBag.AddressID"></select>
+                                         
+                                        </td>
+                                        <td>
                                             <input class="form-control JIDNA_Address" readonly>
                                         </td>
                                         <td><input class="form-control JIDNA_City" readonly></td>
@@ -243,7 +243,6 @@
                                         <td><input class="form-control JIDNA_Country" readonly></td>
                                         <td><input class="form-control JIDNA_PIN" readonly></td>
                                         <td><input class="form-control JIDNA_GSTIN" readonly></td>
-
                                         <td class="text-center align-middle">
                                             <input type="hidden" class="JIDNA_Number" value="0">
                                             <input type="hidden" class="JIDNA_IsDeleted" value="0">
@@ -251,9 +250,7 @@
                                                 <i class="bi bi-trash-fill"></i>
                                             </a>
                                         </td>
-
                                     </tr>
-
                                 </tbody>
 
                             </table>

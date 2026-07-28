@@ -639,7 +639,7 @@
     </div>
 
 <!-- Address Popup -->
-<div class="modal modal-lg modal-xl fade"
+ <div class="modal modal-lg modal-xl fade"
      id="BuyerAddress"
      data-bs-backdrop="static"
      data-bs-keyboard="false"
@@ -687,7 +687,7 @@
                          id="overview-tab-pane"
                          role="tabpanel">
 
-                        <table class="table table-bordered table-hover mb-0">
+                        <table class="table table-bordered table-hover mb-0" id="AddressTable">
 
                             <thead>
                                 <tr class="table-info">
@@ -1184,9 +1184,9 @@
 
                                                                                     <!-- DESCRIPTION -->
                                                                                     <td>
-                                                                    <textarea name="Items[0].JIDNI_Item_Description"
+                                                                    <textarea asp-for="Items[i].JIDNI_Item_Description"
                                                                               class="form-control JIDNI_Item_Description"
-                                                                              rows="2"
+                                                                             
                                                                               readonly></textarea>
                                                                  
                                                             

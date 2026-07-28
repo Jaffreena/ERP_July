@@ -752,9 +752,9 @@ function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
         });
 
         CalculateBatchFooter_Edit();
-        //console.log("Rows after binding:",
-        //    $("#IBatTableBody tr.IBatNewRow").length);
-        CalculateBatchFooter_Edit();
+        SetModalWidth(GetTableWidth("#BatchTable"), "#IBatch");
+        new bootstrap.Modal($("#IBatch")).show();
+    
     }
 
     let qtyPopup = selectedRow.find(".AmendQty").val();

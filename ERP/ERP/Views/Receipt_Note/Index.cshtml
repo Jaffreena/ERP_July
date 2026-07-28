@@ -185,7 +185,7 @@
     </div>
 
     <!-- Batch Popup -->
-    <div class="modal modal-lg fade" id="IBatch" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="IBatch" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border">
                 <div class="modal-header">
@@ -530,7 +530,8 @@
                                                             </th>
 
                                                             <th class="Item_Code">
-                                                                Item Number
+                                                             
+                                                                @Html.DisplayNameFor(m => m.Items.First().Item_Number)
                                                             </th>
 
                                                             <th class="Description">

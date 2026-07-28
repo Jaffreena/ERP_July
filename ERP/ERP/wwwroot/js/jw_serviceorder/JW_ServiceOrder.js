@@ -17,7 +17,7 @@
     { cls: ".JISVOI_UnitPrice", min: 10, max: 20, align: "right" },  // Unit Price
     { cls: ".JISVOI_Amount", min: 13, max: 25, align: "right" },  // Amount
 
-    { cls: ".JISVOI_DeliveryDate", min: 12, max: 12, align: "center" }  // Delivery Date
+    { cls: ".JISVOI_DeliveryDate", min: 10, max: 10, align: "center" }  // Delivery Date
 ];
 
  
@@ -84,7 +84,7 @@ $(document).ready(function () {
             this,
             "#RightPane_Item",
             ".search-results",
-            "#ItemMessage"
+            "#ItemMessage","#Header_JISVOH_MS_Number"
         );
 
     });
@@ -1102,60 +1102,56 @@ function OnFocusItem(inputElement) {
         $(inputElement).select();
     }
 }
-
 function SearchServiceOrderItem(inputElement) {
 
-    let itemCode = inputElement.value;
+    let itemCode = inputElement.value.trim();
     let row = $(inputElement).closest("tr");
     let resultsDiv = $("#RightPane_Item").find(".search-results");
     let material = $("#Header_JISVOH_MS_Number").val();
 
     if (!material) return;
+
     $.ajax({
         url: '/jobinward/transactions/service-order/item',
         type: 'GET',
         data: {
-            ItemCode: itemCode, MS: material
+            ItemCode: itemCode,
+            MS: material
         },
         success: function (data) {
 
             resultsDiv.empty();
-            $("#ItemMessage").hide().text("");
 
             if (data && data.length > 0) {
 
                 $("#RightPane_Item").addClass("show");
                 resultsDiv.show();
 
-          
+                let table = $(`
+<div class="card-body batchPopup modal-content p-0 table-responsive" style="z-index:999;">
+    <table class="table table-bordered table-hover table-fixed table-grid mb-0" id="tblsearch">
+        <thead>
+            <tr class="table-info">
+                <th style="width:30%;">Item Code</th>
+                <th style="width:70%;">Description</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+`);
 
-
-                var table = $(
-                    '<div class="card-body batchPopup modal-content p-0 table-responsive" style="z-index:999;">' +
-                    '<table class="table table-bordered table-hover table-fixed mb-0 table-grid" id="tblsearch">' +
-                    '<thead>' +
-                    '<tr class="table-info">' +
-                    '<th style="width:30%;">Item Code</th>' +
-                    '<th style="width:70%;">Description</th>' +
-                    '</tr>' +
-                    '</thead>' +
-                    '<tbody></tbody>' +
-                    '</table>' +
-                    '</div>'
-                );
-
-                data.forEach(function (item) {
+                $.each(data, function (i, item) {
 
                     let tr = $(`
-                        <tr>
-                            <td>${item.itemCode}</td>
-                            <td>${item.itemDescription}</td>
-                           
-                        </tr>
-                    `);
-                    tr.css("height", "24px");
+<tr style="height:24px;cursor:pointer;">
+    <td style="width:30%;">${item.itemCode}</td>
+    <td style="width:70%;">${item.itemDescription}</td>
+</tr>
+`);
+
                     tr.on("click", function () {
-                        $("#ItemMessage").hide().text("");
+
                         row.find(".JISVOI_Item_Code").val(item.itemCode);
                         row.find(".JISVOI_Item_Number").val(item.itemNumber);
                         row.find(".JISVOI_Number").val(item.itemNumber);
@@ -1167,7 +1163,6 @@ function SearchServiceOrderItem(inputElement) {
                         row.find(".Width").val(item.width);
                         row.find(".MaterialGrade").val(item.materialGrade);
                         row.find(".ItemGroup").val(item.itemGroup);
-
                         row.find(".JISVOI_UoM_Number").val(item.uoM);
 
                         row.find(".JISVOI_Qty").focus();
@@ -1177,9 +1172,12 @@ function SearchServiceOrderItem(inputElement) {
                     });
 
                     table.find("tbody").append(tr);
+
                 });
 
-           
+                // IMPORTANT
+                resultsDiv.append(table);
+
                 resultsDiv.append(`
 <div id="ItemMessage"
      style="
@@ -1199,19 +1197,18 @@ function SearchServiceOrderItem(inputElement) {
         box-sizing:border-box;">
 </div>
 `);
-                // Keyboard Navigation
-                //#region search logic highlight
 
-                // Store all rows
+                //==============================
+                // Match Row Highlight
+                //==============================
+
                 let rows = resultsDiv.find("tbody tr");
 
-                // Clear previous styles
                 rows.removeClass("match-row current-row");
 
-                // No row selected initially
                 $(inputElement).removeData("selectedIndex");
 
-                let searchText = itemCode.trim().toLowerCase();
+                let searchText = itemCode.toLowerCase();
 
                 let firstMatch = -1;
                 let lastMatch = -1;
@@ -1235,22 +1232,22 @@ function SearchServiceOrderItem(inputElement) {
 
                     $(inputElement).data("firstMatch", firstMatch);
                     $(inputElement).data("lastMatch", lastMatch);
-                }
-                else {
+
+                } else {
 
                     $(inputElement).removeData("firstMatch");
                     $(inputElement).removeData("lastMatch");
                 }
 
-                //#endregion
-                //resultsDiv.append(closeButton);
-                resultsDiv.append(table);
+            }
+            else {
 
-            } else {
+                $("#RightPane_Item").addClass("show");
+                resultsDiv.show();
+
                 resultsDiv.append(`
 <div id="ItemMessage"
      style="
-        display:none;
         background:#bdbdbd;
         border-top:1px solid #ced4da;
         color:#dc3545;
@@ -1264,25 +1261,18 @@ function SearchServiceOrderItem(inputElement) {
         right:0;
         z-index:10;
         box-sizing:border-box;">
+No records found
 </div>
 `);
-
-                $("#ItemMessage")
-                    .html("No records found")
-                    .show();
-
-                $("#RightPane_Item").addClass("show");
-                $("#RightPane_Item .search-results").show();
-                //#endregion 
             }
         },
         error: function () {
-            resultsDiv.text("Error loading data.");
+
+            resultsDiv.html("Error loading data.");
             resultsDiv.show();
         }
     });
 }
-
 //#region Calculate Total
 function calculateTotal() {
 

@@ -1,27 +1,31 @@
-﻿
+﻿//#region address width
+const DeliveryNoteAddressFields = [
+    { cls: ".JIDNA_ADTP_Number", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address_ID", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address", min: 40, max: 40, align: "left" },
+    { cls: ".JIDNA_City", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_State", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_Country", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_PIN", min: 10, max: 10, align: "left" },
+    { cls: ".JIDNA_GSTIN", min: 15, max: 15, align: "left" }
+];
+//#endregion
 const ItemTableFields = [
     { cls: ".JIDNI_PRS_Number", min: 10, max: 25, align: "left" },    // Process
     { cls: ".JIDNI_Item_Code", min: 10, max: 15, align: "left" },    // Item Code
     { cls: ".JIDNI_Item_Description", min: 40, max: 40, align: "left" },    // Description
-
     { cls: ".JIDNI_OuterDia", min: 8, max: 8, align: "center" },  // Outer Dia
     { cls: ".JIDNI_Thickness", min: 8, max: 8, align: "center" },  // Thickness
     { cls: ".JIDNI_Length", min: 8, max: 8, align: "center" },  // Length
     { cls: ".JIDNI_Width", min: 8, max: 8, align: "center" },  // Width
-
     { cls: ".JIDNI_MaterialGrade", min: 10, max: 25, align: "left" },    // Material Grade
     { cls: ".JIDNI_ItemGroup", min: 10, max: 30, align: "left" },    // Item Group
     { cls: ".JIDNI_WH_Number", min: 10, max: 25, align: "left" },    // Warehouse
-
     { cls: ".JIDNI_UoM_Number", min: 10, max: 15, align: "center" },  // UoM
-
     { cls: ".JIDNI_Qty", min: 10, max: 20, align: "center" },  // Qty
-
     { cls: ".JIDNI_UnitPrice", min: 10, max: 20, align: "right" },   // Unit Price
     { cls: ".JIDNI_Amount", min: 13, max: 25, align: "right" },   // Amount
-
     { cls: ".JIDNI_JW_InvoiceTracking", min: 8, max: 8, align: "center" },  // JW Invoice Applicable
-
     // Not present in the specification, so left unchanged
     { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" }
 ];
@@ -60,28 +64,30 @@ function GetTableWidth(container = "#DeliveryNoteBatchList") {
         });
 
         // Add some padding for the cell
-        totalWidth += maxWidth+23 ;
+        totalWidth += maxWidth + 23;
     });
 
     return totalWidth;
 }
 
 
+
 function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
 
     const fields = [
-        { cls: ".JIDNI_BCH_WH_Name", min: 15, max: 30, align: "left" },
-        { cls: ".JIDNI_BCH_BatchDate", min: 12, max: 12, align: "center" },
-        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 35, align: "left" },
-        { cls: ".JIDNI_BCH_QtyAvailable", min: 11, max: 20, align: "center" },
-        { cls: ".JIDNI_BCH_QtyReserved", min: 11, max: 20, align: "center" },
-        { cls: ".JIDNI_BCH_QtyInvoice", min: 11, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 25, align: "left" },
+        { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
+        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "center" },
         { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
         { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
     ];
 
+
     const $container = $(container);
-   
+
     fields.forEach(f => {
 
         const controls = $container.find(
@@ -125,7 +131,7 @@ function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
         ) {
             requiredWidth = Math.min(requiredWidth + 8, maxWidth);
         }
-     
+
         controls.each(function () {
 
             this.style.removeProperty("padding");
@@ -150,15 +156,17 @@ function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
                 th.style.setProperty("max-width", maxWidth + "px", "important");
                 th.style.setProperty("text-align", f.align, "important");
                 th.style.setProperty("padding", "2px", "important");
-                
+
             }
         });
     });
     
-    const tableWidth = GetTableWidth("#DeliveryNoteBatchList");
-    SetDeliveryNoteBatchModalWidth(tableWidth);
-}
 
+    ResizeBatchPopup(container, "#DeliveryNoteBatchModal");
+ 
+   // const tableWidth = GetTableWidth("#DeliveryNoteBatchList");
+   // SetDeliveryNoteBatchModalWidth(tableWidth);
+}
 function SetDeliveryNoteBatchModalWidth(tableWidth) {
 
     const dialog = document.querySelector("#DeliveryNoteBatchModal .modal-dialog");
@@ -279,6 +287,7 @@ function SetDeliveryNoteOtherBatchModalWidth(tableWidth) {
     dialog.style.setProperty("max-height", "528px", "important");
 }
 
+
 //#endregion 
 //#region item code right pane search JIDNI_Item_Code
 $(document).on("keydown", ".JIDNI_Item_Code", function (e) {
@@ -288,7 +297,7 @@ $(document).on("keydown", ".JIDNI_Item_Code", function (e) {
         this,
         "#RightPane_Item",
         ".search-results",
-        "#ItemMessage"
+        "#ItemMessage","#Header_JIDNH_MS_Number"
     );
     ShowItemPane();
 });
@@ -422,6 +431,15 @@ $(window).on("load", function () {
 
     }, 200);
 });
+
+function ResizeAddressColumns() {
+    ApplyFieldWidths({
+        fields: DeliveryNoteAddressFields,
+        container: "#AddressTable",
+        tempRow: "#AddTempRow",
+        tableBody: "#AddTableBody"
+    });
+}
 function ResizeColumn(control) {
 
     const field = ItemTableFields.find(f => $(control).is(f.cls));
@@ -438,11 +456,44 @@ function ResizeColumn(control) {
     });
 }
 $(document).ready(function () {
+    //#region address width
+    // Textboxes
+    $(document).on("input", "#AddressTable input", function () {
+        ResizeAddressColumns();
+    });
+
+    // Dropdowns
+    $(document).on("change", "#AddressTable select", function () {
+        ResizeAddressColumns();
+    });
+
+    // Optional: when a readonly field gets focus after being populated
+    $(document).on("focusin",
+        "#BuyerAddress .JIDNA_Address, " +
+        "#BuyerAddress .JIDNA_City, " +
+        "#BuyerAddress .JIDNA_State, " +
+        "#BuyerAddress .JIDNA_Country, " +
+        "#BuyerAddress .JIDNA_PIN, " +
+        "#BuyerAddress .JIDNA_GSTIN",
+        function () {
+            ResizeAddressColumns();
+        });
+    //#endregion
     //#region batch grid alignment
     $(document).on("input change blur", "#DeliveryNoteBatchList input, #DeliveryNoteBatchList textarea, #DeliveryNoteBatchList select", function () {
         ApplyBatchFieldWidths("#DeliveryNoteBatchList");
     });
-    ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+
+    $(window).on("load", function () {
+        setTimeout(function () {
+
+            ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+
+
+        }, 200);
+    });
+
+  
     $(document).on(
         "input change blur",
         "#DeliveryNoteOtherBatchList input, #DeliveryNoteOtherBatchList textarea, #DeliveryNoteOtherBatchList select",
@@ -773,7 +824,7 @@ $(document).ready(function () {
     });
     function GetVisibleAddressRowCount() {
 
-        return $("#AddTableBody tr.AddNewRow").filter(function () {
+        return $("#AddTableBody tr.NewRow").filter(function () {
             var style = ($(this).attr("style") || "")
                 .replace(/\s/g, "")
                 .toLowerCase();
@@ -805,12 +856,9 @@ $(document).ready(function () {
     //#region CHANGE ADDRESS TYPE
     function isDuplicateAddress(type, currentRow) {
         var isDuplicate = false;
-
-        $('tr.AddNewRow').not(currentRow).each(function () {
-
+        $('tr.NewRow').not(currentRow).each(function () {
             var rowType = $(this).find('select.JIDNA_ADTP_Number').val();
             var isDeleted = parseInt($(this).find("input.JIDNA_IsDeleted").val());
-
             if (isDeleted !== 1) {
                 if (rowType === type) {
                     isDuplicate = true;
@@ -818,12 +866,12 @@ $(document).ready(function () {
                 }
             }
         });
-
         return isDuplicate;
     }
-    $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
 
-        var currentRow = $(this).closest('tr.AddNewRow');
+    $(document).on('change', 'tr.NewRow select.JIDNA_ADTP_Number', function () {
+
+        var currentRow = $(this).closest('tr.NewRow');
 
         var ADTPNumber = currentRow.find('.JIDNA_ADTP_Number').val();
         var Buyer = $('#Header_JIDNH_JW_Customer_Number').val(); // keep if same field exists
@@ -844,19 +892,35 @@ $(document).ready(function () {
 
         $.ajax({
             type: "GET",
-            url: "/jobinward/transactions/delivery-note/buyer/address",
+            url: "/jobinward/transactions/delivery-note/buyeraddress",
             data: { Buyer: Buyer, ADTPNumber: ADTPNumber },
             dataType: "json",
             success: function (data) {
-
+                var AddressID = data.buyerAddressId;
              
                 var AddressDefault = data.buyerAddress;
 
-              
+                var $AddressDropdown = currentRow.find('.JIDNA_Address_ID');
+
+                $AddressDropdown.empty();
+
+                $AddressDropdown.append($('<option>', {
+                    value: '',
+                    text: ''
+                }));
+
+                AddressID.forEach(function (item) {
+                    $AddressDropdown.append($('<option>', {
+                        value: item.buY_ADD_AddressID,
+                        text: item.buY_ADD_AddressID
+                    }));
+                });
+
 
                 // set default + fill fields
                 if (AddressDefault != null) {
-                    ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
+                    $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
+                   // ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
 
                     ADDAddress.val(AddressDefault.buY_ADD_Address);
                     ADDCity.val(AddressDefault.buY_ADD_City);
@@ -868,6 +932,38 @@ $(document).ready(function () {
             }
         });
     });
+
+
+    $(document).on('change', 'tr.NewRow select.JIDNA_Address_ID', function () {
+        var currentRow = $(this).closest('tr.NewRow');
+        var ADTPNumber = currentRow.find('select.JIDNA_ADTP_Number').val();
+        var AddressID = currentRow.find('select.JIDNA_Address_ID').val();
+        var Buyer = $('#Header_JIDNH_JW_Customer_Number').val();
+
+        var ADDAddress = currentRow.find('.JIDNA_Address');
+        var ADDCity = currentRow.find('.JIDNA_City');
+        var ADDState = currentRow.find('.JIDNA_State');
+        var ADDCountry = currentRow.find('.JIDNA_Country');
+        var ADDPin = currentRow.find('.JIDNA_PIN');
+        var ADDGSTIN = currentRow.find('.JIDNA_GSTIN');
+
+        $.ajax({
+            type: "get",
+            url: "/jobinward/transactions/delivery-note/buyeraddressid",
+            data: { Buyer: Buyer, ADTPNumber: ADTPNumber, AddressID: AddressID },
+            datatype: "json",
+            traditional: true,
+            success: function (data) {
+                ADDAddress.val(data.buyerAddress.buY_ADD_Address);
+                ADDCity.val(data.buyerAddress.buY_ADD_City);
+                ADDState.val(data.buyerAddress.buY_ADD_State);
+                ADDCountry.val(data.buyerAddress.buY_ADD_Country);
+                ADDPin.val(data.buyerAddress.buY_ADD_Pin);
+                ADDGSTIN.val(data.buyerAddress.buY_ADD_GSTIN);
+            }
+        });
+    });
+
     //#endregion CHANGE ADDRESS TYPE
 
   
@@ -1141,7 +1237,7 @@ $(document).ready(function () {
         // =====================================
         var addresses = [];
 
-        $("#AddTableBody tr.AddNewRow").each(function () {
+        $("#AddTableBody tr.NewRow").each(function () {
 
             let row = $(this);
 
@@ -1359,7 +1455,7 @@ function addAddressRow() {
     let $row = $("#AddTempRow").clone();
 
     $row.removeAttr("id");
-    $row.addClass("AddNewRow");
+    $row.addClass("NewRow");
     $row.show();
 
     // 1. Address Type
@@ -1417,7 +1513,7 @@ function validateAddressGrid() {
     let hasRow = false;
     let valid = true;
 
-    $("#AddTableBody tr.AddNewRow").each(function () {
+    $("#AddTableBody tr.NewRow").each(function () {
 
         let row = $(this);
 
@@ -1458,7 +1554,7 @@ function validateTempRow() {
 
     let isValid = true;
 
-    $("#AddTableBody tr.AddNewRow:visible").each(function () {
+    $("#AddTableBody tr.NewRow:visible").each(function () {
 
         let row = $(this);
         console.log('JIDNA_ADTP_Number:' + row.find(".JIDNA_ADTP_Number").val())
@@ -1596,6 +1692,23 @@ function SearchBuyer(inputElement) {
                 });
 
 
+                table.find("tbody").on("mousedown", "tr", function (e) {
+
+                    e.preventDefault();
+
+                    const clickedCust = $(this).data("customer");
+
+                    SelectBuyer(
+                        clickedCust,
+                        "#Header_JIDNH_JW_Customer_Name",
+                        "#Header_JIDNH_JW_Customer_Number",
+                        "#Header_JIDNH_Currency_Number",
+                        "#Header_JIDNH_Currency_Number",
+                        "#Header_JIDNH_WH_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                });
 
                 resultsDiv.append(table);
 
@@ -2472,7 +2585,7 @@ function LoadJWCAddress() {
                 if (addr.jwC_ADD_Default != 1) return;
 
                 addAddressRow(); // always create new row
-                var row = $("#AddTableBody tr.AddNewRow:last");
+                var row = $("#AddTableBody tr.NewRow:last");
 
                 row.find(".JIDNA_ADTP_Number").val(addr.jwC_ADD_ADTP_Number).trigger("change");
                 row.find(".JIDNA_Address_ID").val(addr.jwC_ADD_Address_ID);
@@ -2485,8 +2598,12 @@ function LoadJWCAddress() {
 
                 row.show();
             });
-
-            $("#BuyerAddress").modal("show");
+            setTimeout(function () {
+                ResizeAddressColumns();
+                $("#BuyerAddress").modal("show");
+            }, 500);
+        
+          
         }
     });
 }

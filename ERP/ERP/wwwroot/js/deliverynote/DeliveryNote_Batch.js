@@ -485,6 +485,38 @@ $(document).on(
 
 //#region SHOW BATCH
 
+$('#DeliveryNoteBatchModal').one('shown.bs.modal', function () {
+
+    setTimeout(function () {
+
+        const backdrop = document.querySelector('.modal-backdrop');
+
+        if (backdrop) {
+            $(".modal-backdrop").click();
+            backdrop.dispatchEvent(new MouseEvent('mousedown', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            }));
+
+            backdrop.dispatchEvent(new MouseEvent('mouseup', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            }));
+
+            backdrop.dispatchEvent(new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            }));
+        }
+
+    }, 300);
+
+});
+
+
 $(document).on("click", ".OpenBatchPopup", function (e) {
 
 
@@ -597,10 +629,7 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
                 ApplyBatchValues(currentItemGridSelectedRow);
                 //#endregion
 
-        
-
-                $("#DeliveryNoteBatchModal")
-                    .modal("show");
+            
             },
 
             error: function (xhr, status, error) {
@@ -890,6 +919,16 @@ function BindDeliveryNoteBatchTable() {
     });
 
     CalculateBatchFooter();
+    ResizeBatchPopup("#DeliveryNoteBatchList", "#DeliveryNoteBatchModal");
+    setTimeout(() => {
+        const modal = document.querySelector("#DeliveryNoteBatchModal .modal-dialog");
+        modal.style.display = "none";
+        modal.offsetHeight; // force reflow
+        modal.style.display = "";
+        $("#DeliveryNoteBatchModal")
+            .modal("show");
+    }, 500);
+
 }
 
 //#endregion
@@ -1162,3 +1201,21 @@ function GetCheckedRowId() {
     return rowId;
 }
 //#endregion
+
+function ResizeBatchPopup(tableSelector , modalSelector ) {
+
+    const table = document.querySelector(tableSelector);
+    const dialog = document.querySelector(modalSelector + " .modal-dialog");
+
+    if (!table || !dialog) return;
+
+    // Actual table width
+    const tableWidth = table.offsetWidth;
+
+    // Extra space for modal padding/borders
+    const popupWidth = tableWidth + 40;
+
+    dialog.style.setProperty("width", popupWidth + "px", "important");
+    dialog.style.setProperty("max-width", popupWidth + "px", "important");
+
+}

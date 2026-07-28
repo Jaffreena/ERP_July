@@ -1,4 +1,15 @@
-﻿
+﻿//#region address width
+const DeliveryNoteAddressFields = [
+    { cls: ".JIDNA_ADTP_Number", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address_ID", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address", min: 40, max: 40, align: "left" },
+    { cls: ".JIDNA_City", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_State", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_Country", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_PIN", min: 10, max: 10, align: "left" },
+    { cls: ".JIDNA_GSTIN", min: 15, max: 15, align: "left" }
+];
+//#endregion
 
 const ItemTableFields = [
     { cls: ".JISVII_JISVOH_Number", min: 20, max: 25, align: "left" },    // Service Order Number
@@ -38,6 +49,14 @@ $(window).on("load", function () {
 
     }, 200);
 });
+function ResizeAddressColumns() {
+    ApplyFieldWidths({
+        fields: DeliveryNoteAddressFields,
+        container: "#AddressTable",
+        tempRow: "#AddTempRow",
+        tableBody: "#AddTableBody"
+    });
+}
 function ResizeColumn(control) {
 
     const field = ItemTableFields.find(f => $(control).is(f.cls));
@@ -132,6 +151,29 @@ function AutoFit() {
     fitInputWidth("Header_JISVIH_Remarks", 40, 40);
 }
 $(document).ready(function () {
+    //#region address width
+    // Textboxes
+    $(document).on("input", "#AddressTable input", function () {
+        ResizeAddressColumns();
+    });
+
+    // Dropdowns
+    $(document).on("change", "#AddressTable select", function () {
+        ResizeAddressColumns();
+    });
+
+    // Optional: when a readonly field gets focus after being populated
+    $(document).on("focusin",
+        "#BuyerAddress .JIDNA_Address, " +
+        "#BuyerAddress .JIDNA_City, " +
+        "#BuyerAddress .JIDNA_State, " +
+        "#BuyerAddress .JIDNA_Country, " +
+        "#BuyerAddress .JIDNA_PIN, " +
+        "#BuyerAddress .JIDNA_GSTIN",
+        function () {
+            ResizeAddressColumns();
+        });
+    //#endregion
     $(document).on("input", "#ItemTable input", function () {
         ResizeColumn(this);
     });
@@ -2457,7 +2499,10 @@ function LoadJWCAddress() {
                     }
                 });
 
-                $("#BuyerAddress").modal("show");
+                setTimeout(function () {
+                    ResizeAddressColumns();
+                    $("#BuyerAddress").modal("show");
+                }, 500);
             }
             else {
                 // alert("No Address Found");

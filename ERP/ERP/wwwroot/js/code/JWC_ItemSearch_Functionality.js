@@ -65,8 +65,31 @@ function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsS
     }
 }
 
+function FocusNextControl(currentControl) {
 
-function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId) {
+    const focusable = $(":input:visible:not([disabled]), button:visible:not([disabled]), select:visible:not([disabled]), textarea:visible:not([disabled]), a[href]:visible");
+
+    const index = focusable.index(currentControl);
+
+    if (index >= 0 && index < focusable.length - 1) {
+        focusable.eq(index + 1).focus();
+    }
+}
+
+function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, msId) {
+     
+    // Material Segregation must be selected
+    if (msId) {
+        let materialCtrl = $(msId);
+        let material = materialCtrl.val();
+
+        if (!material || material.trim() === "") {
+
+
+            materialCtrl.focus();
+            return;
+        }
+    }
 
     let input = $(textbox);
 
@@ -158,9 +181,21 @@ function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId) {
 
             let currentRow = rows.filter(".current-row");
             let matchedRows = rows.filter(".match-row");
-
             if (currentRow.length === 1) {
-                currentRow.trigger("click");
+
+                currentRow.trigger("mousedown");
+
+                setTimeout(function () {
+                    const controls = $("input, select, textarea, button")
+                        .filter(":visible:enabled:not([readonly]):not([tabindex='-1'])");
+
+                    const current = controls.index(input);
+
+                    if (current !== -1 && current < controls.length - 1) {
+                        controls.eq(current + 1).focus();
+                    }
+                }, 0);
+
                 return;
             }
 
@@ -213,6 +248,14 @@ function SelectBuyer(
         .find(resultClass)
         .hide()
         .empty();
+    const controls = $("input, select, textarea, button")
+        .filter(":visible:enabled:not([tabindex='-1'])");
+
+    const currentIndex = controls.index($(customerNameId));
+
+    if (currentIndex !== -1 && currentIndex < controls.length - 1) {
+        controls.eq(currentIndex + 1).focus();
+    }
 }
 function OnBuyerSelect(inputElement, rightPaneId, resultClass) {
 
@@ -417,7 +460,7 @@ function ApplyFieldWidths({
                     td.style.removeProperty("min-height");
                     td.style.removeProperty("max-height");
                     // Make label height equal to td height
-                    this.style.setProperty("height", td.offsetHeight + "px", "important");
+                    this.style.setProperty("height", "100%", "important");
                     this.style.setProperty("box-sizing", "border-box", "important");
                 }
             }
@@ -476,4 +519,61 @@ function ShowItemPane() {
     $("#RightPane_Item").show();
 }
 
-//#endregion 
+//#endregion
+
+//#region Set Batch TableWidth
+function GetTableWidth(container) {
+
+    const $table = $(container);
+    let totalWidth = 0;
+
+    $table.find("thead th").each(function (index) {
+
+        let maxWidth = getTextWidth($(this).text().trim(), this);
+
+        $table.find("tbody tr:visible").each(function () {
+
+            const cell = this.cells[index];
+            if (!cell) return;
+
+            const control = $(cell).find("input, select, textarea")[0];
+
+            let text = "";
+
+            if (control) {
+                if (control.tagName === "SELECT")
+                    text = control.options[control.selectedIndex]?.text || "";
+                else
+                    text = control.value || "";
+
+                maxWidth = Math.max(maxWidth, getTextWidth(text, control));
+            } else {
+                text = cell.textContent || "";
+                maxWidth = Math.max(maxWidth, getTextWidth(text, cell));
+            }
+        });
+
+        // Add some padding for the cell
+        totalWidth += maxWidth + 23;
+    });
+
+    return totalWidth;
+}
+function SetModalWidth(
+    tableWidth,
+    modalSelector,
+    height = "528px",
+    extraWidth = 500
+) {
+    const dialog = document.querySelector(`${modalSelector} .modal-dialog`);
+
+    if (!dialog) return;
+
+    const width = `${tableWidth + extraWidth}px`;
+
+    dialog.style.setProperty("width", width, "important");
+    dialog.style.setProperty("max-width", width, "important");
+    dialog.style.setProperty("height", height, "important");
+    dialog.style.setProperty("max-height", height, "important");
+}
+//#endregion

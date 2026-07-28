@@ -1,4 +1,15 @@
-﻿ 
+﻿//#region address width
+const DeliveryNoteAddressFields = [
+    { cls: ".JIDNA_ADTP_Number", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address_ID", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address", min: 40, max: 40, align: "left" },
+    { cls: ".JIDNA_City", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_State", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_Country", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_PIN", min: 10, max: 10, align: "left" },
+    { cls: ".JIDNA_GSTIN", min: 15, max: 15, align: "left" }
+];
+//#endregion
 const ItemTableFields = [
     { cls: ".JISVII_JISVOH_Number", min: 20, max: 25, align: "left" },    // Service Order Number
     { cls: ".JISVII_DN_No", min: 20, max: 25, align: "left" },    // Delivery Note Number
@@ -36,19 +47,22 @@ $(window).on("load", function () {
 
     }, 200);
 });
-function ResizeColumn(control) {
-
-    const field = ItemTableFields.find(f => $(control).is(f.cls));
-
-    if (!field)
-        return;
-
+function ResizeAddressColumns() {
     ApplyFieldWidths({
-        fields: [field],          // Only this column
-        container: "#ItemTable",        
+        fields: DeliveryNoteAddressFields,
+        container: "#AddressTable",
+        tempRow: "#AddTempRow",
+        tableBody: "#AddTableBody"
+    });
+}
+function ResizeColumns() {
+    ApplyFieldWidths({
+        fields: ItemTableFields,
+        container: "#ItemTable",      
         tableBody: "#TableBody" 
     });
 }
+ 
 
 //#region item grid alignment
 // Converts characters (ch) to pixels
@@ -158,12 +172,35 @@ function AutoFit() {
     fitInputWidth("Header_JISVIH_Remarks", 40, 40);
 }
 $(document).ready(function () {
+    //#region address width
+    // Textboxes
+    $(document).on("input", "#AddressTable input", function () {
+        ResizeAddressColumns();
+    });
+
+    // Dropdowns
+    $(document).on("change", "#AddressTable select", function () {
+        ResizeAddressColumns();
+    });
+
+    // Optional: when a readonly field gets focus after being populated
+    $(document).on("focusin",
+        "#BuyerAddress .JIDNA_Address, " +
+        "#BuyerAddress .JIDNA_City, " +
+        "#BuyerAddress .JIDNA_State, " +
+        "#BuyerAddress .JIDNA_Country, " +
+        "#BuyerAddress .JIDNA_PIN, " +
+        "#BuyerAddress .JIDNA_GSTIN",
+        function () {
+            ResizeAddressColumns();
+        });
+    //#endregion
     $(document).on("input", "#ItemTable input", function () {
-        ResizeColumn(this);
+        ResizeColumns();
     });
 
     $(document).on("change", "#ItemTable select", function () {
-        ResizeColumn(this);
+        ResizeColumns();
     });
     //#region item code right pane search JISVII_ItemCode
     $(document).on("keydown", ".Item_Code", function (e) {
@@ -173,7 +210,7 @@ $(document).ready(function () {
             this,
             "#RightPane_Item",
             ".search-results",
-            "#ItemMessage"
+            "#ItemMessage","#Header_JISVIH_MS_Number"
         );
 
     });
@@ -1773,7 +1810,10 @@ function LoadJWCAddress() {
                 row.show();
             });
 
-            $("#BuyerAddress").modal("show");
+            setTimeout(function () {
+                ResizeAddressColumns();
+                $("#BuyerAddress").modal("show");
+            }, 500);
         }
     });
 }

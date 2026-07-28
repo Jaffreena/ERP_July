@@ -1,4 +1,5 @@
-﻿//#region  field width
+﻿
+//#region  field width
 const ItemTableFields = [
     { cls: ".PRS_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
     { cls: ".Item_Code", min: 10, max: 15, align: "left" },
@@ -18,6 +19,7 @@ const ItemTableFields = [
 
 
 //#endregion
+
 
 
 //#region show right panes
@@ -120,14 +122,29 @@ function HighlightRow(rows, index) {
     });
 }
 
-   
+function ResizeBatchPopup(tableSelector = "#BatchTable", modalSelector = "#IBatch") {
+
+    const table = document.querySelector(tableSelector);
+    const dialog = document.querySelector(modalSelector + " .modal-dialog");
+
+    if (!table || !dialog) return;
+
+    // Actual table width
+    const tableWidth = table.offsetWidth;
+
+    // Extra space for modal padding/borders
+    const popupWidth = tableWidth + 40;
+
+    dialog.style.setProperty("width", popupWidth + "px", "important");
+    dialog.style.setProperty("max-width", popupWidth + "px", "important");
+}
 
 function ApplyBatchFieldWidths(container = "#BatchTable") {
 
     const fields = [
-        { cls: ".RNI_BCH_Date", min: 12, max: 12, align: "center" },
-        { cls: ".RNI_BCH_No", min: 30, max: 50, align: "left" },
-        { cls: ".RNI_BCH_Qty", min: 11, max: 20, align: "center" },
+        { cls: ".RNI_BCH_Date", min: 10, max: 10, align: "center" },
+        { cls: ".RNI_BCH_No", min: 20, max: 50, align: "left" },
+        { cls: ".RNI_BCH_Qty", min: 10, max: 20, align: "center" },
         { cls: ".RNI_BCH_UnitPrice", min: 11, max: 20, align: "right" },
         { cls: ".RNI_BCH_Value", min: 13, max: 25, align: "right" }
     ];
@@ -214,43 +231,42 @@ function ApplyBatchFieldWidths(container = "#BatchTable") {
         });
     });
    
+    ResizeBatchPopup(container, "#IBatch");
 }
-function ResizeColumn(control) {
-
-    const field = ItemTableFields.find(f => $(control).is(f.cls));
-
-    if (!field)
-        return;
-
+function ResizeColumns() {
     ApplyFieldWidths({
-        fields: [field],          // Only this column
+        fields: ItemTableFields,
         container: "#ItemTable",
         tempRow: "#TempRow",
         tableBody: "#TableBody",
         searchTable: "#tblsearch"
     });
 }
+ 
 
 $(document).ready(function () {
  
     
     $(document).on("input", "#ItemTable input", function () {
-        ResizeColumn(this);
+        ResizeColumns();
     });
 
     $(document).on("change", "#ItemTable select", function () {
-        ResizeColumn(this);
+        ResizeColumns();
     });
   
    
 
     $(document).on("focusin", ".Amount", function () {
-        ResizeColumn(this);
+        ResizeColumns();
     });
     $(document).on("input change blur", "#BatchTable input, #BatchTable textarea, #BatchTable select", function () {
-        ApplyBatchFieldWidths("#BatchTable");
+  
+        ApplyBatchFieldWidths("#BatchTable", function () {
+            SetModalWidth(GetTableWidth("#BatchTable"), "#IBatch");
+        });
     });
-     ApplyBatchFieldWidths("#BatchTable");
+    
     $(document).on("focus", ".PRS_Number", function () {
         this.click();
     });
@@ -301,7 +317,8 @@ $(document).ready(function () {
             this,
             "#RightPane_Item",
             ".search-results",
-            "#ItemMessage"
+            "#ItemMessage",
+            "#MS_Number"
         );
  
     });
@@ -309,7 +326,7 @@ $(document).ready(function () {
 
         let input = $(this);
         let rows = $("#RightPane_Item .search-results tbody tr");
-
+      
         HandleSearchSelection(
             input,
             rows,
@@ -317,6 +334,7 @@ $(document).ready(function () {
             "#RightPane_Item",
             "#RightPane_Item .search-results"
         );
+       // HandleFocusOut(this);
     });
     $(document).on("keydown", function (e) {
         if (e.key === "Escape") {
@@ -472,7 +490,16 @@ $(document).ready(function () {
     //#endregion
 
    
+    function HandleFocusOut(textbox) {
 
+        let row = $(textbox).closest("tr");
+
+        row.find(".Item_Code").val($(textbox).data("oldItemCode") || "");
+        row.find(".Item_Number").val($(textbox).data("oldItemNumber") || "");
+
+        $("#RightPane_Item").removeClass("show");
+        $("#RightPane_Item .search-results").hide();
+    }
 
 
 
@@ -527,6 +554,7 @@ $(window).on("load", function () {
             tableBody: "#TableBody",
             searchTable: "#tblsearch"
         });
+     
 
     }, 200);
 });
@@ -1474,13 +1502,12 @@ function SearchBuyer(inputElement) {
                     row.data("customer", cust);
                     row.append("<td>" + cust.cuS_Name + "</td>");
                   
-
-                    table.find("tbody").append(row);
-
                     row.on("click", function () {
                         $("#BuyerMessage").hide().text("");
+                        const clickedCust = $(this).data("customer");
+
                         SelectBuyer(
-                            cust,
+                            clickedCust,
                             "#JWC_Name",
                             "#JWC_Number",
                             "#Currency_Name",
@@ -1490,10 +1517,29 @@ function SearchBuyer(inputElement) {
                             ".buyer-search-results"
                         );
                     });
+                    table.find("tbody").append(row);
+
+              
 
                 });
  
+                table.find("tbody").on("mousedown", "tr", function (e) {
 
+                    e.preventDefault();
+
+                    const clickedCust = $(this).data("customer");
+
+                    SelectBuyer(
+                        clickedCust,
+                        "#JWC_Name",
+                        "#JWC_Number",
+                        "#Currency_Name",
+                        "#Currency_Number",
+                        "#WH_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                });
 
                 resultsDiv.append(table);
 

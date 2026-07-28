@@ -89,7 +89,7 @@ $(document).ready(function () {
             this,
             "#RightPane_Item",
             ".search-results",
-            "#ItemMessage"
+            "#ItemMessage","#Header_JISVOH_MS_Number"
         );
 
     });
@@ -979,7 +979,6 @@ function OnFocusItem(inputElement) {
         $(inputElement).select();
     }
 }
-
 function SearchServiceOrderItem(inputElement) {
 
     let itemCode = inputElement.value;
@@ -987,12 +986,15 @@ function SearchServiceOrderItem(inputElement) {
     let resultsDiv = $("#RightPane_Item").find(".search-results");
     let material = $("#Header_JISVOH_MS_Number").val();
     material = '14';
+
     if (!material) return;
+
     $.ajax({
         url: '/jobinward/transactions/service-order/item',
         type: 'GET',
         data: {
-            ItemCode: itemCode, MS: material
+            ItemCode: itemCode,
+            MS: material
         },
         success: function (data) {
 
@@ -1009,8 +1011,8 @@ function SearchServiceOrderItem(inputElement) {
                         <table class="table table-bordered table-hover table-fixed mb-0 table-grid" id="tblsearch">
                             <thead>
                                 <tr class="table-info">
-                                  <th style="width:30%;">Item Code</th>
-        <th style="width:70%;">Description</th>
+                                    <th style="width:30%;">Item Code</th>
+                                    <th style="width:70%;">Description</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -1024,12 +1026,15 @@ function SearchServiceOrderItem(inputElement) {
                         <tr>
                             <td>${item.itemCode}</td>
                             <td>${item.itemDescription}</td>
-                          
                         </tr>
                     `);
+
                     tr.css("height", "24px");
+
                     tr.on("click", function () {
+
                         $("#ItemMessage").hide().text("");
+
                         row.find(".JISVOI_Item_Code").val(item.itemCode);
                         row.find(".JISVOI_Item_Number").val(item.itemNumber);
                         row.find(".JISVOI_Number").val(item.itemNumber);
@@ -1053,7 +1058,7 @@ function SearchServiceOrderItem(inputElement) {
                     table.find("tbody").append(tr);
                 });
 
-             
+                // Message Div
                 resultsDiv.append(`
 <div id="ItemMessage"
      style="
@@ -1073,16 +1078,16 @@ function SearchServiceOrderItem(inputElement) {
         box-sizing:border-box;">
 </div>
 `);
-                // Keyboard Navigation
-                //#region search logic highlight
 
-                // Store all rows
+                // ************ IMPORTANT CHANGE ************
+                // Append table BEFORE applying highlight
+                resultsDiv.append(table);
+
+                // Keyboard Navigation Highlight
                 let rows = resultsDiv.find("tbody tr");
 
-                // Clear previous styles
                 rows.removeClass("match-row current-row");
 
-                // No row selected initially
                 $(inputElement).removeData("selectedIndex");
 
                 let searchText = itemCode.trim().toLowerCase();
@@ -1116,11 +1121,9 @@ function SearchServiceOrderItem(inputElement) {
                     $(inputElement).removeData("lastMatch");
                 }
 
-                //#endregion
-                //resultsDiv.append(closeButton);
-                resultsDiv.append(table);
+            }
+            else {
 
-            } else {
                 resultsDiv.append(`
 <div id="ItemMessage"
      style="
@@ -1147,16 +1150,15 @@ function SearchServiceOrderItem(inputElement) {
 
                 $("#RightPane_Item").addClass("show");
                 $("#RightPane_Item .search-results").show();
-               
             }
         },
         error: function () {
+
             resultsDiv.text("Error loading data.");
             resultsDiv.show();
         }
     });
 }
-
 //#region Calculate Total
 function calculateTotal() {
 

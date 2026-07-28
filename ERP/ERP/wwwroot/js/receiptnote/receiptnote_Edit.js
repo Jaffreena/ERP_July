@@ -1,4 +1,6 @@
 ﻿
+
+
 const ItemTableFields = [
     { cls: ".PRS_Number", min: 10, max: 25, align: "left" },
     { cls: ".Item_Code", min: 10, max: 15, align: "left" },
@@ -24,15 +26,31 @@ function ShowCustomerPane() {
 }
 
 //#region batch grid alignment
+function ResizeBatchPopup(tableSelector = "#BatchTable", modalSelector = "#IBatch") {
+
+    const table = document.querySelector(tableSelector);
+    const dialog = document.querySelector(modalSelector + " .modal-dialog");
+
+    if (!table || !dialog) return;
+
+    // Actual table width
+    const tableWidth = table.offsetWidth;
+
+    // Extra space for modal padding/borders
+    const popupWidth = tableWidth + 40;
+
+    dialog.style.setProperty("width", popupWidth + "px", "important");
+    dialog.style.setProperty("max-width", popupWidth + "px", "important");
+}
 
 function ApplyBatchFieldWidths(container = "#BatchTable") {
 
     const fields = [
-        { cls: ".RNI_BCH_Date", min: 12, max: 12, align: "center" },
-        { cls: ".RNI_BCH_No", min: 30, max: 50, align: "left" },
-        { cls: ".RNI_BCH_Qty", min: 11, max: 20, align: "center" },
-        { cls: ".RNI_BCH_UsedQty", min: 11, max: 20, align: "center" },
-        { cls: ".RNI_BCH_AmendQty", min: 11, max: 20, align: "center" },
+        { cls: ".RNI_BCH_Date", min: 10, max: 10, align: "center" },
+        { cls: ".RNI_BCH_No", min: 20, max: 50, align: "left" },
+        { cls: ".RNI_BCH_Qty", min: 10, max: 20, align: "center" },
+        { cls: ".RNI_BCH_UsedQty", min: 10, max: 20, align: "center" },
+        { cls: ".RNI_BCH_AmendQty", min: 10, max: 20, align: "center" },
         { cls: ".RNI_BCH_UnitPrice", min: 11, max: 20, align: "right" },
         { cls: ".RNI_BCH_Value", min: 13, max: 25, align: "right" }
     ];
@@ -118,7 +136,8 @@ function ApplyBatchFieldWidths(container = "#BatchTable") {
             }
         });
     });
-
+    ResizeBatchPopup(container, "#IBatch");
+ 
 }
 
 //#endregion
@@ -445,7 +464,8 @@ $(document).ready(function () {
             this,
             "#RightPane_Item",
             ".search-results",
-            "#ItemMessage"
+            "#ItemMessage",
+            "#MS_Number"
         );
 
     });
@@ -1684,13 +1704,12 @@ function SearchBuyer(inputElement) {
                     row.data("customer", cust);
                     row.append("<td>" + cust.cuS_Name + "</td>");
 
-
-                    table.find("tbody").append(row);
-
                     row.on("click", function () {
                         $("#BuyerMessage").hide().text("");
+                        const clickedCust = $(this).data("customer");
+
                         SelectBuyer(
-                            cust,
+                            clickedCust,
                             "#JWC_Name",
                             "#JWC_Number",
                             "#Currency_Name",
@@ -1700,23 +1719,29 @@ function SearchBuyer(inputElement) {
                             ".buyer-search-results"
                         );
                     });
+                    table.find("tbody").append(row);
+
+
 
                 });
 
-                //var closeButton = $(`
-                //    <div class="card-header bg-primary py-1 px-1 d-flex justify-content-end">
-                //        <button type="button"
-                //                class="btn btn-sm btn-primary bg-opacity-10 p-0 d-flex align-items-center justify-content-center">
-                //            ✖
-                //        </button>
-                //    </div>
-                //`);
+                table.find("tbody").on("mousedown", "tr", function (e) {
 
-                //closeButton.on("click", function () {
-                //    resultsDiv.hide();
-                //});
+                    e.preventDefault();
 
-                //resultsDiv.append(closeButton);
+                    const clickedCust = $(this).data("customer");
+
+                    SelectBuyer(
+                        clickedCust,
+                        "#JWC_Name",
+                        "#JWC_Number",
+                        "#Currency_Name",
+                        "#Currency_Number",
+                        "#WH_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                });
 
 
                 resultsDiv.append(table);

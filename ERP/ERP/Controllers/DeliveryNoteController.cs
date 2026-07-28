@@ -34,7 +34,7 @@ namespace ERP.Controllers
        
         public Int64 UserCode => Int64.TryParse(User.FindFirst("ERP_ID")?.Value, out var No) ? No : 0;
     
-        [Route("jobinward/transactions/delivery-note/buyer/address")]
+        [Route("jobinward/transactions/delivery-note/buyeraddress")]
         public IActionResult SaleBuyerAddressID(String? Buyer, String ADTPNumber)
         {
             SaleInvoice_DL S_DL = new SaleInvoice_DL();
@@ -54,6 +54,30 @@ namespace ERP.Controllers
             SaleInvoiceAddress SIA = new SaleInvoiceAddress();
             SIA.BuyerAddressId = S_DL.JWCCustAddressID(DS.Tables[0]);
             SIA.BuyerAddress = S_DL.JWCCustAddress(DS.Tables[1]).FirstOrDefault();
+            return Json(SIA);
+        }
+
+        [Route("jobinward/transactions/delivery-note/buyeraddressid")]
+        public IActionResult SaleBuyerAddressIDInfo(String? Buyer, String ADTPNumber, String AddressID)
+        {
+            SaleInvoice_DL S_DL = new SaleInvoice_DL();
+            DataSet DS = new DataSet();
+            DeliveryNoteCreate_DTO DN_DTO = new DeliveryNoteCreate_DTO();
+            DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
+            if (Buyer == null)
+            {
+                Buyer = "";
+            }
+
+            DN_DTO.Header.DN_CUS_Number = Convert.ToInt32(Buyer);
+            DN_DTO.Header.DN_ADD_ADTP_Number = Convert.ToInt32(ADTPNumber);
+            DN_DTO.Header.DN_ADD_Addressid = Convert.ToString(AddressID);
+            DN_DTO.Header.DN_Id = 14;
+            DS = DN_DAO.DeliveryNoteDB(DN_DTO);
+
+            SaleInvoiceAddress SIA = new SaleInvoiceAddress();
+          
+            SIA.BuyerAddress = S_DL.JWCCustAddress(DS.Tables[0]).FirstOrDefault();
             return Json(SIA);
         }
         [Route("jobinward/transactions/delivery-note/item")]
@@ -1458,6 +1482,30 @@ namespace ERP.Controllers
                 isExceeded = r["IsExceeded"] != DBNull.Value && Convert.ToBoolean(r["IsExceeded"])
             }).ToList());
         }
+        #endregion
+
+        #region Address
+        [Route("jobinward/transactions/delivery-note/address")]
+        public IActionResult DeliveryNoteAddressID(string? JIDNHNumber, string ADTPNumber)
+        {
+            if (string.IsNullOrEmpty(JIDNHNumber))
+            {
+                JIDNHNumber = "0";
+            }
+            DeliveryNote_DAO dbch_DAO = new DeliveryNote_DAO();
+
+            DS = dbch_DAO.DeliveryNoteAddressEditDB(
+                    Convert.ToInt64(JIDNHNumber),
+                    Convert.ToInt32(ADTPNumber));
+
+            SaleRejectionAddress SRA = new SaleRejectionAddress();
+            DeliveryNote_DL dl = new DeliveryNote_DL();
+            SRA.BuyerAddressId = dl.BuyerAddressID(DS.Tables[0]);
+            SRA.BuyerAddress = dl.BuyerAddress(DS.Tables[1]).FirstOrDefault();
+
+            return Json(SRA);
+        }
+
         #endregion
     }
 

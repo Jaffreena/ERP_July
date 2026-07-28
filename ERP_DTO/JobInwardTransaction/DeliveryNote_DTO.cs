@@ -94,6 +94,7 @@ namespace ERP_DTO.JobInwardTransaction
         public int? DN_Id { get; set; }
         public int? DN_CUS_Number { get; set; }
         public int? DN_ADD_ADTP_Number { get; set; }
+        public string? DN_ADD_Addressid { get; set; }
         public int? DN_CreatorCode { get; set; }
 
         public string? JIDNH_Warehouse { get; set; }
@@ -207,6 +208,10 @@ namespace ERP_DTO.JobInwardTransaction
         [Display(Name = "GSTIN")]
         [StringLength(15)]
         public string? JIDNA_GSTIN { get; set; }
+
+        public int? JIDNA_ADD_IsDeleted { get; set; }
+
+        
     }
 
     public class DeliveryNoteSummary_DTO

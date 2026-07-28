@@ -1,4 +1,17 @@
-﻿let deletedRows = [];
+﻿//#region address width
+const DeliveryNoteAddressFields = [
+    { cls: ".JIDNA_ADTP_Number", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address_ID", min: 10, max: 25, align: "left", extraPadding: 20 },
+    { cls: ".JIDNA_Address", min: 40, max: 40, align: "left" },
+    { cls: ".JIDNA_City", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_State", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_Country", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNA_PIN", min: 10, max: 10, align: "left" },
+    { cls: ".JIDNA_GSTIN", min: 15, max: 15, align: "left" }
+];
+//#endregion
+
+let deletedRows = [];
 var G_JINI_Number = 0;
 var G_JINH_Number = 0;
 $(window).on("load", function () {
@@ -14,21 +27,26 @@ $(window).on("load", function () {
 
     }, 200);
 });
-function ResizeColumn(control) {
-
-    const field = ItemTableFields.find(f => $(control).is(f.cls));
-
-    if (!field)
-        return;
-
+function ResizeAddressColumns() {
     ApplyFieldWidths({
-        fields: [field],          // Only this column
+        fields: DeliveryNoteAddressFields,
+        container: "#AddressTable",
+        tempRow: "#AddTempRow",
+        tableBody: "#AddTableBody"
+    });
+}
+
+function ResizeColumns() {
+    ApplyFieldWidths({
+        fields: ItemTableFields,
         container: "#ItemTable",
         tempRow: "#TempRow",
         tableBody: "#TableBody",
         searchTable: "#tblsearch"
     });
 }
+
+ 
 const ItemTableFields = [
     { cls: ".JIDNI_PRS_Number", min: 10, max: 25, align: "left" },
     { cls: ".JIDNI_Item_Code", min: 10, max: 15, align: "left" },
@@ -53,9 +71,29 @@ const ItemTableFields = [
 
     { cls: ".JIDNI_JW_InvoiceTracking", min: 8, max: 8, align: "center" },
 
-    { cls: ".JISVOH_Number", min: 15, max: 30, align: "left" } // Extra field
+    { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" } // Extra field
 ];
 //#region batch grid alignment
+
+
+function ResizeBatchPopup(tableSelector = "#BatchTable", modalSelector = "#IBatch") {
+
+    const table = document.querySelector(tableSelector);
+    const dialog = document.querySelector(modalSelector + " .modal-dialog");
+
+    if (!table || !dialog) return;
+
+    // Actual table width
+    const tableWidth = table.offsetWidth;
+
+    // Extra space for modal padding/borders
+    const popupWidth = tableWidth + 40;
+
+    dialog.style.setProperty("width", popupWidth + "px", "important");
+    dialog.style.setProperty("max-width", popupWidth + "px", "important");
+}
+
+
 function GetTableWidth(container = "#DeliveryNoteBatchList") {
 
     const $table = $(container);
@@ -96,15 +134,16 @@ function GetTableWidth(container = "#DeliveryNoteBatchList") {
 function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
 
     const fields = [
-        { cls: ".JIDNI_BCH_WH_Name", min: 15, max: 30, align: "left" },
-        { cls: ".JIDNI_BCH_BatchDate", min: 12, max: 12, align: "center" },
-        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 35, align: "left" },
-        { cls: ".JIDNI_BCH_QtyAvailable", min: 11, max: 20, align: "center" },
-        { cls: ".JIDNI_BCH_QtyReserved", min: 11, max: 20, align: "center" },
-        { cls: ".JIDNI_BCH_QtyInvoice", min: 11, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 25, align: "left" },
+        { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
+        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "center" },
         { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
         { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
     ];
+
 
     const $container = $(container);
 
@@ -416,6 +455,30 @@ function AutoFit() {
     fitInputWidth("Header_JIDNH_Remarks", 40, 40);
 }
 $(document).ready(function () {
+    //#region address width
+    // Textboxes
+    $(document).on("input", "#AddressTable input", function () {
+        ResizeAddressColumns();
+    });
+
+    // Dropdowns
+    $(document).on("change", "#AddressTable select", function () {
+        ResizeAddressColumns();
+    });
+
+    // Optional: when a readonly field gets focus after being populated
+    $(document).on("focusin",
+        "#BuyerAddress .JIDNA_Address, " +
+        "#BuyerAddress .JIDNA_City, " +
+        "#BuyerAddress .JIDNA_State, " +
+        "#BuyerAddress .JIDNA_Country, " +
+        "#BuyerAddress .JIDNA_PIN, " +
+        "#BuyerAddress .JIDNA_GSTIN",
+        function () {
+            ResizeAddressColumns();
+        });
+    //#endregion
+   
     //#region item code right pane search JIDNI_Item_Code
     $(document).on("keydown", ".JIDNI_Item_Code", function (e) {
 
@@ -424,7 +487,7 @@ $(document).ready(function () {
             this,
             "#RightPane_Item",
             ".search-results",
-            "#ItemMessage"
+            "#ItemMessage","#Header_JIDNH_MS_Number"
         );
 
     });
@@ -475,11 +538,11 @@ $(document).ready(function () {
   
 
     $(document).on("input", "#ItemTable input", function () {
-        ResizeColumn(this);
+        ResizeColumns();
     });
 
     $(document).on("change", "#ItemTable select", function () {
-        ResizeColumn(this);
+        ResizeColumns();
     });
     //#endregion
     AutoFit();
@@ -1103,6 +1166,7 @@ function OnBuyerSelectCall(inputElement) {
 function OnBuyerInput(inputElement) {
     SearchBuyer(inputElement);
 }
+
 
 function OnBuyerInput(inputElement) {
 
@@ -3565,7 +3629,10 @@ function LoadJWCAddress() {
                     }
                 });
 
-                $("#BuyerAddress").modal("show");
+                setTimeout(function () {
+                    ResizeAddressColumns();
+                    $("#BuyerAddress").modal("show");
+                }, 500);
             }
             else {
                 // alert("No Address Found");
@@ -3575,6 +3642,6 @@ function LoadJWCAddress() {
 }
 //#endregion
 
-
+ 
 
 

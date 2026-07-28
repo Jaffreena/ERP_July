@@ -12,6 +12,45 @@ namespace ERP_DL
     public class DeliveryNote_DL
     {
         MethodHelp MH = new MethodHelp();
+
+        public List<BuyerAdd_DTO> BuyerAddress(DataTable Dt)
+        {
+            List<BuyerAdd_DTO> BuyerAddList = new List<BuyerAdd_DTO>();
+            foreach (DataRow dr in Dt.Rows)
+            {
+                BuyerAddList.Add(
+                    new BuyerAdd_DTO
+                    {
+                        BUY_ADD_Number = Convert.ToInt64(dr["BUY_ADD_Number"]),
+                        BUY_ADD_ADTP_Number = Convert.ToInt64(dr["BUY_ADD_ADTP_Number"]),
+                        BUY_ADD_AddressID = Convert.ToString(dr["BUY_ADD_AddressID"]),
+                        BUY_ADD_Address = Convert.ToString(dr["BUY_ADD_Address"]),
+                        BUY_ADD_City = Convert.ToString(dr["BUY_ADD_City"]),
+                        BUY_ADD_State = Convert.ToString(dr["BUY_ADD_State"]),
+                        BUY_ADD_Country = Convert.ToString(dr["BUY_ADD_Country"]),
+                        BUY_ADD_Pin = Convert.ToString(dr["BUY_ADD_Pin"]),
+                        BUY_ADD_GSTIN = Convert.ToString(dr["BUY_ADD_GSTIN"]),
+                        BUY_ADD_Primary = Convert.ToBoolean(dr["BUY_ADD_Primary"]),
+                    });
+            }
+            return BuyerAddList;
+        }
+        public List<BuyerAdd_DTO> BuyerAddressID(DataTable Dt)
+        {
+            List<BuyerAdd_DTO> BuyerAddList = new List<BuyerAdd_DTO>();
+            foreach (DataRow dr in Dt.Rows)
+            {
+                BuyerAddList.Add(
+                    new BuyerAdd_DTO
+                    {
+                        BUY_ADD_Number = Convert.ToInt64(dr["BUY_ADD_Number"]),
+                        BUY_ADD_AddressID = Convert.ToString(dr["BUY_ADD_AddressID"]),
+                    });
+            }
+            return BuyerAddList;
+        }
+
+
         public List<DeliveryNoteSummary_DTO> DNSummaryList(DataTable Dt)
         {
             List<DeliveryNoteSummary_DTO> DNList =

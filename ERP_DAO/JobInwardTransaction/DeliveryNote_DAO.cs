@@ -20,6 +20,29 @@ namespace ERP_DAO.JobInwardTransaction
         DBConnect DB = new DBConnect();
         DataSet DS = new DataSet();
 
+        #region Delivery Note Address Edit
+
+        public DataSet DeliveryNoteAddressEditDB(long JIDNA_JIDNH_Number, int JIDNA_ADTP_Number)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+
+            DbCommand cmd = db.GetStoredProcCommand("USP_JI_DeliveryNoteAddress");
+
+            db.AddInParameter(cmd,
+                              "@JIDNA_JIDNH_Number",
+                              DbType.Int64,
+                              JIDNA_JIDNH_Number);
+
+            db.AddInParameter(cmd,
+                              "@JIDNA_ADTP_Number",
+                              DbType.Int32,
+                              JIDNA_ADTP_Number);
+
+            return db.ExecuteDataSet(cmd);
+        }
+
+        #endregion
+
         public DataSet DeliveryNoteEditDB(long JIDNH_Number)
         {
             Database db = new SqlDatabase(DB.Connection());
@@ -65,7 +88,7 @@ namespace ERP_DAO.JobInwardTransaction
             db.AddInParameter(cmd, "@JIDNI_Item_Code", DbType.String, DN_DTO.Header.JIDNI_Item_Code);
             db.AddInParameter(cmd, "@DN_CUS_Number", DbType.Int32, DN_DTO.Header.DN_CUS_Number);
             db.AddInParameter(cmd, "@DN_ADD_ADTP_Number", DbType.Int32, DN_DTO.Header.DN_ADD_ADTP_Number);
-
+            db.AddInParameter(cmd, "@DN_ADD_Addressid", DbType.String, DN_DTO.Header.DN_ADD_Addressid);
 
             return db.ExecuteDataSet(cmd);
         }

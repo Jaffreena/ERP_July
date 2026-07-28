@@ -767,7 +767,11 @@ $(document).ready(function () {
         lastRow.find(".RNI_BCH_Item_Number").val(itemNumber);
         lastRow.find(".RNI_BCH_UnitPrice").val(unitPrice).attr("data-value", unitPrice).prop("readonly", true);
         CalculateBatchFooter();
-        new bootstrap.Modal($("#IBatch")).show();
+      
+            SetModalWidth(GetTableWidth("#BatchTable"), "#IBatch");
+            new bootstrap.Modal($("#IBatch")).show();
+      
+     
     });
 
     $(document).on("click", "#btnClearAll", function () {
