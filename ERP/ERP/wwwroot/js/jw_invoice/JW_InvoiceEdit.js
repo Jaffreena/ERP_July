@@ -482,13 +482,39 @@ $(document).ready(function () {
         ClearAll();
     });
     //#endregion
+    function ShowBuyerAddressPopup() {
 
-   
+        ResizeAddressColumns();
+
+        $("#BuyerAddress")
+            .off("shown.bs.modal.resize")
+            .one("shown.bs.modal.resize", function () {
+                ResizeAddressPopup();
+            });
+
+        $("#BuyerAddress").modal("show");
+    }
+    function ResizeAddressPopup(tableSelector = "#AddressTable", modalSelector = "#BuyerAddress") {
+
+        const table = document.querySelector(tableSelector);
+        const dialog = document.querySelector(modalSelector + " .modal-dialog");
+
+        if (!table || !dialog) return;
+
+        // Actual table width
+        const tableWidth = table.offsetWidth;
+
+        // Extra space for modal padding/borders
+        const popupWidth = tableWidth + 40;
+
+        dialog.style.setProperty("width", popupWidth + "px", "important");
+        dialog.style.setProperty("max-width", popupWidth + "px", "important");
+    }
    
     
     //#region #AddressButton click
     $("#AddressButton").on("click", function () {
-        $("#BuyerAddress").modal("show");
+        ShowBuyerAddressPopup();
     });
    
     //#endregion
@@ -2086,7 +2112,7 @@ function CreateJobworkInvoiceModel() {
             JISVIA_Number: parseInt(row.find(".JIDNA_Number").val()) || 0,
             JISVIA_ADTP_Number: parseInt(row.find(".JIDNA_ADTP_Number").val()) || 0,
             JISVIA_Address_ID: row.find(".JIDNA_Address_ID").val() || "",
-            JISVIA_Address: row.find(".JIDNA_Address").val() || "",
+            JISVIA_Address: row.find(".JIDNA_Address").text() || "",
             JISVIA_City: row.find(".JIDNA_City").val() || "",
             JISVIA_State: row.find(".JIDNA_State").val() || "",
             JISVIA_Country: row.find(".JIDNA_Country").val() || "",
@@ -2277,7 +2303,7 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
             if (AddressDefault != null) {
                 $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
 
-                ADDAddress.val(AddressDefault.buY_ADD_Address);
+                ADDAddress.text(AddressDefault.buY_ADD_Address);
                 ADDCity.val(AddressDefault.buY_ADD_City);
                 ADDState.val(AddressDefault.buY_ADD_State);
                 ADDCountry.val(AddressDefault.buY_ADD_Country);
@@ -2319,7 +2345,7 @@ function addAddressRow() {
 
     // 3. Address
     $row.find(".JIDNA_Address")
-        .val("")
+        .text("")
         .attr("name", `Addresses[${i}].JIDNA_Address`);
 
     // 4. City
@@ -2479,9 +2505,7 @@ function LoadJWCAddress() {
 
 
                         row.find(".JIDNA_Address")
-                            .val(
-                                (addr.jwC_ADD_Address)
-                            );
+                            .text(addr.jwC_ADD_Address);
 
                         row.find(".JIDNA_City")
                             .val(addr.jwC_ADD_City);
@@ -2499,10 +2523,7 @@ function LoadJWCAddress() {
                     }
                 });
 
-                setTimeout(function () {
-                    ResizeAddressColumns();
-                    $("#BuyerAddress").modal("show");
-                }, 500);
+                ShowBuyerAddressPopup();
             }
             else {
                 // alert("No Address Found");
@@ -2542,7 +2563,7 @@ function LoadJobworkInvoiceAddress() {
 
                     row.find(".JIDNA_ADTP_Number").val(addr.jisviA_ADTP_Number);
                     row.find(".JIDNA_Address_ID").val(addr.jisviA_Address_ID);
-                    row.find(".JIDNA_Address").val(addr.jisviA_Address);
+                    row.find(".JIDNA_Address").text(addr.jisviA_Address);
                     row.find(".JIDNA_City").val(addr.jisviA_City);
                     row.find(".JIDNA_State").val(addr.jisviA_State);
                     row.find(".JIDNA_Country").val(addr.jisviA_Country);

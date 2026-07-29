@@ -139,6 +139,8 @@ function ResizeBatchPopup(tableSelector = "#BatchTable", modalSelector = "#IBatc
     dialog.style.setProperty("max-width", popupWidth + "px", "important");
 }
 
+
+
 function ApplyBatchFieldWidths(container = "#BatchTable") {
 
     const fields = [
@@ -233,6 +235,8 @@ function ApplyBatchFieldWidths(container = "#BatchTable") {
    
     ResizeBatchPopup(container, "#IBatch");
 }
+
+
 function ResizeColumns() {
     ApplyFieldWidths({
         fields: ItemTableFields,
@@ -263,7 +267,7 @@ $(document).ready(function () {
     $(document).on("input change blur", "#BatchTable input, #BatchTable textarea, #BatchTable select", function () {
   
         ApplyBatchFieldWidths("#BatchTable", function () {
-            SetModalWidth(GetTableWidth("#BatchTable"), "#IBatch");
+           
         });
     });
     
@@ -1644,6 +1648,6 @@ function SearchBuyer(inputElement) {
 }
 
 // Hide search when clicking outside
- 
+
 
 //#endregion

@@ -3172,7 +3172,7 @@ function CreateDeliveryNoteModel_Edit() {
                 row.find(".JIDNA_Address_ID").val(),
 
             JIDNA_Address:
-                row.find(".JIDNA_Address").val(),
+                row.find(".JIDNA_Address").text(),
 
             JIDNA_City:
                 row.find(".JIDNA_City").val(),
@@ -3215,8 +3215,20 @@ function CreateDeliveryNoteModel_Edit() {
 //#endregion Save Function
 
 //#region CLICK ADDRESS BUTTON, ADD ADDRESS ROW, DELETE ADDRESS ROW
-$("#AddressButton").on("click", function () {
+function ShowBuyerAddressPopup() {
+
+    ResizeAddressColumns();
+
+    $("#BuyerAddress")
+        .off("shown.bs.modal.resize")
+        .one("shown.bs.modal.resize", function () {
+            ResizeAddressPopup();
+        });
+
     $("#BuyerAddress").modal("show");
+}
+$("#AddressButton").on("click", function () {
+    ShowBuyerAddressPopup();
 });
 let addressIndex = 0;
 
@@ -3290,7 +3302,7 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
             if (AddressDefault != null) {
               //  $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
                 ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
-                ADDAddress.val(AddressDefault.buY_ADD_Address);
+                ADDAddress.text(AddressDefault.buY_ADD_Address);
                 ADDCity.val(AddressDefault.buY_ADD_City);
                 ADDState.val(AddressDefault.buY_ADD_State);
                 ADDCountry.val(AddressDefault.buY_ADD_Country);
@@ -3363,7 +3375,7 @@ function addAddressRow_Edit() {
 
     // 3. Address
     $row.find(".JIDNA_Address")
-        .val("")
+        .text("")
         .attr("name", `Addresses[${i}].JIDNA_Address`);
 
     // 4. City
@@ -3609,9 +3621,7 @@ function LoadJWCAddress() {
 
 
                         row.find(".JIDNA_Address")
-                            .val(
-                                (addr.jwC_ADD_Address)
-                            );
+                            .text(addr.jwC_ADD_Address);
 
                         row.find(".JIDNA_City")
                             .val(addr.jwC_ADD_City);
@@ -3629,10 +3639,7 @@ function LoadJWCAddress() {
                     }
                 });
 
-                setTimeout(function () {
-                    ResizeAddressColumns();
-                    $("#BuyerAddress").modal("show");
-                }, 500);
+                ShowBuyerAddressPopup();
             }
             else {
                 // alert("No Address Found");
@@ -3640,6 +3647,24 @@ function LoadJWCAddress() {
         }
     });
 }
+
+function ResizeAddressPopup(tableSelector = "#AddressTable", modalSelector = "#BuyerAddress") {
+
+    const table = document.querySelector(tableSelector);
+    const dialog = document.querySelector(modalSelector + " .modal-dialog");
+
+    if (!table || !dialog) return;
+
+    // Actual table width
+    const tableWidth = table.offsetWidth;
+
+    // Extra space for modal padding/borders
+    const popupWidth = tableWidth + 40;
+
+    dialog.style.setProperty("width", popupWidth + "px", "important");
+    dialog.style.setProperty("max-width", popupWidth + "px", "important");
+}
+
 //#endregion
 
  

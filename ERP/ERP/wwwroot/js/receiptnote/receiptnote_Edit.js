@@ -24,7 +24,152 @@ function ShowCustomerPane() {
     $("#RightPane").show();
     $("#RightPane_Item").hide();
 }
+//#region otherbatch bind
+function AssignItemRowID() {
 
+    $("#ItemTable tbody tr.NewRow").each(function () {
+
+        let rowID =
+            $(this).attr("data-rowid");
+
+        // ADD ONLY IF NOT EXISTS
+        if (!rowID || rowID === '1') {
+
+            rowID =
+                new Date().getTime() +
+                Math.floor(Math.random() * 1000);
+
+            $(this).attr(
+                "data-rowid",
+                rowID
+            );
+        }
+
+    });
+
+}
+function BindDeliveryNoteOtherBatchTable(response) {
+
+    let tbody = $("#DeliveryNoteOtherBatchTableBody");
+
+    // Clear all rows except template
+    tbody.find(".DeliveryNoteOtherBatchRow").remove();
+
+    $.each(response, function (index, data) {
+
+        let row =
+            $("#DeliveryNoteOtherBatchTemplateRow")
+                .clone()
+                .removeAttr("id")
+                .removeAttr("style")
+                .show()
+                .addClass("DeliveryNoteOtherBatchRow");
+
+        row.find(".JIDNI_BCH_Number")
+            .val(data.lineBatch_Number);
+
+        row.find(".JIDNI_BCH_WH_Number")
+            .val(data.fromWarehouse);
+
+        row.find(".JIDNI_BCH_WH_Name")
+            .val(data.wareHouseCode);
+
+        row.find(".JIDNI_BCH_BatchDate")
+            .val(data.batchDate);
+
+        row.find(".JIDNI_BCH_BatchNo")
+            .val(data.batchNo);
+
+        row.find(".JIDNI_BCH_AvailableQty")
+            .val(data.availableQty);
+
+        row.find(".JIDNI_BCH_BatchUnitPrice")
+            .val(data.batchUnitPrice);
+
+        row.find(".JIDNI_BCH_BatchValue")
+            .val(data.batchValue);
+
+        tbody.append(row);
+
+    });
+    if (response.length === 0) {
+        tbody.append(`
+        <tr class="DeliveryNoteOtherBatchRow">
+            <td style="height:25px;"></td>
+            <td></td>
+            <td></td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+    `);
+        return;
+    }
+
+    CalculateOtherBatchFooter();
+}
+function CalculateOtherBatchFooter() {
+
+    let totalQty = 0;
+    let totalValue = 0;
+
+    $("#DeliveryNoteOtherBatchTableBody .DeliveryNoteOtherBatchRow").each(function () {
+
+        totalQty += parseFloat($(this)
+            .find(".JIDNI_BCH_AvailableQty").val()) || 0;
+
+        totalValue += parseFloat($(this)
+            .find(".JIDNI_BCH_BatchValue").val()) || 0;
+    });
+
+    $("#TotalBatchQtyOther").val(totalQty.toFixed(2));
+    $("#TotalBatchValueOther").val(totalValue.toFixed(2));
+
+    if ($("#DeliveryNoteOtherBatchTableBody .DeliveryNoteOtherBatchRow").length > 0)
+        $("#DeliveryNoteOtherBatchList tfoot").show();
+    else
+        $("#DeliveryNoteOtherBatchList tfoot").hide();
+}
+function BindOtherBatch(fromWarehouse, lineItemNumber, ItemGridindex) {
+    //#region AJAX
+
+    $.ajax({
+
+        url: "/DeliveryNote/GetOtherBatchDetails",
+
+        type: "GET",
+
+        data: {
+            FromWarehouse: fromWarehouse,
+            LineItem_Number: lineItemNumber,
+            ItemGridIndex: ItemGridindex
+        },
+
+        success: function (response) {
+
+          //  console.log(response);
+            BindDeliveryNoteOtherBatchTable(response);
+
+
+
+
+
+        },
+
+        error: function (xhr, status, error) {
+
+          //  console.log("Status:", status);
+          //  console.log("Error:", error);
+         //   console.log("Response Text:", xhr.responseText);
+
+            alert("Error loading batch details");
+        }
+
+    });
+
+    //#endregion
+}
+//#endregion
 //#region batch grid alignment
 function ResizeBatchPopup(tableSelector = "#BatchTable", modalSelector = "#IBatch") {
 
@@ -173,7 +318,7 @@ function BindHeader(h) {
 }
 
 function BindItems_Edit(items) {
-    console.log(items);
+    //console.log(items);
 
     $("#TableBody tr.NewRow").remove();
 
@@ -244,7 +389,7 @@ function LoadReceiptNote(receiptNo) {
         },
         success: function (response) {
 
-            console.log("Receipt Note Response:", response);
+            //console.log("Receipt Note Response:", response);
 
             // Server returned failure
             if (response.success === false) {
@@ -288,9 +433,9 @@ function LoadReceiptNote(receiptNo) {
         },
         error: function (xhr, status, error) {
 
-            console.log("Status :", status);
-            console.log("Error  :", error);
-            console.log("Response :", xhr.responseText);
+            //console.log("Status :", status);
+            //console.log("Error  :", error);
+           // console.log("Response :", xhr.responseText);
 
             alert("Failed to load Receipt Note.");
         }
@@ -311,7 +456,7 @@ function BindItemBatches_RN(itemBatches) {
         let itemNumber = parseInt(row.find(".Item_Number").val()) || 0;
         let whNumber = parseInt(row.find(".WH_Number").val()) || 0;
 
-        console.log("Row JIRNI :", jirniNumber);
+        //console.log("Row JIRNI :", jirniNumber);
 
         let batches = itemBatches
             .filter(batch => (parseInt(batch.JIRNI_BCH_JIRNI_Number) || 0) === jirniNumber)
@@ -341,7 +486,7 @@ function BindItemBatches_RN(itemBatches) {
 
     });
 
-    console.log(batchMismatchData_RN);
+    //console.log(batchMismatchData_RN);
 }
 
 //#region COMMON FUNCTIONS
@@ -456,6 +601,10 @@ function AutoFitHeader() {
     fitInputWidth("Remarks", 40, 40);
 }
 $(document).ready(function () {
+    $(document).on("click", "#ExCloseButton", function (e) {
+        e.preventDefault();
+        CloseIBatchModal();
+    });
     //#region item code right pane search
     $(document).on("keydown", ".Item_Code", function (e) {
 
@@ -632,9 +781,9 @@ $(document).ready(function () {
         }
 
         var dto = GetReceiptNoteDTO_Edit();   // We'll create this function next
-        console.log(dto);                     // Object
-        console.log('111111111111----'+JSON.stringify(dto));
-        console.log(GetHeader_Edit())
+        //console.log(dto);                     // Object
+       // console.log('111111111111----'+JSON.stringify(dto));
+       // console.log(GetHeader_Edit())
         // JSON
         $.ajax({
             url: "/Receipt_Note/UpdateReceiptNote",

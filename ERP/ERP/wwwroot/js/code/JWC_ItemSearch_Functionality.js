@@ -445,6 +445,7 @@ function ApplyFieldWidths({
                 this.style.setProperty("overflow", "hidden", "important");
          
                 if (this.tagName === "LABEL" || this.tagName === "TEXTAREA") {
+                   
 
                     this.style.setProperty("display", "block", "important");
                     this.style.setProperty("width", "100%", "important");

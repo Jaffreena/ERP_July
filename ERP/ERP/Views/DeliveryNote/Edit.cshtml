@@ -41,6 +41,8 @@
     }
 </style>
 <style>
+  
+  
 
     .jwcustomer-search-results {
         width: 500px !important;
@@ -713,8 +715,8 @@
                                                 asp-items="@ViewBag.AddressType"></select>
                                     </td>
                                     <td><input class="form-control JIDNA_Address_ID" readonly></td>
-                                    <td style="width:auto; min-width:300px; max-width:500px;">
-                                        <input class="form-control JIDNA_Address" readonly>
+                                    <td>
+                                        <div class="form-control JIDNA_Address"></div>
                                     </td>
                                     <td><input class="form-control JIDNA_City" readonly></td>
                                     <td><input class="form-control JIDNA_State" readonly></td>
@@ -820,7 +822,7 @@
                                                            class="col-md-4 col-form-label ps-0">
                                                     </label>
 
-                                                    <div class="col-md-7">
+                                                <div class="col-md-6">
 
                                                         <input asp-for="Header.JIDNH_DN_No"
                                                                class="form-control" maxlength="25"
@@ -837,7 +839,7 @@
                                                            class="col-md-4 col-form-label ps-0">
                                                     </label>
 
-                                                    <div class="col-md-7">
+                                                    <div class="col-md-6">
 
                                                         <input asp-for="Header.JIDNH_DN_Date"
                                                                type="date"
@@ -855,7 +857,7 @@
                                                            class="col-md-4 col-form-label ps-0">
                                                     </label>
 
-                                                    <div class="col-md-7">
+                                                    <div class="col-md-6">
 
                                                         <select asp-for="Header.JIDNH_MS_Number"
                                                                 class="form-select"
@@ -879,7 +881,7 @@
                                                        class="col-md-3 col-form-label ps-0">
                                                 </label>
 
-                                                <div class="col-md-7">
+                                                <div class="col-md-8">
 
                                                     <input asp-for="Header.JIDNH_JW_Customer_Number"
                                                            type="hidden" />
@@ -938,15 +940,15 @@
                                             </div>
 
                                             <!-- COLUMN 3 -->
-                                            <div class="col-12 col-md-3">
+                                            <div class="col-12 col-md-4">
                                             <!-- PAYMENT TERMS -->
-                                            <div class="row align-items-center gx-2 mb-0">
+                                            <div class="row align-items-center gx-2 mb-0 ps-5">
 
                                                 <label asp-for="Header.JIDNH_PaymentTerms"
                                                        class="col-md-3 col-form-label ps-0">
                                                 </label>
 
-                                                <div class="col-md-7">
+                                                <div class="col-md-6">
 
                                                     <input asp-for="Header.JIDNH_PaymentTerms"
                                                            class="form-control" maxlength="50"
@@ -957,13 +959,13 @@
                                             </div>
 
                                             <!-- DELIVERY TERMS -->
-                                            <div class="row align-items-center gx-2 mb-0">
+                                            <div class="row align-items-center gx-2 mb-0 ps-5">
 
                                                 <label asp-for="Header.JIDNH_DeliveryTerms"
                                                        class="col-md-3 col-form-label ps-0">
                                                 </label>
 
-                                                <div class="col-md-7">
+                                                <div class="col-md-6">
 
                                                     <input asp-for="Header.JIDNH_DeliveryTerms"
                                                            class="form-control" maxlength="50"
@@ -974,13 +976,13 @@
                                             </div>
 
                                                 <!-- DELIVERY MODE -->
-                                                <div class="row align-items-center gx-2 mb-0">
+                                            <div class="row align-items-center gx-2 mb-0 ps-5">
 
                                                     <label asp-for="Header.JIDNH_DeliveryMode"
                                                        class="col-md-3 col-form-label ps-0">
                                                     </label>
 
-                                                    <div class="col-md-7">
+                                                    <div class="col-md-6">
 
                                                         <input asp-for="Header.JIDNH_DeliveryMode"
                                                            class="form-control" maxlength="50"
@@ -991,13 +993,13 @@
                                                 </div>
 
                                                 <!-- DESPATCH DOC NO -->
-                                                <div class="row align-items-center gx-2 mb-0">
+                                            <div class="row align-items-center gx-2 mb-0 ps-5">
 
                                                     <label asp-for="Header.JIDNH_DespatchDocumentNo"
                                                            class="col-md-3 col-form-label ps-0">
                                                     </label>
 
-                                                    <div class="col-md-7">
+                                                    <div class="col-md-6">
 
                                                         <input asp-for="Header.JIDNH_DespatchDocumentNo"
                                                            class="form-control" maxlength="50"
@@ -1008,13 +1010,13 @@
                                                 </div>
 
                                                 <!-- DESPATCH THROUGH -->
-                                                <div class="row align-items-center gx-2 mb-0">
+                                            <div class="row align-items-center gx-2 mb-0 ps-5">
 
                                                     <label asp-for="Header.JIDNH_DespatchedThrough"
                                                            class="col-md-3 col-lg-2 col-form-label ps-0">
                                                     </label>
 
-                                                <div class="col-md-7 col-lg-5">
+                                                <div class="col-md-6 col-lg-6">
 
                                                         <input asp-for="Header.JIDNH_DespatchedThrough"
                                                            class="form-control" maxlength="50"
@@ -1024,10 +1026,10 @@
 
                                                 </div>
                                         </div>
-                                        <div class="col-12 col-md-3">
-                                            <div class="row align-items-start gx-2 mb-0">
+                                        <div class="col-12 col-md-2">
+                                            <div class="row align-items-start gx-2 mb-0" >
                                                 <label asp-for="Header.JIDNH_Remarks" class="col-sm-5 col-lg-3  col-form-label ps-0"></label>
-                                                <div class="col-sm-7 col-lg-5">
+                                                <div class="col-sm-5 col-lg-5">
                                                     <textarea asp-for="Header.JIDNH_Remarks"
                                                               class="form-control"
                                                               maxlength="250"

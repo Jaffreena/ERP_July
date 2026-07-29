@@ -628,8 +628,12 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
                 var currentItemGridSelectedRow = GetCheckedRowId();
                 ApplyBatchValues(currentItemGridSelectedRow);
                 //#endregion
-
-            
+                console.log($(".DeliveryNoteBatchNewRow").length);
+                console.log($(".DeliveryNoteBatchRow").length);
+                console.log("offsetWidth:", $("#DeliveryNoteBatchList")[0].offsetWidth);
+                console.log("scrollWidth:", $("#DeliveryNoteBatchList")[0].scrollWidth);
+                console.log($("#DeliveryNoteBatchList").length);
+                console.log($("#DeliveryNoteBatchList"));
             },
 
             error: function (xhr, status, error) {
@@ -919,17 +923,170 @@ function BindDeliveryNoteBatchTable() {
     });
 
     CalculateBatchFooter();
-    ResizeBatchPopup("#DeliveryNoteBatchList", "#DeliveryNoteBatchModal");
-    setTimeout(() => {
-        const modal = document.querySelector("#DeliveryNoteBatchModal .modal-dialog");
-        modal.style.display = "none";
-        modal.offsetHeight; // force reflow
-        modal.style.display = "";
-        $("#DeliveryNoteBatchModal")
-            .modal("show");
-    }, 500);
+   
+    $("#DeliveryNoteBatchModal")
+        .one("shown.bs.modal", function () {
+
+            ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+
+            $("#DeliveryNoteBatchList").css({
+                width: "max-content",
+                "max-width": "none"
+            });
+
+            ResizeBatchPopup("#DeliveryNoteBatchList", "#DeliveryNoteBatchModal");
+
+        })
+        .modal("show");
+}
+function DebugBatchTable() {
+
+    const table = document.getElementById("DeliveryNoteBatchList");
+    const dialog = document.querySelector("#DeliveryNoteBatchModal .modal-dialog");
+
+    console.log("========== BATCH DEBUG ==========");
+    console.log(getComputedStyle(document.getElementById("DeliveryNoteBatchList")).width);
+    console.log(getComputedStyle(document.getElementById("DeliveryNoteBatchList")).tableLayout);
+
+    console.log("Table :", table);
+    console.log("Dialog :", dialog);
+
+    console.log("Table offsetWidth :", table.offsetWidth);
+    console.log("Table scrollWidth :", table.scrollWidth);
+    console.log("Table clientWidth :", table.clientWidth);
+
+    let total = 0;
+
+    $("#DeliveryNoteBatchList thead th").each(function (i) {
+
+        console.log(
+            "TH", i,
+            $(this).text().trim(),
+            "offset =", this.offsetWidth,
+            "style =", this.style.width
+        );
+
+        total += this.offsetWidth;
+    });
+
+    console.log("Sum of TH widths :", total);
+
+    console.log("Dialog Width :", dialog.offsetWidth);
+    console.log("Dialog Style Width :", dialog.style.width);
+
+    console.log("===============================");
+    console.log("Table Width =", table.offsetWidth);
+    console.log("Parent Width =", table.parentElement.offsetWidth);
+    console.log("Modal Body Width =", table.closest(".modal-body").offsetWidth);
+    console.log("Dialog Width =", table.closest(".modal-dialog").offsetWidth);
+    const parent = table.parentElement;
+
+    console.log("Parent Class =", parent.className);
+    console.log("Parent Style Width =", parent.style.width);
+    console.log("Parent Computed Width =", getComputedStyle(parent).width);
+    console.log("Parent OverflowX =", getComputedStyle(parent).overflowX);
+    console.log("Parent MaxWidth =", getComputedStyle(parent).maxWidth);
+    console.log("Table style.width =", table.style.width);
+    console.log("Table computed.width =", getComputedStyle(table).width);
+    console.log("Table computed.minWidth =", getComputedStyle(table).minWidth);
+    console.log("Table computed.maxWidth =", getComputedStyle(table).maxWidth);
+    console.log("Has Bootstrap table class:", table.className);
+}
+function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
+
+    const fields = [
+        { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 25, align: "left" },
+        { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
+        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
+    ];
+
+
+    const $container = $(container);
+
+    fields.forEach(f => {
+
+        const controls = $container.find(
+            "#DeliveryNoteBatchTableBody > #DeliveryNoteBatchTemplateRow " + f.cls +
+            ", #DeliveryNoteBatchTableBody > tr.DeliveryNoteBatchRow " + f.cls
+        );
+
+        if (!controls.length) return;
+
+        const sample = controls.first()[0];
+
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null
+            ? chToPx(f.max, sample)
+            : Number.MAX_SAFE_INTEGER;
+
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+
+            let text = "";
+
+            if (this.tagName === "SELECT") {
+                text = this.options[this.selectedIndex]?.text || "";
+            } else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
+                text = this.value || "";
+            } else {
+                text = this.textContent || "";
+            }
+
+            text = text.trim();
+
+            requiredWidth = Math.max(requiredWidth, getTextWidth(text, this));
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+
+        if (
+            f.cls === ".JIDNI_BCH_BatchUnitPrice" ||
+            f.cls === ".JIDNI_BCH_BatchValue"
+        ) {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+
+            this.style.removeProperty("padding");
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("min-width", "100%", "important");
+            this.style.setProperty("max-width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+            td.style.setProperty("text-align", f.align, "important");
+            td.style.setProperty("padding", "2px", "important");
+
+            const th = $container.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+                th.style.setProperty("text-align", f.align, "important");
+                th.style.setProperty("padding", "2px", "important");
+
+            }
+        });
+    });
+
+
+  
 
 }
+
+
 
 //#endregion
 
@@ -1202,20 +1359,19 @@ function GetCheckedRowId() {
 }
 //#endregion
 
-function ResizeBatchPopup(tableSelector , modalSelector ) {
+function ResizeBatchPopup(tableSelector, modalSelector) {
 
     const table = document.querySelector(tableSelector);
     const dialog = document.querySelector(modalSelector + " .modal-dialog");
 
     if (!table || !dialog) return;
 
-    // Actual table width
-    const tableWidth = table.offsetWidth;
+    // Full table width including overflow
+    const tableWidth = table.scrollWidth;
 
     // Extra space for modal padding/borders
     const popupWidth = tableWidth + 40;
 
     dialog.style.setProperty("width", popupWidth + "px", "important");
     dialog.style.setProperty("max-width", popupWidth + "px", "important");
-
 }

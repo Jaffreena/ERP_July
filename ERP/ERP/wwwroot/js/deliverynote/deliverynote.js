@@ -71,116 +71,10 @@ function GetTableWidth(container = "#DeliveryNoteBatchList") {
 }
 
 
-
-function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
-
-    const fields = [
-        { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 25, align: "left" },
-        { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
-        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
-        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "center" },
-        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "center" },
-        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "center" },
-        { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
-        { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
-    ];
-
-
-    const $container = $(container);
-
-    fields.forEach(f => {
-
-        const controls = $container.find(
-            "#DeliveryNoteBatchTableBody > #DeliveryNoteBatchTemplateRow " + f.cls +
-            ", #DeliveryNoteBatchTableBody > tr.DeliveryNoteBatchNewRow " + f.cls
-        );
-
-        if (!controls.length) return;
-
-        const sample = controls.first()[0];
-
-        const minWidth = chToPx(f.min, sample);
-        const maxWidth = f.max != null
-            ? chToPx(f.max, sample)
-            : Number.MAX_SAFE_INTEGER;
-
-        let requiredWidth = minWidth;
-
-        controls.each(function () {
-
-            let text = "";
-
-            if (this.tagName === "SELECT") {
-                text = this.options[this.selectedIndex]?.text || "";
-            } else if (this.tagName === "INPUT" || this.tagName === "TEXTAREA") {
-                text = this.value || "";
-            } else {
-                text = this.textContent || "";
-            }
-
-            text = text.trim();
-
-            requiredWidth = Math.max(requiredWidth, getTextWidth(text, this));
-        });
-
-        requiredWidth = Math.min(requiredWidth, maxWidth);
-
-        if (
-            f.cls === ".JIDNI_BCH_BatchUnitPrice" ||
-            f.cls === ".JIDNI_BCH_BatchValue"
-        ) {
-            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
-        }
-
-        controls.each(function () {
-
-            this.style.removeProperty("padding");
-            this.style.setProperty("width", "100%", "important");
-            this.style.setProperty("min-width", "100%", "important");
-            this.style.setProperty("max-width", "100%", "important");
-            this.style.setProperty("box-sizing", "border-box", "important");
-            this.style.setProperty("text-align", f.align, "important");
-            this.style.setProperty("padding", "2px", "important");
-
-            const td = $(this).closest("td")[0];
-            td.style.setProperty("width", requiredWidth + "px", "important");
-            td.style.setProperty("min-width", minWidth + "px", "important");
-            td.style.setProperty("max-width", maxWidth + "px", "important");
-            td.style.setProperty("text-align", f.align, "important");
-            td.style.setProperty("padding", "2px", "important");
-
-            const th = $container.find("thead th").eq(td.cellIndex)[0];
-            if (th) {
-                th.style.setProperty("width", requiredWidth + "px", "important");
-                th.style.setProperty("min-width", minWidth + "px", "important");
-                th.style.setProperty("max-width", maxWidth + "px", "important");
-                th.style.setProperty("text-align", f.align, "important");
-                th.style.setProperty("padding", "2px", "important");
-
-            }
-        });
-    });
-    
-
-    ResizeBatchPopup(container, "#DeliveryNoteBatchModal");
  
-   // const tableWidth = GetTableWidth("#DeliveryNoteBatchList");
-   // SetDeliveryNoteBatchModalWidth(tableWidth);
-}
-function SetDeliveryNoteBatchModalWidth(tableWidth) {
 
-    const dialog = document.querySelector("#DeliveryNoteBatchModal .modal-dialog");
 
-    if (!dialog) return;
-
-    // Add space for modal padding and borders
-    const width = (tableWidth + 40) + "px";
-
-    dialog.style.setProperty("width", width, "important");
-    dialog.style.setProperty("max-width", width, "important");
-    dialog.style.setProperty("height", "528px", "important");
-    dialog.style.setProperty("max-height", "528px", "important");
-}
+ 
 
 function ApplyOtherBatchFieldWidths(container = "#DeliveryNoteOtherBatchList") {
 
@@ -922,7 +816,7 @@ $(document).ready(function () {
                     $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
                    // ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
 
-                    ADDAddress.val(AddressDefault.buY_ADD_Address);
+                    ADDAddress.text(AddressDefault.buY_ADD_Address);
                     ADDCity.val(AddressDefault.buY_ADD_City);
                     ADDState.val(AddressDefault.buY_ADD_State);
                     ADDCountry.val(AddressDefault.buY_ADD_Country);
@@ -954,7 +848,7 @@ $(document).ready(function () {
             datatype: "json",
             traditional: true,
             success: function (data) {
-                ADDAddress.val(data.buyerAddress.buY_ADD_Address);
+                ADDAddress.text(data.buyerAddress.buY_ADD_Address || "");
                 ADDCity.val(data.buyerAddress.buY_ADD_City);
                 ADDState.val(data.buyerAddress.buY_ADD_State);
                 ADDCountry.val(data.buyerAddress.buY_ADD_Country);
@@ -1266,7 +1160,7 @@ $(document).ready(function () {
                     row.find(".JIDNA_Address_ID").val(),
 
                 JIDNA_Address:
-                    row.find(".JIDNA_Address").val(),
+                    row.find(".JIDNA_Address").text(),
 
                 JIDNA_City:
                     row.find(".JIDNA_City").val(),
@@ -1470,7 +1364,7 @@ function addAddressRow() {
 
     // 3. Address
     $row.find(".JIDNA_Address")
-        .val("")
+        .text("")
         .attr("name", `Addresses[${i}].JIDNA_Address`);
 
     // 4. City
@@ -2568,6 +2462,23 @@ function DateBind() {
 }
 //#endregion
 
+function ResizeAddressPopup(tableSelector = "#AddressTable", modalSelector = "#BuyerAddress") {
+
+    const table = document.querySelector(tableSelector);
+    const dialog = document.querySelector(modalSelector + " .modal-dialog");
+
+    if (!table || !dialog) return;
+
+    // Actual table width
+    const tableWidth = table.offsetWidth;
+
+    // Extra space for modal padding/borders
+    const popupWidth = tableWidth + 40;
+
+    dialog.style.setProperty("width", popupWidth + "px", "important");
+    dialog.style.setProperty("max-width", popupWidth + "px", "important");
+}
+
 function LoadJWCAddress() {
     var jwcNumber = $("#Header_JIDNH_JW_Customer_Number").val();
 
@@ -2589,7 +2500,7 @@ function LoadJWCAddress() {
 
                 row.find(".JIDNA_ADTP_Number").val(addr.jwC_ADD_ADTP_Number).trigger("change");
                 row.find(".JIDNA_Address_ID").val(addr.jwC_ADD_Address_ID);
-                row.find(".JIDNA_Address").val(addr.jwC_ADD_Address);
+                row.find(".JIDNA_Address").text(addr.jwC_ADD_Address || "");
                 row.find(".JIDNA_City").val(addr.jwC_ADD_City);
                 row.find(".JIDNA_State").val(addr.jwC_ADD_State);
                 row.find(".JIDNA_Country").val(addr.jwC_ADD_Country);
@@ -2600,6 +2511,11 @@ function LoadJWCAddress() {
             });
             setTimeout(function () {
                 ResizeAddressColumns();
+               
+                $("#BuyerAddress").one("shown.bs.modal", function () {
+                    ResizeAddressPopup();
+                });
+
                 $("#BuyerAddress").modal("show");
             }, 500);
         
