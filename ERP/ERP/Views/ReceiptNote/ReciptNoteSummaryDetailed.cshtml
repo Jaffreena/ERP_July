@@ -179,7 +179,7 @@
                                                         <th class="table-width-md text-center">
                                                             Qty
                                                         </th>
-                                                        <th class="table-width-lg text-center">
+                                                        <th class="table-width-lg text-end">
                                                             Amount
                                                         </th>
                                                         
@@ -236,7 +236,7 @@
                                                           
                                                             <td class="text-center table-center">@item.RN_UoM_Name</td>
                                                      
-                                                            <td class="table-width-xl text-end">@item.RN_Qty</td>
+                                                            <td class="table-width-xl text-center">@item.RN_Qty</td>
                                                             <td class="table-width-3xl text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(item.RN_TotalAmount))</td>
                                                           
                                                                                 </tr>
@@ -252,7 +252,7 @@
                                                             <td class="table-width-3xl text-end">
                                                                
                                                             </td>
-                                                            <td class="text-end">
+                                                            <td class="text-center">
                                                                 @String.Format(India, "{0:#,0.##}", @ViewBag.SumOfQty)
                                                             </td>
                                                             <td class="table-width-xl text-end"> @String.Format(India, "{0:N2}", Convert.ToDouble(@ViewBag.SumOfAmount))</td>

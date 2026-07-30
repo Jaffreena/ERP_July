@@ -340,13 +340,13 @@ function CalculateBatchFooter() {
         });
 
     $("#TotalBatchQty")
-        .val(totalQty.toFixed(2));
+        .val(totalQty);
 
     $("#TotalBatchValue")
-        .val(totalValue.toFixed(2));
+        .val(totalValue);
     $("#TotalAvailableQty")
-        .val(totalAvailableQty.toFixed(2));
-    $("#TotalReservedQty").val(totalReservedQty.toFixed(2));
+        .val(totalAvailableQty);
+    $("#TotalReservedQty").val(totalReservedQty);
 }
 
 //#endregion
@@ -1232,7 +1232,7 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
             "It will be reset to maximum allowed: " + BalanceQty
         );
 
-        QtyInvoiceInput.val(DecimalIndianRupees(BalanceQty));
+        QtyInvoiceInput.val(BalanceQty);
         QtyInvoice = BalanceQty;
 
         QtyInvoiceInput.focus().select();

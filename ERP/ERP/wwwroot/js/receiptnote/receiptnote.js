@@ -464,7 +464,7 @@ $(document).ready(function () {
             data: JSON.stringify(dto),
             success: function (res) {
 
-               
+                ClearAll();
                 
                     showAlert('Record Inserted')
                 DateBind();
@@ -1197,6 +1197,29 @@ $("#AddRowButton").on("click", function () {
    
 });
 
+//#endregion
+
+
+//#region clear all
+function ClearAll() {
+    $(".left-menu")
+        .find("input, textarea, select")
+        .each(function () {
+
+            if ($(this).is(":hidden")) {
+                $(this).val("");
+            }
+            else if ($(this).is("select")) {
+                $(this).prop("selectedIndex", 0);
+            }
+            else {
+                $(this).val("");
+            }
+        });
+    $("#ItemTable tbody").empty();
+    $(".jwcustomer-search-results").hide().html("");
+
+}
 //#endregion
 
 //#region Calculate Total

@@ -244,6 +244,7 @@ function StoreWrongBatchMismatch_RN(rowId) {
         });
 
     console.log(batchWrongMismatchData_RN);
+    CloseModal_RN();
 }
  
 

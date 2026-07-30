@@ -129,8 +129,8 @@
                                                         <th>Material Segregation</th>
                                                         <th class="table-width-md text-center">No.of Items</th>
                                                         <th class="table-width-md text-center">Warehouse</th>
-                                                        <th class="table-width-xxl text-end">Qty</th>
-                                                        <th class="table-width-lg text-center">Amount</th>
+                                                        <th class="table-width-xxl text-center">Qty</th>
+                                                        <th class="table-width-lg text-end">Amount</th>
                                                        
                                                     
                                                         
@@ -205,7 +205,7 @@
                                                             <td class="table-width-md text-center">@item.RN_NoOfItem</td>
                                                             <td>@Html.DisplayFor(modelItem => item.RN_WH_Name)</td>
                                                          
-                                                            <td class="table-width-xl text-end">
+                                                            <td class="table-width-xl text-center">
                                                                 @item.RN_Qty
                                                             </td>
                                                             <td class="table-width-xl text-end">
@@ -228,7 +228,7 @@
                                                         <td class="table-width-lg text-center">Total</td>
                                                         <td class="table-width-3xl text-center">@ViewBag.SumOfItem</td>
                                                         <td class="table-width-3xl text-end"> </td>
-                                                        <td class="table-width-3xl text-end">    @String.Format(India, "{0:#,0.##}", @ViewBag.SumOfQty)</td>
+                                                        <td class="table-width-3xl text-center">    @String.Format(India, "{0:#,0.##}", @ViewBag.SumOfQty)</td>
                                                  <td class="table-width-3xl text-end"> @String.Format(new CultureInfo("en-IN"),"{0:#,0.##}",
         Convert.ToDouble(ViewBag.SumOfMatrialValue))</td>       
                                                       

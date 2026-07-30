@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,12 +72,54 @@ namespace ERP_DAO.JobInwardTransaction
 
             //---numbering
             Db.AddInParameter(DbC, "@RNH_Date", DbType.Int64, DTO.RNH_Date);
-
-            DS = Db.ExecuteDataSet(DbC);
+            try
+            {
+                WriteLog(DTO); // Log input object
+                DS = Db.ExecuteDataSet(DbC);
+            }
+            catch (Exception ex)
+            {
+                WriteLog(DTO, ex); // Log DTO + exception
+                
+            }
             return DS;
         }
 
+        private void WriteLog(ReceiptNote_DTO dto, Exception ex = null)
+        {
+            try
+            {
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReceiptNoteLog.txt");
 
+                StringBuilder sb = new StringBuilder();
+
+                sb.AppendLine("====================================================");
+                sb.AppendLine("Date : " + DateTime.Now);
+
+                sb.AppendLine("DTO Values:");
+                foreach (PropertyInfo prop in typeof(ReceiptNote_DTO).GetProperties())
+                {
+                    sb.AppendLine($"{prop.Name} = {prop.GetValue(dto)}");
+                }
+
+                if (ex != null)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine("Exception : " + ex.Message);
+                    sb.AppendLine("Inner Exception : " + ex.InnerException?.Message);
+                    sb.AppendLine("Stack Trace :");
+                    sb.AppendLine(ex.StackTrace);
+                }
+
+                sb.AppendLine();
+
+                File.AppendAllText(path, sb.ToString());
+            }
+            catch
+            {
+                // Ignore logging errors
+            }
+        }
         public DataSet JI_ReceiptNoteEditDB(ReceiptNoteEdit_DTO DTO)
         {
             Database Db = new SqlDatabase(DB.Connection());

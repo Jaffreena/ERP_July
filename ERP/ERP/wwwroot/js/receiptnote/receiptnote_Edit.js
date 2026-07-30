@@ -731,9 +731,9 @@ $(document).ready(function () {
         if (amendQty < minimumQty) {
 
             alert("Amend Qty cannot be less than " + formatIndianQty(minimumQty));
-
+         
             $(this).val(formatIndianQty(minimumQty));
-
+            calculateTotal_rn();
             return;
         }
         $(this).val(formatIndianQty(amendQty));
@@ -782,7 +782,8 @@ $(document).ready(function () {
 
         var dto = GetReceiptNoteDTO_Edit();   // We'll create this function next
         //console.log(dto);                     // Object
-       // console.log('111111111111----'+JSON.stringify(dto));
+        console.log('111111111111----' + JSON.stringify(dto));
+      
        // console.log(GetHeader_Edit())
         // JSON
         $.ajax({
@@ -945,9 +946,9 @@ function GetItemBatches_Edit() {
 
                 RNI_BCH_Item_Index: item.rowId,
 
-                RNI_BCH_Item_Number: batch.RNI_BCH_Item_Number,
+                RNI_BCH_Item_Number: String(batch.RNI_BCH_Item_Number || ""),
 
-                RNI_BCH_WH_Number: batch.RNI_BCH_WH_Number,
+                RNI_BCH_WH_Number: String(batch.RNI_BCH_WH_Number || ""),
 
                 RNI_BCH_Date: batch.RNI_BCH_Date,
 
@@ -955,15 +956,15 @@ function GetItemBatches_Edit() {
 
                 RNI_BCH_Number: batch.RNI_BCH_No,
 
-                RNI_BCH_OriginalQty: (batch.RNI_BCH_Qty || "").toString().replace(/,/g, ""),
+                RNI_BCH_OriginalQty: (batch.RNI_BCH_Qty || "0").toString().replace(/,/g, ""),
 
-                RNI_BCH_UsedQty: (batch.RNI_BCH_UsedQty || "").toString().replace(/,/g, ""),
+                RNI_BCH_UsedQty: (batch.RNI_BCH_UsedQty || "0").toString().replace(/,/g, ""),
 
-                RNI_BCH_Qty: (batch.RNI_BCH_AmendQty || "").toString().replace(/,/g, ""),
+                RNI_BCH_Qty: (batch.RNI_BCH_AmendQty || "0").toString().replace(/,/g, ""),
 
-                RNI_BCH_UnitPrice: (batch.RNI_BCH_UnitPrice || "").toString().replace(/,/g, ""),
+                RNI_BCH_UnitPrice: (batch.RNI_BCH_UnitPrice || "0.00").toString().replace(/,/g, ""),
 
-                RNI_BCH_Value: (batch.RNI_BCH_Value || "").toString().replace(/,/g, ""),
+                RNI_BCH_Value: (batch.RNI_BCH_Value || "0.00").toString().replace(/,/g, ""),
 
                 RNI_BCH_IsDeleted: batch.RNI_BCH_IsDeleted || "false"
             });
@@ -974,6 +975,7 @@ function GetItemBatches_Edit() {
 
     return batches;
 }
+
 function GetItems_Edit() {
 
     var items = [];
@@ -988,6 +990,19 @@ function GetItems_Edit() {
 
         let itemNumber = row.find(".Item_Number").val();
 
+
+        //-----------------------------------
+        const rawQty = row.find(".AmendQty").val() || "0";
+        const qty = removeCommas(rawQty);
+
+        const rawUnitPrice = row.find(".UnitPrice").val() || "0";
+        const unitPrice = removeCommas(rawUnitPrice);
+
+        const rawAmount = row.find(".Amount").val() || "0";
+        const amount = removeCommas(rawAmount);
+
+        //-----------------------------------
+
         if (itemNumber && itemNumber.trim() !== "") {
             items.push({
                 Item_Index: itemIndex++,
@@ -998,9 +1013,9 @@ function GetItems_Edit() {
                 WH_Number: row.find(".WH_Number").val(),
                 UoM_Number: row.find(".UoM_Number").val(),
 
-                Qty: String(row.find(".AmendQty").attr("data-value") || "0"),
-                UnitPrice: String(row.find(".UnitPrice").attr("data-value") || "0"),
-                Amount: String(row.find(".Amount").attr("data-value") || "0"),
+                Qty: String(qty),
+                UnitPrice: String(unitPrice),
+                Amount: String(amount),
 
                 IsDeleted: "0"
             });
@@ -1141,7 +1156,7 @@ function ValidateItemBatchMapping() {
             return (
                 batch.RNI_BCH_Date &&
                 batch.RNI_BCH_No &&
-                (parseFloat(batch.RNI_BCH_Qty) || 0) > 0
+                (parseFloat(batch.RNI_BCH_AmendQty) || 0) > 0
             );
 
         });

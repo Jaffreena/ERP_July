@@ -104,6 +104,7 @@ function ValidateBatchQty() {
 
         alert("Qty Mismatch !");
         StoreWrongBatchMismatch_RN_Edit(rowId)
+        CloseIBatchModal();
         CloseModal_RN();
 
         return false;
@@ -416,8 +417,8 @@ function CheckAllValid(row) {
     if ($.trim(row.find(".RNI_BCH_No").val()) === "")
         return false;
 
-    if ($.trim(row.find(".RNI_BCH_Qty").val()) === "" ||
-        parseFloat(row.find(".RNI_BCH_Qty").val()) <= 0)
+    if ($.trim(row.find(".RNI_BCH_AmendQty").val()) === "" ||
+        parseFloat(row.find(".RNI_BCH_AmendQty").val()) <= 0)
         return false;
 
     if ($.trim(row.find(".RNI_BCH_UnitPrice").val()) === "")

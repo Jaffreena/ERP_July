@@ -4,9 +4,19 @@
     ViewData["Title"] = "Delivery Note";
 }
  
+
 <!-----search logic highlight---->
 
 <style>
+    #DeliveryNoteBatchModal .tab-scroll {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    .JIDNI_JW_InvoiceTracking {
+        width: 14px !important;
+        height: 14px !important;
+    }
     .match-row td {
         color: blue !important;
         font-weight: 600;
@@ -501,7 +511,7 @@
                                         <td>
 
                                             <input id="TotalAvailableQty"
-                                                   class="form-control text-end"
+                                                   class="form-control text-center"
                                                    readonly>
 
                                         </td>
@@ -509,7 +519,7 @@
                                         <td>
 
                                             <input id="TotalReservedQty"
-                                                   class="form-control text-end"
+                                                   class="form-control text-center"
                                                    readonly>
 
                                         </td>
@@ -517,7 +527,7 @@
                                         <td>
 
                                             <input id="TotalBatchQty"
-                                                   class="form-control text-end"
+                                                   class="form-control text-center"
                                                    readonly>
 
                                         </td>
@@ -664,7 +674,7 @@
 
                                         <td>
                                             <input id="TotalBatchQtyOther"
-                                                   class="form-control text-end"
+                                                   class="form-control text-center"
                                                    readonly>
                                         </td>
 
@@ -888,7 +898,7 @@
                                             <textarea asp-for="Header.JIDNH_Remarks"
                                                       class="form-control"
                                                       maxlength="250"
-                                                      rows="2"></textarea>
+                                                     ></textarea>
                                         </div>
                                     </div>
                                  
@@ -1102,7 +1112,7 @@
 
                                                             <!-- DESCRIPTION -->
                                                             <td>
-                                                                <textarea id="JIDNI_Item_Description" class="form-control JIDNI_Item_Description" rows="2" readonly></textarea>
+                                                                <textarea id="JIDNI_Item_Description" class="form-control JIDNI_Item_Description"   readonly></textarea>
 
                                                                     
                                                             </td>
@@ -1274,7 +1284,7 @@
 
                                                                 <textarea name="Items[0].JIDNI_Item_Description"
                                                                           class="form-control JIDNI_Item_Description"
-                                                                          rows="2"
+                                                                      
                                                                           readonly></textarea>
 
                                                                         
@@ -1385,7 +1395,7 @@
 
                                                                 <input type="checkbox"
                                                                        name="Items[0].JIDNI_JW_InvoiceTracking"
-                                                                       class="form-check-input JIDNI_JW_InvoiceTracking" />
+                                                                       class="form-check-input form-check-input-sm JIDNI_JW_InvoiceTracking" />
 
                                                                 <input type="hidden"
                                                                        name="Items[0].JIDNI_IsDeleted"
