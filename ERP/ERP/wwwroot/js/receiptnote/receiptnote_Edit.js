@@ -1,5 +1,5 @@
 ﻿
-
+let isMouseSelectingBuyer = false;
 
 const ItemTableFields = [
     { cls: ".PRS_Number", min: 10, max: 25, align: "left" },
@@ -601,12 +601,23 @@ function AutoFitHeader() {
     fitInputWidth("Remarks", 40, 40);
 }
 $(document).ready(function () {
+    $(document).on("mousedown", ".search-results tbody tr", function () {
+
+        let rows = $(".search-results tbody tr");
+
+        // Remove previous current row
+        rows.removeClass("current-row");
+
+        // Make clicked row the current row
+        $(this).addClass("current-row");
+    });
     $(document).on("click", "#ExCloseButton", function (e) {
         e.preventDefault();
         CloseIBatchModal();
     });
+
     //#region item code right pane search
-    $(document).on("keydown", ".Item_Code", function (e) {
+    $(document).on("keydown mousedown", ".Item_Code", function (e) {
 
         HandleSearchKeyDown(
             e,
@@ -616,6 +627,27 @@ $(document).ready(function () {
             "#ItemMessage",
             "#MS_Number"
         );
+
+        if ($.trim($("#MS_Number").val()) === "") {
+            $("#MS_Number").prop("selectedIndex", 1);
+            let txt = $(this);
+            txt.val(txt.val() + "abc").trigger("input");
+
+
+                txt.val(txt.val().slice(0, -3)).trigger("input");
+
+            return;
+        }
+
+
+
+        // Show pane only if Item Code has text
+        if ($.trim($(this).val()) !== "") {
+            ShowItemPane();
+        }
+
+        return;
+
 
     });
     $(document).on("focusout", ".Item_Code", function () {
@@ -647,9 +679,11 @@ $(document).ready(function () {
     });
     //#endregion
 
+
     //#region jwcname
     $(document).on("focusout", "#JWC_Name", function () {
-
+        if (isMouseSelectingBuyer)
+            return;
         let input = $(this);
         let rows = $("#RightPane .buyer-search-results tbody tr");
 
@@ -661,15 +695,30 @@ $(document).ready(function () {
             "#RightPane .buyer-search-results"
         );
     });
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape" || e.key === "Enter") {
+            let input = $("#JWC_Name");
+            let rows = $("#RightPane .buyer-search-results tbody tr");
 
-    $(document).on("keydown", "#JWC_Name", function (e) {
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane",
-            ".buyer-search-results",
-            "#BuyerMessage"
-        );
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+            $("#Currency_Name").focus();
+        } else {
+
+            HandleSearchKeyDown(
+                e,
+                this,
+                "#RightPane",
+                ".buyer-search-results",
+                "#BuyerMessage"
+            );
+
+        }
     });
     //#endregion
   
@@ -1679,7 +1728,7 @@ function searchItemJIDNI(inputElement) {
                         row.find(".UoM_Number").val(item.uoM);
                         row.find(".WH_Number").val(item.saleWarehouse);
 
-                        let qtyInput = row.find(".Qty");
+                        let qtyInput = row.find(".AmendQty");
                         let qtyUnitprice = row.find(".UnitPrice");
 
                         qtyInput.focus();
@@ -1765,29 +1814,7 @@ function searchItemJIDNI(inputElement) {
 
             } else {
 
-                resultsDiv.append(`
-<div id="ItemMessage"
-     style="
-        display:none;
-        background:#bdbdbd;
-        border-top:1px solid #ced4da;
-        color:#dc3545;
-        font-weight:bold;
-        text-align:center;
-        padding:4px 52px;
-        font-size:18px;
-        position:absolute;
-        bottom:0;
-        left:-2px;
-        right:0;
-        z-index:10;
-        box-sizing:border-box;">
-</div>
-`);
-
-                $("#ItemMessage")
-                    .html("No records found")
-                    .show();
+                resultsDiv.append(GetItemEmptyView());
 
                 $("#RightPane_Item").addClass("show");
                 $("#RightPane_Item .search-results").show();
@@ -1871,7 +1898,7 @@ function SearchBuyer(inputElement) {
                     row.on("click", function () {
                         $("#BuyerMessage").hide().text("");
                         const clickedCust = $(this).data("customer");
-
+                        isMouseSelectingBuyer = true;
                         SelectBuyer(
                             clickedCust,
                             "#JWC_Name",
@@ -1882,6 +1909,12 @@ function SearchBuyer(inputElement) {
                             "#RightPane",
                             ".buyer-search-results"
                         );
+                       
+                        $("#RightPane").removeClass("show");
+                        $("#RightPane .buyer-search-results").hide();
+                        setTimeout(function () {
+                            $("#Currency_Name").focus();
+                        }, 100);
                     });
                     table.find("tbody").append(row);
 
@@ -1894,7 +1927,7 @@ function SearchBuyer(inputElement) {
                     e.preventDefault();
 
                     const clickedCust = $(this).data("customer");
-
+                    isMouseSelectingBuyer = true;
                     SelectBuyer(
                         clickedCust,
                         "#JWC_Name",
@@ -1905,6 +1938,14 @@ function SearchBuyer(inputElement) {
                         "#RightPane",
                         ".buyer-search-results"
                     );
+              
+                    $("#RightPane").removeClass("show");
+                    $("#RightPane .buyer-search-results").hide();
+                    setTimeout(function () {
+                        
+                        $("#Currency_Name").focus();
+                       
+                    }, 100);
                 });
 
 
@@ -1975,29 +2016,7 @@ function SearchBuyer(inputElement) {
                 //#endregion
 
             } else {
-                resultsDiv.append(`
-<div id="BuyerMessage"
-     style="
-        display:none;
-        background:#bdbdbd;
-        border-top:1px solid #ced4da;
-        color:#dc3545;
-        font-weight:bold;
-        text-align:center;
-        padding:4px 52px;
-        font-size:18px;
-        position:absolute;
-        bottom:0;
-        left:-2px;
-        right:0;
-        z-index:10;
-        box-sizing:border-box;">
-</div>
-`);
-
-                $("#BuyerMessage")
-                    .html("No records found")
-                    .show();
+                resultsDiv.append(GetBuyerEmptyView());
 
                 $("#RightPane").addClass("show");
                 $("#RightPane .buyer-search-results").show();

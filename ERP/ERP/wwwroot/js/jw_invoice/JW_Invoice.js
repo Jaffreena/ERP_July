@@ -67,7 +67,7 @@ function ResizeColumns() {
 //#region item grid alignment
 // Converts characters (ch) to pixels
 // 1ch = width of the "0" character in the current font
- 
+let isMouseSelectingBuyer = false;
 function chToPx(ch, element) {
 
     const canvas = chToPx.canvas || (chToPx.canvas = document.createElement("canvas"));
@@ -268,9 +268,11 @@ $(document).ready(function () {
         });
 
     //#endregion
+   
 
     $(document).on("focusout", "#Header_JISVIH_JW_Customer_Name", function () {
-
+        if (isMouseSelectingBuyer)
+            return;
         let input = $(this);
         let rows = $("#RightPane .buyer-search-results tbody tr");
 
@@ -283,16 +285,34 @@ $(document).ready(function () {
         );
     });
 
-    $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane",
-            ".buyer-search-results",
-            "#BuyerMessage"
-        );
-    });
+ 
 
+    $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
+
+        if (e.key === "Escape" || e.key === "Enter") {
+
+
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+        } else {
+            HandleSearchKeyDown(
+                e,
+                this,
+                "#RightPane",
+                ".buyer-search-results",
+                "#BuyerMessage"
+            );
+        }
+    }); 
     
 
     //#region call service order onclick
@@ -460,11 +480,11 @@ $(document).ready(function () {
         var row = $(this).closest("tr");
 
         var deliveredQty = parseFloat(
-            row.find(".JISVII_DeliveredQty").text()
+            row.find(".JISVII_DeliveredQty").val()
         ) || 0;
 
         var prevInvoiceQty = parseFloat(
-            row.find(".JISVII_PrevInvoiceQty").text()
+            row.find(".JISVII_PrevInvoiceQty").val()
         ) || 0;
 
         var currentQty = parseFloat(
@@ -649,11 +669,11 @@ function CalculateTotals() {
     $("#TableBody tr.NewRow:visible").each(function () {
 
         totalDeliveredQty += parseFloat(
-            $(this).find(".JISVII_DeliveredQty").text()
+            $(this).find(".JISVII_DeliveredQty").val()
         ) || 0;
 
         totalPrevInvoiceQty += parseFloat(
-            $(this).find(".JISVII_PrevInvoiceQty").text()
+            $(this).find(".JISVII_PrevInvoiceQty").val()
         ) || 0;
 
         totalQty += parseFloat(
@@ -900,19 +920,43 @@ function SearchBuyer(inputElement) {
 
                         $("#Header_JISVIH_Currency_Name")
                             .val(cust.cuS_CUR_Number);
-                      
-
+                        $("#Header_JISVIH_Currency_Number")
+                            .focus();
+                        $("#RightPane").removeClass("show");
+                        $("#RightPane .buyer-search-results").hide();
+                     //   $(document).trigger("click");
+                        setTimeout(function () {
+                            isMouseSelectingBuyer = false;
+                        }, 0);
                  
 
-                        $("#RightPane").hide();
-
-                        resultsDiv.hide();
+                       
                         loadTaxCluster();
-                     
+                      
                     });
 
                 });
+                table.find("tbody").on("mousedown", "tr", function (e) {
 
+                    e.preventDefault();
+
+                    const clickedCust = $(this).data("customer");
+                    isMouseSelectingBuyer = true;
+                    SelectBuyer(
+                        clickedCust,
+                        "Header_JISVIH_JW_Customer_Name",
+                        "Header_JISVIH_JW_Customer_Number",
+                        "Header_JISVIH_Currency_Name",
+                        "Header_JISVIH_Currency_Number",
+                        "Header_JISVIH_WH_Number",
+                        "RightPane",
+                        ".buyer-search-results"
+                    );
+                    setTimeout(function () {
+                        $(document).trigger("click");
+                    }, 200);
+                   
+                });
 
 
                 resultsDiv.append(table);
@@ -982,29 +1026,7 @@ function SearchBuyer(inputElement) {
                 //#endregion
 
             } else {
-                resultsDiv.append(`
-<div id="BuyerMessage"
-     style="
-        display:none;
-        background:#bdbdbd;
-        border-top:1px solid #ced4da;
-        color:#dc3545;
-        font-weight:bold;
-        text-align:center;
-        padding:4px 52px;
-        font-size:18px;
-        position:absolute;
-        bottom:0;
-        left:-2px;
-        right:0;
-        z-index:10;
-        box-sizing:border-box;">
-</div>
-`);
-
-                $("#BuyerMessage")
-                    .html("No records found")
-                    .show();
+                resultsDiv.append(GetBuyerEmptyView());
 
                 $("#RightPane").addClass("show");
                 $("#RightPane .buyer-search-results").show();
@@ -1928,7 +1950,26 @@ $("#LoadDeliveryNote").click(function () {
     }
     LoadDeliveryNoteItems();
 });
+function ResizeDeliveryNotePopup() {
 
+    const table = document.querySelector("#DeliveryNoteTableView table");
+    const dialog = document.querySelector("#DNView .modal-dialog");
+
+    if (!table || !dialog) return;
+
+    // Actual table width
+    let tableWidth = table.offsetWidth;
+
+    // Add padding for modal body
+    tableWidth += 60;
+
+    // Minimum and maximum width
+    tableWidth = Math.max(500, tableWidth);
+    tableWidth = Math.min(window.innerWidth - 40, tableWidth);
+
+    dialog.style.maxWidth = tableWidth + "px";
+    dialog.style.width = tableWidth + "px";
+}
 // Load delivery note items from SP and fill table
 function LoadDeliveryNoteItems() {
 
@@ -2119,7 +2160,8 @@ function LoadDeliveryNoteItems() {
                     $("#DNView").modal('hide');
 
                 });
-
+                // Resize popup based on table width
+                ResizeDeliveryNotePopup();
                 $("#DNView").modal('show');
             }
             else {
@@ -2538,32 +2580,31 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
     </td>
 
     <!-- QTY 1 -->
-    <td class="text-end">
+    <td style="text-align:center !important;">
 
         <input name="Items[${rowCount}].JISVII_Qty"
                type="hidden"
                value="${item.jidnI_Qty ?? 0}" />
 
-        <label class="form-control JISVII_DeliveredQty" >
-
-           ${item.jidnI_Qty ?? 0}
-
-        </label>
+       
+             <input
+               value="${item.jidnI_Qty}"
+               class="form-control JISVII_DeliveredQty" />
 
     </td>
 
     <!-- QTY 2 -->
-    <td class="text-end">
+    <td style="text-align:center !important;">
 
         <input name="Items[${rowCount}].JISVII_Qty"
                type="hidden"
                value="${item.invoicedQty}" />
 
-        <label class="form-control JISVII_PrevInvoiceQty">
+      
+           <input  
+               value="${item.invoicedQty}"
+               class="form-control JISVII_PrevInvoiceQty" />
 
-            ${item.invoicedQty}
-
-        </label>
 
     </td>
 
@@ -2597,11 +2638,10 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
                value="${item.saC_Number ?? 0}"   type="hidden"
                class="form-control SAC_Number" />
 
-        <label class="form-control SAC">
-
-            ${item.sac ?? 0}
-
-        </label>
+    
+           <input
+               value="${item.sac ?? 0}"
+               class="form-control SAC" />
 
     </td>
 

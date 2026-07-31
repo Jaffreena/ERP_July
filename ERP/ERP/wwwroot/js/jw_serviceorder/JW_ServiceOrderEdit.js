@@ -23,7 +23,7 @@
     { cls: ".JISVOI_DeliveryDate", min: 12, max: 12, align: "center" }  // Delivery Date
 ];
 
- 
+let isMouseSelectingBuyer = false;
  
 //#region item grid alignment
  function getTextWidth(text, element) {
@@ -81,7 +81,38 @@ function AutoFit() {
     fitInputWidth("Header_JISVOH_Remarks", 40, 40);
 }
 $(document).ready(function () {
+   
     //#region item code right pane search JISVOI_Item_Code
+    $(document).on("mousedown", ".search-results tbody tr", function () {
+
+        let rows = $(".search-results tbody tr");
+
+        // Remove previous current row
+        rows.removeClass("current-row");
+
+        // Make clicked row the current row
+        $(this).addClass("current-row");
+    });
+    $(document).on("mousedown", ".JISVOI_Item_Code", function (e) {
+
+        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            $("#RightPane_Item").removeClass("show");
+            $("#RightPane_Item .search-results").hide();
+
+            setTimeout(function () {
+                $("#Header_JISVOH_MS_Number").focus().select();
+            }, 0);
+
+            return false;
+        } else {
+            $("#RightPane_Item").addClass("show");
+            $("#RightPane_Item .search-results").show();
+        }
+    });
     $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
 
         HandleSearchKeyDown(
@@ -94,7 +125,9 @@ $(document).ready(function () {
 
     });
     $(document).on("focusout", ".JISVOI_Item_Code", function () {
-
+        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
+            return;
+        }
         let input = $(this);
         let rows = $("#RightPane_Item .search-results tbody tr");
 
@@ -106,9 +139,11 @@ $(document).ready(function () {
             "#RightPane_Item .search-results"
         );
     });
-    $(document).on("keydown", function (e) {
+    $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
+
         if (e.key === "Escape") {
-            let input = $(".JISVOI_Item_Code");
+
+            let input = $(this);
             let rows = $("#RightPane_Item .search-results tbody tr");
 
             HandleSearchSelection(
@@ -118,11 +153,14 @@ $(document).ready(function () {
                 "#RightPane_Item",
                 "#RightPane_Item .search-results"
             );
+
+            e.preventDefault();
         }
     });
     //#endregion
     $(document).on("focusout", "#Header_JISVOH_JW_Customer_Name", function () {
-
+        if (isMouseSelectingBuyer)
+            return;
         let input = $(this);
         let rows = $("#RightPane .buyer-search-results tbody tr");
 
@@ -136,14 +174,31 @@ $(document).ready(function () {
     });
 
     $(document).on("keydown", "#Header_JISVOH_JW_Customer_Name", function (e) {
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane",
-            ".buyer-search-results",
-            "#BuyerMessage"
-        );
-    });
+
+        if (e.key === "Escape" || e.key === "Enter") {
+
+
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+        } else {
+            HandleSearchKeyDown(
+                e,
+                this,
+                "#RightPane",
+                ".buyer-search-results",
+                "#BuyerMessage"
+            );
+        }
+    }); 
     //#region item grid alignment
  
     ApplyFieldWidths({
@@ -851,13 +906,36 @@ function SearchBuyer(inputElement) {
                         $("#Header_JISVOH_Currency_Number")
                             .val(cust.cuS_CUR_Number)
                             .trigger("change");
+                        $("#Header_JISVOH_Currency_Number")
+                            .focus();
+                        $("#RightPane").removeClass("show");
+                        $("#RightPane .buyer-search-results").hide();
                         $("#RightPane").hide();
 
                         resultsDiv.hide();
+                       
                     });
 
                 });
+                table.find("tbody").on("mousedown", "tr", function (e) {
 
+                    e.preventDefault();
+
+                    const clickedCust = $(this).data("customer");
+                    isMouseSelectingBuyer = true;
+                    SelectBuyer(
+                        clickedCust,
+                        "Header_JISVOH_JW_Customer_Name",
+                        "Header_JISVOH_JW_Customer_Number",
+                        "Header_JISVOH_Currency_Name",
+                        "Header_JISVOH_Currency_Number",
+                        "Header_JISVOH_WH_Number",
+                        "RightPane",
+                        ".buyer-search-results"
+                    );
+                   
+
+                });
 
 
                 resultsDiv.append(table);
@@ -928,29 +1006,7 @@ function SearchBuyer(inputElement) {
 
 
             } else {
-                resultsDiv.append(`
-<div id="BuyerMessage"
-     style="
-        display:none;
-        background:#bdbdbd;
-        border-top:1px solid #ced4da;
-        color:#dc3545;
-        font-weight:bold;
-        text-align:center;
-        padding:4px 52px;
-        font-size:18px;
-        position:absolute;
-        bottom:0;
-        left:-2px;
-        right:0;
-        z-index:10;
-        box-sizing:border-box;">
-</div>
-`);
-
-                $("#BuyerMessage")
-                    .html("No records found")
-                    .show();
+                resultsDiv.append(GetBuyerEmptyView());
 
                 $("#RightPane").addClass("show");
                 $("#RightPane .buyer-search-results").show();
@@ -985,7 +1041,7 @@ function SearchServiceOrderItem(inputElement) {
     let row = $(inputElement).closest("tr");
     let resultsDiv = $("#RightPane_Item").find(".search-results");
     let material = $("#Header_JISVOH_MS_Number").val();
-    material = '14';
+   // material = '14';
 
     if (!material) return;
 
@@ -1124,29 +1180,7 @@ function SearchServiceOrderItem(inputElement) {
             }
             else {
 
-                resultsDiv.append(`
-<div id="ItemMessage"
-     style="
-        display:none;
-        background:#bdbdbd;
-        border-top:1px solid #ced4da;
-        color:#dc3545;
-        font-weight:bold;
-        text-align:center;
-        padding:4px 52px;
-        font-size:18px;
-        position:absolute;
-        bottom:0;
-        left:-2px;
-        right:0;
-        z-index:10;
-        box-sizing:border-box;">
-</div>
-`);
-
-                $("#ItemMessage")
-                    .html("No records found")
-                    .show();
+                resultsDiv.append(GetItemEmptyView());
 
                 $("#RightPane_Item").addClass("show");
                 $("#RightPane_Item .search-results").show();

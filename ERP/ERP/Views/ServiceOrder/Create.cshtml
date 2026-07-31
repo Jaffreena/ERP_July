@@ -341,14 +341,15 @@
                                     </div>
 
                                     <!-- COLUMN 2 -->
-                                    <div class="col-12 col-md-3 col-lg-2">
+                                    <div class="col-12 col-md-3 col-lg-2" style="padding-right: 3rem;">
+
                                     
 
-                                        <div class="row align-items-center gx-2 mb-0">
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
                                             <label asp-for="Header.JISVOH_JW_Customer_Number"
                                                    class="col-sm-5 col-form-label ps-0"></label>
 
-                                            <div class="col-sm-7">
+                                            <div class="col-sm-7" style="padding-right: 5rem;">
                                                 <input asp-for="Header.JISVOH_JW_Customer_Number" type="hidden" />
 
                                                
@@ -361,11 +362,11 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2 mb-0">
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
                                             <label asp-for="Header.JISVOH_Currency_Number"
                                                    class="col-sm-5 col-form-label ps-0"></label>
 
-                                            <div class="col-sm-7 position-relative">
+                                            <div class="col-sm-7 position-relative" style="padding-right: 5rem;">
                                                 <select asp-for="Header.JISVOH_Currency_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Currency">
@@ -378,36 +379,36 @@
                                     </div>
 
                                     <!-- COLUMN 3 -->
-                                    <div class="col-12 col-md-3">
-                                        <div class="row align-items-center gx-2 mb-0">
+                                    <div class="col-12 col-md-3 ps-5">
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label asp-for="Header.JISVOH_PaymentTerms"
                                                    class="col-sm-5 col-form-label ps-0"></label>
-                                            <div class="col-sm-7">
+                                            <div class="col-sm-7 ps-5">
                                                 <input asp-for="Header.JISVOH_PaymentTerms" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2 mb-0">
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label asp-for="Header.JISVOH_DeliveryTerms"
                                                    class="col-sm-5 col-form-label ps-0"></label>
-                                            <div class="col-sm-7">
+                                            <div class="col-sm-7 ps-5">
                                                 <input asp-for="Header.JISVOH_DeliveryTerms" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
-                                        <div class="row align-items-center gx-2 mb-0">
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label asp-for="Header.JISVOH_DeliveryMode"
                                                    class="col-sm-5 col-form-label ps-0"></label>
-                                            <div class="col-sm-7">
+                                            <div class="col-sm-7 ps-5">
                                                 <input asp-for="Header.JISVOH_DeliveryMode" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
-                                        <div class="row align-items-center gx-2 mb-0">
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label asp-for="Header.JISVOH_Tax"
                                                    class="col-sm-5 col-form-label ps-0"></label>
-                                            <div class="col-sm-7">
+                                            <div class="col-sm-7 ps-5">
                                                 
                                                 <textarea asp-for="Header.JISVOH_Tax"
                                                           class="form-control" maxlength="250"
@@ -416,13 +417,14 @@
                                         </div>
                                        
                                     </div>
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-12 col-md-2 ps-5">
                                      
-
-                                        <div class="row align-items-center gx-2 mb-0">
-                                            <label asp-for="Header.JISVOH_TDC"
-                                                   class="col-sm-5 col-form-label ps-0"></label>
-                                            <div class="col-sm-7">
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-left: 6rem;">
+                                            <label 
+                                                   class="col-sm-1 col-form-label">Technical 
+                                                   <br/>delivery conditions
+</label>
+                                            <div class="col-sm-2" style="padding-left: 6rem;">
                                                
                                                 <textarea asp-for="Header.JISVOH_TDC"
                                                           class="form-control" maxlength="250"
@@ -430,10 +432,10 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-start gx-2 mb-0">
+                                        <div class="row align-items-start gx-2 mb-0" style="padding-left: 6rem;">
                                             <label asp-for="Header.JISVOH_Remarks"
-                                                   class="col-sm-5 col-form-label ps-0"></label>
-                                            <div class="col-sm-7">
+                                                   class="col-sm-1 col-form-label ps-0"></label>
+                                            <div class="col-sm-2" style="padding-left: 6rem;">
                                                 <textarea asp-for="Header.JISVOH_Remarks"
                                                           class="form-control" maxlength="250"
                                                           rows="2"></textarea>

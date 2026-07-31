@@ -1,20 +1,21 @@
 ﻿
 function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsSelector) {
 
+
     input = $(input);
     rows = $(rows);
 
     let txt = $.trim(input.val());
 
     // Empty textbox -> first row
-    if (txt === "") {
+    //if (txt === "") {
 
-        if (rows.length)
-            rows.eq(0).trigger("click");
+    //    if (rows.length)
+    //        rows.eq(0).trigger("click");
 
-        return;
-    }
-
+    //    return;
+    //}
+   
     // Only one row
     if (rows.length === 1) {
         rows.eq(0).trigger("click");
@@ -64,7 +65,20 @@ function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsS
         return;
     }
 }
-
+function GetBuyerTableHeader() {
+    return `
+        <div class="card-body modal-content batchPopup p-0"
+             style="z-index:999;">
+            <table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">
+                <thead>
+                    <tr class="table-info">
+                        <th>JW Customer Name</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>`;
+}
 function FocusNextControl(currentControl) {
 
     const focusable = $(":input:visible:not([disabled]), button:visible:not([disabled]), select:visible:not([disabled]), textarea:visible:not([disabled]), a[href]:visible");
@@ -77,17 +91,24 @@ function FocusNextControl(currentControl) {
 }
 
 function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, msId) {
-     
+
     // Material Segregation must be selected
     if (msId) {
-        let materialCtrl = $(msId);
-        let material = materialCtrl.val();
+        const materialCtrl = $(msId);
 
-        if (!material || material.trim() === "") {
+        if ($.trim(materialCtrl.val()) === "") {
 
+            $(rightPaneId).removeClass("show");
+            $(rightPaneId).find(resultClass).hide();
 
-            materialCtrl.focus();
-            return;
+          
+
+            setTimeout(function () {
+                materialCtrl.trigger("focus");
+                materialCtrl.trigger("click");
+            }, 0);
+
+            return false;
         }
     }
 
@@ -101,8 +122,8 @@ function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, ms
 
     let rows = resultsDiv.find("tbody tr");
 
-    if (!resultsDiv.is(":visible") || rows.length === 0)
-        return;
+    //if (!resultsDiv.is(":visible") || rows.length === 0)
+    //    return;
 
     let selectedIndex = input.data("selectedIndex");
 
@@ -174,48 +195,34 @@ function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, ms
             input.data("selectedIndex", selectedIndex);
             break;
 
-
         case "Enter":
 
             e.preventDefault();
 
             let currentRow = rows.filter(".current-row");
-            let matchedRows = rows.filter(".match-row");
-            if (currentRow.length === 1) {
 
-                currentRow.trigger("mousedown");
+            // If no current row, select the first matched row
+            if (currentRow.length === 0) {
 
-                setTimeout(function () {
-                    const controls = $("input, select, textarea, button")
-                        .filter(":visible:enabled:not([readonly]):not([tabindex='-1'])");
+                currentRow = rows.filter(".match-row").first();
 
-                    const current = controls.index(input);
-
-                    if (current !== -1 && current < controls.length - 1) {
-                        controls.eq(current + 1).focus();
-                    }
-                }, 0);
-
-                return;
+                if (currentRow.length > 0) {
+                    rows.removeClass("current-row");
+                    currentRow.addClass("current-row");
+                    input.data("selectedIndex", currentRow.index());
+                }
             }
 
-            if (matchedRows.length === 1) {
-                matchedRows.trigger("click");
-                return;
-            }
-
-            if (matchedRows.length > 1 || rows.length > 1) {
-
-                $(messageId)
-                    .html("Too many Choices !<br/> Select any one.")
-                    .show();
-
-                rightPane.addClass("show");
-                resultsDiv.show();
-                input.focus();
-            }
-
+            HandleSearchSelection(
+                input,
+                rows,
+                messageId,
+                rightPaneId,
+                rightPaneId + " " + resultClass
+            );
+         
             break;
+
     }
 }
 
@@ -230,32 +237,32 @@ function SelectBuyer(
     rightPaneId,
     resultClass
 ) {
-
+    console.log("SelectBuyer called");
     // Customer
     $(customerNameId).val(cust.cuS_Name);
     $(customerNumberId).val(cust.cuS_Number);
-
+    
     // Currency
     $(currencyNameId).val(cust.cuS_CUR_Name);
     $(currencyNumberId).val(cust.cuS_CUR_Number);
 
     // Warehouse
     $(warehouseId).val(cust.cuS_WH_Number);
+   
 
-    // Hide search results
+
     $(rightPaneId)
         .removeClass("show")
         .find(resultClass)
         .hide()
         .empty();
-    const controls = $("input, select, textarea, button")
-        .filter(":visible:enabled:not([tabindex='-1'])");
+    setTimeout(function () {
+        $(currencyNumberId).focus();
+    }, 100);
+         
+    // Hide search results
 
-    const currentIndex = controls.index($(customerNameId));
 
-    if (currentIndex !== -1 && currentIndex < controls.length - 1) {
-        controls.eq(currentIndex + 1).focus();
-    }
 }
 function OnBuyerSelect(inputElement, rightPaneId, resultClass) {
 
@@ -424,7 +431,7 @@ function ApplyFieldWidths({
                 // Actual TD Width
                 const actualWidth = td.getBoundingClientRect().width;
                 // Actual TD Width
-             
+
 
                 // Control
                 this.style.setProperty("width", "100%", "important");
@@ -437,15 +444,15 @@ function ApplyFieldWidths({
                 this.style.setProperty("max-height", "100%", "important");
 
                 this.style.setProperty("box-sizing", "border-box", "important");
-             //   this.style.setProperty("padding", "0", "important");
+                //   this.style.setProperty("padding", "0", "important");
                 this.style.setProperty("margin", "0", "important");
                 this.style.setProperty("border-radius", "0", "important");
                 this.style.setProperty("text-align", f.align, "important");
                 this.style.setProperty("resize", "none", "important");
                 this.style.setProperty("overflow", "hidden", "important");
-         
+
                 if (this.tagName === "LABEL" || this.tagName === "TEXTAREA") {
-                   
+
 
                     this.style.setProperty("display", "block", "important");
                     this.style.setProperty("width", "100%", "important");
@@ -468,7 +475,7 @@ function ApplyFieldWidths({
         });
     });
 
-    ApplyHeaderAlignment(fields,container);
+    ApplyHeaderAlignment(fields, container);
 }
 
 
@@ -578,3 +585,89 @@ function SetModalWidth(
     dialog.style.setProperty("max-height", height, "important");
 }
 //#endregion
+function GetBuyerEmptyView() {
+    return `
+<div id="BuyerMessage"
+     style="
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        z-index:10;
+        display:flex;
+        flex-direction:column;
+        box-sizing:border-box;">
+
+    <div class="card-body modal-content batchPopup p-0"
+         style="z-index:999;">
+        <table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">
+            <thead>
+                <tr class="table-info">
+                    <th>JW Customer Name</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div style="flex:1;"></div>
+
+    <div style="
+        background:#bdbdbd;
+        border-top:1px solid #ced4da;
+        color:#dc3545;
+        font-weight:bold;
+        text-align:center;
+        padding:4px 52px;
+        font-size:18px;">
+        No records found
+    </div>
+
+</div>`;
+}
+
+function GetItemEmptyView() {
+    return `
+<div id="ItemMessage"
+     style="
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        z-index:10;
+        display:flex;
+        flex-direction:column;
+        box-sizing:border-box;">
+
+    <div id="ItemHeader"
+         class="card-body modal-content batchPopup p-0"
+         style="z-index:999;">
+        <table id="ItemEmptyTable"
+               class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">
+            <thead>
+                <tr class="table-info">
+                    <th>Item Code</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div style="flex:1;"></div>
+
+    <div id="ItemMessageText"
+         style="
+            background:#bdbdbd;
+            border-top:1px solid #ced4da;
+            color:#dc3545;
+            font-weight:bold;
+            text-align:center;
+            padding:4px 52px;
+            font-size:18px;">
+        No records found
+    </div>
+
+</div>`;
+}

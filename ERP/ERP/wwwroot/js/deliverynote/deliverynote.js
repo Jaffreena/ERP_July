@@ -29,7 +29,7 @@ const ItemTableFields = [
     // Not present in the specification, so left unchanged
     { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" }
 ];
-
+let isMouseSelectingBuyer = false;
 var addressIndex = 0;
 //#region batch grid alignment
 function GetTableWidth(container = "#DeliveryNoteBatchList") {
@@ -350,6 +350,16 @@ function ResizeColumn(control) {
     });
 }
 $(document).ready(function () {
+    $(document).on("mousedown", ".search-results tbody tr", function () {
+
+        let rows = $(".search-results tbody tr");
+
+        // Remove previous current row
+        rows.removeClass("current-row");
+
+        // Make clicked row the current row
+        $(this).addClass("current-row");
+    });
     //#region address width
     // Textboxes
     $(document).on("input", "#AddressTable input", function () {
@@ -436,7 +446,8 @@ $(document).ready(function () {
     //#endregion
 
     $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
-
+        if (isMouseSelectingBuyer)
+            return;
         let input = $(this);
         let rows = $("#RightPane .buyer-search-results tbody tr");
 
@@ -449,14 +460,33 @@ $(document).ready(function () {
         );
     });
 
+  
+
     $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane",
-            ".buyer-search-results",
-            "#BuyerMessage"
-        );
+      
+        if (e.key === "Escape" || e.key === "Enter") {
+
+            
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+        } else {
+            HandleSearchKeyDown(
+                e,
+                this,
+                "#RightPane",
+                ".buyer-search-results",
+                "#BuyerMessage"
+            );
+        }
     }); 
     //#region Unit Price Format
 
@@ -1551,6 +1581,7 @@ function SearchBuyer(inputElement) {
                             "#RightPane",
                             ".buyer-search-results"
                         );
+
                         //-------------------------------
                         // DISPLAY VALUE
                         $(inputElement).val(cust.cuS_Name);
@@ -1581,6 +1612,11 @@ function SearchBuyer(inputElement) {
                         $("#WH_Number")
                             .val(cust.cuS_WH_Number);
                         //--------------------------------
+
+                        $(document).trigger("click");
+                        setTimeout(function () {
+                            isMouseSelectingBuyer = false;
+                        }, 0);
                     });
 
                 });
@@ -1591,7 +1627,7 @@ function SearchBuyer(inputElement) {
                     e.preventDefault();
 
                     const clickedCust = $(this).data("customer");
-
+                    isMouseSelectingBuyer = true;
                     SelectBuyer(
                         clickedCust,
                         "#Header_JIDNH_JW_Customer_Name",
@@ -1671,30 +1707,7 @@ function SearchBuyer(inputElement) {
                 //#endregion
 
             } else {
-                resultsDiv.append(`
-<div id="BuyerMessage"
-     style="
-        display:none;
-        background:#bdbdbd;
-        border-top:1px solid #ced4da;
-        color:#dc3545;
-        font-weight:bold;
-        text-align:center;
-        padding:4px 52px;
-        font-size:18px;
-        position:absolute;
-        bottom:0;
-        left:-2px;
-        right:0;
-        z-index:10;
-        box-sizing:border-box;">
-</div>
-`);
-
-                $("#BuyerMessage")
-                    .html("No records found")
-                    .show();
-
+                resultsDiv.append(GetBuyerEmptyView());
                 $("#RightPane").addClass("show");
                 $("#RightPane .buyer-search-results").show();
 
@@ -2026,29 +2039,7 @@ function searchItemJIDNI(inputElement) {
                 resultsDiv.append(table);
 
             } else {
-                resultsDiv.append(`
-<div id="ItemMessage"
-     style="
-        display:none;
-        background:#bdbdbd;
-        border-top:1px solid #ced4da;
-        color:#dc3545;
-        font-weight:bold;
-        text-align:center;
-        padding:4px 52px;
-        font-size:18px;
-        position:absolute;
-        bottom:0;
-        left:-2px;
-        right:0;
-        z-index:10;
-        box-sizing:border-box;">
-</div>
-`);
-
-                $("#ItemMessage")
-                    .html("No records found")
-                    .show();
+                resultsDiv.append(GetItemEmptyView());
 
                 $("#RightPane_Item").addClass("show");
                 $("#RightPane_Item .search-results").show();
