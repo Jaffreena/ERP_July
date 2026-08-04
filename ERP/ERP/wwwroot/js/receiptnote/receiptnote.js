@@ -23,15 +23,7 @@ const ItemTableFields = [
 let isMouseSelectingBuyer = false;
 
 //#region show right panes
-function ShowCustomerPane() {
-    $("#RightPane").show();
-    $("#RightPane_Item").hide();
-}
-
-function ShowItemPane() {
-    $("#RightPane").hide();
-    $("#RightPane_Item").show();
-}
+ 
 
 //#endregion
 //#region COMMON FUNCTIONS
@@ -246,10 +238,76 @@ function ResizeColumns() {
         searchTable: "#tblsearch"
     });
 }
- 
+function OpenItemCodeSearch(inputElement) {
+
+    if ($.trim($("#MS_Number").val()) === "" || $("#MS_Number").val() === "0") {
+        $("#MS_Number").prop("selectedIndex", 1);
+    }
+
+    $("#RightPane").hide();
+    $("#RightPane").removeClass("show");
+    $("#RightPane .buyer-search-results").hide();
+
+    $("#RightPane_Item").show();
+    $("#RightPane_Item").addClass("show");
+    $("#RightPane_Item .search-results").show();
+
+    searchItemJIDNI(inputElement);
+}
 
 $(document).ready(function () {
     //#region #JWC_Name----------------------
+    $(document).on("keydown", "#JWC_Name", function (e) {
+
+        if (e.key !== "Enter")
+            return;
+
+        e.preventDefault();
+
+       
+
+            let currentRow = $("#RightPane .buyer-search-results tbody tr.current-row");
+
+            if (!currentRow.length)
+                currentRow = $("#RightPane .buyer-search-results tbody tr.match-row:first");
+
+            if (!currentRow.length)
+                return;
+
+            let clickedCust = currentRow.data("customer");
+
+            if (!clickedCust)
+                return;
+
+            $("#BuyerMessage").hide().text("");
+
+            // Customer
+            $("#JWC_Name").val(clickedCust.cuS_Name);
+            $("#JWC_Number").val(clickedCust.cuS_Number);
+
+            // Currency
+            $("#Currency_Name").val(clickedCust.cuS_CUR_Name);
+            $("#Currency_Number").val(clickedCust.cuS_CUR_Number);
+
+            // Warehouse
+            $("#WH_Number").val(clickedCust.cuS_WH_Number);
+
+            // Hide search pane
+          
+
+
+ 
+        setTimeout(function () {
+            $("#RightPane")
+                .removeClass("show")
+                .find(".buyer-search-results")
+                .hide()
+                .empty();
+
+            $("#Currency_Name").focus();
+        $(document).trigger("mouse");
+    }, 300);
+    });
 
     $(document).on("focusout", "#JWC_Name", function () {
         if (isMouseSelectingBuyer)
@@ -270,22 +328,22 @@ $(document).ready(function () {
 
     $(document).on("keydown", "#JWC_Name", function (e) {
 
-        if (e.key === "Escape" || e.key === "Enter") {
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
 
-            let input = $(this);
-            let rows = $("#RightPane .buyer-search-results tbody tr");
+        //    let input = $(this);
+        //    let rows = $("#RightPane .buyer-search-results tbody tr");
 
-            HandleSearchSelection(
-                input,
-                rows,
-                "#BuyerMessage",
-                "#RightPane",
-                "#RightPane .buyer-search-results"
-            );
+        //    HandleSearchSelection(
+        //        input,
+        //        rows,
+        //        "#BuyerMessage",
+        //        "#RightPane",
+        //        "#RightPane .buyer-search-results"
+        //    );
 
-            $("#Currency_Name").focus();
-        }
-        else {
+        //    $("#Currency_Name").focus();
+        //}
+        //else {
 
             HandleSearchKeyDown(
                 e,
@@ -294,12 +352,12 @@ $(document).ready(function () {
                 ".buyer-search-results",
                 "#BuyerMessage"
             );
-        }
+       }
     });
 
     //#endregion #JWC_Name----------------------
 
-  
+
     //#region item code right pane search
     $(document).on("keydown mousedown", ".Item_Code", function (e) {
 
@@ -311,29 +369,12 @@ $(document).ready(function () {
             "#ItemMessage",
             "#MS_Number"
         );
- 
-            if ($.trim($("#MS_Number").val()) === "") {
-                $("#MS_Number").prop("selectedIndex", 1);
-                //let txt = $(this);
-                //txt.val(txt.val() + "a").trigger("input");
 
-            
-                //    txt.val(txt.val().slice(0, -1)).trigger("input");
-            
-                return;
-            }
-
- 
-         
-            // Show pane only if Item Code has text
-            if ($.trim($(this).val()) !== "") {
-                ShowItemPane();
-            }
-     
-
-      
-         
+        if (e.type === "mousedown") {
+            OpenItemCodeSearch(this);
+        }
     });
+   
     $(document).on("focusout", ".Item_Code", function () {
 
         let input = $(this);
@@ -349,7 +390,8 @@ $(document).ready(function () {
     });
     $(document).on("keydown", function (e) {
         if (e.key === "Escape") {
-            let input = $(".Item_Code");
+            let input = $(".Item_Code:focus");
+            if (!input.length) return;
             let rows = $("#RightPane_Item .search-results tbody tr");
 
             HandleSearchSelection(
@@ -362,9 +404,7 @@ $(document).ready(function () {
         }
     });
     //#endregion
-  
 
- 
     $(document).on("mousedown", ".search-results tbody tr", function () {
 
         let rows = $(".search-results tbody tr");
@@ -375,7 +415,6 @@ $(document).ready(function () {
         // Make clicked row the current row
         $(this).addClass("current-row");
     });
-
   
     $(document).on("input", "#ItemTable input", function () {
         ResizeColumns();
@@ -518,11 +557,13 @@ $(document).ready(function () {
             contentType: "application/json",
             data: JSON.stringify(dto),
             success: function (res) {
-
-                ClearAll();                
+             
+                ClearAll();    
+            
                 showAlert('Record Inserted')
                 DateBind();
                 $("#AddRowButton").trigger("click");
+           
                   //  window.location.href = res.redirectUrl;
               
             },
@@ -547,7 +588,7 @@ $(document).ready(function () {
     });
     //#endregion
 
-   
+
     function HandleFocusOut(textbox) {
 
         let row = $(textbox).closest("tr");
@@ -670,6 +711,49 @@ function ValidateItemBatchMapping() {
 
     return true;
 }
+
+function CloseIBatchModal() {
+
+    const modal = $("#IBatch");
+
+    modal.one("hidden.bs.modal", function () {
+
+        // Remove any remaining backdrops
+        $(".modal-backdrop").remove();
+
+        // Reset body
+        $("body").removeClass("modal-open");
+        $("body").css({
+            "overflow": "",
+            "padding-right": ""
+        });
+
+        // Ensure modal is hidden
+        modal.removeClass("show")
+            .css("display", "none")
+            .attr("aria-hidden", "true");
+    });
+
+    modal.modal("hide");
+
+    // Force cleanup if hidden event doesn't fire
+    setTimeout(function () {
+
+        $(".modal-backdrop").remove();
+
+        $("body").removeClass("modal-open");
+        $("body").css({
+            "overflow": "",
+            "padding-right": ""
+        });
+
+        modal.removeClass("show")
+            .css("display", "none")
+            .attr("aria-hidden", "true");
+
+    }, 500);
+}
+
 
 function GetReceiptNoteDTO() {
 
@@ -1270,7 +1354,7 @@ function ClearAll() {
                 $(this).val("");
             }
         });
-    $("#ItemTable tbody").empty();
+    $("#ItemTable tbody tr.NewRow").remove(); 
     $(".jwcustomer-search-results").hide().html("");
 
 }
@@ -1310,17 +1394,15 @@ function OnFocus(inputElement) {
     $(inputElement).data("oldItemNumber",
         $(inputElement).closest("tr").find(".Item_Number").val());
 
-    var value = inputElement.value;
-
-    if (!value) {
-        searchItemJIDNI(inputElement);
-    } else {
+    if (inputElement.value) {
         $(inputElement).select();
     }
-}
- 
-function searchItemJIDNI(inputElement) {
 
+    OpenItemCodeSearch(inputElement);
+}
+let itemSearchXHR = null;
+function searchItemJIDNI(inputElement) {
+    if (itemSearchXHR) itemSearchXHR.abort()
     let itemCode = inputElement.value.trim();
     let row = $(inputElement).closest("tr");
 
@@ -1330,7 +1412,7 @@ function searchItemJIDNI(inputElement) {
 
     if (!material) return;
 
-    $.ajax({
+   itemSearchXHR= $.ajax({
         url: '/jobinward/transactions/conversion/item',
         type: 'GET',
         data: {
@@ -1563,19 +1645,29 @@ function SearchBuyer(inputElement) {
                     row.append("<td>" + cust.cuS_Name + "</td>");
                   
                     row.on("click", function () {
+
                         $("#BuyerMessage").hide().text("");
                         const clickedCust = $(this).data("customer");
+
+                        $("#JWC_Name").val(clickedCust.cuS_Name);
+                        $("#JWC_Number").val(clickedCust.cuS_Number);
+
+                        // Currency
+                        $("#Currency_Name").val(clickedCust.cuS_CUR_Name);
+                        $("#Currency_Number").val(clickedCust.cuS_CUR_Number);
+
+                        // Warehouse
+                        $("#WH_Number").val(clickedCust.cuS_WH_Number);
+                        $("#RightPane")
+                            .removeClass("show")
+                            .find(".buyer-search-results")
+                            .hide()
+                            .empty();
+                        setTimeout(function () {
+                            $("#Currency_Name").focus();
+                        }, 100);
                       
-                        SelectBuyer(
-                            clickedCust,
-                            "#JWC_Name",
-                            "#JWC_Number",
-                            "#Currency_Name",
-                            "#Currency_Number",
-                            "#WH_Number",
-                            "#RightPane",
-                            ".buyer-search-results"
-                        );
+                       
                     
                         //$(document).trigger("click");
                         //setTimeout(function () {
@@ -1591,6 +1683,7 @@ function SearchBuyer(inputElement) {
                 });
  
                 table.find("tbody").on("mousedown", "tr", function (e) {
+                    console.log("buyer row clicked");
                       $("#BuyerMessage").hide().text("");
                     e.preventDefault();
 

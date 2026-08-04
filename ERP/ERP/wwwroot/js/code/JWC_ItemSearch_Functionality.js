@@ -21,12 +21,14 @@ function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsS
         rows.eq(0).trigger("click");
         return;
     }
+    console.log("HandleSearchSelection");
 
     // Highlighted row
     let currentRow = rows.filter(".current-row");
-
+    console.log(currentRow.length);
     if (currentRow.length === 1) {
         currentRow.trigger("click");
+        console.log("trigger finished");
         return;
     }
 
@@ -237,7 +239,8 @@ function SelectBuyer(
     rightPaneId,
     resultClass
 ) {
-    console.log("SelectBuyer called");
+    console.log("SelectBuyer");
+   
     // Customer
     $(customerNameId).val(cust.cuS_Name);
     $(customerNumberId).val(cust.cuS_Number);
@@ -258,8 +261,9 @@ function SelectBuyer(
         .empty();
     setTimeout(function () {
         $(currencyNumberId).focus();
+        $(document).trigger("click");
     }, 100);
-         
+   
     // Hide search results
 
 
@@ -519,12 +523,31 @@ function ApplyHeaderAlignment(fields, container = "#ItemTable") {
 //#region show right panes
 function ShowCustomerPane() {
     $("#RightPane").show();
-    $("#RightPane_Item").hide();
-}
+    $("#RightPane").addClass("show");
+    $("#RightPane .buyer-search-results").show();
+    //-----------------------------------------------
 
+    $("#RightPane_Item").hide();
+    $("#RightPane_Item").removeClass("show");
+    $("#RightPane_Item .search-results").hide();
+}
+function HideCustomerPane() {
+    $("#RightPane").hide();
+    $("#RightPane").removeClass("show");
+    $("#RightPane .buyer-search-results").hide();
+    //-----------------------------------------------
+
+    
+}
 function ShowItemPane() {
     $("#RightPane").hide();
+    $("#RightPane").removeClass("show");
+    $("#RightPane .buyer-search-results").hide();
+    //------------------------------------------
     $("#RightPane_Item").show();
+    $("#RightPane_Item").addClass("show");
+    $("#RightPane_Item .search-results").show();
+  
 }
 
 //#endregion

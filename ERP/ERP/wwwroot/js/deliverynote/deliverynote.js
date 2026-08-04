@@ -183,46 +183,7 @@ function SetDeliveryNoteOtherBatchModalWidth(tableWidth) {
 
 
 //#endregion 
-//#region item code right pane search JIDNI_Item_Code
-$(document).on("keydown", ".JIDNI_Item_Code", function (e) {
 
-    HandleSearchKeyDown(
-        e,
-        this,
-        "#RightPane_Item",
-        ".search-results",
-        "#ItemMessage","#Header_JIDNH_MS_Number"
-    );
-    ShowItemPane();
-});
-$(document).on("focusout", ".JIDNI_Item_Code", function () {
-
-    let input = $(this);
-    let rows = $("#RightPane_Item .search-results tbody tr");
-
-    HandleSearchSelection(
-        input,
-        rows,
-        "#ItemMessage",
-        "#RightPane_Item",
-        "#RightPane_Item .search-results"
-    );
-});
-$(document).on("keydown", function (e) {
-    if (e.key === "Escape") {
-        let input = $(".JIDNI_Item_Code");
-        let rows = $("#RightPane_Item .search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#ItemMessage",
-            "#RightPane_Item",
-            "#RightPane_Item .search-results"
-        );
-    }
-});
-//#endregion
 
 //#region item grid alignment
 // Converts characters (ch) to pixels
@@ -334,6 +295,22 @@ function ResizeAddressColumns() {
         tableBody: "#AddTableBody"
     });
 }
+function OpenItemCodeSearch(inputElement) {
+
+    if ($.trim($("#Header_JIDNH_MS_Number").val()) === "" || $("#Header_JIDNH_MS_Number").val() === "0") {
+        $("#Header_JIDNH_MS_Number").prop("selectedIndex", 1);
+    }
+
+    $("#RightPane").hide();
+    $("#RightPane").removeClass("show");
+    $("#RightPane .buyer-search-results").hide();
+
+    $("#RightPane_Item").show();
+    $("#RightPane_Item").addClass("show");
+    $("#RightPane_Item .search-results").show();
+
+    searchItemJIDNI(inputElement);
+}
 function ResizeColumn(control) {
 
     const field = ItemTableFields.find(f => $(control).is(f.cls));
@@ -350,6 +327,97 @@ function ResizeColumn(control) {
     });
 }
 $(document).ready(function () {
+
+    //#region Header_JIDNH_JW_Customer_Name
+
+    $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
+        if (isMouseSelectingBuyer)
+            return;
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#BuyerMessage",
+            "#RightPane",
+            "#RightPane .buyer-search-results"
+        );
+    });
+
+
+
+    $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
+
+        if (e.key === "Escape" || e.key === "Enter") {
+
+
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+        } else {
+            HandleSearchKeyDown(
+                e,
+                this,
+                "#RightPane",
+                ".buyer-search-results",
+                "#BuyerMessage"
+            );
+        }
+    });
+    //#endregion
+    //#region item code right pane search JIDNI_Item_Code
+    $(document).on("keydown mousedown", ".JIDNI_Item_Code", function (e) {
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#Header_JIDNH_MS_Number"
+        );
+
+        if (e.type === "mousedown") {
+            OpenItemCodeSearch(this);
+        }
+    });
+    $(document).on("focusout", ".JIDNI_Item_Code", function () {
+
+        let input = $(this);
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#ItemMessage",
+            "#RightPane_Item",
+            "#RightPane_Item .search-results"
+        );
+    });
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape") {
+            let input = $(".JIDNI_Item_Code");
+            let rows = $("#RightPane_Item .search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#ItemMessage",
+                "#RightPane_Item",
+                "#RightPane_Item .search-results"
+            );
+        }
+    });
+    //#endregion
     $(document).on("mousedown", ".search-results tbody tr", function () {
 
         let rows = $(".search-results tbody tr");
@@ -444,66 +512,17 @@ $(document).ready(function () {
         });
 
     //#endregion
-
-    $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
-        if (isMouseSelectingBuyer)
-            return;
-        let input = $(this);
-        let rows = $("#RightPane .buyer-search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#BuyerMessage",
-            "#RightPane",
-            "#RightPane .buyer-search-results"
-        );
-    });
-
-  
-
-    $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
-      
-        if (e.key === "Escape" || e.key === "Enter") {
-
-            
-
-            let input = $(this);
-            let rows = $("#RightPane .buyer-search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#BuyerMessage",
-                "#RightPane",
-                "#RightPane .buyer-search-results"
-            );
-        } else {
-            HandleSearchKeyDown(
-                e,
-                this,
-                "#RightPane",
-                ".buyer-search-results",
-                "#BuyerMessage"
-            );
-        }
-    }); 
+ 
     //#region Unit Price Format
 
-    $(document).on("focusout", ".JIDNI_UnitPrice", function () {
+    //#region comma format on focusout
+    $(document).on("focusout", ".JIDNI_Qty, .JIDNI_UnitPrice, .JIDNI_Amount", function () {
 
-        // Get current input value
-        var value = $(this).val().trim();
+        let type = $(this).hasClass("JIDNI_Qty") ? "q" : "c";
 
-        // If empty or invalid, set default value
-        if (value === "" || isNaN(value)) {
-            $(this).val("0.00");
-            return;
-        }
-
-        // Convert to 2 decimal format
-        $(this).val(parseFloat(value).toFixed(2));
+        $(this).val(addComma($(this).val(), type));
     });
+    //#endregion
 
     //#endregion
 
@@ -567,8 +586,8 @@ $(document).ready(function () {
     //#region auto add row function
     function autoAddRow(currentRow) {
 
-        let qty = parseFloat(currentRow.find(".JIDNI_Qty").val()) || 0;
-        let price = parseFloat(currentRow.find(".JIDNI_UnitPrice").val()) || 0;
+        let qty = parseFloat(removeComma(currentRow.find(".JIDNI_Qty").val())) || 0;
+        let price = parseFloat(removeComma(currentRow.find(".JIDNI_UnitPrice").val())) || 0;
 
         let itemCode = currentRow.find(".JIDNI_Item_Code").val();
         let prsNo = currentRow.find(".JIDNI_PRS_Number").val();
@@ -623,7 +642,7 @@ $(document).ready(function () {
             }
 
             if (el.hasClass("JIDNI_Qty")) {
-                if (!el.val() || parseFloat(el.val()) <= 0) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
                     isValid = false;
                     el.focus();
                     return false;
@@ -631,7 +650,7 @@ $(document).ready(function () {
             }
 
             if (el.hasClass("JIDNI_UnitPrice")) {
-                if (!el.val() || parseFloat(el.val()) <= 0) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
                     isValid = false;
                     el.focus();
                     return false;
@@ -1729,12 +1748,12 @@ function SearchBuyer(inputElement) {
 $(document).on("focusout", ".JIDNI_Qty", function () {
 
     let row = $(this).closest("tr");
-    let jisvohNumber = row.find(".JISVOH_Number").val();  
+    let jisvohNumber = row.find(".JISVOH_Number").val();
     if (!jisvohNumber) return;
     let prsNumber = row.find(".JIDNI_PRS_Number").val();
     let itemNumber = row.find(".JIDNI_Item_Number").val();
     let uomNumber = row.find(".JIDNI_UoM_Number").val();
-    let originalQty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+    let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
     let rowIndex = row.index();
     $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
         jisvohNumber,
@@ -1762,12 +1781,12 @@ $(document).on("change", ".JISVOH_Number", function () {
 
     let row = $(this).closest("tr");
     let jisvohNumber = $(this).val();
-    row.find(".JISVOH_Number").val(jisvohNumber)  
+    row.find(".JISVOH_Number").val(jisvohNumber)
 
     let prsNumber = row.find(".JIDNI_PRS_Number").val();
     let itemNumber = row.find(".JIDNI_Item_Number").val();
     let uomNumber = row.find(".JIDNI_UoM_Number").val();
-    let originalQty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+    let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
     let rowIndex = row.index();
 
     $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
@@ -1830,16 +1849,16 @@ function calculateTotal() {
         }
 
         // Get Qty
-        let qty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+        let qty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
 
         // Get Unit Price
-        let unitPrice = parseFloat(row.find(".JIDNI_UnitPrice").val()) || 0;
+        let unitPrice = parseFloat(removeComma(row.find(".JIDNI_UnitPrice").val())) || 0;
 
         // Row Amount = Qty × Unit Price
         let amount = qty * unitPrice;
 
         // Set row amount field
-        row.find(".JIDNI_Amount").val(amount.toFixed(2));
+        row.find(".JIDNI_Amount").val(addComma(amount, "c"));
 
         // Add to totals
         totalQty += qty;
@@ -1847,8 +1866,8 @@ function calculateTotal() {
     });
 
     // Footer totals
-    $("#TotalQty").val(totalQty);
-    $("#TotalAmount").val(totalAmount.toFixed(2));
+    $("#TotalQty").val(addComma(totalQty, "q"));
+    $("#TotalAmount").val(addComma(totalAmount, "c"));
 }
 //#endregion Calculate Total
 
@@ -1859,13 +1878,15 @@ function OnInputItem(inputElement) {
 
 function OnFocusItem(inputElement) {
 
-    var value = inputElement.value;
+    $(inputElement).data("oldItemCode", $(inputElement).val());
+    $(inputElement).data("oldItemNumber",
+        $(inputElement).closest("tr").find(".JIDNI_Item_Number").val());
 
-    if (!value) {
-        searchItemJIDNI(inputElement);
-    } else {
+    if (inputElement.value) {
         $(inputElement).select();
     }
+
+    OpenItemCodeSearch(inputElement);
 }
 
 function searchItemJIDNI(inputElement) {
@@ -2057,10 +2078,7 @@ function searchItemJIDNI(inputElement) {
 
 
 //#region COMMON FUNCTIONS
-function removeCommas(value) {
-    return (value || '').toString().replace(/,/g, '');
-}
-
+ 
 function DecimalIndianRupees(value) {
     if (value === "" || isNaN(value)) {
         return "0.00";

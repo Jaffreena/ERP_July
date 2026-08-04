@@ -16,6 +16,18 @@ function formatIndianCurrency(amount) {
         maximumFractionDigits: 2
     }).format(Number(amount));
 }
-function removeCommas(value) {
-    return (value || "").toString().replace(/,/g, "").trim();
+ 
+function removeComma(val) {
+    return (val || "").toString().replace(/,/g, "").trim();
+}
+
+function addComma(val, type = "c") {
+
+    let num = parseFloat(removeComma(val));
+
+    if (isNaN(num)) return val;
+
+    return type === "q"
+        ? formatIndianQty(num)
+        : formatIndianCurrency(num);
 }

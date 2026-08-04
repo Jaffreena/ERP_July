@@ -24,7 +24,7 @@
 ];
 
 let isMouseSelectingBuyer = false;
- 
+let isBindingItems = false;
 //#region item grid alignment
  function getTextWidth(text, element) {
 
@@ -93,24 +93,34 @@ $(document).ready(function () {
         // Make clicked row the current row
         $(this).addClass("current-row");
     });
-    $(document).on("mousedown", ".JISVOI_Item_Code", function (e) {
+    $(document).on("keydown mousedown", ".JISVOI_Item_Code", function (e) {
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#Header_JISVOH_MS_Number"
+        );
 
         if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
+            $("#Header_JISVOH_MS_Number").prop("selectedIndex", 1);
+            // return;
+        }
 
-            e.preventDefault();
-            e.stopImmediatePropagation();
+        if ($.trim($(this).val()) !== "") {
 
-            $("#RightPane_Item").removeClass("show");
-            $("#RightPane_Item .search-results").hide();
 
-            setTimeout(function () {
-                $("#Header_JISVOH_MS_Number").focus().select();
-            }, 0);
-
-            return false;
-        } else {
+            SearchServiceOrderItem(this);
+            $("#RightPane").hide();
+            $("#RightPane").removeClass("show");
+            $("#RightPane .buyer-search-results").hide();
+            //------------------------------------------
+            $("#RightPane_Item").show();
             $("#RightPane_Item").addClass("show");
             $("#RightPane_Item .search-results").show();
+
         }
     });
     $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
@@ -268,9 +278,9 @@ $(document).ready(function () {
 
         let $row = $(this).closest("tr");
 
-        let invoicedQty = parseFloat($row.find(".InvoicedQty").val()) || 0;
-        let invoiceToBeRaised = parseFloat($row.find(".InvoiceToBeRaised").val()) || 0;
-        let amendQty = parseFloat($(this).val()) || 0;
+        let invoicedQty = parseFloat(removeComma($row.find(".InvoicedQty").val())) || 0;
+        let invoiceToBeRaised = parseFloat(removeComma($row.find(".InvoiceToBeRaised").val())) || 0;
+        let amendQty = parseFloat(removeComma($(this).val())) || 0;
 
         let minQty = invoicedQty + invoiceToBeRaised;
 
@@ -280,12 +290,19 @@ $(document).ready(function () {
             $(this).focus(); // optional: focus back
         }
     });
+
+    //#region comma format on focusout
+    $(document).on("focusout", ".JISVOI_Qty, .JISVOI_UnitPrice, .JISVOI_Amount", function () {
+        let type = $(this).hasClass("JISVOI_Qty") ? "q" : "c";
+        $(this).val(addComma($(this).val(), type));
+    });
+    //#endregion
     $(document).on("keyup change", ".JISVOI_Qty, .JISVOI_UnitPrice", function () {
 
         let row = $(this).closest("tr");
 
-        let qty = parseFloat((row.find(".JISVOI_Qty").val() || "0").replace(/,/g, "")) || 0;
-        let price = parseFloat((row.find(".JISVOI_UnitPrice").val() || "0").replace(/,/g, "")) || 0;
+        let qty = parseFloat(removeComma(row.find(".JISVOI_Qty").val())) || 0;
+        let price = parseFloat(removeComma(row.find(".JISVOI_UnitPrice").val())) || 0;
 
         let amount = qty * price;
 
@@ -323,7 +340,7 @@ $(document).ready(function () {
             }
 
             if (el.hasClass("JISVOI_Qty")) {
-                if (!el.val() || parseFloat(el.val()) <= 0) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
                     isValid = false;
                     el.focus();
                     return false;
@@ -331,13 +348,12 @@ $(document).ready(function () {
             }
 
             if (el.hasClass("JISVOI_UnitPrice")) {
-                if (!el.val() || parseFloat(el.val()) <= 0) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
                     isValid = false;
                     el.focus();
                     return false;
                 }
             }
-
             if (el.hasClass("JISVOI_PRS_Number")) {
                 if (!el.val() || el.val() === "0") {
                     isValid = false;
@@ -516,9 +532,9 @@ $(document).ready(function () {
 });
 //#region auto add row function
 function autoAddRow(currentRow) {
-
-    let qty = parseFloat(currentRow.find(".JISVOI_Qty").val()) || 0;
-    let price = parseFloat(currentRow.find(".JISVOI_UnitPrice").val()) || 0;
+    if (isBindingItems) return;
+    let qty = parseFloat(removeComma(currentRow.find(".JISVOI_Qty").val())) || 0;
+    let price = parseFloat(removeComma(currentRow.find(".JISVOI_UnitPrice").val())) || 0;
 
     let itemCode = currentRow.find(".JISVOI_Item_Code").val();
     let prsNo = currentRow.find(".JISVOI_PRS_Number").val();
@@ -689,13 +705,13 @@ function CreateServiceOrderModel() {
                 parseInt(row.find(".JISVOI_UoM_Number").val()) || 0,
 
             JISVOI_Qty:
-                parseFloat(row.find(".JISVOI_Qty").val()) || 0,
+                parseFloat(removeComma(row.find(".JISVOI_Qty").val())) || 0,
 
             JISVOI_UnitPrice:
-                parseFloat(row.find(".JISVOI_UnitPrice").val()) || 0,
+                parseFloat(removeComma(row.find(".JISVOI_UnitPrice").val())) || 0,
 
             JISVOI_Amount:
-                parseFloat(row.find(".JISVOI_Amount").val()) || 0,
+                parseFloat(removeComma(row.find(".JISVOI_Amount").val())) || 0,
 
             JISVOI_DeliveryDate:
                 row.find(".JISVOI_DeliveryDate").val()
@@ -1211,16 +1227,16 @@ function calculateTotal() {
         }
 
         // Get Qty
-        let qty = parseFloat(row.find(".JISVOI_Qty").val()) || 0;
+        let qty = parseFloat(removeComma(row.find(".JISVOI_Qty").val())) || 0;
 
         // Get Unit Price
-        let unitPrice = parseFloat(row.find(".JISVOI_UnitPrice").val()) || 0;
+        let unitPrice = parseFloat(removeComma(row.find(".JISVOI_UnitPrice").val())) || 0;
 
         // Row Amount = Qty × Unit Price
         let amount = qty * unitPrice;
 
         // Set row amount field
-        row.find(".JISVOI_Amount").val(amount.toFixed(2));
+        row.find(".JISVOI_Amount").val(addComma(amount, "c"));
 
         // Add to totals
         totalQty += qty;
@@ -1228,8 +1244,9 @@ function calculateTotal() {
     });
 
     // Footer totals
-    $("#TotalQty").val(totalQty);
-    $("#TotalAmount").val(totalAmount.toFixed(2));
+    // Footer totals
+    $("#TotalQty").val(addComma(totalQty, "q"));
+    $("#TotalAmount").val(addComma(totalAmount, "c"));
 }
 //#endregion Calculate Total
 
@@ -1428,7 +1445,7 @@ function BindItems(items) {
 
     if (!items || items.length === 0)
         return;
-
+    isBindingItems = true;
     $.each(items, function (index, item) {
 
         var row = `
@@ -1547,21 +1564,21 @@ function BindItems(items) {
            readonly />
 </td>
 
-    <td>
+   <td>
         <input name="Items[${index}].JISVOI_Qty"
-               value="${item.JISVOI_Qty ?? 0}"
+             value="${addComma(item.JISVOI_Qty ?? 0, 'q')}"
                class="form-control JISVOI_Qty text-center" />
     </td>
 
     <td>
         <input name="Items[${index}].JISVOI_UnitPrice"
-               value="${item.JISVOI_UnitPrice ?? 0}"
+              value="${addComma(item.JISVOI_UnitPrice ?? 0, 'c')}"
                class="form-control JISVOI_UnitPrice text-end" />
     </td>
 
     <td>
         <input name="Items[${index}].JISVOI_Amount"
-               value="${item.JISVOI_Amount ?? 0}"
+              value="${addComma(item.JISVOI_Amount ?? 0, 'c')}"
                class="form-control JISVOI_Amount text-end"
                readonly />
     </td>
@@ -1588,7 +1605,7 @@ function BindItems(items) {
         $row.find(".JISVOI_AmendQty").trigger("change");
         $row.find(".JISVOI_UnitPrice").trigger("change");
     });
-
+    isBindingItems = false;
     calculateTotal();
 }
 

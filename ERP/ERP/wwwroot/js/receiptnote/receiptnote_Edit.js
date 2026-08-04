@@ -601,85 +601,6 @@ function AutoFitHeader() {
     fitInputWidth("Remarks", 40, 40);
 }
 $(document).ready(function () {
-    $(document).on("mousedown", ".search-results tbody tr", function () {
-
-        let rows = $(".search-results tbody tr");
-
-        // Remove previous current row
-        rows.removeClass("current-row");
-
-        // Make clicked row the current row
-        $(this).addClass("current-row");
-    });
-    $(document).on("click", "#ExCloseButton", function (e) {
-        e.preventDefault();
-        CloseIBatchModal();
-    });
-
-    //#region item code right pane search
-    $(document).on("keydown mousedown", ".Item_Code", function (e) {
-
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage",
-            "#MS_Number"
-        );
-
-        if ($.trim($("#MS_Number").val()) === "") {
-            $("#MS_Number").prop("selectedIndex", 1);
-            let txt = $(this);
-            txt.val(txt.val() + "abc").trigger("input");
-
-
-                txt.val(txt.val().slice(0, -3)).trigger("input");
-
-            return;
-        }
-
-
-
-        // Show pane only if Item Code has text
-        if ($.trim($(this).val()) !== "") {
-            ShowItemPane();
-        }
-
-        return;
-
-
-    });
-    $(document).on("focusout", ".Item_Code", function () {
-
-        let input = $(this);
-        let rows = $("#RightPane_Item .search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#ItemMessage",
-            "#RightPane_Item",
-            "#RightPane_Item .search-results"
-        );
-    });
-    $(document).on("keydown", function (e) {
-        if (e.key === "Escape") {
-            let input = $(".Item_Code");
-            let rows = $("#RightPane_Item .search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#ItemMessage",
-                "#RightPane_Item",
-                "#RightPane_Item .search-results"
-            );
-        }
-    });
-    //#endregion
-
-
     //#region jwcname
     $(document).on("focusout", "#JWC_Name", function () {
         if (isMouseSelectingBuyer)
@@ -721,7 +642,80 @@ $(document).ready(function () {
         }
     });
     //#endregion
-  
+
+    //#region item code right pane search
+    $(document).on("keydown mousedown", ".Item_Code", function (e) {
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#MS_Number"
+        );
+
+        if ($.trim($("#MS_Number").val()) === "") {
+            $("#MS_Number").prop("selectedIndex", 1);
+            return;
+        }
+
+        if ($.trim($(this).val()) !== "") {
+
+
+            searchItemJIDNI(this);
+            ShowItemPane();
+
+
+        }
+    });
+    $(document).on("focusout", ".Item_Code", function () {
+
+        let input = $(this);
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#ItemMessage",
+            "#RightPane_Item",
+            "#RightPane_Item .search-results"
+        );
+    });
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape") {
+            let input = $(".Item_Code");
+            let rows = $("#RightPane_Item .search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#ItemMessage",
+                "#RightPane_Item",
+                "#RightPane_Item .search-results"
+            );
+        }
+    });
+    //#endregion
+    $(document).on("mousedown", ".search-results tbody tr", function () {
+
+        let rows = $(".search-results tbody tr");
+
+        // Remove previous current row
+        rows.removeClass("current-row");
+
+        // Make clicked row the current row
+        $(this).addClass("current-row");
+    });
+    $(document).on("click", "#ExCloseButton", function (e) {
+        e.preventDefault();
+        CloseIBatchModal();
+    });
+
+   
+
+
+   
     AutoFitHeader();
     //#region Header AutoFit - KeyUp
 
@@ -1457,7 +1451,7 @@ function IBatNewRow() {
 }
 
 function autoAddRow_F(currentRow) {
-
+   
     let qty = parseFloat(currentRow.find(".AmendQty").val()) || 0;
 
     let itemCode = currentRow.find(".Item_Code").val();

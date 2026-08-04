@@ -87,23 +87,37 @@ $(document).ready(function () {
         $(this).addClass("current-row");
     });
     //#region item code right pane search JISVOI_Item_Code
-    $(document).on("mousedown", ".JISVOI_Item_Code", function (e) {
+    $(document).on("keydown mousedown", ".JISVOI_Item_Code", function (e) {
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#Header_JISVOH_MS_Number"
+        );
 
         if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
+            $("#Header_JISVOH_MS_Number").prop("selectedIndex", 1);
+            // return;
+        }
 
-            e.preventDefault();
-            e.stopImmediatePropagation();
+        if ($.trim($(this).val()) !== "") {
 
-            $("#RightPane_Item").removeClass("show");
-            $("#RightPane_Item .search-results").hide();
 
-            setTimeout(function () {
-                $("#Header_JISVOH_MS_Number").focus().select();
-            }, 0);
+            SearchServiceOrderItem(this);
+            $("#RightPane").hide();
+            $("#RightPane").removeClass("show");
+            $("#RightPane .buyer-search-results").hide();
+            //------------------------------------------
+            $("#RightPane_Item").show();
+            $("#RightPane_Item").addClass("show");
+            $("#RightPane_Item .search-results").show();
 
-            return false;
         }
     });
+   
     $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
 
         HandleSearchKeyDown(
@@ -346,6 +360,14 @@ $(document).ready(function () {
         autoAddRow(row);
 
     });
+    //#region comma format on focusout
+    $(document).on("focusout", ".JISVOI_Qty, .JISVOI_UnitPrice, .JISVOI_Amount", function () {
+
+        let type = $(this).hasClass("JISVOI_Qty") ? "q" : "c";
+
+        $(this).val(addComma($(this).val(), type));
+    });
+    //#endregion
     //#endregion
     //#region add row item grid
     let rowIndex = 1; // start from 1 because 0 already exists
@@ -370,7 +392,7 @@ $(document).ready(function () {
             }
 
             if (el.hasClass("JISVOI_Qty")) {
-                if (!el.val() || parseFloat(el.val()) <= 0) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
                     isValid = false;
                     el.focus();
                     return false;
@@ -378,7 +400,7 @@ $(document).ready(function () {
             }
 
             if (el.hasClass("JISVOI_UnitPrice")) {
-                if (!el.val() || parseFloat(el.val()) <= 0) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
                     isValid = false;
                     el.focus();
                     return false;
@@ -612,8 +634,8 @@ function ValidateDuplicateItemCombination() {
 //#region auto add row function
 function autoAddRow(currentRow) {
 
-    let qty = parseFloat(currentRow.find(".JISVOI_Qty").val()) || 0;
-    let price = parseFloat(currentRow.find(".JISVOI_UnitPrice").val()) || 0;
+    let qty = parseFloat(removeComma(currentRow.find(".JISVOI_Qty").val())) || 0;
+    let price = parseFloat(removeComma(currentRow.find(".JISVOI_UnitPrice").val())) || 0;
 
     let itemCode = currentRow.find(".JISVOI_Item_Code").val();
     let prsNo = currentRow.find(".JISVOI_PRS_Number").val();
@@ -812,13 +834,13 @@ function CreateServiceOrderModel() {
                 parseInt(row.find(".JISVOI_UoM_Number").val()) || 0,
 
             JISVOI_Qty:
-                parseFloat(row.find(".JISVOI_Qty").val()) || 0,
+                parseFloat(removeComma(row.find(".JISVOI_Qty").val())) || 0,
 
             JISVOI_UnitPrice:
-                parseFloat(row.find(".JISVOI_UnitPrice").val()) || 0,
+                parseFloat(removeComma(row.find(".JISVOI_UnitPrice").val())) || 0,
 
             JISVOI_Amount:
-                parseFloat(row.find(".JISVOI_Amount").val()) || 0,
+                parseFloat(removeComma(row.find(".JISVOI_Amount").val())) || 0,
 
             JISVOI_DeliveryDate:
                 row.find(".JISVOI_DeliveryDate").val()
@@ -1329,16 +1351,16 @@ function calculateTotal() {
         }
 
         // Get Qty
-        let qty = parseFloat(row.find(".JISVOI_Qty").val()) || 0;
+        let qty = parseFloat(removeComma(row.find(".JISVOI_Qty").val())) || 0;
 
         // Get Unit Price
-        let unitPrice = parseFloat(row.find(".JISVOI_UnitPrice").val()) || 0;
+        let unitPrice = parseFloat(removeComma(row.find(".JISVOI_UnitPrice").val())) || 0;
 
         // Row Amount = Qty × Unit Price
         let amount = qty * unitPrice;
 
         // Set row amount field
-        row.find(".JISVOI_Amount").val(amount.toFixed(2));
+        row.find(".JISVOI_Amount").val(addComma(amount, "c"));
 
         // Add to totals
         totalQty += qty;
@@ -1346,8 +1368,8 @@ function calculateTotal() {
     });
 
     // Footer totals
-    $("#TotalQty").val(totalQty);
-    $("#TotalAmount").val(totalAmount.toFixed(2));
+    $("#TotalQty").val(addComma(totalQty, "q"));
+    $("#TotalAmount").val(addComma(totalAmount, "c"));
 }
 //#endregion Calculate Total
 

@@ -4,7 +4,17 @@
     ViewData["Title"] = "Conversion";
 }
 <!-----search logic highlight---->
+<style>
+    #RightPane_Item {
+        display: none;
+        position: absolute;
+        z-index: 1000;
+    }
 
+        #RightPane_Item.show {
+            display: block;
+        }
+</style>
 <style>
     .match-row td {
         color: blue !important;
@@ -1017,16 +1027,13 @@
                                                                                        type="hidden"
                                                                                        class="JIDNI_Item_Number" />
 
-                                                                                <input id="JIDNI_Item_Code" autocomplete="off"
-                                                                                       class="form-control JIDNI_Item_Code"
-                                                                                       oninput="OnInputItem(this)" onfocus="OnFocusItem(this)" />
+                                                                               <input id="JIDNI_Item_Code" autocomplete="off"
+                                                                               class="form-control JIDNI_Item_Code"
+                                                                                 oninput="OnInput(this)" onfocus="OnFocus(this)" />
 
-                                                                                <div class="search-results card"
-                                                                                     style="display:none">
-                                                                                </div>
-
+                                                                              
                                                                             </td>
-
+                                                                            `
                                                                             <!-- DESCRIPTION -->
                                                                             <td>
 
@@ -1151,11 +1158,9 @@
                                                                                 <input name="Items[0].JIDNI_Item_Code"
                                                                                 autocomplete="off"
                                                                                        class="form-control JIDNI_Item_Code"
-                                                                                       oninput="OnInputItem(this)" onfocus="OnFocusItem(this)" />
+                                                                       oninput="OnInput(this)" onfocus="OnFocus(this)" />
 
-                                                                                <div class="search-results card"
-                                                                                     style="display:none">
-                                                                                </div>
+                                                                               
 
                                                                             </td>
 
@@ -1578,11 +1583,9 @@
                                                                                 <input name="Items[0].JIDNI_Item_Code"
                                                                                        autocomplete="off"
                                                                                        class="form-control JIDNI_Item_Code"
-                                                                                       oninput="OnInputItem(this)" onfocus="OnFocusItem(this)" />
+                                                                                       oninput="OnInput(this)" onfocus="OnFocus(this)"/>
 
-                                                                                <div class="search-results card"
-                                                                                     style="display:none">
-                                                                                </div>
+                                                                              
 
                                                                             </td>
 
@@ -2001,11 +2004,9 @@
                                                                                 <input name="Items[0].JIDNI_Item_Code"
                                                                                        autocomplete="off"
                                                                                        class="form-control JIDNI_Item_Code"
-                                                                                       oninput="OnInputItem(this)" onfocus="OnFocusItem(this)" />
+                                                                                      oninput="OnInput(this)" onfocus="OnFocus(this)" />
 
-                                                                                <div class="search-results card"
-                                                                                     style="display:none">
-                                                                                </div>
+                                                                            
 
                                                                             </td>
 
@@ -2190,7 +2191,11 @@
         </div>
 
     </div>
-
+    <div id="RightPane_Item">
+    <div class="p-2">
+        <div class="search-results"></div>
+    </div>
+</div>
 </form>
 
 @section Scripts {
@@ -2202,6 +2207,8 @@
          var productionBatchRowCount = @(Model.ItemBatch_Production?.Count ?? 0);
     </script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+      <script src="~/js/code/ItemGrid.js" asp-append-version="true"></script>
+        <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
     <script src="~/js/conversion/conversion.js" asp-append-version="true"></script>
     <script src="~/js/conversion/conversion_batch.js" asp-append-version="true"></script>
         
@@ -2211,5 +2218,6 @@
          <script src="~/js/conversion/conversion_ItemScrap.js" asp-append-version="true"></script>
       <script src="~/js/conversion/conversion_ItemScrapBatch.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
+    
  
 }

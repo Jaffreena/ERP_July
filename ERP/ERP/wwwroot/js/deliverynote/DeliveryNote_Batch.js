@@ -278,34 +278,36 @@ $(document).on(
     ".JIDNI_BCH_QtyInvoice, .JIDNI_BCH_BatchUnitPrice",
     function () {
 
-        let row =
-            $(this).closest("tr");
+        let row = $(this).closest("tr");
 
-        let qty =
-            parseFloat(
-                row.find(".JIDNI_BCH_QtyInvoice").val()
-            ) || 0;
-
-        let price =
-            parseFloat(
-                row.find(".JIDNI_BCH_BatchUnitPrice").val()
-            ) || 0;
+        let qty = parseFloat(removeComma(row.find(".JIDNI_BCH_QtyInvoice").val())) || 0;
+        let price = parseFloat(removeComma(row.find(".JIDNI_BCH_BatchUnitPrice").val())) || 0;
 
         let value = qty * price;
 
-        row.find(".JIDNI_BCH_BatchValue")
-            .val(value.toFixed(2));
+        row.find(".JIDNI_BCH_BatchValue").val(addComma(value, "c"));
 
         CalculateBatchFooter();
-
     });
-
 //#endregion
 
+//#region comma format on focusout - Batch WH
+$(document).on("focusout",
+    ".JIDNI_BCH_QtyAvailable, .JIDNI_BCH_QtyReserved, .JIDNI_BCH_QtyInvoice, .JIDNI_BCH_BatchUnitPrice, .JIDNI_BCH_BatchValue",
+    function () {
 
+        let isQty =
+            $(this).hasClass("JIDNI_BCH_QtyAvailable") ||
+            $(this).hasClass("JIDNI_BCH_QtyReserved") ||
+            $(this).hasClass("JIDNI_BCH_QtyInvoice");
+
+        let type = isQty ? "q" : "c";
+
+        $(this).val(addComma($(this).val(), type));
+    });
+//#endregion
 
 //#region FOOTER TOTAL
-
 function CalculateBatchFooter() {
 
     let totalQty = 0;
@@ -316,39 +318,17 @@ function CalculateBatchFooter() {
     $("#DeliveryNoteBatchTableBody tr.DeliveryNoteBatchRow")
         .each(function () {
 
-            totalQty +=
-                parseFloat(
-                    $(this)
-                        .find(".JIDNI_BCH_QtyInvoice")
-                        .val()
-                ) || 0;
-            totalAvailableQty +=
-                parseFloat(
-                    $(this)
-                        .find(".JIDNI_BCH_QtyAvailable")
-                        .val()
-                ) || 0;
-
-            totalValue +=
-                parseFloat(
-                    $(this)
-                        .find(".JIDNI_BCH_BatchValue")
-                        .val()
-                ) || 0;
-            totalReservedQty += parseFloat($(this).find(".JIDNI_BCH_QtyReserved").val()) || 0;
-
+            totalQty += parseFloat(removeComma($(this).find(".JIDNI_BCH_QtyInvoice").val())) || 0;
+            totalAvailableQty += parseFloat(removeComma($(this).find(".JIDNI_BCH_QtyAvailable").val())) || 0;
+            totalValue += parseFloat(removeComma($(this).find(".JIDNI_BCH_BatchValue").val())) || 0;
+            totalReservedQty += parseFloat(removeComma($(this).find(".JIDNI_BCH_QtyReserved").val())) || 0;
         });
 
-    $("#TotalBatchQty")
-        .val(totalQty);
-
-    $("#TotalBatchValue")
-        .val(totalValue);
-    $("#TotalAvailableQty")
-        .val(totalAvailableQty);
-    $("#TotalReservedQty").val(totalReservedQty);
+    $("#TotalBatchQty").val(addComma(totalQty, "q"));
+    $("#TotalBatchValue").val(addComma(totalValue, "c"));
+    $("#TotalAvailableQty").val(addComma(totalAvailableQty, "q"));
+    $("#TotalReservedQty").val(addComma(totalReservedQty, "q"));
 }
-
 //#endregion
 
 
@@ -690,7 +670,7 @@ function ApplyBatchValues(rowId) {
 
         $(this)
             .find(".JIDNI_BCH_QtyInvoice")
-            .val(batchValues[index]);
+            .val(addComma(batchValues[index], "q"));
     });
     CalculateBatchFooter();
 }
@@ -755,14 +735,9 @@ function BindDeliveryNoteOtherBatchTable(response) {
         row.find(".JIDNI_BCH_BatchNo")
             .val(data.batchNo);
 
-        row.find(".JIDNI_BCH_AvailableQty")
-            .val(data.availableQty);
-
-        row.find(".JIDNI_BCH_BatchUnitPrice")
-            .val(data.batchUnitPrice);
-
-        row.find(".JIDNI_BCH_BatchValue")
-            .val(data.batchValue);
+        row.find(".JIDNI_BCH_AvailableQty").val(addComma(data.availableQty, "q"));
+        row.find(".JIDNI_BCH_BatchUnitPrice").val(addComma(data.batchUnitPrice, "c"));
+        row.find(".JIDNI_BCH_BatchValue").val(addComma(data.batchValue, "c"));
 
         tbody.append(row);
 
@@ -790,15 +765,12 @@ function CalculateOtherBatchFooter() {
 
     $("#DeliveryNoteOtherBatchTableBody .DeliveryNoteOtherBatchRow").each(function () {
 
-        totalQty += parseFloat($(this)
-            .find(".JIDNI_BCH_AvailableQty").val()) || 0;
-
-        totalValue += parseFloat($(this)
-            .find(".JIDNI_BCH_BatchValue").val()) || 0;
+        totalQty += parseFloat(removeComma($(this).find(".JIDNI_BCH_AvailableQty").val())) || 0;
+        totalValue += parseFloat(removeComma($(this).find(".JIDNI_BCH_BatchValue").val())) || 0;
     });
 
-    $("#TotalBatchQtyOther").val(totalQty.toFixed(2));
-    $("#TotalBatchValueOther").val(totalValue.toFixed(2));
+    $("#TotalBatchQtyOther").val(addComma(totalQty, "q"));
+    $("#TotalBatchValueOther").val(addComma(totalValue, "c"));
 
     if ($("#DeliveryNoteOtherBatchTableBody .DeliveryNoteOtherBatchRow").length > 0)
         $("#DeliveryNoteOtherBatchList tfoot").show();
@@ -887,20 +859,11 @@ function BindDeliveryNoteBatchTable() {
             row.find(".JIDNI_BCH_Number")
                 .val(data.JIDNI_BCH_Number);
 
-            row.find(".JIDNI_BCH_QtyAvailable")
-                .val(data.JIDNI_BCH_QtyAvailable);
-
-            row.find(".JIDNI_BCH_QtyReserved")
-                .val(data.JIDNI_BCH_QtyReserved);
-
-            row.find(".JIDNI_BCH_QtyInvoice")
-                .val(data.JIDNI_BCH_QtyInvoice);
-
-            row.find(".JIDNI_BCH_BatchUnitPrice")
-                .val(data.JIDNI_BCH_BatchUnitPrice);
-
-            row.find(".JIDNI_BCH_BatchValue")
-                .val(data.JIDNI_BCH_BatchValue);
+            row.find(".JIDNI_BCH_QtyAvailable").val(addComma(data.JIDNI_BCH_QtyAvailable, "q"));
+            row.find(".JIDNI_BCH_QtyReserved").val(addComma(data.JIDNI_BCH_QtyReserved, "q"));
+            row.find(".JIDNI_BCH_QtyInvoice").val(addComma(data.JIDNI_BCH_QtyInvoice, "q"));
+            row.find(".JIDNI_BCH_BatchUnitPrice").val(addComma(data.JIDNI_BCH_BatchUnitPrice, "c"));
+            row.find(".JIDNI_BCH_BatchValue").val(addComma(data.JIDNI_BCH_BatchValue, "c"));
 
             $("#DeliveryNoteBatchTableBody").append(row);
 
@@ -1095,16 +1058,14 @@ function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
 function ValidateBatchQty() {
 
     let InvoiceQty =
-        parseFloat(removeCommas($("#BatchPopupQty").text())) || 0;
+        parseFloat(removeComma($("#BatchPopupQty").text())) || 0;
 
     let BatchQty = $("#DeliveryNoteBatchTableBody tr")
         .not("#DeliveryNoteBatchTemplateRow")
         .map(function () {
 
             return parseFloat(
-                removeCommas(
-                    $(this).find(".JIDNI_BCH_QtyInvoice").val()
-                )
+                removeComma($(this).find(".JIDNI_BCH_QtyInvoice").val())
             ) || 0;
 
         }).get()
@@ -1150,9 +1111,7 @@ function StoreBatchMismatch(rowId) {
         .not("#DeliveryNoteBatchTemplateRow")
         .map(function () {
             return parseFloat(
-                removeCommas(
-                    $(this).find(".JIDNI_BCH_QtyInvoice").val()
-                )
+                removeComma($(this).find(".JIDNI_BCH_QtyInvoice").val())
             ) || 0;
         }).get();
 
@@ -1211,16 +1170,10 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
 
     var row = $(this).closest("tr");
 
-    var QtyAvailable =
-        parseFloat(removeCommas(row.find(".JIDNI_BCH_QtyAvailable").val())) || 0;
-
-    var QtyReserved =
-        parseFloat(removeCommas(row.find(".JIDNI_BCH_QtyReserved").val())) || 0;
-
+    var QtyAvailable = parseFloat(removeComma(row.find(".JIDNI_BCH_QtyAvailable").val())) || 0;
+    var QtyReserved = parseFloat(removeComma(row.find(".JIDNI_BCH_QtyReserved").val())) || 0;
     var QtyInvoiceInput = row.find(".JIDNI_BCH_QtyInvoice");
-
-    var QtyInvoice =
-        parseFloat(removeCommas(QtyInvoiceInput.val())) || 0;
+    var QtyInvoice = parseFloat(removeComma(QtyInvoiceInput.val())) || 0;
 
     var BalanceQty = QtyAvailable - QtyReserved;
 
@@ -1232,7 +1185,7 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
             "It will be reset to maximum allowed: " + BalanceQty
         );
 
-        QtyInvoiceInput.val(BalanceQty);
+        QtyInvoiceInput.val(addComma(BalanceQty, "q"));
         QtyInvoice = BalanceQty;
 
         QtyInvoiceInput.focus().select();
@@ -1255,55 +1208,29 @@ function SaveTempBatch() {
         if (currentRow.length == 0)
             return;
 
-        let Qty =
-            parseFloat(currentRow.find(".JIDNI_BCH_QtyInvoice").val()) || 0;
+        let Qty = parseFloat(removeComma(currentRow.find(".JIDNI_BCH_QtyInvoice").val())) || 0;
 
         if (Qty <= 0)
             return;
 
         let rowID = CurrentBatchItemRow.attr("data-rowid");
-
-        let ItemGridindex =
-            $("#TableBody tr[data-rowid='" + rowID + "']").index();
+        let ItemGridindex = $("#TableBody tr[data-rowid='" + rowID + "']").index();
 
         let model = {
             DBCH_RowGuid: rowID,
-            DBCH_Number:
-                parseInt(currentRow.find(".JIDNI_BCH_Number").val()) || 0,
-
-            DBCH_Index:
-                parseInt(ItemGridindex) || 0,
-
-            DBCH_DBCH_Number:
-                parseInt(currentRow.find(".JIDNI_BCH_Number").val()) || 0,
-
-            DBCH_Item_Number:
-                parseInt(currentRow.find(".JIDNI_BCH_JIDNI_Number").val()) || 0,
-
-            DBCH_Warehouse_Number:
-                parseInt(currentRow.find(".JIDNI_BCH_WH_Number").val()) || 0,
-
-            DBCH_Date:
-                new Date(currentRow.find(".JIDNI_BCH_BatchDate").val()).toISOString(),
-
-            DBCH_No:
-                currentRow.find(".JIDNI_BCH_BatchNo").val(),
-
+            DBCH_Number: parseInt(currentRow.find(".JIDNI_BCH_Number").val()) || 0,
+            DBCH_Index: parseInt(ItemGridindex) || 0,
+            DBCH_DBCH_Number: parseInt(currentRow.find(".JIDNI_BCH_Number").val()) || 0,
+            DBCH_Item_Number: parseInt(currentRow.find(".JIDNI_BCH_JIDNI_Number").val()) || 0,
+            DBCH_Warehouse_Number: parseInt(currentRow.find(".JIDNI_BCH_WH_Number").val()) || 0,
+            DBCH_Date: new Date(currentRow.find(".JIDNI_BCH_BatchDate").val()).toISOString(),
+            DBCH_No: currentRow.find(".JIDNI_BCH_BatchNo").val(),
             DBCH_Qty: Qty,
-
-            DBCH_UnitPrice:
-                parseFloat(currentRow.find(".JIDNI_BCH_BatchUnitPrice").val()) || 0,
-
-            DBCH_Value:
-                parseFloat(currentRow.find(".JIDNI_BCH_BatchValue").val()) || 0,
-            JIDNI_NUMBER:
-                parseInt(currentRow.find(".JIDNI_Number").val()) || 0,
-
-            JIDNH_NUMBER:
-                parseInt(currentRow.find(".JIDNH_Number").val()) || 0,
-
-            RefBatch_Number:
-                parseInt(currentRow.find(".RefBatch_Number").val()) || 0,
+            DBCH_UnitPrice: parseFloat(removeComma(currentRow.find(".JIDNI_BCH_BatchUnitPrice").val())) || 0,
+            DBCH_Value: parseFloat(removeComma(currentRow.find(".JIDNI_BCH_BatchValue").val())) || 0,
+            JIDNI_NUMBER: parseInt(currentRow.find(".JIDNI_Number").val()) || 0,
+            JIDNH_NUMBER: parseInt(currentRow.find(".JIDNH_Number").val()) || 0,
+            RefBatch_Number: parseInt(currentRow.find(".RefBatch_Number").val()) || 0,
             Mode: 1,
             CreatorCode: 1,
             CreatorDate: new Date().toISOString()

@@ -375,10 +375,7 @@ function getTextWidth(text, element) {
 
 
 //#region COMMON FUNCTIONS
-function removeCommas(value) {
-    return (value || '').toString().replace(/,/g, '');
-}
-
+ 
 function DecimalIndianRupees(value) {
     if (value === "" || isNaN(value)) {
         return "0.00";
@@ -455,6 +452,111 @@ function AutoFit() {
     fitInputWidth("Header_JIDNH_Remarks", 40, 40);
 }
 $(document).ready(function () {
+    //#region item code right pane search JIDNI_Item_Code
+
+    $(document).on("keydown mousedown", ".JIDNI_Item_Code", function (e) {
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#Header_JIDNH_MS_Number"
+        );
+
+        if ($.trim($("#Header_JIDNH_MS_Number").val()) === "") {
+            $("#Header_JIDNH_MS_Number").prop("selectedIndex", 1);
+            // return;
+        }
+
+        if ($.trim($(this).val()) !== "") {
+
+
+            SearchEditItemJIDNI(this);
+            $("#RightPane").hide();
+            $("#RightPane").removeClass("show");
+            $("#RightPane .buyer-search-results").hide();
+            //------------------------------------------
+            $("#RightPane_Item").show();
+            $("#RightPane_Item").addClass("show");
+            $("#RightPane_Item .search-results").show();
+
+        }
+    });
+    $(document).on("focusout", ".JIDNI_Item_Code", function () {
+
+        let input = $(this);
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#ItemMessage",
+            "#RightPane_Item",
+            "#RightPane_Item .search-results"
+        );
+    });
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape") {
+            let input = $(".JIDNI_Item_Code");
+            let rows = $("#RightPane_Item .search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#ItemMessage",
+                "#RightPane_Item",
+                "#RightPane_Item .search-results"
+            );
+        }
+    });
+    //#endregion
+    //#region Header_JIDNH_JW_Customer_Name
+    $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
+        if (isMouseSelectingBuyer)
+            return;
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#BuyerMessage",
+            "#RightPane",
+            "#RightPane .buyer-search-results"
+        );
+    });
+
+
+
+    $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
+
+        if (e.key === "Escape" || e.key === "Enter") {
+
+
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+        } else {
+            HandleSearchKeyDown(
+                e,
+                this,
+                "#RightPane",
+                ".buyer-search-results",
+                "#BuyerMessage"
+            );
+        }
+    }); 
+    //#endregion
     $(document).on("mousedown", ".search-results tbody tr", function () {
 
         let rows = $(".search-results tbody tr");
@@ -489,68 +591,7 @@ $(document).ready(function () {
         });
     //#endregion
    
-    //#region item code right pane search JIDNI_Item_Code
- 
-    $(document).on("keydown mousedown", ".JIDNI_Item_Code", function (e) {
-
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage",
-            "#Header_JIDNH_MS_Number"
-        );
-        $(document).trigger("click");
-        if ($.trim($("#Header_JIDNH_MS_Number").val()) === "") {
-            $("#Header_JIDNH_MS_Number").prop("selectedIndex", 1);
-            //let txt = $(this);
-            //txt.val(txt.val() + "a").trigger("input");
-             
-
-            //    txt.val(txt.val().slice(0, -1)).trigger("input");
-
-            return;
-        }
-
-
-
-       
-
-        setTimeout(function () {
-         
-        }, 500);
-
-
-    });
-    $(document).on("focusout", ".JIDNI_Item_Code", function () {
-
-        let input = $(this);
-        let rows = $("#RightPane_Item .search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#ItemMessage",
-            "#RightPane_Item",
-            "#RightPane_Item .search-results"
-        );
-    });
-    $(document).on("keydown", function (e) {
-        if (e.key === "Escape") {
-            let input = $(".JIDNI_Item_Code");
-            let rows = $("#RightPane_Item .search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#ItemMessage",
-                "#RightPane_Item",
-                "#RightPane_Item .search-results"
-            );
-        }
-    });
-    //#endregion
+  
     //#region batch grid alignment
     $(document).on("input change blur", "#DeliveryNoteBatchList input, #DeliveryNoteBatchList textarea, #DeliveryNoteBatchList select", function () {
         ApplyBatchFieldWidths("#DeliveryNoteBatchList");
@@ -604,49 +645,7 @@ $(document).ready(function () {
 
     //#endregion
 
-    $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
-        if (isMouseSelectingBuyer)
-            return;
-        let input = $(this);
-        let rows = $("#RightPane .buyer-search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#BuyerMessage",
-            "#RightPane",
-            "#RightPane .buyer-search-results"
-        );
-    });
-
-
-
-    $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
-
-        if (e.key === "Escape" || e.key === "Enter") {
-
-
-
-            let input = $(this);
-            let rows = $("#RightPane .buyer-search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#BuyerMessage",
-                "#RightPane",
-                "#RightPane .buyer-search-results"
-            );
-        } else {
-            HandleSearchKeyDown(
-                e,
-                this,
-                "#RightPane",
-                ".buyer-search-results",
-                "#BuyerMessage"
-            );
-        }
-    }); 
+   
     //#region JIDNI_JW_InvoiceTracking change
 
     $(document).on(
@@ -702,7 +701,7 @@ $(document).ready(function () {
         let prsNumber = row.find(".JIDNI_PRS_Number").val();
         let itemNumber = row.find(".JIDNI_Item_Number").val();
         let uomNumber = row.find(".JIDNI_UoM_Number").val();
-        let originalQty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+        let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
         let rowIndex = row.index();
         $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
             jisvohNumber,
@@ -763,20 +762,14 @@ $(document).ready(function () {
 
     //#region Unit Price Format
 
-    $(document).on("focusout", ".JIDNI_UnitPrice", function () {
+    //#region comma format on focusout
+    $(document).on("focusout", ".JIDNI_Qty, .JIDNI_UnitPrice, .JIDNI_Amount", function () {
 
-        // Get current input value
-        var value = $(this).val().trim();
+        let type = $(this).hasClass("JIDNI_Qty") ? "q" : "c";
 
-        // If empty or invalid, set default value
-        if (value === "" || isNaN(value)) {
-            $(this).val("0.00");
-            return;
-        }
-
-        // Convert to 2 decimal format
-        $(this).val(parseFloat(value).toFixed(2));
+        $(this).val(addComma($(this).val(), type));
     });
+    //#endregion
 
     //#endregion
 
@@ -856,8 +849,8 @@ $(document).ready(function () {
     //#region auto add row function
     function autoAddRow(currentRow) {
 
-        let qty = parseFloat(currentRow.find(".JIDNI_Qty").val()) || 0;
-        let price = parseFloat(currentRow.find(".JIDNI_UnitPrice").val()) || 0;
+        let qty = parseFloat(removeComma(currentRow.find(".JIDNI_Qty").val())) || 0;
+        let price = parseFloat(removeComma(currentRow.find(".JIDNI_UnitPrice").val())) || 0;
 
         let itemCode = currentRow.find(".JIDNI_Item_Code").val();
         let prsNo = currentRow.find(".JIDNI_PRS_Number").val();
@@ -921,7 +914,7 @@ $(document).ready(function () {
                 // QTY
                 if (el.hasClass("JIDNI_Qty")) {
 
-                    if (!el.val() || parseFloat(el.val()) <= 0) {
+                    if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
 
                         isValid = false;
 
@@ -934,7 +927,7 @@ $(document).ready(function () {
                 // UNIT PRICE
                 if (el.hasClass("JIDNI_UnitPrice")) {
 
-                    if (!el.val() || parseFloat(el.val()) <= 0) {
+                    if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
 
                         isValid = false;
 
@@ -1183,17 +1176,18 @@ function calculateTotal() {
             return;
         }
 
+        
         // Get Qty
-        let qty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+        let qty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
 
         // Get Unit Price
-        let unitPrice = parseFloat(row.find(".JIDNI_UnitPrice").val()) || 0;
+        let unitPrice = parseFloat(removeComma(row.find(".JIDNI_UnitPrice").val())) || 0;
 
         // Row Amount = Qty × Unit Price
         let amount = qty * unitPrice;
 
         // Set row amount field
-        row.find(".JIDNI_Amount").val(amount.toFixed(2));
+        row.find(".JIDNI_Amount").val(addComma(amount, "c"));
 
         // Add to totals
         totalQty += qty;
@@ -1201,8 +1195,8 @@ function calculateTotal() {
     });
 
     // Footer totals
-    $("#TotalQty").val(formatIndianQty(totalQty));
-    $("#TotalAmount").val(formatIndianCurrency(totalAmount));
+    $("#TotalQty").val(addComma(totalQty, "q"));
+    $("#TotalAmount").val(addComma(totalAmount, "c"));
 }
 //#endregion Calculate Total
 
@@ -1938,20 +1932,11 @@ function BindDeliveryNoteBatchTable() {
             row.find(".JIDNI_BCH_Number")
                 .val(data.JIDNI_BCH_Number);
 
-            row.find(".JIDNI_BCH_QtyAvailable")
-                .val(data.JIDNI_BCH_QtyAvailable);
-
-            row.find(".JIDNI_BCH_QtyReserved")
-                .val(data.JIDNI_BCH_QtyReserved);
-
-            row.find(".JIDNI_BCH_QtyInvoice")
-                .val(data.JIDNI_BCH_QtyInvoice);
-
-            row.find(".JIDNI_BCH_BatchUnitPrice")
-                .val(parseFloat(data.JIDNI_BCH_BatchUnitPrice || 0).toFixed(2));
-
-            row.find(".JIDNI_BCH_BatchValue")
-                .val(data.JIDNI_BCH_BatchValue);
+            row.find(".JIDNI_BCH_QtyAvailable").val(addComma(data.JIDNI_BCH_QtyAvailable, "q"));
+            row.find(".JIDNI_BCH_QtyReserved").val(addComma(data.JIDNI_BCH_QtyReserved, "q"));
+            row.find(".JIDNI_BCH_QtyInvoice").val(addComma(data.JIDNI_BCH_QtyInvoice, "q"));
+            row.find(".JIDNI_BCH_BatchUnitPrice").val(addComma(data.JIDNI_BCH_BatchUnitPrice, "c"));
+            row.find(".JIDNI_BCH_BatchValue").val(addComma(data.JIDNI_BCH_BatchValue, "c"));
                 
             row.find(".JIDNI_Number")
                 .val(data.JIDNI_Number);
@@ -1971,48 +1956,23 @@ function BindDeliveryNoteBatchTable() {
 }
 
 //#region FOOTER TOTAL
-
 function CalculateBatchFooter() {
 
     let totalQty = 0;
-
     let totalValue = 0;
     let totalAvailableQty = 0;
 
     $("#DeliveryNoteBatchTableBody tr.DeliveryNoteBatchRow")
         .each(function () {
 
-            totalQty +=
-                parseFloat(
-                    $(this)
-                        .find(".JIDNI_BCH_QtyInvoice")
-                        .val()
-                ) || 0;
-            totalAvailableQty +=
-                parseFloat(
-                    $(this)
-                        .find(".JIDNI_BCH_QtyAvailable")
-                        .val()
-                ) || 0;
-
-            totalValue +=
-                parseFloat(
-                    $(this)
-                        .find(".JIDNI_BCH_BatchValue")
-                        .val()
-                ) || 0;
-
+            totalQty += parseFloat(removeComma($(this).find(".JIDNI_BCH_QtyInvoice").val())) || 0;
+            totalAvailableQty += parseFloat(removeComma($(this).find(".JIDNI_BCH_QtyAvailable").val())) || 0;
+            totalValue += parseFloat(removeComma($(this).find(".JIDNI_BCH_BatchValue").val())) || 0;
         });
-
-    $("#TotalBatchQty")
-        .val(totalQty.toFixed(2));
-
-    $("#TotalBatchValue")
-        .val(totalValue.toFixed(2));
-    $("#TotalAvailableQty")
-        .val(totalAvailableQty.toFixed(2));
+    $("#TotalBatchQty").val(addComma(totalQty, "q"));
+    $("#TotalBatchValue").val(addComma(totalValue, "c"));
+    $("#TotalAvailableQty").val(addComma(totalAvailableQty, "q"));
 }
-
 //#endregion
 
 function BindDeliveryNoteOtherBatchTable(response) {
@@ -2106,15 +2066,15 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
     var row = $(this).closest("tr");
 
     var QtyAvailable =
-        parseFloat(removeCommas(row.find(".JIDNI_BCH_QtyAvailable").val())) || 0;
+        parseFloat(removeComma(row.find(".JIDNI_BCH_QtyAvailable").val())) || 0;
 
     var QtyReserved =
-        parseFloat(removeCommas(row.find(".JIDNI_BCH_QtyReserved").val())) || 0;
+        parseFloat(removeComma(row.find(".JIDNI_BCH_QtyReserved").val())) || 0;
 
     var QtyInvoiceInput = row.find(".JIDNI_BCH_QtyInvoice");
 
     var QtyInvoice =
-        parseFloat(removeCommas(QtyInvoiceInput.val())) || 0;
+        parseFloat(removeComma(QtyInvoiceInput.val())) || 0;
 
     var BalanceQty = QtyAvailable - QtyReserved;
 
@@ -2126,7 +2086,7 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
             "It will be reset to maximum allowed: " + BalanceQty
         );
 
-        QtyInvoiceInput.val(DecimalIndianRupees(BalanceQty));
+        QtyInvoiceInput.val(addComma(BalanceQty, "q"));
         QtyInvoice = BalanceQty;
 
         QtyInvoiceInput.focus().select();
@@ -2191,14 +2151,14 @@ function ValidateExistingBatchRows_Edit() {
 function ValidateBatchQty_Edit() {
 
     let InvoiceQty =
-        parseFloat(removeCommas($("#BatchPopupQty").text())) || 0;
+        parseFloat(removeComma($("#BatchPopupQty").text())) || 0;
 
     let BatchQty = $("#DeliveryNoteBatchTableBody tr")
         .not("#DeliveryNoteBatchTemplateRow")
         .map(function () {
 
             return parseFloat(
-                removeCommas(
+                removeComma(
                     $(this).find(".JIDNI_BCH_QtyInvoice").val()
                 )
             ) || 0;
@@ -2275,9 +2235,8 @@ function SaveTempBatch_Edit() {
 
         if (currentRow.length == 0)
             return;
+        let Qty = parseFloat(removeComma(currentRow.find(".JIDNI_BCH_QtyInvoice").val())) || 0;
 
-        let Qty =
-            parseFloat(currentRow.find(".JIDNI_BCH_QtyInvoice").val()) || 0;
 
         if (Qty <= 0)
             return;
@@ -2339,11 +2298,9 @@ function SaveTempBatch_Edit() {
 
             DBCH_Qty: Qty,
 
-            DBCH_UnitPrice:
-                parseFloat(currentRow.find(".JIDNI_BCH_BatchUnitPrice").val()) || 0,
+            DBCH_UnitPrice: parseFloat(removeComma(currentRow.find(".JIDNI_BCH_BatchUnitPrice").val())) || 0,
+            DBCH_Value: parseFloat(removeComma(currentRow.find(".JIDNI_BCH_BatchValue").val())) || 0,
 
-            DBCH_Value:
-                parseFloat(currentRow.find(".JIDNI_BCH_BatchValue").val()) || 0,
             JIDNI_NUMBER:
                 parseInt(currentRow.find(".JIDNI_Number").val()) || 0,
 
@@ -2832,9 +2789,7 @@ function validateDeliveryNoteBatchList_Edit() {
 
         let row = $(this);
 
-        let qty =
-            row.find(".JIDNI_BCH_QtyInvoice").val();
-
+        let qty = removeComma(row.find(".JIDNI_BCH_QtyInvoice").val());
         qty = parseFloat(qty) || 0;
 
         if (qty > 0) {
@@ -3532,7 +3487,7 @@ function validate_Amended_BatchQtyDB() {
                 let row = $(this);
 
                 let gridQty = parseFloat(
-                    row.find(".JIDNI_Qty").val()
+                    removeComma(row.find(".JIDNI_Qty").val())
                 ) || 0;
 
                 let dbchIndex = index + 1;
@@ -3695,5 +3650,19 @@ function ResizeAddressPopup(tableSelector = "#AddressTable", modalSelector = "#B
 //#endregion
 
  
+//#region comma format on focusout - Batch WH row fields (Edit)
+$(document).on("focusout",
+    ".JIDNI_BCH_QtyAvailable, .JIDNI_BCH_QtyReserved, .JIDNI_BCH_QtyInvoice, .JIDNI_BCH_BatchUnitPrice, .JIDNI_BCH_BatchValue",
+    function () {
 
+        let isQty =
+            $(this).hasClass("JIDNI_BCH_QtyAvailable") ||
+            $(this).hasClass("JIDNI_BCH_QtyReserved") ||
+            $(this).hasClass("JIDNI_BCH_QtyInvoice");
+
+        let type = isQty ? "q" : "c";
+
+        $(this).val(addComma($(this).val(), type));
+    });
+//#endregion
 

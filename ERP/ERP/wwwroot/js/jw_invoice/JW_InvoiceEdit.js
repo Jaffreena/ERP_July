@@ -27,12 +27,12 @@ const ItemTableFields = [
     { cls: ".JISVII_ItemGroup", min: 10, max: 30, align: "left" },    // Item Group
     { cls: ".JISVII_UoM", min: 10, max: 15, align: "center" },  // UoM
 
-    { cls: ".DeliveredQty", min: 10, max: 20, align: "center" },  // Delivery Note Qty
-    { cls: ".PreviouslyInvoicedQty", min: 10, max: 20, align: "center" },  // Already Invoiced Qty
+    { cls: ".JISVII_DeliveredQty", min: 10, max: 20, align: "center" },  // Delivery Note Qty
+    { cls: ".JISVII_PrevInvoiceQty", min: 10, max: 20, align: "center" },  // Already Invoiced Qty
     { cls: ".JISVII_Qty", min: 10, max: 20, align: "center" },  // Invoice Qty
     { cls: ".JISVII_AmendQty", min: 10, max: 20, align: "center" },  // Extra field
 
-    { cls: ".JISVII_UnitPrice", min: 10, max: 20, align: "right" },   // Unit Price
+    { cls: ".JISVII_UnitPrice", min: 10, max: 20, align: "right", extraPadding: 20 },   // Unit Price
     { cls: ".JISVII_Amount", min: 13, max: 25, align: "right" },   // Amount
 
     { cls: ".JISVII_SAC_Number", min: 8, max: 8, align: "left" },    // SAC
@@ -150,7 +150,30 @@ function AutoFit() {
     fitInputWidth("Header_JISVIH_PaymentMethod", 30, 40);
     fitInputWidth("Header_JISVIH_Remarks", 40, 40);
 }
+function ResizeColumn(control) {
+
+    const field = ItemTableFields.find(f => $(control).is(f.cls));
+
+    if (!field)
+        return;
+
+    ApplyFieldWidths({
+        fields: [field],          // Only this column
+        container: "#ItemTable",
+        tempRow: "#TempRow",
+        tableBody: "#TableBody"
+    });
+}
 $(document).ready(function () {
+    //#region item grid alignment
+    $(document).on("input", "#ItemTable input", function () {
+        ResizeColumn(this);
+    });
+
+    $(document).on("change", "#ItemTable select", function () {
+        ResizeColumn(this);
+    });
+    //#endregion
     //#region address width
     // Textboxes
     $(document).on("input", "#AddressTable input", function () {
@@ -181,6 +204,15 @@ $(document).ready(function () {
     $(document).on("change", "#ItemTable select", function () {
         ResizeColumn(this);
     });
+    //#region comma format on focusout
+    $(document).on("focusout",
+        ".JISVII_DeliveredQty, .JISVII_PrevInvoiceQty, .JISVII_AmendQty, .JISVII_UnitPrice, .JISVII_Amount, .JISVII_GST_Amount",
+        function () {
+            let isQty = $(this).is(".JISVII_DeliveredQty, .JISVII_PrevInvoiceQty, .JISVII_AmendQty");
+            let type = isQty ? "q" : "c";
+            $(this).val(addComma($(this).val(), type));
+        });
+    //#endregion
     AutoFit();
     $(document).on("focusout", "#Header_JISVIH_JW_Customer_Name", function () {
         if (isMouseSelectingBuyer)
@@ -626,18 +658,14 @@ $(document).ready(function () {
 
         var row = $(this).closest("tr");
 
-        var qty = parseFloat(
-            (row.find(".JISVII_AmendQty").val() || "0").replace(/,/g, "")
-        ) || 0;
+        var qty = parseFloat(removeCommas(row.find(".JISVII_AmendQty").val())) || 0;
 
-        var unitPrice = parseFloat(
-            (row.find(".JISVII_UnitPrice").val() || "0").replace(/,/g, "")
-        ) || 0;
+        var unitPrice = parseFloat(removeCommas(row.find(".JISVII_UnitPrice").val())) || 0;
 
         var amount = qty * unitPrice;
 
         row.find(".JISVII_Amount")
-            .val(formatIndianCurrency(amount));
+            .val(addComma(amount, "c"));
 
         CalculateTotals();
     });
@@ -651,15 +679,15 @@ $(document).ready(function () {
         var row = $(this).closest("tr");
 
         var deliveredQty = parseFloat(
-            row.find(".JISVII_DeliveredQty").text()
+            removeCommas(row.find(".JISVII_DeliveredQty").text())
         ) || 0;
 
         var prevInvoiceQty = parseFloat(
-            row.find(".JISVII_PrevInvoiceQty").val()
+            removeCommas(row.find(".JISVII_PrevInvoiceQty").val())
         ) || 0;
 
         var currentQty = parseFloat(
-            row.find(".JISVII_AmendQty").val()
+            removeCommas(row.find(".JISVII_AmendQty").val())
         ) || 0;
 
         var balanceQty = deliveredQty - prevInvoiceQty;
@@ -706,13 +734,13 @@ $(document).ready(function () {
                 }
 
                 var unitPrice = parseFloat(
-                    row.find(".JISVII_UnitPrice").val()
+                    removeCommas(row.find(".JISVII_UnitPrice").val())
                 ) || 0;
 
                 var amount = currentQty * unitPrice;
 
                 row.find(".JISVII_Amount")
-                    .val(amount.toFixed(2));
+                    .val(addComma(amount, "c"));
 
                 CalculateTotals();
             });
@@ -722,13 +750,13 @@ $(document).ready(function () {
         else {
 
             var unitPrice = parseFloat(
-                row.find(".JISVII_UnitPrice").val()
+                removeCommas(row.find(".JISVII_UnitPrice").val())
             ) || 0;
 
             var amount = currentQty * unitPrice;
 
             row.find(".JISVII_Amount")
-                .val(amount.toFixed(2));
+                .val(addComma(amount, "c"));
 
             CalculateTotals();
         }
@@ -740,9 +768,9 @@ $(document).ready(function () {
 
         const $row = $(this).closest("tr");
 
-        const qty = parseFloat($row.find(".JISVII_AmendQty").val()) || 0;
+        const qty = parseFloat(removeCommas($row.find(".JISVII_AmendQty").val())) || 0;
 
-        const unitPrice = parseFloat($row.find(".JISVII_UnitPrice").val()) || 0;
+        const unitPrice = parseFloat(removeCommas($row.find(".JISVII_UnitPrice").val())) || 0;
 
         const baseAmount = qty * unitPrice;
 
@@ -784,9 +812,11 @@ $(document).ready(function () {
 
         const $row = $(this).closest("tr");
 
-        const qty = parseFloat($row.find(".JISVII_Qty").val()) || 0;
+ 
 
-        const unitPrice = parseFloat($row.find(".JISVII_UnitPrice").val()) || 0;
+        const qty = parseFloat(removeCommas($row.find(".JISVII_Qty").val())) || 0;
+
+        const unitPrice = parseFloat(removeCommas($row.find(".JISVII_UnitPrice").val())) || 0;
 
         const baseAmount = qty * unitPrice;
 
@@ -807,8 +837,7 @@ $(document).ready(function () {
                 baseAmount
             );
         }
-
-        gstAmount = parseFloat(gstAmount || 0).toFixed(2);
+        gstAmount = addComma(parseFloat(gstAmount || 0), "c");   
 
         $row.find(".JISVII_GST_Amount").val(gstAmount);
 
@@ -881,26 +910,26 @@ function CalculateTotals() {
     $("#TableBody tr.NewRow:visible").each(function () {
 
         totalDeliveredQty += parseFloat(
-            $(this).find(".JISVII_DeliveredQty").text()
+            removeCommas($(this).find(".JISVII_DeliveredQty").text())
         ) || 0;
 
         totalPrevInvoiceQty += parseFloat(
-            $(this).find(".JISVII_PrevInvoiceQty").val()
+            removeCommas($(this).find(".JISVII_PrevInvoiceQty").val())
         ) || 0;
 
         totalQty += parseFloat(
-            $(this).find(".JISVII_AmendQty").val()
+            removeCommas($(this).find(".JISVII_AmendQty").val())
         ) || 0;
 
         totalAmount += parseFloat(
-            $(this).find(".JISVII_Amount").val()
+            removeCommas($(this).find(".JISVII_Amount").val())
         ) || 0;
 
         totalGSTAmount += parseFloat(
-            $(this).find(".JISVII_GST_Amount").val()
+            removeCommas($(this).find(".JISVII_GST_Amount").val())
         ) || 0;
         totalAmendedQty += parseFloat(
-            $(this).find(".JISVII_AmendQty").val()
+            removeCommas($(this).find(".JISVII_AmendQty").val())
         ) || 0;
 
     });
@@ -913,12 +942,12 @@ function CalculateTotals() {
         });
 
     }, 200);
-    $("#TotalDeliveredQty").val(totalDeliveredQty);
-    $("#TotalPrevInvoiceQty").val(totalPrevInvoiceQty);
-    $("#TotalQty").val(totalQty);
-    $("#TotalAmount").val(totalAmount.toFixed(2));
-    $("#TotalGSTAmount").val(totalGSTAmount.toFixed(2));
-    $("#TotalAmendedQty").val(totalAmendedQty.toFixed(2));
+    $("#TotalDeliveredQty").val(addComma(totalDeliveredQty, "q"));
+    $("#TotalPrevInvoiceQty").val(addComma(totalPrevInvoiceQty, "q"));
+    $("#TotalQty").val(addComma(totalQty, "q"));
+    $("#TotalAmount").val(addComma(totalAmount, "c"));
+    $("#TotalGSTAmount").val(addComma(totalGSTAmount, "c"));
+    $("#TotalAmendedQty").val(addComma(totalAmendedQty, "q"));
     
 
 }
@@ -1704,29 +1733,29 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
                readonly />
     </td>
 
-    <td class="text-end">
+    <td class="text-center">
         <input name="Items[${rowCount}].JISVII_Qty"
                type="hidden"
                value="${item.jidnI_Qty ?? 0}" />
-        <label class="form-control text-end JISVII_DeliveredQty">
+        <label class="form-control text-center JISVII_DeliveredQty">
             ${item.jidnI_Qty ?? 0}
         </label>
     </td>
 
-    <td class="text-end">
+    <td class="text-center">
         <input name="Items[${rowCount}].JISVII_Qty"
                type="hidden"
                value="${item.InvoicedQty ?? 0}" />
         <input name="Items[${rowCount}].JISVII_PrevInvoiceQty"
                value="${item.invoicedQty ?? 0}"
-               class="form-control JISVII_PrevInvoiceQty text-end"
+               class="form-control JISVII_PrevInvoiceQty text-center"
                readonly />
     </td>
 
   <td>
     <input name="Items[${rowCount}].JISVII_Qty"
            value="${jisviiNumber === 0 ? 0 : (item.jidnI_Qty ?? 0)}"
-           class="form-control JISVII_Qty text-end"
+           class="form-control JISVII_Qty text-center"
            readonly />
 </td>
 
@@ -1735,7 +1764,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 <td>
     <input name="Items[${rowCount}].JISVII_Qty"
            value="${amendQty}"
-           class="form-control JISVII_AmendQty text-end" />
+           class="form-control JISVII_AmendQty text-center" />
 </td>
    <td>
     ${unitPriceCell}
@@ -1794,11 +1823,11 @@ function ValidateUnitPriceAndAmount() {
             return true;
 
         var unitPrice = parseFloat(
-            row.find(".JISVII_UnitPrice").val()
+            removeCommas(row.find(".JISVII_UnitPrice").val())
         ) || 0;
 
         var amount = parseFloat(
-            row.find(".JISVII_Amount").val()
+            removeCommas(row.find(".JISVII_Amount").val())
         ) || 0;
 
         row.removeClass("error-row");
@@ -2048,19 +2077,19 @@ function CreateJobworkInvoiceItemModel() {
                 row.find(".JISVII_UoM_Number").val(),
 
             JISVII_Qty:
-                parseFloat(row.find(".JISVII_AmendQty").val()) || 0,
+                parseFloat(removeCommas(row.find(".JISVII_AmendQty").val())) || 0,
 
             JISVII_UnitPrice:
-                parseFloat(row.find(".JISVII_UnitPrice").val()) || 0,
+                parseFloat(removeCommas(row.find(".JISVII_UnitPrice").val())) || 0,
 
             JISVII_Amount:
-                parseFloat(row.find(".JISVII_Amount").val()) || 0,
+                parseFloat(removeCommas(row.find(".JISVII_Amount").val())) || 0,
 
             JISVII_SAC_Number:
                 parseInt(row.find(".SAC_Number").val()) || 0,
 
             JISVII_GST_Amount:
-                parseFloat(row.find(".JISVII_GST_Amount").val()) || 0,
+                parseFloat(removeCommas(row.find(".JISVII_GST_Amount").val())) || 0,
             JISVII_PRS_Number:
                 parseFloat(row.find(".JISVII_PRS_Number").val()) || 0,
             JISVII_JIDNH_Number:
@@ -2755,21 +2784,21 @@ function BindItems(items) {
     </td>
 
     <td class="text-end">
-        <label class="form-control text-end JISVII_DeliveredQty">
+        <label class="form-control text-center JISVII_DeliveredQty">
             ${item.DeliveredQty ?? 0}
         </label>
     </td>
 
     <td class="text-end">
-        <input value="${item.InvoicedQty ?? 0}" class="form-control JISVII_PrevInvoiceQty text-end" readonly />
+        <input value="${item.InvoicedQty ?? 0}" class="form-control JISVII_PrevInvoiceQty text-center" readonly />
     </td>
 
     <td>
-        <input value="${item.JISVII_Qty ?? 0}" class="form-control JISVII_BalanceQty text-end" readonly />
+        <input value="${item.JISVII_Qty ?? 0}" class="form-control JISVII_BalanceQty text-center" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_Qty" value="${item.JISVII_Qty ?? 0}" class="form-control JISVII_AmendQty text-end" />
+        <input name="Items[${index}].JISVII_Qty" value="${item.JISVII_Qty ?? 0}" class="form-control JISVII_AmendQty text-center" />
     </td>
 
     <td>
