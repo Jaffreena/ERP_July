@@ -1,4 +1,4 @@
-﻿@model List<ERP_DTO.JobInwardTransaction.RNNumberSuffix_DTO>
+﻿@model List<ERP_DTO.JobInwardTransaction.JINumberSuffix_DTO>
 
 <div class="col table-fixed h-100">
     <div class="w-100 table-responsive table-body table-body-f">
@@ -14,16 +14,16 @@
             <tbody id="SubTableBody">
                 <tr id="SubTempRow" style="display: none;">
                     <td>
-                        <input id="RNS_Date" class="form-control RNS_Date datepicker text-center" autocomplete="off" />
+                        <input id="JIS_Date" class="form-control JIS_Date datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="RNS_EndDate" class="form-control RNS_EndDate datepicker text-center" autocomplete="off" />
+                        <input id="JIS_EndDate" class="form-control JIS_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="RNS_Particulars" class="form-control RNS_Particulars" autocomplete="off" />
+                        <input id="JIS_Particulars" class="form-control JIS_Particulars" autocomplete="off" />
                     </td>
                     <td class="text-center">
-                        <input type="hidden" name="RNS_IsDeleted" class="RNS_IsDeleted" value="false" />
+                        <input type="hidden" name="JIS_IsDeleted" class="JIS_IsDeleted" value="false" />
                         <a class="SubRowRemove btn btn-sm btn-danger p-1 icon-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -37,20 +37,20 @@
                     {
                         <tr class="SubNewRow">
                             <td>
-                                <input id="RNS_Date" name="RNNumberSuffix[@i].RNS_Date" class="form-control RNS_Date text-center datepicker" autocomplete="off" value="@Model[i].RNS_Date" />
+                                <input id="JIS_Date" name="JINumberSuffix[@i].JIS_Date" class="form-control JIS_Date text-center datepicker" autocomplete="off" value="@Model[i].JIS_Date" />
                             </td>
                             <td>
-                                <input id="RNS_EndDate" name="RNNumberSuffix[@i].RNS_EndDate" class="form-control RNS_EndDate text-center datepicker" autocomplete="off" value="@Model[i].RNS_EndDate" />
+                                <input id="JIS_EndDate" name="JINumberSuffix[@i].JIS_EndDate" class="form-control JIS_EndDate text-center datepicker" autocomplete="off" value="@Model[i].JIS_EndDate" />
                             </td>
                             <td>
-                                <input id="RNS_Particulars" name="RNNumberSuffix[@i].RNS_Particulars" class="form-control RNS_Particulars" autocomplete="off" value="@Model[i].RNS_Particulars" />
+                                <input id="JIS_Particulars" name="JINumberSuffix[@i].JIS_Particulars" class="form-control JIS_Particulars" autocomplete="off" value="@Model[i].JIS_Particulars" />
                             </td>
                             <td class="text-center">
-                                @if (@Model[i].RNS_Number != 0)
+                                @if (@Model[i].JIS_Number != 0)
                                 {
-                                    <input name="RNNumberSuffix[@i].RNS_Number" type="hidden" class="RNS_Number" value="@Model[i].RNS_Number" />
+                                    <input name="JINumberSuffix[@i].JIS_Number" type="hidden" class="JIS_Number" value="@Model[i].JIS_Number" />
                                 }
-                                <input type="hidden" name="RNNumberSuffix[@i].RNS_IsDeleted" value="false" class="RNS_IsDeleted" />
+                                <input type="hidden" name="JINumberSuffix[@i].JIS_IsDeleted" value="false" class="JIS_IsDeleted" />
                                 <a class="SubRowRemove btn btn-sm btn-danger p-1 icon-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -83,12 +83,12 @@
 
         function SubaddRow() {
             var NewRow = $("#SubTempRow").clone().removeAttr("style").removeAttr("id").addClass("SubNewRow");
-            NewRow.find("input.RNS_Date").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_Date").val();
-               NewRow.find("input.RNS_EndDate").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_EndDate").val();
-            NewRow.find("input.RNS_Particulars").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_Particulars");
-            NewRow.find("input.RNS_IsDeleted").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_IsDeleted");
+            NewRow.find("input.JIS_Date").attr("name", "JINumberSuffix[" + rowCount + "].JIS_Date").val();
+               NewRow.find("input.JIS_EndDate").attr("name", "JINumberSuffix[" + rowCount + "].JIS_EndDate").val();
+            NewRow.find("input.JIS_Particulars").attr("name", "JINumberSuffix[" + rowCount + "].JIS_Particulars");
+            NewRow.find("input.JIS_IsDeleted").attr("name", "JINumberSuffix[" + rowCount + "].JIS_IsDeleted");
 
-            NewRow.find("input[name='RNNumberSuffix[" + rowCount + "].RNS_IsDeleted']").val(false);
+            NewRow.find("input[name='JINumberSuffix[" + rowCount + "].JIS_IsDeleted']").val(false);
 
             $("#SubTableBody").append(NewRow);
             rowCount++;
@@ -103,7 +103,7 @@
         }
 
         $(document).on('click', '.SubRowRemove', function () {
-            $(this).closest('tr').find("input[name*='RNS_IsDeleted']").val(true);
+            $(this).closest('tr').find("input[name*='JIS_IsDeleted']").val(true);
             $(this).closest('tr').hide();
         });
 

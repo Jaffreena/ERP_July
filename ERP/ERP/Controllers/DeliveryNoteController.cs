@@ -8,9 +8,10 @@ using ERP_DTO;
 using ERP_DTO.JobInwardTransaction;
 using Humanizer;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using SelectPdf;
 using System.Data;
+using System.Globalization;
+using System.Text.Json;
  
 
 
@@ -33,7 +34,73 @@ namespace ERP.Controllers
        DeliveryNote_DL DN_DL = new DeliveryNote_DL();
        
         public Int64 UserCode => Int64.TryParse(User.FindFirst("ERP_ID")?.Value, out var No) ? No : 0;
-    
+
+        #region date chnage
+        [HttpGet]
+        [Route("deliverynote/transactions/deliverynote/numbering")]
+        public string OnDeliveryNoteNumber(Int32 PODate)
+        {
+            DateTime dnDate = DateTime.ParseExact(
+       PODate.ToString(),
+       "yyyyMMdd",
+       CultureInfo.InvariantCulture);
+            DeliveryNoteCreate_DTO DN_DTO = new DeliveryNoteCreate_DTO();
+            DN_DTO.Header.JIDNH_DN_Date = dnDate;
+            DN_DTO.Header.DN_Id = 0;
+            DN_DTO.Header.DN_CreatorCode = 0;
+            DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
+            DS = DN_DAO.DeliveryNoteDB(DN_DTO);
+
+            if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "Delivery Note Number is not configured for the selected Delivery Date.";
+                return "";
+            }
+
+            // Manual Numbering
+            int order = Convert.ToInt32(DS.Tables[0].Rows[0]["DNN_Method"]);
+            if (order != 2)
+                return "";
+
+            string prefix = "";
+            string suffix = "";
+            string prefill = "";
+            int number = 0;
+
+            // Prefix
+            if (DS.Tables[2].Rows.Count > 0)
+                prefix = DS.Tables[2].Rows[0]["DNP_Particulars"].ToString();
+
+            // Suffix
+            if (DS.Tables[3].Rows.Count > 0)
+                suffix = DS.Tables[3].Rows[0]["DNS_Particulars"].ToString();
+
+            // Reset Configuration
+            int startNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["DNR_StartingNumber"]);
+            int digit = Convert.ToInt32(DS.Tables[1].Rows[0]["DNR_NumberofDigits"]);
+            int prefillZero = Convert.ToInt32(DS.Tables[1].Rows[0]["DNR_PrefilZero"]);
+
+            if (prefillZero == 1)
+                prefill = "D" + digit;
+
+            // Running Number
+            if (DS.Tables[4].Rows.Count > 0)
+            {
+                int runningNumber = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"]);
+                number = runningNumber + 1;
+            }
+            else
+            {
+                number = startNumber;
+            }
+
+            return prefix + number.ToString(prefill) + suffix;
+        }
+        #endregion
+
+
+
         [Route("jobinward/transactions/delivery-note/buyeraddress")]
         public IActionResult SaleBuyerAddressID(String? Buyer, String ADTPNumber)
         {
@@ -57,6 +124,7 @@ namespace ERP.Controllers
             return Json(SIA);
         }
 
+      
         [Route("jobinward/transactions/delivery-note/buyeraddressid")]
         public IActionResult SaleBuyerAddressIDInfo(String? Buyer, String ADTPNumber, String AddressID)
         {
@@ -218,6 +286,8 @@ namespace ERP.Controllers
         #region Delivery Note Create
         public IActionResult Index()
         {
+
+      
             GetDevliverNoteData();
             DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
             DN_DAO.DeleteTempDeliveryNoteBatch();

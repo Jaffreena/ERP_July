@@ -231,29 +231,8 @@ $(document).ready(function () {
 
         // 5. Recalculate totals (optional hook)
         calculateTotal_S();
-        //region item grid row focus out event
-        //$("#ItemTable_S").on(
-        //    "focusout",
-        //    "tr.NewRow",
-        //    function (e) {
-
-        //        let row = $(this);
-
-        //        setTimeout(() => {
-
-        //            // check next focused element
-        //            if (!row.find(document.activeElement).length) {
-
-        //                // document.getElementById('SaveBatchButton').click();
-
-        //            }
-
-        //        }, 0);
-
-        //    }
-        //);
-
-        //#endregion
+        // 6. Resize columns for newly added row
+        ResizeScrapColumns();
 
 
     });
@@ -454,6 +433,7 @@ function DateBind() {
 
     var fp = document.getElementById("Header_JIDNH_DN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
+    GetConversionNumber();
 }
 
 //#region delete grid

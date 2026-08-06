@@ -27,7 +27,7 @@ namespace ERP_DAO.JobInwardTransaction
             // 🔹 Mode
             db.AddInParameter(cmd, "@JW_Inv_Id", DbType.Int32, DN_DTO.Header.JW_Inv_Id);
 
-            DN_DTO.Header.JISVIH_InvoiceDate = DateTime.Now;
+       //     DN_DTO.Header.JISVIH_InvoiceDate = DateTime.Now;
             db.AddInParameter(cmd, "@JISVIH_InvoiceDate", DbType.Date, DN_DTO.Header.JISVIH_InvoiceDate);
             //db.AddInParameter(cmd, "@JIDNI_Item_Code", DbType.String, DN_DTO.Header.it);
             //db.AddInParameter(cmd, "@DN_CUS_Number", DbType.Int32, DN_DTO.Header.JISVIH_JW_Customer_Number);

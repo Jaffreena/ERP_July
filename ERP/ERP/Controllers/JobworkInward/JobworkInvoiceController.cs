@@ -12,6 +12,7 @@ using SelectPdf;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Text.Json;
 
 namespace ERP.Controllers.JobworkInward
@@ -36,7 +37,73 @@ namespace ERP.Controllers.JobworkInward
         }
         #endregion
 
+        #region date chnage
 
+        [HttpGet]
+        [Route("jwinvoice/transactions/jwinvoice/numbering")]
+        public string OnJWInvoiceNumber(Int32 PODate)
+        {
+            DateTime invoiceDate = DateTime.ParseExact(
+                PODate.ToString(),
+                "yyyyMMdd",
+                CultureInfo.InvariantCulture);
+
+            JobworkInvoiceCreate_DTO INV_DTO = new JobworkInvoiceCreate_DTO();
+            INV_DTO.Header.JISVIH_InvoiceDate = invoiceDate;
+            INV_DTO.Header.JW_Inv_Id = 0;
+
+
+            JobworkInvoice_DAO INV_DAO = new JobworkInvoice_DAO();
+            DS = INV_DAO.JobworkInvoice(INV_DTO);
+
+            if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "JW Invoice Number is not configured for the selected Invoice Date.";
+                return "";
+            }
+
+            // Manual Numbering
+            int order = Convert.ToInt32(DS.Tables[0].Rows[0]["JIN_Method"]);
+            if (order != 2)
+                return "";
+
+            string prefix = "";
+            string suffix = "";
+            string prefill = "";
+            int number = 0;
+
+            // Prefix
+            if (DS.Tables[2].Rows.Count > 0)
+                prefix = DS.Tables[2].Rows[0]["JIP_Particulars"].ToString();
+
+            // Suffix
+            if (DS.Tables[3].Rows.Count > 0)
+                suffix = DS.Tables[3].Rows[0]["JIS_Particulars"].ToString();
+
+            // Reset Configuration
+            int startNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["JIR_StartingNumber"]);
+            int digit = Convert.ToInt32(DS.Tables[1].Rows[0]["JIR_NumberofDigits"]);
+            int prefillZero = Convert.ToInt32(DS.Tables[1].Rows[0]["JIR_PrefilZero"]);
+
+            if (prefillZero == 1)
+                prefill = "D" + digit;
+
+            // Running Number
+            if (DS.Tables[4].Rows.Count > 0)
+            {
+                int runningNumber = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"]);
+                number = runningNumber + 1;
+            }
+            else
+            {
+                number = startNumber;
+            }
+
+            return prefix + number.ToString(prefill) + suffix;
+        }
+
+        #endregion
         public IActionResult Create()
         {
             GetJobworkInvoiceData();

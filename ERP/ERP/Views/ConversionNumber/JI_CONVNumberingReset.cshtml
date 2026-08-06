@@ -1,4 +1,4 @@
-﻿@model List<ERP_DTO.JobInwardTransaction.RNNumberReset_DTO>
+﻿@model List<ERP_DTO.JobInwardTransaction.JI_CONVNumberReset_DTO>
 
 <div class="col table-fixed h-100">
     <div class="w-100 table-responsive table-body table-body-f">
@@ -17,25 +17,25 @@
             <tbody id="ResetTableBody">
                 <tr id="ResetTempRow" style="display: none;">
                     <td>
-                        <input id="RNR_Date" class="form-control RNR_Date datepicker text-center" autocomplete="off" />
+                        <input id="JICR_Date" class="form-control JICR_Date datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="RNR_EndDate" class="form-control RNR_EndDate datepicker text-center" autocomplete="off" />
+                        <input id="JICR_EndDate" class="form-control JICR_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td style="width:110px;">
-                        <input id="RNR_StartingNumber" class="form-control RNR_StartingNumber text-center" autocomplete="off" />
+                        <input id="JICR_StartingNumber" class="form-control JICR_StartingNumber text-center" autocomplete="off" />
                     </td>
                     <td style="width:110px;">
-                        <input id="RNR_NumberofDigits" class="form-control RNR_NumberofDigits text-center" autocomplete="off" />
+                        <input id="JICR_NumberofDigits" class="form-control JICR_NumberofDigits text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <select id="RNR_PrefilZero" class="form-select RNR_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
+                        <select id="JICR_PrefilZero" class="form-select JICR_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
                     </td>
                     <td>
-                        <select id="RNR_Frequency" class="form-select RNR_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
+                        <select id="JICR_Frequency" class="form-select JICR_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
                     </td>
                     <td class="text-center">
-                        <input type="hidden" name="RNR_IsDeleted" class="RNR_IsDeleted" value="false" />
+                        <input type="hidden" name="JICR_IsDeleted" class="JICR_IsDeleted" value="false" />
                         <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -49,22 +49,22 @@
                     {
                         <tr class="ResetNewRow">
                             <td>
-                                <input id="RNR_Date" name="RNNumberReset[@i].RNR_Date" class="form-control RNR_Date datepicker text-center" autocomplete="off" value="@Model[i].RNR_Date" />
+                                <input id="JICR_Date" name="JI_CONVNumberReset[@i].JICR_Date" class="form-control JICR_Date datepicker text-center" autocomplete="off" value="@Model[i].JICR_Date" />
                             </td>
                             <td>
-                                <input id="RNR_EndDate" name="RNNumberReset[@i].RNR_EndDate" class="form-control RNR_EndDate datepicker text-center" autocomplete="off" value="@Model[i].RNR_EndDate" />
+                                <input id="JICR_EndDate" name="JI_CONVNumberReset[@i].JICR_EndDate" class="form-control JICR_EndDate datepicker text-center" autocomplete="off" value="@Model[i].JICR_EndDate" />
                             </td>
                             <td style="width:110px;">
-                                <input id="RNR_StartingNumber" name="RNNumberReset[@i].RNR_StartingNumber" class="form-control RNR_StartingNumber text-center" autocomplete="off" value="@Model[i].RNR_StartingNumber" />
+                                <input id="JICR_StartingNumber" name="JI_CONVNumberReset[@i].JICR_StartingNumber" class="form-control JICR_StartingNumber text-center" autocomplete="off" value="@Model[i].JICR_StartingNumber" />
                             </td>
                             <td style="width:110px;">
-                                <input id="RNR_NumberofDigits" name="RNNumberReset[@i].RNR_NumberofDigits" class="form-control RNR_NumberofDigits text-center" autocomplete="off" value="@Model[i].RNR_NumberofDigits" />
+                                <input id="JICR_NumberofDigits" name="JI_CONVNumberReset[@i].JICR_NumberofDigits" class="form-control JICR_NumberofDigits text-center" autocomplete="off" value="@Model[i].JICR_NumberofDigits" />
                             </td>
                             <td>
-                                <select id="RNR_PrefilZero" name="RNNumberReset[@i].RNR_PrefilZero" class="form-select RNR_PrefilZero text-center">
+                                <select id="JICR_PrefilZero" name="JI_CONVNumberReset[@i].JICR_PrefilZero" class="form-select JICR_PrefilZero text-center">
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Prefil)
                                     {
-                                        if (item.Value == Model[i].RNR_PrefilZero)
+                                        if (item.Value == Model[i].JICR_PrefilZero)
                                         {
                                             <option value="@item.Value" selected>@item.Text</option>
                                         }
@@ -76,17 +76,17 @@
                                 </select>
                             </td>
                             <td>
-                                <select id="RNR_Frequency" name="RNNumberReset[@i].RNR_Frequency" class="form-select RNR_Frequency text-center">
-                                    <option value="1" selected="@(Model[i].RNR_Frequency == "1")">Monthly</option>
-                                    <option value="2" selected="@(Model[i].RNR_Frequency == "2")">Yearly</option>
+                                <select id="JICR_Frequency" name="JI_CONVNumberReset[@i].JICR_Frequency" class="form-select JICR_Frequency text-center">
+                                    <option value="1" selected="@(Model[i].JICR_Frequency == "1")">Monthly</option>
+                                    <option value="2" selected="@(Model[i].JICR_Frequency == "2")">Yearly</option>
                                 </select>
                             </td>
                             <td class="text-center">
-                                @if (@Model[i].RNR_Number != 0)
+                                @if (@Model[i].JICR_Number != 0)
                                 {
-                                    <input name="RNNumberReset[@i].RNR_Number" type="hidden" class="RNR_Number" value="@Model[i].RNR_Number" />
+                                    <input name="JI_CONVNumberReset[@i].JICR_Number" type="hidden" class="JICR_Number" value="@Model[i].JICR_Number" />
                                 }
-                                <input type="hidden" name="RNNumberReset[@i].RNR_IsDeleted" value="false" class="RNR_IsDeleted" />
+                                <input type="hidden" name="JI_CONVNumberReset[@i].JICR_IsDeleted" value="false" class="JICR_IsDeleted" />
                                 <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -119,15 +119,15 @@
 
         function ResetaddRow() {
             var NewRow = $("#ResetTempRow").clone().removeAttr("style").removeAttr("id").addClass("ResetNewRow");
-            NewRow.find("input.RNR_Date").attr("name", "RNNumberReset[" + rowCount + "].RNR_Date").val();
-            NewRow.find("input.RNR_EndDate").attr("name", "RNNumberReset[" + rowCount + "].RNR_EndDate").val();
-            NewRow.find("input.RNR_StartingNumber").attr("name", "RNNumberReset[" + rowCount + "].RNR_StartingNumber");
-            NewRow.find("input.RNR_NumberofDigits").attr("name", "RNNumberReset[" + rowCount + "].RNR_NumberofDigits");
-            NewRow.find("select.RNR_PrefilZero").attr("name", "RNNumberReset[" + rowCount + "].RNR_PrefilZero");
-            NewRow.find("select.RNR_Frequency").attr("name", "RNNumberReset[" + rowCount + "].RNR_Frequency");
-            NewRow.find("input.RNR_IsDeleted").attr("name", "RNNumberReset[" + rowCount + "].RNR_IsDeleted");
+            NewRow.find("input.JICR_Date").attr("name", "JI_CONVNumberReset[" + rowCount + "].JICR_Date").val();
+            NewRow.find("input.JICR_EndDate").attr("name", "JI_CONVNumberReset[" + rowCount + "].JICR_EndDate").val();
+            NewRow.find("input.JICR_StartingNumber").attr("name", "JI_CONVNumberReset[" + rowCount + "].JICR_StartingNumber");
+            NewRow.find("input.JICR_NumberofDigits").attr("name", "JI_CONVNumberReset[" + rowCount + "].JICR_NumberofDigits");
+            NewRow.find("select.JICR_PrefilZero").attr("name", "JI_CONVNumberReset[" + rowCount + "].JICR_PrefilZero");
+            NewRow.find("select.JICR_Frequency").attr("name", "JI_CONVNumberReset[" + rowCount + "].JICR_Frequency");
+            NewRow.find("input.JICR_IsDeleted").attr("name", "JI_CONVNumberReset[" + rowCount + "].JICR_IsDeleted");
 
-            NewRow.find("input[name='RNNumberReset[" + rowCount + "].RNR_IsDeleted']").val(false);
+            NewRow.find("input[name='JI_CONVNumberReset[" + rowCount + "].JICR_IsDeleted']").val(false);
 
             $("#ResetTableBody").append(NewRow);
             rowCount++;
@@ -142,7 +142,7 @@
         }
 
         $(document).on('click', '.ResetRowRemove', function () {
-            $(this).closest('tr').find("input[name*='RNR_IsDeleted']").val(true);
+            $(this).closest('tr').find("input[name*='JICR_IsDeleted']").val(true);
             $(this).closest('tr').hide();
         });
 

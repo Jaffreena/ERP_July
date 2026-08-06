@@ -747,7 +747,7 @@ function BindDeliveryNoteOtherBatchTable(response) {
     `);
         return;
     }
-
+    ApplyOtherBatchFieldWidths();
     CalculateOtherBatchFooter();
 }
 function CalculateOtherBatchFooter() {
@@ -890,6 +890,8 @@ function BindDeliveryNoteBatchTable() {
     });
 
     CalculateBatchFooter();
+    ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+
 }
 
 //#endregion
@@ -1043,6 +1045,8 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
     }
 
     CalculateBatchFooter();
+    ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+
 });
 
 //#endregion
@@ -1160,5 +1164,179 @@ function GetCheckedRowId_F() {
     });
 
     return rowId;
+}
+//#endregion 
+//#region conversion batch
+function ApplyIBatFieldWidths(suffix) {
+    const fields = [
+        { cls: ".RNI_BCH_Date", min: 10, max: 10, align: "center" },
+        { cls: ".RNI_BCH_No", min: 15, max: 30, align: "left" },
+        { cls: ".RNI_BCH_Qty", min: 10, max: 20, align: "right" },
+        { cls: ".RNI_BCH_UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".RNI_BCH_Value", min: 13, max: 25, align: "right" }
+    ];
+
+    const tableBodyId = "IBatTableBody_" + suffix;
+    const $table = $("#" + tableBodyId).closest("table");
+
+    fields.forEach(f => {
+        const controls = $table.find(
+            "#" + tableBodyId + " > #IBatTempRow " + f.cls +
+            ", #" + tableBodyId + " > tr.IBatNewRow " + f.cls
+        );
+        if (!controls.length) return;
+
+        const sample = controls.first()[0];
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null ? chToPx(f.max, sample) : Number.MAX_SAFE_INTEGER;
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+            let text = (this.tagName === "SELECT")
+                ? (this.options[this.selectedIndex]?.text || "")
+                : (this.value || "");
+            requiredWidth = Math.max(requiredWidth, getTextWidth(text.trim(), this));
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+        if (f.cls === ".RNI_BCH_UnitPrice" || f.cls === ".RNI_BCH_Value") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+
+            const th = $table.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+            }
+        });
+    });
+}
+//#endregion
+
+//#region CONSUMPTION BATCH WIDTH (Batch WH tab)
+function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
+    const fields = [
+        { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 25, align: "left" },
+        { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
+        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
+    ];
+
+    const $container = $(container);
+
+    fields.forEach(f => {
+        const controls = $container.find(
+            "#DeliveryNoteBatchTableBody > #DeliveryNoteBatchTemplateRow " + f.cls +
+            ", #DeliveryNoteBatchTableBody > tr.DeliveryNoteBatchRow " + f.cls
+        );
+        if (!controls.length) return;
+
+        const sample = controls.first()[0];
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null ? chToPx(f.max, sample) : Number.MAX_SAFE_INTEGER;
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+            let text = (this.value || "").trim();
+            requiredWidth = Math.max(requiredWidth, getTextWidth(text, this));
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+        if (f.cls === ".JIDNI_BCH_BatchUnitPrice" || f.cls === ".JIDNI_BCH_BatchValue") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+
+            const th = $container.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+            }
+        });
+    });
+}
+//#endregion
+
+//#region OTHER WH BATCH WIDTH
+function ApplyOtherBatchFieldWidths(container = "#DeliveryNoteOtherBatchList") {
+    const fields = [
+        { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 25, align: "left" },
+        { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
+        { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
+        { cls: ".JIDNI_BCH_AvailableQty", min: 10, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
+    ];
+
+    const $container = $(container);
+
+    fields.forEach(f => {
+        const controls = $container.find(
+            "#DeliveryNoteOtherBatchTableBody > #DeliveryNoteOtherBatchTemplateRow " + f.cls +
+            ", #DeliveryNoteOtherBatchTableBody > tr.DeliveryNoteOtherBatchRow " + f.cls
+        );
+        if (!controls.length) return;
+
+        const sample = controls.first()[0];
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null ? chToPx(f.max, sample) : Number.MAX_SAFE_INTEGER;
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+            let text = (this.value || "").trim();
+            requiredWidth = Math.max(requiredWidth, getTextWidth(text, this));
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+        if (f.cls === ".JIDNI_BCH_BatchUnitPrice" || f.cls === ".JIDNI_BCH_BatchValue") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+
+            const th = $container.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+            }
+        });
+    });
 }
 //#endregion

@@ -1,4 +1,4 @@
-﻿@model List<ERP_DTO.JobInwardTransaction.RNNumberSuffix_DTO>
+﻿@model List<ERP_DTO.JobInwardTransaction.JI_CONVNumberPrefix_DTO>
 
 <div class="col table-fixed h-100">
     <div class="w-100 table-responsive table-body table-body-f">
@@ -6,25 +6,25 @@
             <thead>
                 <tr class="table-info">
                     <th class="datetype text-center">Start Date</th>
-                    <th class="datetype text-center">End Date</th>
+                      <th class="datetype text-center">End Date</th>
                     <th>Particulars</th>
                     <th class="table-width-sm"></th>
                 </tr>
             </thead>
-            <tbody id="SubTableBody">
-                <tr id="SubTempRow" style="display: none;">
+            <tbody id="PreTableBody">
+                <tr id="PreTempRow" style="display: none;">
                     <td>
-                        <input id="RNS_Date" class="form-control RNS_Date datepicker text-center" autocomplete="off" />
+                        <input id="JICP_Date" class="form-control JICP_Date datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="RNS_EndDate" class="form-control RNS_EndDate datepicker text-center" autocomplete="off" />
+                        <input id="JICP_EndDate" class="form-control JICP_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="RNS_Particulars" class="form-control RNS_Particulars" autocomplete="off" />
+                        <input id="JICP_Particulars" class="form-control JICP_Particulars" autocomplete="off" />
                     </td>
                     <td class="text-center">
-                        <input type="hidden" name="RNS_IsDeleted" class="RNS_IsDeleted" value="false" />
-                        <a class="SubRowRemove btn btn-sm btn-danger p-1 icon-link">
+                        <input type="hidden" name="JICP_IsDeleted" class="JICP_IsDeleted" value="false" />
+                        <a class="PreRowRemove btn btn-sm btn-danger p-1 icon-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
                             </svg>
@@ -35,23 +35,23 @@
                 {
                     @for (int i = 0; i < Model.Count; i++)
                     {
-                        <tr class="SubNewRow">
+                        <tr class="PreNewRow">
                             <td>
-                                <input id="RNS_Date" name="RNNumberSuffix[@i].RNS_Date" class="form-control RNS_Date text-center datepicker" autocomplete="off" value="@Model[i].RNS_Date" />
+                                <input id="JICP_Date" name="JI_CONVNumberPrefix[@i].JICP_Date" class="form-control JICP_Date text-center datepicker" autocomplete="off" value="@Model[i].JICP_Date" />
+                            </td>
+                                <td>
+                                <input id="JICP_EndDate" name="JI_CONVNumberPrefix[@i].JICP_EndDate" class="form-control JICP_EndDate text-center datepicker" autocomplete="off" value="@Model[i].JICP_EndDate" />
                             </td>
                             <td>
-                                <input id="RNS_EndDate" name="RNNumberSuffix[@i].RNS_EndDate" class="form-control RNS_EndDate text-center datepicker" autocomplete="off" value="@Model[i].RNS_EndDate" />
-                            </td>
-                            <td>
-                                <input id="RNS_Particulars" name="RNNumberSuffix[@i].RNS_Particulars" class="form-control RNS_Particulars" autocomplete="off" value="@Model[i].RNS_Particulars" />
+                                <input id="JICP_Particulars" name="JI_CONVNumberPrefix[@i].JICP_Particulars" class="form-control JICP_Particulars" autocomplete="off" value="@Model[i].JICP_Particulars" />
                             </td>
                             <td class="text-center">
-                                @if (@Model[i].RNS_Number != 0)
+                                @if (@Model[i].JICP_Number != 0)
                                 {
-                                    <input name="RNNumberSuffix[@i].RNS_Number" type="hidden" class="RNS_Number" value="@Model[i].RNS_Number" />
+                                    <input name="JI_CONVNumberPrefix[@i].JICP_Number" type="hidden" class="JICP_Number" value="@Model[i].JICP_Number" />
                                 }
-                                <input type="hidden" name="RNNumberSuffix[@i].RNS_IsDeleted" value="false" class="RNS_IsDeleted" />
-                                <a class="SubRowRemove btn btn-sm btn-danger p-1 icon-link">
+                                <input type="hidden" name="JI_CONVNumberPrefix[@i].JICP_IsDeleted" value="false" class="JICP_IsDeleted" />
+                                <a class="PreRowRemove btn btn-sm btn-danger p-1 icon-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
                                     </svg>
@@ -66,12 +66,12 @@
 </div>
 <div class="row table-footer align-items-center">
     <div class="col">
-        <a id="SubNewRowButton" class="btn btn-primary">Add Row</a>
+        <a id="PreNewRowButton" class="btn btn-primary">Add Row</a>
     </div>
 </div>
 <script>
     $(document).ready(function () {
-        function SuffixInitializeFlatpickrs() {
+        function PrefixInitializeFlatpickrs() {
             $(".datepicker").flatpickr({
                 dateFormat: "d-M-Y",
                 altInput: false,
@@ -81,42 +81,42 @@
         var rowCount = @(Model != null ? Model.Count : 0);
         var isAddingRow = false;
 
-        function SubaddRow() {
-            var NewRow = $("#SubTempRow").clone().removeAttr("style").removeAttr("id").addClass("SubNewRow");
-            NewRow.find("input.RNS_Date").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_Date").val();
-               NewRow.find("input.RNS_EndDate").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_EndDate").val();
-            NewRow.find("input.RNS_Particulars").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_Particulars");
-            NewRow.find("input.RNS_IsDeleted").attr("name", "RNNumberSuffix[" + rowCount + "].RNS_IsDeleted");
+        function PreaddRow() {
+            var NewRow = $("#PreTempRow").clone().removeAttr("style").removeAttr("id").addClass("PreNewRow");
+            NewRow.find("input.JICP_Date").attr("name", "JI_CONVNumberPrefix[" + rowCount + "].JICP_Date").val();
+               NewRow.find("input.JICP_EndDate").attr("name", "JI_CONVNumberPrefix[" + rowCount + "].JICP_EndDate").val();
+            NewRow.find("input.JICP_Particulars").attr("name", "JI_CONVNumberPrefix[" + rowCount + "].JICP_Particulars");
+            NewRow.find("input.JICP_IsDeleted").attr("name", "JI_CONVNumberPrefix[" + rowCount + "].JICP_IsDeleted");
 
-            NewRow.find("input[name='RNNumberSuffix[" + rowCount + "].RNS_IsDeleted']").val(false);
+            NewRow.find("input[name='JI_CONVNumberPrefix[" + rowCount + "].JICP_IsDeleted']").val(false);
 
-            $("#SubTableBody").append(NewRow);
+            $("#PreTableBody").append(NewRow);
             rowCount++;
             NewRow.data("isValid", false);
             isAddingRow = false;
 
-            SuffixInitializeFlatpickrs();
+            PrefixInitializeFlatpickrs();
         }
 
-        if ($("tr.SubNewRow").length == 0) {
-            SubaddRow();
+        if ($("tr.PreNewRow").length == 0) {
+            PreaddRow();
         }
 
-        $(document).on('click', '.SubRowRemove', function () {
-            $(this).closest('tr').find("input[name*='RNS_IsDeleted']").val(true);
+        $(document).on('click', '.PreRowRemove', function () {
+            $(this).closest('tr').find("input[name*='JICP_IsDeleted']").val(true);
             $(this).closest('tr').hide();
         });
 
 
-        $("#SubNewRowButton").click(function () {
-            var lastRow = $("tr.SubNewRow").last();
-            if (SubCheckAllFieldsValid(lastRow)) {
-                SubaddRow();
+        $("#PreNewRowButton").click(function () {
+            var lastRow = $("tr.PreNewRow").last();
+            if (PreCheckAllFieldsValid(lastRow)) {
+                PreaddRow();
             }
             else {
                 var firstInvalidField = null;
                 lastRow.find("select, input, input[type='text']").each(function () {
-                    if (!SubValidateField($(this))) {
+                    if (!PreValidateField($(this))) {
                         if (firstInvalidField == null)
                             firstInvalidField = $(this);
                         return false;
@@ -128,11 +128,11 @@
                 }
             }
         });
-        function SubCheckAllFieldsValid(currentRow) {
+        function PreCheckAllFieldsValid(currentRow) {
             var allFieldsValid = true;
-            $("tr.SubNewRow:visible").each(function () {
+            $("tr.PreNewRow:visible").each(function () {
                 $(this).find("select, input, input[type='text']").each(function () {
-                    if (!SubValidateField($(this))) {
+                    if (!PreValidateField($(this))) {
                         allFieldsValid = false;
                         return false;
                     }
@@ -141,7 +141,7 @@
             });
             return allFieldsValid;
         }
-        function SubValidateField(currentInput) {
+        function PreValidateField(currentInput) {
             var valid = 1;
             var inputValue = currentInput.val();
             if (inputValue === "") {
@@ -154,7 +154,6 @@
                 return true;
             }
         }
-
-        SuffixInitializeFlatpickrs();
+        PrefixInitializeFlatpickrs();
     });
 </script>

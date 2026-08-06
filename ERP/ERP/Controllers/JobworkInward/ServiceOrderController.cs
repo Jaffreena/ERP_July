@@ -7,6 +7,7 @@ using ERP_DTO;
 using ERP_DTO.JobInwardTransaction;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using System.Globalization;
 using System.Text.Json;
 
 namespace ERP.Controllers.JobworkInward
@@ -23,6 +24,74 @@ namespace ERP.Controllers.JobworkInward
         ServiceOrderSummary_DTO SOS_DTO =    new ServiceOrderSummary_DTO();
         ServiceOrder_DAO SO_DAO =    new ServiceOrder_DAO();
         ServiceOrder_DL SO_DL = new ServiceOrder_DL();
+        #region date chnage
+
+        [HttpGet]
+        [Route("serviceorder/transactions/serviceorder/numbering")]
+        public string OnServiceOrderNumber(Int32 PODate)
+        {
+            JI_ServiceOrder_DTO SO_DTO = new JI_ServiceOrder_DTO();
+         
+            DateTime regDate = DateTime.ParseExact(
+                PODate.ToString(),
+                "yyyyMMdd",
+                CultureInfo.InvariantCulture);
+
+         
+            SO_DTO.Header.JISVOH_RegDate = regDate;
+            SO_DTO.Header.SVO_Id = 0;
+
+            ServiceOrder_DAO SO_DAO = new ServiceOrder_DAO();
+            DS = SO_DAO.ServiceOrderDB(SO_DTO);
+
+            if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "Service Order Number is not configured for the selected Registration Date.";
+                return "";
+            }
+
+            // Manual Numbering
+            int order = Convert.ToInt32(DS.Tables[0].Rows[0]["JSON_Method"]);
+            if (order != 2)
+                return "";
+
+            string prefix = "";
+            string suffix = "";
+            string prefill = "";
+            int number = 0;
+
+            // Prefix
+            if (DS.Tables[2].Rows.Count > 0)
+                prefix = DS.Tables[2].Rows[0]["JSOP_Particulars"].ToString();
+
+            // Suffix
+            if (DS.Tables[3].Rows.Count > 0)
+                suffix = DS.Tables[3].Rows[0]["JSOS_Particulars"].ToString();
+
+            // Reset Configuration
+            int startNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["JSOR_StartingNumber"]);
+            int digit = Convert.ToInt32(DS.Tables[1].Rows[0]["JSOR_NumberofDigits"]);
+            int prefillZero = Convert.ToInt32(DS.Tables[1].Rows[0]["JSOR_PrefilZero"]);
+
+            if (prefillZero == 1)
+                prefill = "D" + digit;
+
+            // Running Number
+            if (DS.Tables[4].Rows.Count > 0)
+            {
+                int runningNumber = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"]);
+                number = runningNumber + 1;
+            }
+            else
+            {
+                number = startNumber;
+            }
+
+            return prefix + number.ToString(prefill) + suffix;
+        }
+
+        #endregion
         [HttpPost]
         public IActionResult UpdateServiceOrder([FromBody] JI_ServiceOrder_DTO dto)
         {

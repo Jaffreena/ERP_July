@@ -1,17 +1,17 @@
-﻿@model ERP_DTO.JobInwardTransaction.RNNumber_DTO
+﻿@model ERP_DTO.JobInwardTransaction.JINumber_DTO
 
 
 @{
-    ViewData["Title"] = "Receipt Note Number Setup";
+    ViewData["Title"] = "JW Invoice Number Setup";
 }
-<form asp-action="RNNumbering" class="h-100">
+<form asp-action="JINumbering" class="h-100">
 
     <div class="row align-items-center panel-header h-auto">
         <div class="col">
             <div class="card rounded-0 mt-3">
                 <div class="card-body px-2 py-2">
                     <h1 class="h6 fw-light">
-                        Receipt Note Number Setup
+                        JW Invoice Number Setup
                         <a asp-controller="Procurement" asp-action="Index" class="float-end btn p-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -33,17 +33,17 @@
                                 <div class="row text-dark" style="display:none">
                                     <div class="col-12 col-sm-5 col-lg-3">
                                         <div class="row align-items-center px-2 mb-1">
-                                            <label asp-for="RNN_Method" class="col-md-6 col-lg-5 col-form-label ps-0">Method of Number</label>
+                                            <label asp-for="JIN_Method" class="col-md-6 col-lg-5 col-form-label ps-0">Method of Number</label>
                                             <div class="col-md-6 col-lg-7">
-                                                <select asp-for="RNN_Method" class="form-select" asp-items="@ViewBag.Method"></select>
-                                                <input asp-for="RNN_Number" type="hidden" />
+                                                <select asp-for="JIN_Method" class="form-select" asp-items="@ViewBag.Method"></select>
+                                                <input asp-for="JIN_Number" type="hidden" />
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-5 col-lg-3">
                                     </div>
                                 </div>
-                                <div class="@(@Model.RNN_Method == "3" ? "row py-3 d-none" : "row py-3")">
+                                <div class="@(@Model.JIN_Method == "3" ? "row py-3 d-none" : "row py-3")">
                                     <div class="col-12 col-md-3">
                                         <div class="row">
                                             <div class="col text-dark pb-2">
@@ -51,7 +51,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <partial name="RNNumberingPrefix.cshtml" model="@Model.RNNumberPrefix" />
+                                            <partial name="JINumberingPrefix.cshtml" model="@Model.JINumberPrefix" />
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6">
@@ -61,7 +61,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <partial name="RNNumberingReset.cshtml" model="@Model.RNNumberReset" />
+                                            <partial name="JINumberingReset.cshtml" model="@Model.JINumberReset" />
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-3">
@@ -71,7 +71,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <partial name="RNNumberingSuffix.cshtml" model="@Model.RNNumberSuffix" />
+                                            <partial name="JINumberingSuffix.cshtml" model="@Model.JINumberSuffix" />
                                         </div>
                                     </div>
                                 </div>
@@ -94,18 +94,18 @@
     <partial name="_ValidationScriptsPartial" />
 
    
-    <script src="~/js/code/RNNumbering.js" asp-append-version="true"></script>
+    <script src="~/js/code/JINumbering.js" asp-append-version="true"></script>
+
  
 
-    
 }
 <script>
 
     $('form').submit(function (event) {
         $("tr.SubNewRow").each(function () {
-            var Date = $(this).find("input.RNS_Date").val();
-             var EndDate = $(this).find("input.RNS_EndDate").val();
-            var Particulars = $(this).find("input.RNS_Particulars").val();
+            var Date = $(this).find("input.JIS_Date").val();
+             var EndDate = $(this).find("input.JIS_EndDate").val();
+            var Particulars = $(this).find("input.JIS_Particulars").val();
 
             if (!Date && !Particulars) {
                 $(this).remove();
@@ -113,9 +113,9 @@
         });
 
         $("tr.PreNewRow").each(function () {
-            var Date = $(this).find("input.RNP_Date").val();
-             var EndDate = $(this).find("input.RNP_EndDate").val();
-            var Particulars = $(this).find("input.RNP_Particulars").val();
+            var Date = $(this).find("input.JIP_Date").val();
+             var EndDate = $(this).find("input.JIP_EndDate").val();
+            var Particulars = $(this).find("input.JIP_Particulars").val();
 
             if (!Date && !Particulars) {
                 $(this).remove();
@@ -123,12 +123,12 @@
         });
 
         $("tr.ResetNewRow").each(function () {
-            var Date = $(this).find("input.RNP_Date").val();
-            var EndDate = $(this).find("input.RNP_EndDate").val();
-            var StartingNumber = $(this).find("input.RNR_StartingNumber").val();
-            var NumberofDigits = $(this).find("input.RNR_NumberofDigits").val();
-            var PrefilZero = $(this).find("select.RNR_PrefilZero").val();
-            var Frequency = $(this).find("select.RNR_Frequency").val();
+            var Date = $(this).find("input.JIP_Date").val();
+            var EndDate = $(this).find("input.JIP_EndDate").val();
+            var StartingNumber = $(this).find("input.JIR_StartingNumber").val();
+            var NumberofDigits = $(this).find("input.JIR_NumberofDigits").val();
+            var PrefilZero = $(this).find("select.JIR_PrefilZero").val();
+            var Frequency = $(this).find("select.JIR_Frequency").val();
 
             if (!Date && !StartingNumber && !NumberofDigits && !PrefilZero && !Frequency) {
                 $(this).remove();

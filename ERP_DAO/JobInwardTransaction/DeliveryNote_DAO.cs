@@ -83,7 +83,7 @@ namespace ERP_DAO.JobInwardTransaction
             // 🔹 Mode
             db.AddInParameter(cmd, "@DN_Id", DbType.Int32, DN_DTO.Header.DN_Id);
 
-            DN_DTO.Header.JIDNH_DN_Date = DateTime.Now;
+     //       DN_DTO.Header.JIDNH_DN_Date = DateTime.Now;
             db.AddInParameter(cmd, "@JIDNH_DN_Date", DbType.Date, DN_DTO.Header.JIDNH_DN_Date);
             db.AddInParameter(cmd, "@JIDNI_Item_Code", DbType.String, DN_DTO.Header.JIDNI_Item_Code);
             db.AddInParameter(cmd, "@DN_CUS_Number", DbType.Int32, DN_DTO.Header.DN_CUS_Number);

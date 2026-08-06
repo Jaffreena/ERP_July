@@ -5,7 +5,8 @@
         <table class="table table-one table-striped table-bordered table-hover align-middle w-100">
             <thead>
                 <tr class="table-info">
-                    <th class="datetype text-center">Date</th>
+                    <th class="datetype text-center">Start Date</th>
+                      <th class="datetype text-center">End Date</th>
                     <th>Particulars</th>
                     <th class="table-width-sm"></th>
                 </tr>
@@ -14,6 +15,9 @@
                 <tr id="PreTempRow" style="display: none;">
                     <td>
                         <input id="RNP_Date" class="form-control RNP_Date datepicker text-center" autocomplete="off" />
+                    </td>
+                    <td>
+                        <input id="RNP_EndDate" class="form-control RNP_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
                         <input id="RNP_Particulars" class="form-control RNP_Particulars" autocomplete="off" />
@@ -34,6 +38,9 @@
                         <tr class="PreNewRow">
                             <td>
                                 <input id="RNP_Date" name="RNNumberPrefix[@i].RNP_Date" class="form-control RNP_Date text-center datepicker" autocomplete="off" value="@Model[i].RNP_Date" />
+                            </td>
+                                <td>
+                                <input id="RNP_EndDate" name="RNNumberPrefix[@i].RNP_EndDate" class="form-control RNP_EndDate text-center datepicker" autocomplete="off" value="@Model[i].RNP_EndDate" />
                             </td>
                             <td>
                                 <input id="RNP_Particulars" name="RNNumberPrefix[@i].RNP_Particulars" class="form-control RNP_Particulars" autocomplete="off" value="@Model[i].RNP_Particulars" />
@@ -77,6 +84,7 @@
         function PreaddRow() {
             var NewRow = $("#PreTempRow").clone().removeAttr("style").removeAttr("id").addClass("PreNewRow");
             NewRow.find("input.RNP_Date").attr("name", "RNNumberPrefix[" + rowCount + "].RNP_Date").val();
+               NewRow.find("input.RNP_EndDate").attr("name", "RNNumberPrefix[" + rowCount + "].RNP_EndDate").val();
             NewRow.find("input.RNP_Particulars").attr("name", "RNNumberPrefix[" + rowCount + "].RNP_Particulars");
             NewRow.find("input.RNP_IsDeleted").attr("name", "RNNumberPrefix[" + rowCount + "].RNP_IsDeleted");
 

@@ -231,29 +231,8 @@ $(document).ready(function () {
 
         // 5. Recalculate totals (optional hook)
         calculateTotal_P();
-        //region item grid row focus out event
-        //$("#ItemTable_P").on(
-        //    "focusout",
-        //    "tr.NewRow",
-        //    function (e) {
-
-        //        let row = $(this);
-
-        //        setTimeout(() => {
-
-        //            // check next focused element
-        //            if (!row.find(document.activeElement).length) {
-
-        //                // document.getElementById('SaveBatchButton').click();
-
-        //            }
-
-        //        }, 0);
-
-        //    }
-        //);
-
-        //#endregion
+        // 6. Resize columns for newly added row
+        ResizeProductionColumns();
 
 
     });

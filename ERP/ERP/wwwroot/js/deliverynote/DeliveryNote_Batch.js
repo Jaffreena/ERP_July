@@ -288,6 +288,7 @@ $(document).on(
         row.find(".JIDNI_BCH_BatchValue").val(addComma(value, "c"));
 
         CalculateBatchFooter();
+        ApplyBatchFieldWidths();
     });
 //#endregion
 
@@ -951,7 +952,7 @@ function DebugBatchTable() {
     console.log("Parent MaxWidth =", getComputedStyle(parent).maxWidth);
     console.log("Table style.width =", table.style.width);
     console.log("Table computed.width =", getComputedStyle(table).width);
-    console.log("Table computed.minWidth =", getComputedStyle(table).minWidth);
+    console.log("Table computed.minWidth =ResizeBatchPopup", getComputedStyle(table).minWidth);
     console.log("Table computed.maxWidth =", getComputedStyle(table).maxWidth);
     console.log("Has Bootstrap table class:", table.className);
 }

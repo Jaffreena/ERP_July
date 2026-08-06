@@ -45,7 +45,6 @@ function GetTableWidth(container = "#DeliveryNoteBatchList") {
 
             const cell = this.cells[index];
             if (!cell) return;
-
             const control = $(cell).find("input, select, textarea")[0];
 
             let text = "";
@@ -70,12 +69,7 @@ function GetTableWidth(container = "#DeliveryNoteBatchList") {
     return totalWidth;
 }
 
-
  
-
-
- 
-
 function ApplyOtherBatchFieldWidths(container = "#DeliveryNoteOtherBatchList") {
 
     const fields = [
@@ -328,6 +322,7 @@ function ResizeColumn(control) {
 }
 $(document).ready(function () {
 
+
     //#region Header_JIDNH_JW_Customer_Name
 
     $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
@@ -556,6 +551,8 @@ $(document).ready(function () {
     }
 
     DateBind();
+
+   
     //#endregion Initialize Flatpickr
 
     //#region onkeypress qty and unit
@@ -747,9 +744,15 @@ $(document).ready(function () {
             tableBody: "#TableBody",
             searchTable: "#tblsearch"
         });
-      
+
+     
+
+
     });
     //#endregion add row item grid
+
+
+  
 
     //#region jwc address
   
@@ -794,7 +797,7 @@ $(document).ready(function () {
     });
     //#endregion CLICK ADDRESS BUTTON
 
-
+ 
 
     //#region CHANGE ADDRESS TYPE
     function isDuplicateAddress(type, currentRow) {
@@ -951,6 +954,7 @@ $(document).ready(function () {
                         ClearAll();
                         showAlert('Record Inserted')
                         DateBind();
+                    
                         window.location.reload();
                      //  window.location.href = response.redirectUrl;
                         console.log(JSON.stringify(model));
@@ -1343,6 +1347,41 @@ $(document).ready(function () {
 
 });
 
+//#region GetDeliveryNoteNumber
+ 
+$(document).on("change", "#Header_JIDNH_DN_Date", function () {
+    GetDeliveryNoteNumber();
+}); 
+ 
+function GetDeliveryNoteNumber() {
+
+    let date = $("#Header_JIDNH_DN_Date").val();
+
+    if (!date)
+        return;
+
+    // Convert dd-MMM-yyyy to yyyyMMdd
+    let d = new Date(date);
+
+    let poDate =
+        d.getFullYear().toString() +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        String(d.getDate()).padStart(2, '0');
+
+    $.ajax({
+        url: "/deliverynote/transactions/deliverynote/numbering",
+        type: "GET",
+        data: { PODate: poDate },
+        success: function (response) {
+            $("#Header_JIDNH_DN_No").val(response);
+        },
+        error: function () {
+            // alert("Unable to generate Delivery Note Number.");
+        }
+    });
+}
+ 
+//#endregion
 
 
 //#region ADD  ADDRESS ROW GRID ,VALIDATE ADDRESS GRID,VALIDATE TEMP ROW
@@ -1359,6 +1398,7 @@ function DateBind() {
 
     var fp = document.getElementById("Header_JIDNH_DN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
+    GetDeliveryNoteNumber();
 }
 
 //#region delete grid
@@ -2456,20 +2496,7 @@ function ClearAll() {
 }
 //#endregion
 
-//#region datebind
-function DateBind() {
-    var today = new Date();
-
-    var day = String(today.getDate()).padStart(2, '0');
-    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-    var formattedDate = day + "-" + months[today.getMonth()] + "-" + today.getFullYear();
-
-    var fp = document.getElementById("Header_JIDNH_DN_Date")._flatpickr;
-    if (fp) fp.setDate(formattedDate, true, "d-M-Y");
-}
-//#endregion
+ 
 
 function ResizeAddressPopup(tableSelector = "#AddressTable", modalSelector = "#BuyerAddress") {
 

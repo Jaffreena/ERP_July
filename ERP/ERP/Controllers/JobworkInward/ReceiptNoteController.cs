@@ -245,6 +245,7 @@ namespace ERP.Controllers.JobworkInward
                 foreach (var Reset in Reset_DTO)
                 {
                     PON_DTO.RNN_Date = Convert.ToString(Convert.ToDateTime(Reset.RNR_Date).ToString("yyyyMMdd"));
+                    PON_DTO.RNN_EndDate = Convert.ToString(Convert.ToDateTime(Reset.RNR_EndDate).ToString("yyyyMMdd"));
                     PON_DTO.RNN_StartingNumber = Convert.ToInt32(Reset.RNR_StartingNumber).ToString();
                     PON_DTO.RNN_NumberofDigits = Convert.ToInt32(Reset.RNR_NumberofDigits).ToString();
                     PON_DTO.RNN_PrefilZero = Convert.ToInt64(Reset.RNR_PrefilZero).ToString();
@@ -264,6 +265,7 @@ namespace ERP.Controllers.JobworkInward
                 foreach (var Prefix in Prefix_DTO)
                 {
                     PON_DTO.RNN_Date = Convert.ToString(Convert.ToDateTime(Prefix.RNP_Date).ToString("yyyyMMdd"));
+                    PON_DTO.RNN_EndDate = Convert.ToString(Convert.ToDateTime(Prefix.RNP_EndDate).ToString("yyyyMMdd"));
                     PON_DTO.RNN_Particulars = Convert.ToString(Prefix.RNP_Particulars);
                     if (Prefix.RNP_Number == 0)
                     {
@@ -280,6 +282,7 @@ namespace ERP.Controllers.JobworkInward
                 foreach (var Suffix in Suffix_DTO)
                 {
                     PON_DTO.RNN_Date = Convert.ToString(Convert.ToDateTime(Suffix.RNS_Date).ToString("yyyyMMdd"));
+                    PON_DTO.RNN_EndDate = Convert.ToString(Convert.ToDateTime(Suffix.RNS_EndDate).ToString("yyyyMMdd"));
                     PON_DTO.RNN_Particulars = Convert.ToString(Suffix.RNS_Particulars);
                     if (Suffix.RNS_Number == 0)
                     {
@@ -339,108 +342,63 @@ namespace ERP.Controllers.JobworkInward
 
 
 
-
         [Route("receiptnote/transactions/receiptnote/numbering")]
-        public String OnReceiptNoteNumber(Int32 PODate)
+        public string OnReceiptNoteNumber(Int32 PODate)
         {
-            
             SI_DTO.RNH_Date = PODate;
             SI_DTO.JIRN_Id = 0;
             SI_DTO.JIRN_CreatorCode = Convert.ToInt32(UserCode);
+
             DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
 
-            if (DS.Tables[0].Rows.Count > 0 && DS.Tables[1].Rows.Count > 0)
+            if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
             {
-                Int32 Number = 0;
-                Int32 Order = 0;
-                String Prefix = "";
-                String Surfix = "";
-                String Prefil = "";
-                String OrderNum = "";
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "RN Number is not configured for the selected Receipt Date.";
+                return "";
+            }
 
-                if (DS.Tables[0].Rows.Count > 0)
-                {
-                    Order = Convert.ToInt32(DS.Tables[0].Rows[0]["RNN_Method"].ToString());
-                }
-                if (Order == 2)
-                {
-                    if (DS.Tables[2].Rows.Count > 0)
-                    {
-                        Prefix = DS.Tables[2].Rows[0]["RNP_Particulars"].ToString();
-                    }
-                    if (DS.Tables[3].Rows.Count > 0)
-                    {
-                        Surfix = DS.Tables[3].Rows[0]["RNS_Particulars"].ToString();
-                    }
-                    if (DS.Tables[4].Rows.Count > 0 )
-                    {
-                        Int32 OrNum = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"].ToString());
-                        if (DS.Tables[1].Rows.Count > 0)
-                        {
-                            Int32 RZero = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_PrefilZero"].ToString());
-                            Int32 RDigit = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_NumberofDigits"].ToString());
-                            Int32 RFre = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_Frequency"].ToString());
+            // Manual Numbering
+            int order = Convert.ToInt32(DS.Tables[0].Rows[0]["RNN_Method"]);
+            if (order != 2)
+                return "";
 
-                            //if (RFre == 4)
-                            //{
-                            Number = OrNum + 1;
-                            if (RZero == 1)
-                            {
-                                Prefil = "D" + RDigit;
-                            }
-                            //}
-                            //else if (RFre == 5)
-                            //{
-                            //    Number = OrNum + 1;
-                            //    if (RZero == 2)
-                            //    {
-                            //        Prefil = "D" + RDigit;
-                            //    }
-                            //}
-                        }
-                    }
-                    else
-                    {
-                        if (DS.Tables[1].Rows.Count > 0)
-                        {
-                            //DateTime RDate = Convert.ToDateTime(DS.Tables[1].Rows[0]["RNR_Date"]);
-                            Int32 RNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_StartingNumber"].ToString());
-                            Int32 RZero = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_PrefilZero"].ToString());
-                            Int32 RDigit = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_NumberofDigits"].ToString());
-                            Int32 RFre = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_Frequency"].ToString());
+            string prefix = "";
+            string suffix = "";
+            string prefill = "";
+            int number = 0;
 
-                            //if (RFre == 4)
-                            //{
-                            Number = RNumber;
-                            if (RZero == 1)
-                            {
-                                Prefil = "D" + RDigit;
-                            }
-                            //}
-                            //else if (RFre == 5)
-                            //{
-                            //Number = RNumber;
-                            //if (RZero == 2)
-                            //{
-                            //    Prefil = "D" + RDigit;
-                            //}
-                            //}
-                        }
-                    }
-                    OrderNum = Prefix + "" + Number.ToString(Prefil) + "" + Surfix;
+            // Prefix
+            if (DS.Tables[2].Rows.Count > 0)
+                prefix = DS.Tables[2].Rows[0]["RNP_Particulars"].ToString();
 
-                    return OrderNum;
-                }
+            // Suffix
+            if (DS.Tables[3].Rows.Count > 0)
+                suffix = DS.Tables[3].Rows[0]["RNS_Particulars"].ToString();
+
+            // Reset Configuration
+            int startNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_StartingNumber"]);
+            int digit = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_NumberofDigits"]);
+            int prefillZero = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_PrefilZero"]);
+
+            if (prefillZero == 1)
+                prefill = "D" + digit;
+
+            // Running Number
+            if (DS.Tables[4].Rows.Count > 0)
+            {
+                int runningNumber = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"]);
+                number = runningNumber + 1;
             }
             else
             {
-                ViewBag.ErrorCode = 2;
-                ViewBag.ErrorMessage = "RN number Not assigned for Given date";
+                number = startNumber;
             }
-            return "";
+
+            return prefix + number.ToString(prefill) + suffix;
         }
 
-
+     
         #endregion
 
         #region receipt-note summary
@@ -1462,7 +1420,7 @@ namespace ERP.Controllers.JobworkInward
                         {
                             //DateTime RDate = Convert.ToDateTime(DS.Tables[1].Rows[0]["PIR_Date"]);
                             Int32 RNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_StartingNumber"].ToString());
-                            Int32 RZero = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_PrefilZero"].ToString());
+                            Int32 RZero = Convert.ToInt32(DS.Tables[1].Rows[0][" RNR_PrefilZero"].ToString());
                             Int32 RDigit = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_NumberofDigits"].ToString());
                             Int32 RFre = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_Frequency"].ToString());
 
@@ -1647,6 +1605,10 @@ namespace ERP.Controllers.JobworkInward
                                 DS1.Tables[2].Rows[0]["RNR_StartingNumber"].ToString()
                             );
 
+                            EndDate = Convert.ToDateTime(
+                                DS1.Tables[2].Rows[0]["RNR_EndDate"].ToString()
+                            );
+
                             Frequency = Convert.ToInt32(
                                 DS1.Tables[2].Rows[0]["RNR_Frequency"].ToString()
                             );
@@ -1758,7 +1720,7 @@ namespace ERP.Controllers.JobworkInward
                 SH_DTO = System.Text.Json.JsonSerializer.Deserialize<ReceiptNoteHead_DTO>(SHto);
             }
             SH_DTO.JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");
-          //  SH_DTO.RN_No = OnReceiptNoteNumber(Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd")));
+            SH_DTO.RN_No = OnReceiptNoteNumber(Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd")));
             ReceiptGetData();
             return View(SH_DTO);
         }
@@ -1990,6 +1952,95 @@ namespace ERP.Controllers.JobworkInward
 
 
         #endregion
+
+        [HttpPost]
+        public JsonResult ValidateDateRange(string StartDate, string EndDate)
+        {
+            int startDate = int.Parse(
+                DateTime.ParseExact(StartDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
+                        .ToString("yyyyMMdd"));
+
+            int endDate = int.Parse(
+                DateTime.ParseExact(EndDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
+                        .ToString("yyyyMMdd"));
+
+            RNNumber_DTO dto = new RNNumber_DTO();
+
+            dto.RNN_Date = startDate.ToString();
+            dto.RNN_EndDate = endDate.ToString();
+            dto.Id = 51;
+
+            DataSet ds = PON_DAO.RNNumberDB(dto);
+
+            bool exists = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
+
+            return Json(new
+            {
+                success = !exists,
+                message = exists
+                    ? "The selected date range overlaps with an existing date range."
+                    : ""
+            });
+        }
+
+        [HttpPost]
+        public JsonResult ValidatePrefixDateRange(string StartDate, string EndDate)
+        {
+            int startDate = int.Parse(
+                DateTime.ParseExact(StartDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
+                        .ToString("yyyyMMdd"));
+
+            int endDate = int.Parse(
+                DateTime.ParseExact(EndDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
+                        .ToString("yyyyMMdd"));
+
+            RNNumber_DTO dto = new RNNumber_DTO();
+
+            dto.RNN_Date = startDate.ToString();
+            dto.RNN_EndDate = endDate.ToString();
+            dto.Id = 52;      // Prefix Validation
+
+            DataSet ds = PON_DAO.RNNumberDB(dto);
+
+            bool exists = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
+
+            return Json(new
+            {
+                success = !exists,
+                message = exists
+                    ? "The selected Prefix date range overlaps with an existing date range."
+                    : ""
+            });
+        }
+        [HttpPost]
+        public JsonResult ValidateSuffixDateRange(string StartDate, string EndDate)
+        {
+            int startDate = int.Parse(
+                DateTime.ParseExact(StartDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
+                        .ToString("yyyyMMdd"));
+
+            int endDate = int.Parse(
+                DateTime.ParseExact(EndDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
+                        .ToString("yyyyMMdd"));
+
+            RNNumber_DTO dto = new RNNumber_DTO();
+
+            dto.RNN_Date = startDate.ToString();
+            dto.RNN_EndDate = endDate.ToString();
+            dto.Id = 53;      // Suffix Validation
+
+            DataSet ds = PON_DAO.RNNumberDB(dto);
+
+            bool exists = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
+
+            return Json(new
+            {
+                success = !exists,
+                message = exists
+                    ? "The selected Suffix date range overlaps with an existing date range."
+                    : ""
+            });
+        }
 
 
     }

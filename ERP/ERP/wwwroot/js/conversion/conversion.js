@@ -1,14 +1,108 @@
 ﻿var addressIndex = 0;
+ 
 function AutoFit() {
     fitInputWidth("Header_JIDNH_DN_No", 20, 30);
-     
-
+    fitInputWidth("Header_JIDNH_MS_Number", 20, 30);
+    fitInputWidth("Header_JIDNH_Shift_Number", 20, 30);
+    fitInputWidth("Header_JIDNH_WC_Number", 25, 30);
+    fitInputWidth("Header_JIDNH_PRS_Number", 25, 30);
+    fitInputWidth("Header_JIDNH_Operator_Number", 25, 30);
 }
-$(document).ready(function () {
-    AutoFit();
-    $(document).on("input keyup", "#Header_JIDNH_DN_No", function () {
-        fitInputWidth(this, 20, 30);
+//#region Conversion resize functions
+
+function ResizeConsumptionColumns() {
+    ApplyFieldWidths({
+        fields: ConversionConsumptionFields,
+        container: "#ItemTable",
+        tempRow: "#TempRow",
+        tableBody: "#TableBody_F",
+        searchTable: "#tblsearch"
     });
+}
+
+function ResizeProductionColumns() {
+    ApplyFieldWidths({
+        fields: ConversionProductionFields,
+        container: "#ItemTable_P",
+        tempRow: "#TempRow_P",
+        tableBody: "#TableBody_P",
+        searchTable: "#tblsearch"
+    });
+}
+
+function ResizeScrapColumns() {
+    ApplyFieldWidths({
+        fields: ConversionScrapFields,
+        container: "#ItemTable_S",
+        tempRow: "#TempRow_S",
+        tableBody: "#TableBody_S",
+        searchTable: "#tblsearch"
+    });
+}
+
+//#endregion
+$(window).on("load", function () {
+
+    setTimeout(function () {
+      
+        ResizeConsumptionColumns();
+        ResizeProductionColumns();
+        ResizeScrapColumns();
+    }, 200);
+
+});
+$(document).ready(function () {
+    $(document).on("change", "#Header_JIDNH_DN_Date", function () {
+        GetConversionNumber();
+    });
+ 
+
+    $(document).on("keyup", "#ItemTable input", function () {
+        ResizeConsumptionColumns();
+    });
+
+    $(document).on("change", "#ItemTable select", function () {
+        ResizeConsumptionColumns();
+    });
+    $(document).on("keyup", "#ItemTable_P input", function () {
+        ResizeProductionColumns();
+    });
+
+    $(document).on("change", "#ItemTable_P select", function () {
+        ResizeProductionColumns();
+    });
+
+    $(document).on("keyup", "#ItemTable_S input", function () {
+        ResizeScrapColumns();
+    });
+
+    $(document).on("change", "#ItemTable_S select", function () {
+        ResizeScrapColumns();
+    });
+    //#region autofitheader
+    AutoFit();
+
+    const headerFieldWidths = {
+        Header_JIDNH_DN_No: [20, 30],
+        Header_JIDNH_Operator_Number: [25, 30]
+    };
+
+    $(document).on("input keyup", "#Header_JIDNH_DN_No, #Header_JIDNH_Operator_Number", function () {
+        const [min, max] = headerFieldWidths[this.id];
+        fitInputWidth(this, min, max);
+    });
+
+    $(document).on("change", "#Header_JIDNH_MS_Number, #Header_JIDNH_Shift_Number, #Header_JIDNH_WC_Number, #Header_JIDNH_PRS_Number", function () {
+        const selectWidths = {
+            Header_JIDNH_MS_Number: [20, 30],
+            Header_JIDNH_Shift_Number: [20, 30],
+            Header_JIDNH_WC_Number: [25, 30],
+            Header_JIDNH_PRS_Number: [25, 30]
+        };
+        const [min, max] = selectWidths[this.id];
+        fitInputWidth(this, min, max);
+    });
+ //#region autofitheader
    
     console.log("ItemProduction ready");
 
@@ -211,29 +305,8 @@ $(document).ready(function () {
 
         // 5. Recalculate totals (optional hook)
         calculateTotal_F();
-        //region item grid row focus out event
-        //$("#ItemTable").on(
-        //    "focusout",
-        //    "tr.NewRow",
-        //    function (e) {
-
-        //        let row = $(this);
-
-        //        setTimeout(() => {
-
-        //            // check next focused element
-        //            if (!row.find(document.activeElement).length) {
-
-        //                // document.getElementById('SaveBatchButton').click();
-
-        //            }
-
-        //        }, 0);
-
-        //    }
-        //);
-
-        //#endregion
+        // 6. Resize columns for newly added row
+        ResizeConsumptionColumns();
       
       
     });
@@ -799,7 +872,39 @@ $(document).ready(function () {
 
 });
 
+//#region GetConversionNumber
 
+
+
+function GetConversionNumber() {
+
+    let date = $("#Header_JIDNH_DN_Date").val();
+
+    if (!date)
+        return;
+
+    // Convert dd-MMM-yyyy to yyyyMMdd
+    let d = new Date(date);
+
+    let poDate =
+        d.getFullYear().toString() +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        String(d.getDate()).padStart(2, '0');
+
+    $.ajax({
+        url: "/conversion/transactions/conversion/numbering",
+        type: "GET",
+        data: { PODate: poDate },
+        success: function (response) {
+            $("#Header_JIDNH_DN_No").val(response);
+        },
+        error: function () {
+            // alert("Unable to generate Conversion Number.");
+        }
+    });
+}
+
+//#endregion
 
 //#region ADD  ADDRESS ROW GRID ,VALIDATE ADDRESS GRID,VALIDATE TEMP ROW
 
@@ -815,6 +920,7 @@ function DateBind() {
 
     var fp = document.getElementById("Header_JIDNH_DN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
+    GetConversionNumber();
 }
 
 //#region delete grid
@@ -1461,6 +1567,65 @@ function DateBind() {
 
     var fp = document.getElementById("Header_JIDNH_DN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
+}
+//#endregion
+
+//#region ApplyIBatFieldWidths
+function ApplyIBatFieldWidths(suffix) {
+    const fields = [
+        { cls: ".RNI_BCH_Date", min: 10, max: 10, align: "center" },
+        { cls: ".RNI_BCH_No", min: 15, max: 30, align: "left" },
+        { cls: ".RNI_BCH_Qty", min: 10, max: 20, align: "right" },
+        { cls: ".RNI_BCH_UnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".RNI_BCH_Value", min: 13, max: 25, align: "right" }
+    ];
+
+    const tableBodyId = "IBatTableBody_" + suffix;
+    const $table = $("#" + tableBodyId).closest("table");
+
+    fields.forEach(f => {
+        const controls = $table.find(
+            "#" + tableBodyId + " > #IBatTempRow " + f.cls +
+            ", #" + tableBodyId + " > tr.IBatNewRow " + f.cls
+        );
+        if (!controls.length) return;
+
+        const sample = controls.first()[0];
+        const minWidth = chToPx(f.min, sample);
+        const maxWidth = f.max != null ? chToPx(f.max, sample) : Number.MAX_SAFE_INTEGER;
+        let requiredWidth = minWidth;
+
+        controls.each(function () {
+            let text = (this.tagName === "SELECT")
+                ? (this.options[this.selectedIndex]?.text || "")
+                : (this.value || "");
+            requiredWidth = Math.max(requiredWidth, getTextWidth(text.trim(), this));
+        });
+
+        requiredWidth = Math.min(requiredWidth, maxWidth);
+        if (f.cls === ".RNI_BCH_UnitPrice" || f.cls === ".RNI_BCH_Value") {
+            requiredWidth = Math.min(requiredWidth + 8, maxWidth);
+        }
+
+        controls.each(function () {
+            this.style.setProperty("width", "100%", "important");
+            this.style.setProperty("box-sizing", "border-box", "important");
+            this.style.setProperty("text-align", f.align, "important");
+            this.style.setProperty("padding", "2px", "important");
+
+            const td = $(this).closest("td")[0];
+            td.style.setProperty("width", requiredWidth + "px", "important");
+            td.style.setProperty("min-width", minWidth + "px", "important");
+            td.style.setProperty("max-width", maxWidth + "px", "important");
+
+            const th = $table.find("thead th").eq(td.cellIndex)[0];
+            if (th) {
+                th.style.setProperty("width", requiredWidth + "px", "important");
+                th.style.setProperty("min-width", minWidth + "px", "important");
+                th.style.setProperty("max-width", maxWidth + "px", "important");
+            }
+        });
+    });
 }
 //#endregion
 

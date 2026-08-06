@@ -75,7 +75,45 @@ function AutoFit() {
     fitInputWidth("Header_JISVOH_TDC", 40, 40);
     fitInputWidth("Header_JISVOH_Remarks", 40, 40);
 }
+function GetServiceOrderNumber() {
+
+    let date = $("#Header_JISVOH_RegDate").val();
+
+    if (!date)
+        return;
+
+    // Convert dd-MMM-yyyy to yyyyMMdd
+    let d = new Date(date);
+
+    let poDate =
+        d.getFullYear().toString() +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        String(d.getDate()).padStart(2, '0');
+
+    $.ajax({
+        url: "/serviceorder/transactions/serviceorder/numbering",
+        type: "GET",
+        data: { PODate: poDate },
+        success: function (response) {
+            $("#Header_JISVOH_RegNo").val(response);
+        },
+        error: function () {
+            // alert("Unable to generate Delivery Note Number.");
+        }
+    });
+}
+
 $(document).ready(function () {
+
+    //#region GetDeliveryNoteNumber
+
+    $(document).on("change", "#Header_JISVOH_RegDate", function () {
+        GetServiceOrderNumber();
+    });
+
+   
+
+    //#endregion
     $(document).on("mousedown", ".search-results tbody tr", function () {
 
         let rows = $(".search-results tbody tr");
@@ -734,7 +772,9 @@ function DateBind() {
     var serviceOrderDate = document.getElementById("Header_JISVOH_ServiceOrderDate")?._flatpickr;
     if (serviceOrderDate)
         serviceOrderDate.setDate(formattedDate, true, "d-M-Y");
-    console.log(formattedDate +'--formattedDate')
+    console.log(formattedDate + '--formattedDate')
+    GetServiceOrderNumber();
+
 }
 
 function CreateServiceOrderModel() {

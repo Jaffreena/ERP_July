@@ -187,6 +187,7 @@ function ResizeColumn(control) {
     });
 }
 $(document).ready(function () {
+    
     //#region item grid alignment
     $(document).on("input", "#ItemTable input", function () {
         ResizeColumn(this);
@@ -430,10 +431,15 @@ $(document).ready(function () {
 
     });
 
+    $(document).on("change", "#Header_JISVIH_InvoiceDate", function () {
+        GetJWInvoiceNumber();
+    }); 
+
     $("#Header_JISVIH_InvoiceDate").on("change", function () {
        // console.log("Date changed:", $(this).val());
 
         loadTaxCluster(); // your function
+      
     });
     $("#Header_JISVIH_JW_Customer_Number").change(function () {
         LoadServiceOrders();
@@ -598,7 +604,7 @@ $(document).ready(function () {
 
     });
 
-
+    DateBind();
 });
 
 function GetAllowedQty(jisvohNumber, prsNumber, itemNumber, uomNumber, callback) {
@@ -634,6 +640,7 @@ function DateBind() {
 
     var fp = document.getElementById("Header_JISVIH_InvoiceDate")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
+    GetJWInvoiceNumber();
 }
 function ClearAll() {
     $(".left-menu")
@@ -829,7 +836,38 @@ function loadTaxCluster() {
         }
     });
 }
+//#region GetJWInvoiceNumber
 
+ 
+function GetJWInvoiceNumber() {
+
+    let date = $("#Header_JISVIH_InvoiceDate").val();
+
+    if (!date)
+        return;
+
+    // Convert dd-MMM-yyyy to yyyyMMdd
+    let d = new Date(date);
+
+    let poDate =
+        d.getFullYear().toString() +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        String(d.getDate()).padStart(2, '0');
+
+    $.ajax({
+        url: "/jwinvoice/transactions/jwinvoice/numbering",
+        type: "GET",
+        data: { PODate: poDate },
+        success: function (response) {
+            $("#Header_JISVIH_InvoiceNo").val(response);
+        },
+        error: function () {
+            // alert("Unable to generate JW Invoice Number.");
+        }
+    });
+}
+
+//#endregion
 //#region customer Search Functions
 function OnBuyerSelectCall(inputElement) {
 

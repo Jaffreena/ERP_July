@@ -11,6 +11,7 @@ using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using SelectPdf;
 using System.Data;
+using System.Globalization;
 using System.Text.Json;
 using System.Transactions;
 
@@ -197,7 +198,72 @@ namespace ERP.Controllers
 
         }
 
+        #region date chnage
 
+        [HttpGet]
+        [Route("conversion/transactions/conversion/numbering")]
+        public string OnConversionNumber(Int32 PODate)
+        {
+            DateTime conversionDate = DateTime.ParseExact(
+                PODate.ToString(),
+                "yyyyMMdd",
+                CultureInfo.InvariantCulture);
+
+            ConversionCreate_DTO CONV_DTO = new ConversionCreate_DTO();
+            CONV_DTO.Header.JIDNH_DN_Date = conversionDate;
+            CONV_DTO.Header.DN_Id = 0;
+
+            Conversion_DAO CONV_DAO = new Conversion_DAO();
+            DS = CONV_DAO.ConversionDB(CONV_DTO);
+
+            if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "Conversion Number is not configured for the selected Conversion Date.";
+                return "";
+            }
+
+            // Manual Numbering
+            int order = Convert.ToInt32(DS.Tables[0].Rows[0]["JICN_Method"]);
+            if (order != 2)
+                return "";
+
+            string prefix = "";
+            string suffix = "";
+            string prefill = "";
+            int number = 0;
+
+            // Prefix
+            if (DS.Tables[2].Rows.Count > 0)
+                prefix = DS.Tables[2].Rows[0]["JICP_Particulars"].ToString();
+
+            // Suffix
+            if (DS.Tables[3].Rows.Count > 0)
+                suffix = DS.Tables[3].Rows[0]["JICS_Particulars"].ToString();
+
+            // Reset Configuration
+            int startNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["JICR_StartingNumber"]);
+            int digit = Convert.ToInt32(DS.Tables[1].Rows[0]["JICR_NumberofDigits"]);
+            int prefillZero = Convert.ToInt32(DS.Tables[1].Rows[0]["JICR_PrefilZero"]);
+
+            if (prefillZero == 1)
+                prefill = "D" + digit;
+
+            // Running Number
+            if (DS.Tables[4].Rows.Count > 0)
+            {
+                int runningNumber = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"]);
+                number = runningNumber + 1;
+            }
+            else
+            {
+                number = startNumber;
+            }
+
+            return prefix + number.ToString(prefill) + suffix;
+        }
+
+        #endregion
         #region Delivery Note Create
         public IActionResult Index()
         {

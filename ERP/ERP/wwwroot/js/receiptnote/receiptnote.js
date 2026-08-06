@@ -871,6 +871,41 @@ function DateBind() {
     var fp = document.getElementById("RN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
 }
+
+//#region Receipt Note Number
+$(document).on("change", "#RN_Date", function () {
+    GetReceiptNoteNumber();
+});
+function GetReceiptNoteNumber() {
+
+    let date = $("#RN_Date").val();
+
+    if (!date)
+        return;
+
+    // Convert dd-MMM-yyyy to yyyyMMdd
+    let d = new Date(date);
+
+    let poDate =
+        d.getFullYear().toString() +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        String(d.getDate()).padStart(2, '0');
+
+    $.ajax({
+        url: "/receiptnote/transactions/receiptnote/numbering",
+        type: "GET",
+        data: { PODate: poDate },
+        success: function (response) {
+            $("#RN_No").val(response);
+        },
+        error: function () {
+           // alert("Unable to generate Receipt Note Number.");
+        }
+    });
+}
+
+//#endregion
+
 //#region SUBMIT VALIDATION
 function validateHeaderById_RN() {
 

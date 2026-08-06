@@ -4,6 +4,7 @@ using ERP_DL;
 using ERP_DTO.JobInwardTransaction;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using System.Globalization;
 using System.Text.Json;
 using System.Transactions;
 
@@ -38,10 +39,66 @@ namespace ERP.Controllers.JobworkInward
                 SH_DTO = System.Text.Json.JsonSerializer.Deserialize<ReceiptNoteHead_DTO>(SHto);
             }
             SH_DTO.JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");
-            //  SH_DTO.RN_No = OnReceiptNoteNumber(Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd")));
+              SH_DTO.RN_No = OnReceiptNoteNumber(Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd")));
             ReceiptGetData();
             ViewBag.Collapse = true;
             return View(SH_DTO);
+        }
+        [HttpGet]
+        [Route("receiptnote/transactions/receiptnote/numbering")]
+        public string OnReceiptNoteNumber(Int32 PODate)
+        {
+            SI_DTO.RNH_Date = PODate;
+            SI_DTO.JIRN_Id = 0;
+            SI_DTO.JIRN_CreatorCode = Convert.ToInt32(0);
+
+            DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
+
+            if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "RN Number is not configured for the selected Receipt Date.";
+                return "";
+            }
+
+            // Manual Numbering
+            int order = Convert.ToInt32(DS.Tables[0].Rows[0]["RNN_Method"]);
+            if (order != 2)
+                return "";
+
+            string prefix = "";
+            string suffix = "";
+            string prefill = "";
+            int number = 0;
+
+            // Prefix
+            if (DS.Tables[2].Rows.Count > 0)
+                prefix = DS.Tables[2].Rows[0]["RNP_Particulars"].ToString();
+
+            // Suffix
+            if (DS.Tables[3].Rows.Count > 0)
+                suffix = DS.Tables[3].Rows[0]["RNS_Particulars"].ToString();
+
+            // Reset Configuration
+            int startNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_StartingNumber"]);
+            int digit = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_NumberofDigits"]);
+            int prefillZero = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_PrefilZero"]);
+
+            if (prefillZero == 1)
+                prefill = "D" + digit;
+
+            // Running Number
+            if (DS.Tables[4].Rows.Count > 0)
+            {
+                int runningNumber = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"]);
+                number = runningNumber + 1;
+            }
+            else
+            {
+                number = startNumber;
+            }
+
+            return prefix + number.ToString(prefill) + suffix;
         }
 
         void ReceiptGetData()
@@ -432,6 +489,9 @@ namespace ERP.Controllers.JobworkInward
         }
 
         #endregion
+
+    
+
 
     }
 }

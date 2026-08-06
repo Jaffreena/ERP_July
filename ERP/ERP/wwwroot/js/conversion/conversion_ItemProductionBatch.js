@@ -255,6 +255,8 @@ $(document).ready(function () {
         browCount++;
         row.data("isValid", false);
         isbAddingRow = false;
+        ApplyIBatFieldWidths("P");
+     
     }
 
     $(document).on("click", ".ItemBatch_P", function () {
@@ -337,6 +339,7 @@ $(document).ready(function () {
         ApplyBatchValues_P(currentItemGridSelectedRow);
         //#endregion
         new bootstrap.Modal($("#IBatch")).show();
+        ApplyIBatFieldWidths("P");
     
     });
 
@@ -348,6 +351,11 @@ $(document).ready(function () {
         $(this).closest('tr').hide();
 
         BatchCalculateFooter_P();
+        ApplyIBatFieldWidths("P");
+    });
+    // ✅ Batch No width recalculation
+    $(document).on('input', "#IBatTableBody_P tr.IBatNewRow input.RNI_BCH_No", function () {
+        ApplyIBatFieldWidths("P");
     });
 
     // ✅ Qty → Value calculation
@@ -363,6 +371,7 @@ $(document).ready(function () {
         row.find(".RNI_BCH_Value").val(DecimalIndianRupees(value));
 
         BatchCalculateFooter_P();
+        ApplyIBatFieldWidths("P");
         var lastRow = $("#IBatTableBody_P tr.IBatNewRow").last();
         if (CheckAllValid(lastRow)) {
             IBatNewRow();
@@ -381,6 +390,7 @@ $(document).ready(function () {
         }
 
         BatchCalculateFooter_P();
+        ApplyIBatFieldWidths("P");
     });
     //#region apply batch values
     function ApplyBatchValues_P(rowId) {
@@ -405,6 +415,7 @@ $(document).ready(function () {
         });
 
         CalculateBatchFooter_P();
+        ApplyIBatFieldWidths("P");
     }
     //#endregion
 
@@ -562,5 +573,8 @@ function BatchCalculateFooter_P() {
 
 }
 
-window.onload = BatchCalculateFooter_P;
+window.onload = function () {
+    BatchCalculateFooter_P();
+    ApplyIBatFieldWidths("P");
+};
  
