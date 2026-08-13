@@ -147,27 +147,48 @@
         });
 
 
-
-        $("#ResetNewRowButton").click(function () {
-            var lastRow = $("tr.ResetNewRow").last();
-            if (ResetCheckAllFieldsValid(lastRow)) {
-                ResetaddRow();
-            }
-            else {
-                var firstInvalidField = null;
-                lastRow.find("select, input, input[type='text']").each(function () {
-                    if (!ResetValidateField($(this))) {
-                        if (firstInvalidField == null)
-                            firstInvalidField = $(this);
-                        return false;
-                    }
-                });
-                if (firstInvalidField != null) {
-                    alert("Please complete all fields !");
-                    firstInvalidField.focus();
+    $("#ResetNewRowButton").click(function () {
+                var lastRow = $("tr.ResetNewRow").last();
+                if (ResetCheckAllFieldsValid(lastRow)) {
+                    ResetaddRow();
                 }
-            }
-        });
+                else {
+                    var startingNumberInvalid = false;
+                    var numberOfDigitsInvalid = false;
+                    var otherInvalid = false;
+                    var firstInvalidField = null;
+
+                    lastRow.find("select, input, input[type='text']").each(function () {
+                        if (!ResetValidateField($(this))) {
+                            if (firstInvalidField == null) {
+                                firstInvalidField = $(this);
+                            }
+                            if ($(this).hasClass("JSOR_StartingNumber")) {
+                                startingNumberInvalid = true;
+                            } else if ($(this).hasClass("JSOR_NumberofDigits")) {
+                                numberOfDigitsInvalid = true;
+                            } else {
+                                otherInvalid = true;
+                            }
+                        }
+                    });
+
+                    if (firstInvalidField != null) {
+                        var message;
+                        if (startingNumberInvalid && numberOfDigitsInvalid) {
+                            message = "Start Number must be greater than 0, and Number Of Digits must be a single digit between 3 and 9.";
+                        } else if (startingNumberInvalid) {
+                            message = "Start Number must be greater than 0. Negative numbers, 0, or blank are not allowed.";
+                        } else if (numberOfDigitsInvalid) {
+                            message = "Number Of Digits must be a single digit between 3 and 9.";
+                        } else {
+                            message = "Please complete all fields !";
+                        }
+                        alert(message);
+                        firstInvalidField.focus();
+                    }
+                }
+            });
         function ResetCheckAllFieldsValid(currentRow) {
             var allFieldsValid = true;
             $("tr.ResetNewRow:visible").each(function () {
@@ -181,19 +202,28 @@
             });
             return allFieldsValid;
         }
-        function ResetValidateField(currentInput) {
-            var valid = 1;
-            var inputValue = currentInput.val();
-            if (inputValue === "") {
-                valid = 0;
-            }
-            if (valid == 0) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
+    function ResetValidateField(currentInput) {
+             var inputValue = currentInput.val();
+
+             if (inputValue === null || $.trim(inputValue) === "") {
+                 return false;
+             }
+
+             if (currentInput.hasClass("JSOR_StartingNumber")) {
+                 var numValue = parseInt(inputValue, 10);
+                 if (isNaN(numValue) || numValue <= 0) {
+                     return false;
+                 }
+             }
+
+             if (currentInput.hasClass("JSOR_NumberofDigits")) {
+                 if (!/^[3-9]$/.test($.trim(inputValue))) {
+                     return false;
+                 }
+             }
+
+             return true;
+         }
         ResetInitializeFlatpickrs();
     });
 </script>

@@ -141,7 +141,11 @@
             });
             return allFieldsValid;
         }
-        function SubValidateField(currentInput) {
+    function SubValidateField(currentInput) {
+            if (currentInput.hasClass("RNS_Particulars")) {
+                return true;
+            }
+
             var valid = 1;
             var inputValue = currentInput.val();
             if (inputValue === "") {

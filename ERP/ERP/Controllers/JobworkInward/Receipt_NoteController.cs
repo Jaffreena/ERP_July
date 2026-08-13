@@ -39,68 +39,85 @@ namespace ERP.Controllers.JobworkInward
                 SH_DTO = System.Text.Json.JsonSerializer.Deserialize<ReceiptNoteHead_DTO>(SHto);
             }
             SH_DTO.JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");
-              SH_DTO.RN_No = OnReceiptNoteNumber(Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd")));
+              SH_DTO.RN_No = OnReceiptNoteNextNumber(DateTime.Now);
             ReceiptGetData();
             ViewBag.Collapse = true;
             return View(SH_DTO);
         }
+
         [HttpGet]
-        [Route("receiptnote/transactions/receiptnote/numbering")]
-        public string OnReceiptNoteNumber(Int32 PODate)
+        [Route("receiptnote/transactions/receiptnote/next-rn-number")]
+        public string OnReceiptNoteNextNumber(DateTime RNDate)
         {
-            SI_DTO.RNH_Date = PODate;
-            SI_DTO.JIRN_Id = 0;
-            SI_DTO.JIRN_CreatorCode = Convert.ToInt32(0);
+            RN_NextNumber_DTO DTO = new RN_NextNumber_DTO();
+            DTO.Id = 101;
+            DTO.RNDate = RNDate;
+            DTO.CreatorCode = Convert.ToInt32(0);
 
-            DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
-
-            if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
+            try
+            {
+                DTO = new RN_GetNextNumberDAO().RNNextNumberDB(DTO);
+            }
+            catch (Exception ex)
             {
                 ViewBag.ErrorCode = 2;
                 ViewBag.ErrorMessage = "RN Number is not configured for the selected Receipt Date.";
                 return "";
             }
 
-            // Manual Numbering
-            int order = Convert.ToInt32(DS.Tables[0].Rows[0]["RNN_Method"]);
-            if (order != 2)
-                return "";
-
-            string prefix = "";
-            string suffix = "";
-            string prefill = "";
-            int number = 0;
-
-            // Prefix
-            if (DS.Tables[2].Rows.Count > 0)
-                prefix = DS.Tables[2].Rows[0]["RNP_Particulars"].ToString();
-
-            // Suffix
-            if (DS.Tables[3].Rows.Count > 0)
-                suffix = DS.Tables[3].Rows[0]["RNS_Particulars"].ToString();
-
-            // Reset Configuration
-            int startNumber = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_StartingNumber"]);
-            int digit = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_NumberofDigits"]);
-            int prefillZero = Convert.ToInt32(DS.Tables[1].Rows[0]["RNR_PrefilZero"]);
-
-            if (prefillZero == 1)
-                prefill = "D" + digit;
-
-            // Running Number
-            if (DS.Tables[4].Rows.Count > 0)
-            {
-                int runningNumber = Convert.ToInt32(DS.Tables[4].Rows[0]["StartingNumber"]);
-                number = runningNumber + 1;
-            }
-            else
-            {
-                number = startNumber;
-            }
-
-            return prefix + number.ToString(prefill) + suffix;
+            return DTO.FinalRNNumber;
         }
+        RNNumber_DTO PON_DTO = new RNNumber_DTO();
+        RNNumber_DAO PON_DAO = new RNNumber_DAO();
+        void OnReceiptNoteNumberGen(Int32 RNDate)
+        {
+            DataSet DS1 = new DataSet();
 
+            PON_DTO.RNN_Date = RNDate.ToString();
+            PON_DTO.CreatorCode = 1;
+            PON_DTO.Id = 101;
+
+            DS1 = PON_DAO.RNNumberDB(PON_DTO);
+
+            if (DS1.Tables[0].Rows.Count > 0)
+            {
+                Int32 Order = Convert.ToInt32(DS1.Tables[0].Rows[0]["RNN_Method"].ToString());
+
+                if (Order == 2)
+                {
+                    if (DS1.Tables[1].Rows.Count > 0)
+                    {
+                        // Existing range -> increment
+                        Int32 Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["StartingNumber"].ToString());
+
+                        PON_DTO.RNN_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["RNR_Number"].ToString());
+                        PON_DTO.RNN_StartingNumber = Convert.ToString(Number + 1);
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 103;
+
+                        PON_DAO.RNNumberDB(PON_DTO);
+                    }
+                    else if (DS1.Tables[2].Rows.Count > 0)
+                    {
+                        // New range -> insert fresh, using Setup dates directly (no Frequency calculation)
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["RNR_Date"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["RNR_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["RNR_StartingNumber"].ToString());
+
+                        PON_DTO.RNN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["RNR_Number"].ToString());
+                        PON_DTO.RNN_StartingNumber = Convert.ToString(Start);
+                        PON_DTO.RNN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
+                        PON_DTO.RNN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 102;
+
+                        PON_DAO.RNNumberDB(PON_DTO);
+                    }
+                    
+                }
+            }
+        }
+        
         void ReceiptGetData()
         {
             SI_DTO.JIRNH_RN_Date = DateTime.Now;
@@ -252,7 +269,7 @@ namespace ERP.Controllers.JobworkInward
                                     throw new Exception("Header insert failed");
 
                                 long headerId = Convert.ToInt64(DS.Tables[0].Rows[0][0]);
-
+                                OnReceiptNoteNumberGen(Convert.ToInt32(Convert.ToDateTime(S_DTO.RN_Date).ToString("yyyyMMdd")));
                                 // =========================
                                 // ITEM INSERT
                                 // =========================

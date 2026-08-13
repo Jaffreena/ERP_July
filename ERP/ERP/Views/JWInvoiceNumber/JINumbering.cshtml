@@ -122,9 +122,9 @@
             }
         });
 
-        $("tr.ResetNewRow").each(function () {
-            var Date = $(this).find("input.JIP_Date").val();
-            var EndDate = $(this).find("input.JIP_EndDate").val();
+      $("tr.ResetNewRow").each(function () {
+            var Date = $(this).find("input.JIR_Date").val();
+            var EndDate = $(this).find("input.JIR_EndDate").val();
             var StartingNumber = $(this).find("input.JIR_StartingNumber").val();
             var NumberofDigits = $(this).find("input.JIR_NumberofDigits").val();
             var PrefilZero = $(this).find("select.JIR_PrefilZero").val();
@@ -134,6 +134,48 @@
                 $(this).remove();
             }
         });
+
+        var startingNumberInvalid = false;
+        var numberOfDigitsInvalid = false;
+        var firstInvalidField = null;
+
+        $("tr.ResetNewRow:visible").each(function () {
+            var startingNumberField = $(this).find("input.JIR_StartingNumber");
+            var numValue = parseInt(startingNumberField.val(), 10);
+            if (isNaN(numValue) || numValue <= 0) {
+                startingNumberInvalid = true;
+                if (firstInvalidField == null) {
+                    firstInvalidField = startingNumberField;
+                }
+            }
+
+            var digitsField = $(this).find("input.JIR_NumberofDigits");
+            if (!/^[3-9]$/.test($.trim(digitsField.val()))) {
+                numberOfDigitsInvalid = true;
+                if (firstInvalidField == null) {
+                    firstInvalidField = digitsField;
+                }
+            }
+        });
+
+        if (startingNumberInvalid || numberOfDigitsInvalid) {
+            event.preventDefault();
+
+            var message;
+            if (startingNumberInvalid && numberOfDigitsInvalid) {
+                message = "Start Number must be greater than 0, and Number Of Digits must be a single digit between 3 and 9.";
+            } else if (startingNumberInvalid) {
+                message = "Start Number must be greater than 0. Negative numbers, 0, or blank are not allowed.";
+            } else {
+                message = "Number Of Digits must be a single digit between 3 and 9.";
+            }
+
+            alert(message);
+            if (firstInvalidField != null) {
+                firstInvalidField.focus();
+            }
+            return false;
+        }
 
         $(".datepicker").flatpickr({
             dateFormat: "d-M-Y",

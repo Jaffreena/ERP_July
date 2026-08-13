@@ -644,6 +644,9 @@ namespace ERP_DTO.JobInwardTransaction
     #endregion
     public class ReceiptNote_DTO
     {
+
+        public String? Result_Message { get; set; }
+        public int? Result_Number { get; set; }
         // =======================
         // HEADER (JIRNH)
         // =======================

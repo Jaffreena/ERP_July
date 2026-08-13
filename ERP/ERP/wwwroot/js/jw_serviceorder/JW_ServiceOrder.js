@@ -75,41 +75,83 @@ function AutoFit() {
     fitInputWidth("Header_JISVOH_TDC", 40, 40);
     fitInputWidth("Header_JISVOH_Remarks", 40, 40);
 }
-function GetServiceOrderNumber() {
-
-    let date = $("#Header_JISVOH_RegDate").val();
-
-    if (!date)
-        return;
-
-    // Convert dd-MMM-yyyy to yyyyMMdd
-    let d = new Date(date);
-
-    let poDate =
-        d.getFullYear().toString() +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        String(d.getDate()).padStart(2, '0');
-
+function LoadDefaultFormSetting() {
     $.ajax({
-        url: "/serviceorder/transactions/serviceorder/numbering",
-        type: "GET",
-        data: { PODate: poDate },
+        url: '/jobinward/transactions/service-order/get',
+        type: 'GET',
+        dataType: 'json',
         success: function (response) {
-            $("#Header_JISVOH_RegNo").val(response);
+            if (response && response.success && response.data) {
+                var data = response.data;
+
+                if (data.dfS_JISVOH_ServiceOrderNo) {
+                    $('#Header_JISVOH_ServiceOrderNo').val(data.dfS_JISVOH_ServiceOrderNo);
+                }
+                if (data.dfS_JISVOH_JW_Customer_Number) {
+                    $('#Header_JISVOH_JW_Customer_Number').val(data.dfS_JISVOH_JW_Customer_Number);
+                    $('#Header_JISVOH_JW_Customer_Name').val(data.cuS_Name);
+                }
+                if (data.dfS_JISVOH_Currency_Number) {
+                    $('#Header_JISVOH_Currency_Number').val(data.dfS_JISVOH_Currency_Number).trigger('change');
+                }
+                if (data.dfS_JISVOH_PaymentTerms) {
+                    $('#Header_JISVOH_PaymentTerms').val(data.dfS_JISVOH_PaymentTerms);
+                }
+                if (data.dfS_JISVOH_DeliveryTerms) {
+                    $('#Header_JISVOH_DeliveryTerms').val(data.dfS_JISVOH_DeliveryTerms);
+                }
+                if (data.dfS_JISVOH_DeliveryMode) {
+                    $('#Header_JISVOH_DeliveryMode').val(data.dfS_JISVOH_DeliveryMode);
+                }
+                if (data.dfS_JISVOH_Tax) {
+                    $('#Header_JISVOH_Tax').val(data.dfS_JISVOH_Tax);
+                }
+                if (data.dfS_JISVOH_TDC) {
+                    $('#Header_JISVOH_TDC').val(data.dfS_JISVOH_TDC);
+                }
+                if (data.dfS_JISVOH_Remarks) {
+                    $('#Header_JISVOH_Remarks').val(data.dfS_JISVOH_Remarks);
+                }
+                if (data.dfS_JISVOH_MS_Number) {
+                    $('#Header_JISVOH_MS_Number').val(data.dfS_JISVOH_MS_Number).trigger('change');
+                }
+            }
         },
-        error: function () {
-            // alert("Unable to generate Delivery Note Number.");
+        error: function (xhr) {
+            console.error('Failed to load default form setting', xhr);
         }
     });
 }
+$(document).on("change", "#Header_JISVOH_RegDate", function () {
+    GetServiceOrderNumber();
+});
+function GetServiceOrderNumber() {
+    let date = $("#Header_JISVOH_RegDate").val();
+    if (!date)
+        return;
 
+    $.ajax({
+        url: "/serviceorder/transactions/serviceorder/next-jso-number",
+        type: "GET",
+        data: { JSODate: date },
+        success: function (response) {
+            if (!response || response.trim() === "") {
+                alert("Please set numbering for this date range.");
+                $("#Header_JISVOH_RegNo").val("");
+                DateBind();
+                return;
+            }
+            $("#Header_JISVOH_RegNo").val(response);
+        },
+        error: function () {
+        }
+    });
+}
 $(document).ready(function () {
-
+    LoadDefaultFormSetting();
     //#region GetDeliveryNoteNumber
 
-    $(document).on("change", "#Header_JISVOH_RegDate", function () {
-        GetServiceOrderNumber();
-    });
+
 
    
 
@@ -557,10 +599,10 @@ $(document).ready(function () {
             success: function (response) {
 
                 if (response.success) {
+                    $('#ModelAlert').one('hidden.bs.modal', function () {
+                        location.reload();
+                    });
                     showAlert('Record Inserted');
-                    ClearAll();
-                    DateBind();
-                    console.log(model);
                 }
             },
 

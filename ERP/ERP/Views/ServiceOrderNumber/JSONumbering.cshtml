@@ -122,23 +122,65 @@
             }
         });
 
-        $("tr.ResetNewRow").each(function () {
-            var Date = $(this).find("input.JSOP_Date").val();
-            var EndDate = $(this).find("input.JSOP_EndDate").val();
-            var StartingNumber = $(this).find("input.JSOR_StartingNumber").val();
-            var NumberofDigits = $(this).find("input.JSOR_NumberofDigits").val();
-            var PrefilZero = $(this).find("select.JSOR_PrefilZero").val();
-            var Frequency = $(this).find("select.JSOR_Frequency").val();
+    $("tr.ResetNewRow").each(function () {
+             var Date = $(this).find("input.JSOR_Date").val();
+             var EndDate = $(this).find("input.JSOR_EndDate").val();
+             var StartingNumber = $(this).find("input.JSOR_StartingNumber").val();
+             var NumberofDigits = $(this).find("input.JSOR_NumberofDigits").val();
+             var PrefilZero = $(this).find("select.JSOR_PrefilZero").val();
+             var Frequency = $(this).find("select.JSOR_Frequency").val();
 
-            if (!Date && !StartingNumber && !NumberofDigits && !PrefilZero && !Frequency) {
-                $(this).remove();
-            }
-        });
+             if (!Date && !StartingNumber && !NumberofDigits && !PrefilZero && !Frequency) {
+                 $(this).remove();
+             }
+         });
 
-        $(".datepicker").flatpickr({
-            dateFormat: "d-M-Y",
-            altInput: false,
-        });
-    });
+         var startingNumberInvalid = false;
+         var numberOfDigitsInvalid = false;
+         var firstInvalidField = null;
+
+         $("tr.ResetNewRow:visible").each(function () {
+             var startingNumberField = $(this).find("input.JSOR_StartingNumber");
+             var numValue = parseInt(startingNumberField.val(), 10);
+             if (isNaN(numValue) || numValue <= 0) {
+                 startingNumberInvalid = true;
+                 if (firstInvalidField == null) {
+                     firstInvalidField = startingNumberField;
+                 }
+             }
+
+             var digitsField = $(this).find("input.JSOR_NumberofDigits");
+             if (!/^[3-9]$/.test($.trim(digitsField.val()))) {
+                 numberOfDigitsInvalid = true;
+                 if (firstInvalidField == null) {
+                     firstInvalidField = digitsField;
+                 }
+             }
+         });
+
+         if (startingNumberInvalid || numberOfDigitsInvalid) {
+             event.preventDefault();
+
+             var message;
+             if (startingNumberInvalid && numberOfDigitsInvalid) {
+                 message = "Start Number must be greater than 0, and Number Of Digits must be a single digit between 3 and 9.";
+             } else if (startingNumberInvalid) {
+                 message = "Start Number must be greater than 0. Negative numbers, 0, or blank are not allowed.";
+             } else {
+                 message = "Number Of Digits must be a single digit between 3 and 9.";
+             }
+
+             alert(message);
+             if (firstInvalidField != null) {
+                 firstInvalidField.focus();
+             }
+             return false;
+         }
+
+         $(".datepicker").flatpickr({
+             dateFormat: "d-M-Y",
+             altInput: false,
+         });
+     });
 
 </script>

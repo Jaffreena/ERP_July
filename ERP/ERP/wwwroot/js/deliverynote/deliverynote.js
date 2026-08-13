@@ -13,6 +13,7 @@ const DeliveryNoteAddressFields = [
 const ItemTableFields = [
     { cls: ".JIDNI_PRS_Number", min: 10, max: 25, align: "left" },    // Process
     { cls: ".JIDNI_Item_Code", min: 10, max: 15, align: "left" },    // Item Code
+    { cls: ".JIDNI_Item_Code", min: 10, max: 15, align: "left" },    // Item Code
     { cls: ".JIDNI_Item_Description", min: 40, max: 40, align: "left" },    // Description
     { cls: ".JIDNI_OuterDia", min: 8, max: 8, align: "center" },  // Outer Dia
     { cls: ".JIDNI_Thickness", min: 8, max: 8, align: "center" },  // Thickness
@@ -320,8 +321,56 @@ function ResizeColumn(control) {
         searchTable: "#tblsearch"
     });
 }
-$(document).ready(function () {
+function LoadDefaultFormSetting() {
+    $.ajax({
+        url: '/jobinward/transactions/delivery-note/get',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response && response.success && response.data) {
+                var data = response.data;
 
+                if (data.dfS_JIDNH_MS_Number) {
+                    $('#Header_JIDNH_MS_Number').val(data.dfS_JIDNH_MS_Number).trigger('change');
+                }
+                if (data.dfS_JIDNH_JW_Customer_Number) {
+                    $('#Header_JIDNH_JW_Customer_Number').val(data.dfS_JIDNH_JW_Customer_Number);
+                    $('#Header_JIDNH_JW_Customer_Name').val(data.cuS_Name);
+                }
+                if (data.dfS_JIDNH_Currency_Number) {
+                    $('#Header_JIDNH_Currency_Number').val(data.dfS_JIDNH_Currency_Number).trigger('change');
+                }
+                if (data.dfS_JIDNH_WH_Number) {
+                    $('#Header_JIDNH_WH_Number').val(data.dfS_JIDNH_WH_Number).trigger('change');
+                }
+                if (data.dfS_JIDNH_PaymentTerms) {
+                    $('#Header_JIDNH_PaymentTerms').val(data.dfS_JIDNH_PaymentTerms);
+                }
+                if (data.dfS_JIDNH_DeliveryTerms) {
+                    $('#Header_JIDNH_DeliveryTerms').val(data.dfS_JIDNH_DeliveryTerms);
+                }
+                if (data.dfS_JIDNH_DeliveryMode) {
+                    $('#Header_JIDNH_DeliveryMode').val(data.dfS_JIDNH_DeliveryMode);
+                }
+                if (data.dfS_JIDNH_DespatchedThrough) {
+                    $('#Header_JIDNH_DespatchedThrough').val(data.dfS_JIDNH_DespatchedThrough);
+                }
+                if (data.dfS_JIDNH_Remarks) {
+                    $('#Header_JIDNH_Remarks').val(data.dfS_JIDNH_Remarks);
+                }
+                if (data.dfS_JIDNH_DespatchDocument) {
+                    $('#Header_JIDNH_DespatchDocumentNo').val(data.dfS_JIDNH_DespatchDocument);
+                }
+            }
+        },
+        error: function (xhr) {
+            console.error('Failed to load default form setting', xhr);
+        }
+    });
+}
+$(document).ready(function () {
+ 
+    LoadDefaultFormSetting();
 
     //#region Header_JIDNH_JW_Customer_Name
 
@@ -951,11 +1000,10 @@ $(document).ready(function () {
                 success: function (response) {
 
                     if (response.success) {
-                        ClearAll();
-                        showAlert('Record Inserted')
-                        DateBind();
-                    
-                        window.location.reload();
+                        $('#ModelAlert').one('hidden.bs.modal', function () {
+                            location.reload();
+                        });
+                        showAlert('Record Inserted');
                      //  window.location.href = response.redirectUrl;
                         console.log(JSON.stringify(model));
                     }
@@ -1348,11 +1396,10 @@ $(document).ready(function () {
 });
 
 //#region GetDeliveryNoteNumber
- 
 $(document).on("change", "#Header_JIDNH_DN_Date", function () {
     GetDeliveryNoteNumber();
-}); 
- 
+});
+
 function GetDeliveryNoteNumber() {
 
     let date = $("#Header_JIDNH_DN_Date").val();
@@ -1360,7 +1407,6 @@ function GetDeliveryNoteNumber() {
     if (!date)
         return;
 
-    // Convert dd-MMM-yyyy to yyyyMMdd
     let d = new Date(date);
 
     let poDate =
@@ -1369,20 +1415,27 @@ function GetDeliveryNoteNumber() {
         String(d.getDate()).padStart(2, '0');
 
     $.ajax({
-        url: "/deliverynote/transactions/deliverynote/numbering",
+        url: "/deliverynote/transactions/deliverynote/next-dn-number",
         type: "GET",
-        data: { PODate: poDate },
+        data: { DNDate: date },
         success: function (response) {
+            if (!response || response.trim() === "") {
+                alert("Please set numbering for this date range.");
+                $("#Header_JIDNH_DN_No").val("");
+                DateBind();
+
+                return;
+            }
+
             $("#Header_JIDNH_DN_No").val(response);
+
         },
         error: function () {
-            // alert("Unable to generate Delivery Note Number.");
         }
     });
 }
- 
-//#endregion
 
+//#endregion
 
 //#region ADD  ADDRESS ROW GRID ,VALIDATE ADDRESS GRID,VALIDATE TEMP ROW
 

@@ -111,8 +111,56 @@ namespace ERP.Controllers.JobworkInward
             return View();
         }
 
+        JINumber_DTO PON_DTO = new JINumber_DTO();
+        JINumber_DAO PON_DAO = new JINumber_DAO();
+        void On_JI_NumberGen(Int32 JIDate)
+        {
+            DataSet DS1 = new DataSet();
 
+            PON_DTO.JIN_Date = JIDate.ToString();
+            PON_DTO.CreatorCode = 1;
+            PON_DTO.Id = 101;
 
+            DS1 = PON_DAO.JINumberDB(PON_DTO);
+
+            if (DS1.Tables[0].Rows.Count > 0)
+            {
+                Int32 Order = Convert.ToInt32(DS1.Tables[0].Rows[0]["JIN_Method"].ToString());
+
+                if (Order == 2)
+                {
+                    if (DS1.Tables[1].Rows.Count > 0)
+                    {
+                        // Existing range -> increment
+                        Int32 Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["StartingNumber"].ToString());
+
+                        PON_DTO.JIN_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["JIR_Number"].ToString());
+                        PON_DTO.JIN_StartingNumber = Convert.ToString(Number + 1);
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 103;
+
+                        PON_DAO.JINumberDB(PON_DTO);
+                    }
+                    else if (DS1.Tables[2].Rows.Count > 0)
+                    {
+                        // New range -> insert fresh, using Setup dates directly (no Frequency calculation)
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIR_Date"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIR_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIR_StartingNumber"].ToString());
+
+                        PON_DTO.JIN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIR_Number"].ToString());
+                        PON_DTO.JIN_StartingNumber = Convert.ToString(Start);
+                        PON_DTO.JIN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
+                        PON_DTO.JIN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 102;
+
+                        PON_DAO.JINumberDB(PON_DTO);
+                    }
+                    // else: இந்த Date-க்கு ஒரு Reset range-கூட setup பண்ணல -> insert நடக்காது
+                }
+            }
+        }
         public void GetJobworkInvoiceData()
         {
             JobworkInvoiceCreate_DTO DN_DTO = new JobworkInvoiceCreate_DTO();
@@ -132,6 +180,30 @@ namespace ERP.Controllers.JobworkInward
             ViewBag.MaterialSegregation = Help.GetCat(DS.Tables[15]);
 
         }
+
+        [HttpGet]
+        [Route("jobworkinvoice/transactions/jobworkinvoice/next-jwi-number")]
+        public string OnJobworkInvoiceNextNumber(DateTime JWIDate)
+        {
+            JWI_NextNumber_DTO DTO = new JWI_NextNumber_DTO();
+            DTO.Id = 101;
+            DTO.JWIDate = JWIDate;
+            DTO.CreatorCode = Convert.ToInt32(0);
+
+            try
+            {
+                DTO = new JWI_NextNumber_DAO().JWINextNumberDB(DTO);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "Invoice Number is not configured for the selected Invoice Date.";
+                return "";
+            }
+
+            return DTO.FinalJWINumber;
+        }
+
         #region GET DELIVERY NOTE ITEMS
 
         // Get delivery note items using customer number and return JSON
@@ -444,7 +516,7 @@ namespace ERP.Controllers.JobworkInward
                 JobworkInvoice_DAO DAO = new JobworkInvoice_DAO();
 
                 DAO.JobworkInvoiceInsertDB(dto);
-
+                On_JI_NumberGen(Convert.ToInt32(Convert.ToDateTime(dto.Header.JISVIH_InvoiceDate).ToString("yyyyMMdd")));
                 return Json(new
                 {
                     success = true,

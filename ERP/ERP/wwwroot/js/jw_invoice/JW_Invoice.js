@@ -162,6 +162,7 @@ function HighlightRow(rows, index) {
 var DeliveryNoteMap = {};
 let ItemGSTMap = {};
 let CurrentGSTRow = null;
+
 function AutoFit() {
     fitInputWidth("Header_JISVIH_InvoiceNo", 20, 25);
     fitInputWidth("Header_JISVIH_MS_Number", 20, 30);
@@ -172,6 +173,7 @@ function AutoFit() {
     fitInputWidth("Header_JISVIH_PaymentMethod", 30, 40);
     fitInputWidth("Header_JISVIH_Remarks", 40, 40);
 }
+
 function ResizeColumn(control) {
 
     const field = ItemTableFields.find(f => $(control).is(f.cls));
@@ -186,8 +188,46 @@ function ResizeColumn(control) {
         tableBody: "#TableBody" 
     });
 }
+function LoadDefaultFormSetting() {
+    $.ajax({
+        url: '/jobinward/transactions/jobwork-invoice/get',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response && response.success && response.data) {
+                var data = response.data;
+
+                if (data.dfS_JISVIH_JW_Customer_Number) {
+                    $('#Header_JISVIH_JW_Customer_Number').val(data.dfS_JISVIH_JW_Customer_Number);
+                    $('#Header_JISVIH_JW_Customer_Name').val(data.cuS_Name);
+                }
+                if (data.dfS_JISVIH_Currency_Number) {
+                    $('#Header_JISVIH_Currency_Number').val(data.dfS_JISVIH_Currency_Number).trigger('change');
+                }
+                if (data.dfS_JISVIH_TCT_Number) {
+                    $('#Header_JISVIH_TCT_Number').val(data.dfS_JISVIH_TCT_Number).trigger('change');
+                }
+                if (data.dfS_JISVIH_PaymentTerms) {
+                    $('#Header_JISVIH_PaymentTerms').val(data.dfS_JISVIH_PaymentTerms);
+                }
+                if (data.dfS_JISVIH_PaymentMethod) {
+                    $('#Header_JISVIH_PaymentMethod').val(data.dfS_JISVIH_PaymentMethod);
+                }
+                if (data.dfS_JISVIH_Remarks) {
+                    $('#Header_JISVIH_Remarks').val(data.dfS_JISVIH_Remarks);
+                }
+                if (data.dfS_JISVIH_MS_Number) {
+                    $('#Header_JISVIH_MS_Number').val(data.dfS_JISVIH_MS_Number).trigger('change');
+                }
+            }
+        },
+        error: function (xhr) {
+            console.error('Failed to load default form setting', xhr);
+        }
+    });
+}
 $(document).ready(function () {
-    
+    LoadDefaultFormSetting();
     //#region item grid alignment
     $(document).on("input", "#ItemTable input", function () {
         ResizeColumn(this);
@@ -277,11 +317,12 @@ $(document).ready(function () {
     });
     //#endregion
     //#region item grid alignment
-   
-    //#endregion
-    AutoFit();
-    //#region Header AutoFit - KeyUp
 
+    //#endregion
+
+    AutoFit();
+
+    //#region Header AutoFit - KeyUp
     $(document).on("keyup change input",
         "#Header_JISVIH_InvoiceNo, #Header_JISVIH_MS_Number, #Header_JISVIH_JW_Customer_Name, #Header_JISVIH_Currency_Number, #Header_JISVIH_TCT_Number, #Header_JISVIH_PaymentTerms, #Header_JISVIH_PaymentMethod, #Header_JISVIH_Remarks",
         function () {
@@ -300,7 +341,6 @@ $(document).ready(function () {
             const [min, max] = widths[this.id];
             fitInputWidth(this, min, max);
         });
-
     //#endregion
    
 
@@ -431,9 +471,6 @@ $(document).ready(function () {
 
     });
 
-    $(document).on("change", "#Header_JISVIH_InvoiceDate", function () {
-        GetJWInvoiceNumber();
-    }); 
 
     $("#Header_JISVIH_InvoiceDate").on("change", function () {
        // console.log("Date changed:", $(this).val());
@@ -836,9 +873,10 @@ function loadTaxCluster() {
         }
     });
 }
-//#region GetJWInvoiceNumber
+$(document).on("change", "#Header_JISVIH_InvoiceDate", function () {
+    GetJWInvoiceNumber();
+});  //#region GetJWInvoiceNumber
 
- 
 function GetJWInvoiceNumber() {
 
     let date = $("#Header_JISVIH_InvoiceDate").val();
@@ -846,27 +884,26 @@ function GetJWInvoiceNumber() {
     if (!date)
         return;
 
-    // Convert dd-MMM-yyyy to yyyyMMdd
-    let d = new Date(date);
-
-    let poDate =
-        d.getFullYear().toString() +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        String(d.getDate()).padStart(2, '0');
-
     $.ajax({
-        url: "/jwinvoice/transactions/jwinvoice/numbering",
+        url: "/jobworkinvoice/transactions/jobworkinvoice/next-jwi-number",
         type: "GET",
-        data: { PODate: poDate },
+        data: { JWIDate: date },
         success: function (response) {
+            if (!response || response.trim() === "") {
+                alert("Please set numbering for this date range.");
+                $("#Header_JISVIH_InvoiceNo").val("");
+                DateBind();
+
+                return;
+            }
+
             $("#Header_JISVIH_InvoiceNo").val(response);
+
         },
         error: function () {
-            // alert("Unable to generate JW Invoice Number.");
         }
     });
 }
-
 //#endregion
 //#region customer Search Functions
 function OnBuyerSelectCall(inputElement) {
@@ -1281,13 +1318,10 @@ $("#btnSave").on("click", function (e) {
             success: function (response) {
 
                 if (response.success) {
-                    ClearAll();
-                    
-                  
-                  
+                    $('#ModelAlert').one('hidden.bs.modal', function () {
+                        location.reload();
+                    });
                     showAlert('Record Inserted');
-               
-                    DateBind();
                     //window.location.href = response.redirectUrl;
 
                 //    console.log(JSON.stringify(model));

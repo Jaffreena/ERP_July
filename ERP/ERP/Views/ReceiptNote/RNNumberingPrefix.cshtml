@@ -141,19 +141,23 @@
             });
             return allFieldsValid;
         }
-        function PreValidateField(currentInput) {
-            var valid = 1;
-            var inputValue = currentInput.val();
-            if (inputValue === "") {
-                valid = 0;
-            }
-            if (valid == 0) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
+    function PreValidateField(currentInput) {
+              if (currentInput.hasClass("RNP_Particulars")) {
+                  return true;
+              }
+
+              var valid = 1;
+              var inputValue = currentInput.val();
+              if (inputValue === "") {
+                  valid = 0;
+              }
+              if (valid == 0) {
+                  return false;
+              }
+              else {
+                  return true;
+              }
+          }
         PrefixInitializeFlatpickrs();
     });
 </script>

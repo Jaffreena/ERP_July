@@ -70,6 +70,8 @@ namespace ERP.Controllers.JobworkInward
             var Ven = S_DL.CustomerListData(DS.Tables[0]);
             return Json(Ven);
         }
+     
+        
         [Route("jobinward/transactions/receipt-note/item")]
         public IActionResult SaleItem(String? ItemCode, String MS)
         {
@@ -1538,7 +1540,7 @@ namespace ERP.Controllers.JobworkInward
             var json = System.Text.Json.JsonSerializer.Serialize(obj);
             return System.Text.Json.JsonSerializer.Deserialize<T>(json);
         }
-      
+
         #endregion
 
         #region Create Receipt note old
@@ -1605,13 +1607,15 @@ namespace ERP.Controllers.JobworkInward
                                 DS1.Tables[2].Rows[0]["RNR_StartingNumber"].ToString()
                             );
 
-                            EndDate = Convert.ToDateTime(
-                                DS1.Tables[2].Rows[0]["RNR_EndDate"].ToString()
-                            );
-
                             Frequency = Convert.ToInt32(
                                 DS1.Tables[2].Rows[0]["RNR_Frequency"].ToString()
                             );
+                            // NOTE: RNR_EndDate removed — that column isn't
+                            // returned by RNNumbering_SP's Id=101 branch (only
+                            // RNR_Number, RNR_Date, RNR_StartingNumber,
+                            // RNR_NumberofDigits, RNR_PrefilZero, RNR_Frequency
+                            // are selected). EndDate is always computed below
+                            // from Frequency instead — same as the PO version.
                         }
 
                         // Monthly
@@ -1840,7 +1844,7 @@ namespace ERP.Controllers.JobworkInward
 
                                     DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
 
-
+                                    OnReceiptNoteNumberGen(Convert.ToInt32(Convert.ToDateTime(SI_DTO.JIRNH_RN_Date).ToString("yyyyMMdd")));
 
                                     if (DS == null || DS.Tables.Count == 0 || DS.Tables[0].Rows.Count == 0)
                                         throw new Exception("Header insert failed");
@@ -1954,7 +1958,7 @@ namespace ERP.Controllers.JobworkInward
         #endregion
 
         [HttpPost]
-        public JsonResult ValidateDateRange(string StartDate, string EndDate)
+        public JsonResult ValidateDateRange(string StartDate, string EndDate, int ExcludeNumber = 0)
         {
             int startDate = int.Parse(
                 DateTime.ParseExact(StartDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
@@ -1969,6 +1973,7 @@ namespace ERP.Controllers.JobworkInward
             dto.RNN_Date = startDate.ToString();
             dto.RNN_EndDate = endDate.ToString();
             dto.Id = 51;
+            dto.RNN_Number = ExcludeNumber;   // 0 = new/unsaved row, nothing to exclude
 
             DataSet ds = PON_DAO.RNNumberDB(dto);
 
@@ -1984,7 +1989,7 @@ namespace ERP.Controllers.JobworkInward
         }
 
         [HttpPost]
-        public JsonResult ValidatePrefixDateRange(string StartDate, string EndDate)
+        public JsonResult ValidatePrefixDateRange(string StartDate, string EndDate, int ExcludeNumber = 0)
         {
             int startDate = int.Parse(
                 DateTime.ParseExact(StartDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
@@ -1999,6 +2004,7 @@ namespace ERP.Controllers.JobworkInward
             dto.RNN_Date = startDate.ToString();
             dto.RNN_EndDate = endDate.ToString();
             dto.Id = 52;      // Prefix Validation
+            dto.RNN_Number = ExcludeNumber;
 
             DataSet ds = PON_DAO.RNNumberDB(dto);
 
@@ -2012,8 +2018,9 @@ namespace ERP.Controllers.JobworkInward
                     : ""
             });
         }
+
         [HttpPost]
-        public JsonResult ValidateSuffixDateRange(string StartDate, string EndDate)
+        public JsonResult ValidateSuffixDateRange(string StartDate, string EndDate, int ExcludeNumber = 0)
         {
             int startDate = int.Parse(
                 DateTime.ParseExact(StartDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture)
@@ -2028,6 +2035,7 @@ namespace ERP.Controllers.JobworkInward
             dto.RNN_Date = startDate.ToString();
             dto.RNN_EndDate = endDate.ToString();
             dto.Id = 53;      // Suffix Validation
+            dto.RNN_Number = ExcludeNumber;
 
             DataSet ds = PON_DAO.RNNumberDB(dto);
 
@@ -2041,7 +2049,6 @@ namespace ERP.Controllers.JobworkInward
                     : ""
             });
         }
-
 
     }
 }

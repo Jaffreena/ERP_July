@@ -265,6 +265,76 @@ namespace ERP.Controllers
 
         #endregion
         #region Delivery Note Create
+        JI_CONVNumber_DTO PON_DTO = new JI_CONVNumber_DTO();
+        JI_CONVNumber_DAO PON_DAO = new JI_CONVNumber_DAO();
+        void OnConversionNumberGen(Int32 ConvDate)
+        {
+            DataSet DS1 = new DataSet();
+
+            PON_DTO.JICN_Date = ConvDate.ToString();
+            PON_DTO.CreatorCode = 1;
+            PON_DTO.Id = 101;
+
+            DS1 = PON_DAO.JI_CONVNumberDB(PON_DTO);
+
+            if (DS1.Tables[0].Rows.Count > 0)
+            {
+                Int32 Order = Convert.ToInt32(DS1.Tables[0].Rows[0]["JICN_Method"].ToString());
+
+                if (Order == 2)
+                {
+                    if (DS1.Tables[1].Rows.Count > 0)
+                    {
+                        Int32 Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["StartingNumber"].ToString());
+
+                        PON_DTO.JICN_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["JICR_Number"].ToString());
+                        PON_DTO.JICN_StartingNumber = Convert.ToString(Number + 1);
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 103;
+
+                        PON_DAO.JI_CONVNumberDB(PON_DTO);
+                    }
+                    else if (DS1.Tables[2].Rows.Count > 0)
+                    {
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JICR_Date"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JICR_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["JICR_StartingNumber"].ToString());
+
+                        PON_DTO.JICN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["JICR_Number"].ToString());
+                        PON_DTO.JICN_StartingNumber = Convert.ToString(Start);
+                        PON_DTO.JICN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
+                        PON_DTO.JICN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 102;
+
+                        PON_DAO.JI_CONVNumberDB(PON_DTO);
+                    }
+                }
+            }
+        }
+
+        [HttpGet]
+        [Route("conversion/transactions/conversion/next-cnv-number")]
+        public string OnConversionNextNumber(DateTime CNVDate)
+        {
+            CNV_NextNumber_DTO DTO = new CNV_NextNumber_DTO();
+            DTO.Id = 101;
+            DTO.CNVDate = CNVDate;
+            DTO.CreatorCode = Convert.ToInt32(0);
+
+            try
+            {
+                DTO = new CNV_NextNumber_DAO().CNVNextNumberDB(DTO);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "Conversion Journal Number is not configured for the selected date.";
+                return "";
+            }
+
+            return DTO.FinalCNVNumber;
+        }
         public IActionResult Index()
         {
             ConversionCreate_DTO DN_DTO = new ConversionCreate_DTO();
@@ -320,11 +390,11 @@ namespace ERP.Controllers
                 Conversion_DAO DN_DAO = new Conversion_DAO();
 
                 dto.Header.DN_Id = 10;
-                dto.Header.JIDNH_DN_Date = DateTime.Now;
+           //    dto.Header.JIDNH_DN_Date = DateTime.Now;
                 dto.Header.JIDNI_Item_Code = "1";
 
                 DataSet ds = DN_DAO.ConversionCreateDB(dto);
-
+                OnConversionNumberGen(Convert.ToInt32(Convert.ToDateTime(dto.Header.JIDNH_DN_Date).ToString("yyyyMMdd")));
                 return Json(new
                 {
                     success = true,

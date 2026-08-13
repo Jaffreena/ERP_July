@@ -291,7 +291,9 @@
         });
 
 
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox'); const rowCheckboxes = document.querySelectorAll('.DeleteNumber'); if (selectAllCheckbox) { selectAllCheckbox.addEventListener('change', function () { rowCheckboxes.forEach(function (checkbox) { checkbox.checked = selectAllCheckbox.checked; }); }); }
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox'); const rowCheckboxes = document.querySelectorAll('.DeleteNumber');
+        if (selectAllCheckbox) { selectAllCheckbox.addEventListener('change',
+        function () { rowCheckboxes.forEach(function (checkbox) { checkbox.checked = selectAllCheckbox.checked; }); }); }
 
             var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) { return c.value; })
             if (array == "") {
@@ -299,7 +301,7 @@
             } else {
                 $('.MenuAction').removeClass("d-none");
             }
-        });
+        
 
         rowCheckboxes.forEach(function (checkbox) {
             checkbox.addEventListener('change', function () {

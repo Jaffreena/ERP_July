@@ -1,0 +1,298 @@
+﻿@model ERP_DTO.JobInwardTransaction.ConversionHeader_DTO;
+@{
+    ViewData["Title"] = "Conversion Create";
+}
+<style>
+
+    form {
+        height: calc(100vh - 60px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-body {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    /* Equal spacing for all form rows */
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    /* Labels */
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+    }
+
+    /* Input containers */
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Inputs, Selects & Textarea */
+    .form-control,
+    .form-select {
+        border-radius: 4px;
+    }
+    /* Make all labels in the form use the same width */
+    .col-form-label {
+        white-space: nowrap;
+    }
+
+    /* Force label columns to the same width */
+    .row > .col-md-6.col-lg-5.col-form-label,
+    .row > .col-sm-5.col-form-label {
+        flex: 0 0 42%;
+        max-width: 42%;
+    }
+
+    .row > .col-md-6.col-lg-7,
+    .row > .col-sm-7 {
+        flex: 0 0 58%;
+        max-width: 58%;
+    }
+    /* Apply rounded corners to all form controls */
+    .col-form-label {
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+        max-width: 30% !important;
+    }
+
+    .form-control,
+    .flatpickr-input,
+    .form-select,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px !important;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        resize: vertical; /* or both */
+        overflow: auto;
+    }
+
+    textarea.form-control {
+        min-height: 60px !important;
+    }
+
+</style>
+
+<form>
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Conversion
+                <a asp-controller="JobworkInward" asp-action="Index" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row panel-body gx-2  position-relative">
+        <div class="col-12 panel-card-fixed h-100">
+            <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
+                <!-- HEADER -->
+            
+                <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
+                        <div class="row ps-2">
+                            @if (Model.JIDNH_Number != 0)
+                            {
+                                <input asp-for="JIDNH_Number" type="hidden" class="Number" />
+                            }
+                            <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header draggable-modal-header">
+                                            <p class="modal-title mb-0">Warning</p>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body py-4 text-dark fs-6 text-center">
+                                            <img src="~/img/danger.png" class="img-fluid mb-2" />
+                                            <div id="AlertMessage">@Html.Raw(ViewBag.ErrorMessage)</div>
+                                        </div>
+
+                                        <div class="modal-footer justify-content-center">
+                                            <button type="button" class="btn btn-primary px-4" id="AlertOkay" data-bs-dismiss="modal">Ok</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-auto left-menu text-black">
+                                <div class="row">
+                                    <div class="col-12 col-md-6 col-lg-3">
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JIDNH_WC_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-7 col-lg-4">
+                                                <select asp-for="JIDNH_WC_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.WorkCentre"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JIDNH_Shift_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-7 col-lg-4">
+                                                <select asp-for="JIDNH_Shift_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.Shift"></select>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JIDNH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JIDNH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-lg-3">
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JIDNH_PRS_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-7 col-lg-4">
+                                                <select asp-for="JIDNH_PRS_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.Process"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JIDNH_Operator_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-7 col-lg-4">
+                                                <input asp-for="JIDNH_Operator_Number" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-auto right-menu text-center border-start">
+
+                                <input type="submit" name="Mode" value="Submit" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                                <input type="submit" name="Mode" value="Clear All" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- HEADER -->
+                <!-- BODY has ITEM -->
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+ 
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+
+ 
+
+}
+<script>
+        function AutoFit() {
+      
+        fitInputWidth("JIDNH_MS_Number", 20, 30);
+        fitInputWidth("JIDNH_Shift_Number", 20, 30);
+        fitInputWidth("JIDNH_WC_Number", 25, 30);
+        fitInputWidth("JIDNH_PRS_Number", 25, 30);
+        fitInputWidth("JIDNH_Operator_Number", 25, 30);
+    }
+     $(document).ready(function () {
+             //#region autofitheader
+       AutoFit();
+
+       const headerFieldWidths = {
+          
+           JIDNH_Operator_Number: [25, 30]
+       };
+
+       $(document).on("input keyup", "#JIDNH_Operator_Number", function () {
+           const [min, max] = headerFieldWidths[this.id];
+           fitInputWidth(this, min, max);
+       });
+
+       $(document).on("change", "#JIDNH_MS_Number, #JIDNH_Shift_Number, #JIDNH_WC_Number, #JIDNH_PRS_Number", function () {
+           const selectWidths = {
+               JIDNH_MS_Number: [20, 30],
+               JIDNH_Shift_Number: [20, 30],
+               JIDNH_WC_Number: [25, 30],
+               JIDNH_PRS_Number: [25, 30]
+           };
+           const [min, max] = selectWidths[this.id];
+           fitInputWidth(this, min, max);
+       });
+    //#region autofitheader
+     });
+    
+    </script>
+<script>
+        $(document).on("click", "input[name='Mode'][value='Submit']", function (e) {
+
+        e.preventDefault();
+
+        var dto = GetConversionDTO();
+
+        $.ajax({
+            url: "/jobinward/transactions/conversion/save",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(dto),
+
+            success: function (res) {
+
+                   if (res.success) {
+            location.reload();
+        }
+            },
+
+            error: function (xhr) {
+                console.error(xhr.responseText);
+            }
+        });
+
+    });
+    $(document).on("click", "input[name='Mode'][value='Clear All']", function (e) {
+         e.preventDefault();
+         location.reload();
+     });
+    // Prevent native form submit from firing alongside the AJAX call
+    $(document).on("submit", "form", function (e) {
+        e.preventDefault();
+    });
+
+    function GetConversionDTO() {
+
+        return {
+            JIDNH_Number: $("input.Number").val() || 0,
+            JIDNH_WC_Number: $("#JIDNH_WC_Number").val() || 0,
+            JIDNH_Shift_Number: $("#JIDNH_Shift_Number").val() || 0,
+            JIDNH_PRS_Number: $("#JIDNH_PRS_Number").val() || 0,
+            JIDNH_Operator_Number: $("#JIDNH_Operator_Number").val(),
+            JIDNH_MS_Number: $("#JIDNH_MS_Number").val() || 0
+        };
+    }
+</script>

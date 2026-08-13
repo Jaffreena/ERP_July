@@ -21,8 +21,13 @@ const ItemTableFields = [
     { cls: ".Amount", min: 13, max: 25, align: "right", extraPadding: 8 }
 ];
 function ShowCustomerPane() {
-    $("#RightPane").show();
-    $("#RightPane_Item").hide();
+    $("#RightPane").addClass("show");
+    $("#RightPane .buyer-search-results").show();
+
+    // Symmetric to the item pane's mousedown handler hiding the customer
+    // pane — opening the customer list must close the item list.
+    $("#RightPane_Item").removeClass("show");
+    $("#RightPane_Item .search-results").hide();
 }
 //#region otherbatch bind
 function AssignItemRowID() {
@@ -616,8 +621,19 @@ $(document).ready(function () {
             "#RightPane .buyer-search-results"
         );
     });
-    $(document).on("keydown", function (e) {
+    // Requirement 1 — Focus In: show the customer list (and close the
+    // item pane symmetrically).
+    // Focus In (Requirement 1) and Text Change (Requirement 2) for
+    // #JWC_Name are already wired via inline onfocus/oninput attributes
+    // in the .cshtml (onfocus="ShowCustomerPane();OnBuyerSelectCall(this)",
+    // oninput="OnBuyerInput(this)") — no delegated binding needed here,
+    // that would double-fire the search.
+    $(document).on("keydown", "#JWC_Name", function (e) {
+
+        // Escape and Enter both resolve/close the same way here.
+        // Tab is intentionally not handled — focusout covers it.
         if (e.key === "Escape" || e.key === "Enter") {
+
             let input = $("#JWC_Name");
             let rows = $("#RightPane .buyer-search-results tbody tr");
 
@@ -628,8 +644,14 @@ $(document).ready(function () {
                 "#RightPane",
                 "#RightPane .buyer-search-results"
             );
+
+            if (e.key === "Escape") {
+                return;
+            }
+
             $("#Currency_Name").focus();
-        } else {
+
+        } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
 
             HandleSearchKeyDown(
                 e,
@@ -638,36 +660,44 @@ $(document).ready(function () {
                 ".buyer-search-results",
                 "#BuyerMessage"
             );
-
         }
     });
     //#endregion
 
     //#region item code right pane search
-    $(document).on("keydown mousedown", ".Item_Code", function (e) {
+    // Requirement 3/4/5 — Tab/Enter/ArrowUp/ArrowDown navigate the
+    // already-loaded list. This must NOT re-run the search, or the
+    // highlighted row/match state gets reset mid-navigation.
+    $(document).on("keydown", ".Item_Code", function (e) {
 
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage",
-            "#MS_Number"
-        );
+        if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter") {
+
+            HandleSearchKeyDown(
+                e,
+                this,
+                "#RightPane_Item",
+                ".search-results",
+                "#ItemMessage",
+                "#MS_Number"
+            );
+        }
+    });
+
+    // mousedown -> (re)open the item pane and load/refresh the search.
+    $(document).on("mousedown", ".Item_Code", function (e) {
 
         if ($.trim($("#MS_Number").val()) === "") {
             $("#MS_Number").prop("selectedIndex", 1);
             return;
         }
 
-        if ($.trim($(this).val()) !== "") {
+        // Symmetric to ShowCustomerPane: opening the item list must
+        // close the customer list.
+        $("#RightPane").removeClass("show");
+        $("#RightPane .buyer-search-results").hide();
 
-
-            searchItemJIDNI(this);
-            ShowItemPane();
-
-
-        }
+        searchItemJIDNI(this);
+        ShowItemPane();
     });
     $(document).on("focusout", ".Item_Code", function () {
 
@@ -1638,16 +1668,30 @@ function OnInput(inputElement) {
 
 function OnFocus(inputElement) {
 
-    var value = inputElement.value;
+    // Requirement 1 — Focus In: always show the item list, regardless
+    // of whether the field already has a value.
+    if ($.trim($("#MS_Number").val()) === "") {
+        $("#MS_Number").prop("selectedIndex", 1);
+        return;
+    }
 
-    if (!value) {
-        searchItemJIDNI(inputElement);
-    } else {
+    // Symmetric hide — item focus closes the customer pane.
+    $("#RightPane").removeClass("show");
+    $("#RightPane .buyer-search-results").hide();
+
+    if (inputElement.value) {
         $(inputElement).select();
     }
+
+    searchItemJIDNI(inputElement);
+    ShowItemPane();
 }
 
+ 
+
 function searchItemJIDNI(inputElement) {
+
+    console.trace("searchItemJIDNI CALLED, value =", inputElement.value);
 
     let itemCode = inputElement.value.trim();
     let row = $(inputElement).closest("tr");
@@ -1658,7 +1702,15 @@ function searchItemJIDNI(inputElement) {
 
     if (!material) return;
 
-    $.ajax({
+    // Cancel any still-in-flight search so a late/stale response can't
+    // hide a "Too many choices" message that a newer Enter/keystroke
+    // has already shown (the success handler below unconditionally
+    // does resultsDiv.empty() / $("#ItemMessage").hide()).
+    if (itemSearchXHR) {
+        itemSearchXHR.abort();
+    }
+
+    itemSearchXHR = $.ajax({
         url: '/jobinward/transactions/conversion/item',
         type: 'GET',
         data: {
@@ -1666,6 +1718,8 @@ function searchItemJIDNI(inputElement) {
             MS: material
         },
         success: function (data) {
+
+            console.trace("AJAX SUCCESS — about to hide #ItemMessage");
 
             resultsDiv.empty();
             $("#ItemMessage").hide().text("");
@@ -1700,8 +1754,13 @@ function searchItemJIDNI(inputElement) {
                     tr.append('<td style="width:70%;">' + item.itemDescription + '</td>');
 
                     table.find("tbody").append(tr);
+                    // Changed from "click" to "mousedown" so that the
+                    // common HandleSearchSelection's rows.trigger("mousedown")
+                    // (used for Tab/Enter auto-select and "Too many choices")
+                    // actually fires row selection here.
+                    tr.on("mousedown", function (e) {
 
-                    tr.on("click", function () {
+                        e.preventDefault();
 
                         $("#ItemMessage").hide().text("");
 
@@ -1814,8 +1873,13 @@ function searchItemJIDNI(inputElement) {
                 $("#RightPane_Item .search-results").show();
             }
         },
-        error: function () {
+       error: function (xhr, status) {
 
+            // A cancelled (aborted) request is not a real error — it
+            // just means a newer search superseded this one.
+            if (status === "abort") {
+                return;
+            }
             resultsDiv.text("Error loading data.").show();
         }
     });
@@ -1889,27 +1953,6 @@ function SearchBuyer(inputElement) {
                     row.data("customer", cust);
                     row.append("<td>" + cust.cuS_Name + "</td>");
 
-                    row.on("click", function () {
-                        $("#BuyerMessage").hide().text("");
-                        const clickedCust = $(this).data("customer");
-                        isMouseSelectingBuyer = true;
-                        SelectBuyer(
-                            clickedCust,
-                            "#JWC_Name",
-                            "#JWC_Number",
-                            "#Currency_Name",
-                            "#Currency_Number",
-                            "#WH_Number",
-                            "#RightPane",
-                            ".buyer-search-results"
-                        );
-                       
-                        $("#RightPane").removeClass("show");
-                        $("#RightPane .buyer-search-results").hide();
-                        setTimeout(function () {
-                            $("#Currency_Name").focus();
-                        }, 100);
-                    });
                     table.find("tbody").append(row);
 
 
@@ -1932,13 +1975,15 @@ function SearchBuyer(inputElement) {
                         "#RightPane",
                         ".buyer-search-results"
                     );
-              
+
                     $("#RightPane").removeClass("show");
                     $("#RightPane .buyer-search-results").hide();
                     setTimeout(function () {
-                        
                         $("#Currency_Name").focus();
-                       
+                        // Reset so the NEXT focusout on #JWC_Name is
+                        // evaluated normally (spec: mouse click outside
+                        // the list box).
+                        isMouseSelectingBuyer = false;
                     }, 100);
                 });
 

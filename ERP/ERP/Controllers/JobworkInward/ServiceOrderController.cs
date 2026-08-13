@@ -90,8 +90,78 @@ namespace ERP.Controllers.JobworkInward
 
             return prefix + number.ToString(prefill) + suffix;
         }
+        JSONumber_DTO PON_DTO = new JSONumber_DTO();
+        JSONumber_DAO PON_DAO = new JSONumber_DAO();
 
+        void OnServiceOrderNumberGen(Int32 SODate)
+        {
+            DataSet DS1 = new DataSet();
+
+            PON_DTO.JSON_Date = SODate.ToString();
+            PON_DTO.CreatorCode = 1;
+            PON_DTO.Id = 101;
+
+            DS1 = PON_DAO.JSONumberDB(PON_DTO);
+
+            if (DS1.Tables[0].Rows.Count > 0)
+            {
+                Int32 Order = Convert.ToInt32(DS1.Tables[0].Rows[0]["JSON_Method"].ToString());
+
+                if (Order == 2)
+                {
+                    if (DS1.Tables[1].Rows.Count > 0)
+                    {
+                        Int32 Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["StartingNumber"].ToString());
+
+                        PON_DTO.JSON_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["JSOR_Number"].ToString());
+                        PON_DTO.JSON_StartingNumber = Convert.ToString(Number + 1);
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 103;
+
+                        PON_DAO.JSONumberDB(PON_DTO);
+                    }
+                    else if (DS1.Tables[2].Rows.Count > 0)
+                    {
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JSOR_Date"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JSOR_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["JSOR_StartingNumber"].ToString());
+
+                        PON_DTO.JSON_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["JSOR_Number"].ToString());
+                        PON_DTO.JSON_StartingNumber = Convert.ToString(Start);
+                        PON_DTO.JSON_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
+                        PON_DTO.JSON_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 102;
+
+                        PON_DAO.JSONumberDB(PON_DTO);
+                    }
+                }
+            }
+        }
         #endregion
+
+        [HttpGet]
+        [Route("serviceorder/transactions/serviceorder/next-jso-number")]
+        public string OnServiceOrderNextNumber(DateTime JSODate)
+        {
+            JSO_NextNumber_DTO DTO = new JSO_NextNumber_DTO();
+            DTO.Id = 101;
+            DTO.JSODate = JSODate;
+            DTO.CreatorCode = Convert.ToInt32(0);
+
+            try
+            {
+                DTO = new JSO_NextNumber_DAO().JSONextNumberDB(DTO);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "Service Order Number is not configured for the selected date.";
+                return "";
+            }
+
+            return DTO.FinalJSONumber;
+        }
         [HttpPost]
         public IActionResult UpdateServiceOrder([FromBody] JI_ServiceOrder_DTO dto)
         {
@@ -156,7 +226,7 @@ namespace ERP.Controllers.JobworkInward
                 //dto.Header.JISVOH_RegDate = DateTime.Now;
 
                 serviceOrderDAO.ServiceOrderInsertDB(dto);
-
+                OnServiceOrderNumberGen(Convert.ToInt32(Convert.ToDateTime(dto.Header.JISVOH_RegDate).ToString("yyyyMMdd")));
                 return Json(new
                 {
                     success = true,

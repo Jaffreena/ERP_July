@@ -98,9 +98,28 @@ namespace ERP.Controllers
             return prefix + number.ToString(prefill) + suffix;
         }
         #endregion
+        [HttpGet]
+        [Route("deliverynote/transactions/deliverynote/next-dn-number")]
+        public string OnDeliveryNoteNextNumber(DateTime DNDate)
+        {
+            DN_NextNumber_DTO DTO = new DN_NextNumber_DTO();
+            DTO.Id = 101;
+            DTO.DNDate = DNDate;
+            DTO.CreatorCode = Convert.ToInt32(0);
 
+            try
+            {
+                DTO = new DN_NextNumber_DAO().DNNextNumberDB(DTO);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorCode = 2;
+                ViewBag.ErrorMessage = "DN Number is not configured for the selected Delivery Date.";
+                return "";
+            }
 
-
+            return DTO.FinalDNNumber;
+        }
         [Route("jobinward/transactions/delivery-note/buyeraddress")]
         public IActionResult SaleBuyerAddressID(String? Buyer, String ADTPNumber)
         {
@@ -287,14 +306,64 @@ namespace ERP.Controllers
         public IActionResult Index()
         {
 
-      
+          
             GetDevliverNoteData();
             DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
             DN_DAO.DeleteTempDeliveryNoteBatch();
             ViewBag.Collapse = true;
             return View();
         }
+        DNNumber_DTO PON_DTO = new DNNumber_DTO();
+        DNNumber_DAO PON_DAO = new DNNumber_DAO();
 
+        void OnDeliveryNoteNumberGen(Int32 DNDate)
+        {
+            DataSet DS1 = new DataSet();
+
+            PON_DTO.DNN_Date = DNDate.ToString();
+            PON_DTO.CreatorCode = 1;
+            PON_DTO.Id = 101;
+
+            DS1 = PON_DAO.DNNumberDB(PON_DTO);
+
+            if (DS1.Tables[0].Rows.Count > 0)
+            {
+                Int32 Order = Convert.ToInt32(DS1.Tables[0].Rows[0]["DNN_Method"].ToString());
+
+                if (Order == 2)
+                {
+                    if (DS1.Tables[1].Rows.Count > 0)
+                    {
+                        // Existing range -> increment
+                        Int32 Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["StartingNumber"].ToString());
+
+                        PON_DTO.DNN_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["DNR_Number"].ToString());
+                        PON_DTO.DNN_StartingNumber = Convert.ToString(Number + 1);
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 103;
+
+                        PON_DAO.DNNumberDB(PON_DTO);
+                    }
+                    else if (DS1.Tables[2].Rows.Count > 0)
+                    {
+                        // New range -> insert fresh, using Setup dates directly (no Frequency calculation)
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["DNR_Date"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["DNR_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["DNR_StartingNumber"].ToString());
+
+                        PON_DTO.DNN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["DNR_Number"].ToString());
+                        PON_DTO.DNN_StartingNumber = Convert.ToString(Start);
+                        PON_DTO.DNN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
+                        PON_DTO.DNN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
+                        PON_DTO.CreatorCode = 1;
+                        PON_DTO.Id = 102;
+
+                        PON_DAO.DNNumberDB(PON_DTO);
+                    }
+                    // else: இந்த Date-க்கு ஒரு Reset range-கூட setup பண்ணல -> insert நடக்காது
+                }
+            }
+        }
         public void GetDevliverNoteData()
         {
             DeliveryNoteCreate_DTO DN_DTO = new DeliveryNoteCreate_DTO();
@@ -338,10 +407,11 @@ namespace ERP.Controllers
                 DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
 
                 dto.Header.DN_Id = 10;
-                dto.Header.JIDNH_DN_Date = DateTime.Now;
+             //   dto.Header.JIDNH_DN_Date = DateTime.Now;
                 dto.Header.JIDNI_Item_Code = "1";
 
                 DataSet ds = DN_DAO.DeliveryNoteCreateDB(dto);
+                OnDeliveryNoteNumberGen(Convert.ToInt32(Convert.ToDateTime(dto.Header.JIDNH_DN_Date).ToString("yyyyMMdd")));
                 return Json(new
                 {
                     success = true,

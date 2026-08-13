@@ -18,7 +18,7 @@ function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsS
    
     // Only one row
     if (rows.length === 1) {
-        rows.eq(0).trigger("click");
+        rows.eq(0).trigger("mousedown");
         return;
     }
     console.log("HandleSearchSelection");
@@ -27,7 +27,7 @@ function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsS
     let currentRow = rows.filter(".current-row");
     console.log(currentRow.length);
     if (currentRow.length === 1) {
-        currentRow.trigger("click");
+        currentRow.trigger("mousedown");
         console.log("trigger finished");
         return;
     }
@@ -36,17 +36,23 @@ function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsS
     let matchedRows = rows.filter(".match-row");
 
     if (matchedRows.length === 1) {
-        matchedRows.trigger("click");
+        matchedRows.trigger("mousedown");
         return;
     }
-
     if (matchedRows.length > 1 || rows.length > 1) {
+
+        console.log("SHOWING too many choices on", messageSelector,
+            "html after show:", $(messageSelector).length);
 
         input.removeData("selectedIndex");
 
         $(messageSelector)
             .html("Too many Choices!<br/>Select any one.")
             .show();
+
+        console.log("after .show(), display=", $(messageSelector).css("display"),
+            "visible=", $(messageSelector).is(":visible"));
+
         input.focus();
         $(rightPane).addClass("show");
         $(resultsSelector).show();
@@ -67,6 +73,7 @@ function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsS
         return;
     }
 }
+
 function GetBuyerTableHeader() {
     return `
         <div class="card-body modal-content batchPopup p-0"
@@ -196,25 +203,14 @@ function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, ms
             HighlightRow(rows, selectedIndex);
             input.data("selectedIndex", selectedIndex);
             break;
-
         case "Enter":
 
             e.preventDefault();
 
-            let currentRow = rows.filter(".current-row");
-
-            // If no current row, select the first matched row
-            if (currentRow.length === 0) {
-
-                currentRow = rows.filter(".match-row").first();
-
-                if (currentRow.length > 0) {
-                    rows.removeClass("current-row");
-                    currentRow.addClass("current-row");
-                    input.data("selectedIndex", currentRow.index());
-                }
-            }
-
+            // Let HandleSearchSelection decide (start-with single/multiple,
+            // contains single/multiple, or an already arrow-highlighted row).
+            // Do NOT force-select the first match here — that bypassed the
+            // "Too many choices" check.
             HandleSearchSelection(
                 input,
                 rows,
@@ -222,13 +218,25 @@ function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, ms
                 rightPaneId,
                 rightPaneId + " " + resultClass
             );
-         
+
             break;
 
     }
 }
 
+function HighlightRow(rows, index) {
 
+    rows.removeClass("current-row");
+
+    if (index < 0 || index >= rows.length)
+        return;
+
+    $(rows[index]).addClass("current-row");
+
+    rows[index].scrollIntoView({
+        block: "nearest"
+    });
+}
 function SelectBuyer(
     cust,
     customerNameId,
@@ -269,6 +277,12 @@ function SelectBuyer(
 
 }
 function OnBuyerSelect(inputElement, rightPaneId, resultClass) {
+
+    // Symmetric to OpenItemCodeSearch: opening the customer list must
+    // close the item list, so only one popup shows at a time.
+    $("#RightPane_Item").hide();
+    $("#RightPane_Item").removeClass("show");
+    $("#RightPane_Item .search-results").hide();
 
     var rightPane = $(rightPaneId);
     var resultsDiv = rightPane.find(resultClass);

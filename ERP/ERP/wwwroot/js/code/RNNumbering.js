@@ -1,8 +1,39 @@
-﻿function validateDateRange(dateClass, endDateClass, url, sectionName) {
+﻿//#region Initialize Flatpickr
+InitializeGstFlatpickrs();
+
+function InitializeGstFlatpickrs() {
+    $(".datepicker").each(function () {
+
+        if (this._flatpickr) {
+            return;
+        }
+
+        $(this).flatpickr({
+            dateFormat: "d-M-Y",
+            altInput: true,
+            altFormat: "d-M-Y",
+            allowInput: true,
+
+            onOpen: function (selectedDates, dateStr, instance) {
+                $(instance.input).data("prevVal", instance.input.value);
+            }
+        });
+    });
+}
+//#endregion
+
+
+function validateDateRange(dateClass, endDateClass, sectionName) {
+
+    $(`${dateClass}, ${endDateClass}`).each(function () {
+        $(this).data("prevVal", $(this).val());
+    });
 
     $(document).on("change", `${dateClass}, ${endDateClass}`, function () {
 
-        let currentRow = $(this).closest("tr");
+        let $changedField = $(this);
+
+        let currentRow = $changedField.closest("tr");
 
         let startDate = currentRow.find(dateClass).val();
         let endDate = currentRow.find(endDateClass).val();
@@ -19,8 +50,7 @@
         // End Date Validation
         if (end < start) {
             alert("End Date must be greater than or equal to Start Date.");
-
-            currentRow.find(endDateClass).val("").focus();
+            revertField($changedField);
             return;
         }
 
@@ -34,8 +64,14 @@
 
             let row = $(this).closest("tr");
 
-            // Skip current row
             if (row.is(currentRow))
+                return;
+
+            if (row.is(":hidden"))
+                return;
+
+            let isDeletedInput = row.find("input[name*='IsDeleted']");
+            if (isDeletedInput.length && isDeletedInput.val() === "true")
                 return;
 
             let rowStart = row.find(dateClass).val();
@@ -50,7 +86,6 @@
             let s2 = new Date(rowStart);
             let e2 = new Date(rowEnd);
 
-            // Overlap condition
             if (start <= e2 && end >= s2) {
                 overlap = true;
                 return false;
@@ -58,67 +93,37 @@
         });
 
         if (overlap) {
-
             alert(`The selected ${sectionName} date range overlaps with another row.`);
-
-            currentRow.find(dateClass).focus();
-          //  currentRow.find(endDateClass).val("");
-
+            revertField($changedField);
             return;
         }
 
-        //==============================================
-        // Validate against database
-        //==============================================
-
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: {
-                StartDate: startDate,
-                EndDate: endDate
-            },
-            success: function (res) {
-
-                if (!res.success) {
-
-                    alert(res.message);
-
-                    currentRow.find(dateClass).val("").focus();
-                    currentRow.find(endDateClass).val("");
-
-                    return;
-                }
-
-            },
-            error: function () {
-                alert(`Unable to validate ${sectionName} Date Range.`);
-            }
-        });
+        // Validation passed - this becomes the new "known good" value
+        $changedField.data("prevVal", $changedField.val());
 
     });
 }
 
+function revertField($field) {
+    let prevVal = $field.data("prevVal") || "";
+    let fp = $field[0]._flatpickr;
+
+    if (fp) {
+        if (prevVal) {
+            fp.setDate(prevVal, false);
+        } else {
+            fp.clear(false);
+        }
+    } else {
+        $field.val(prevVal);
+    }
+}
+
 // Reset
-validateDateRange(
-    ".RNR_Date",
-    ".RNR_EndDate",
-    "/ReceiptNote/ValidateDateRange",
-    "Reset"
-);
+validateDateRange(".RNR_Date", ".RNR_EndDate", "Reset");
 
 // Prefix
-validateDateRange(
-    ".RNP_Date",
-    ".RNP_EndDate",
-    "/ReceiptNote/ValidatePrefixDateRange",
-    "Prefix"
-);
+validateDateRange(".RNP_Date", ".RNP_EndDate", "Prefix");
 
 // Suffix
-validateDateRange(
-    ".RNS_Date",
-    ".RNS_EndDate",
-    "/ReceiptNote/ValidateSuffixDateRange",
-    "Suffix"
-);
+validateDateRange(".RNS_Date", ".RNS_EndDate", "Suffix");

@@ -1,0 +1,737 @@
+﻿@model ERP_DTO.JobInwardTransaction.JI_ServiceOrderHead_DTO;
+@{
+    ViewData["Title"] = "Service Order Create";
+}
+<style>
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
+
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
+<style>
+
+    form {
+        height: calc(100vh - 60px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-body {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    /* Equal spacing for all form rows */
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    /* Labels */
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+    }
+
+    /* Input containers */
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Inputs, Selects & Textarea */
+    .form-control,
+    .form-select {
+        border-radius: 4px;
+    }
+    /* Make all labels in the form use the same width */
+    .col-form-label {
+        white-space: nowrap;
+    }
+
+    /* Force label columns to the same width */
+    .row > .col-md-6.col-lg-5.col-form-label,
+    .row > .col-sm-5.col-form-label {
+        flex: 0 0 42%;
+        max-width: 42%;
+    }
+
+    .row > .col-md-6.col-lg-7,
+    .row > .col-sm-7 {
+        flex: 0 0 58%;
+        max-width: 58%;
+    }
+    /* Apply rounded corners to all form controls */
+    .col-form-label {
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+        max-width: 30% !important;
+    }
+
+    .form-control,
+    .flatpickr-input,
+    .form-select,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px !important;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        resize: vertical; /* or both */
+        overflow: auto;
+    }
+
+    textarea.form-control {
+        min-height: 60px !important;
+    }
+
+</style>
+<form>
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Service Order
+                <a asp-controller="JobworkInward" asp-action="Index" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row panel-body gx-2  position-relative">
+        <div class="col-12 panel-card-fixed h-100">
+            <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
+                <!-- HEADER -->
+            
+                <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
+                        <div class="row ps-2">
+                            @if (Model.JISVOH_Number != 0)
+                            {
+                                <input asp-for="JISVOH_Number" type="hidden" class="Number" />
+                            }
+                            <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header draggable-modal-header">
+                                            <p class="modal-title mb-0">Warning</p>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body py-4 text-dark fs-6 text-center">
+                                            <img src="~/img/danger.png" class="img-fluid mb-2" />
+                                            <div id="AlertMessage">@Html.Raw(ViewBag.ErrorMessage)</div>
+                                        </div>
+
+                                        <div class="modal-footer justify-content-center">
+                                            <button type="button" class="btn btn-primary px-4" id="AlertOkay" data-bs-dismiss="modal">Ok</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-auto left-menu text-black">
+                                <div class="row">
+                                    <div class="col-12 col-md-3 col-lg-3">
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_ServiceOrderNo" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JISVOH_ServiceOrderNo" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_PaymentTerms" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JISVOH_PaymentTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_DeliveryTerms" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JISVOH_DeliveryTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-12 col-md-3 col-lg-4">
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_MS_Number" class="col-md-6 col-lg-6 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-6">
+                                                <select asp-for="JISVOH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_JW_Customer_Number" class="col-md-6 col-lg-6 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-6">
+                                                <input asp-for="JISVOH_JW_Customer_Number" type="hidden" />
+
+                                                <input asp-for="JISVOH_JW_Customer_Name"
+                                                       class="form-control"
+                                                       autocomplete="off"
+                                                       onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                       oninput="OnBuyerInput(this)" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_Currency_Number" class="col-md-6 col-lg-6 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-6">
+                                                <select asp-for="JISVOH_Currency_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.Currency"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_DeliveryMode" class="col-md-6 col-lg-6 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-6">
+                                                <input asp-for="JISVOH_DeliveryMode" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-12 col-md-3 col-lg-3">
+
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JISVOH_Tax" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JISVOH_Tax" class="form-control Key KeyDup" maxlength="250" autocomplete="off" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2">
+                                            <label class="col-sm-4 col-lg-5 col-form-label ps-0">
+                                                Technical delivery<br /> conditions
+                                            </label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JISVOH_TDC" class="form-control Key KeyDup" maxlength="250" autocomplete="off" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-start  gx-2">
+                                            <label asp-for="JISVOH_Remarks" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <textarea asp-for="JISVOH_Remarks" maxlength="250"
+                                                          class="form-control Key KeyDup"
+                                                          autocomplete="off"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-auto right-menu text-center border-start">
+
+                                <input type="submit" name="Mode" value="Submit" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                                <input type="submit" name="Mode" value="Clear All" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- HEADER -->
+                <!-- BODY has ITEM -->
+            </div>
+        </div>
+        <div id="RightPane">
+            <div class="p-2">
+                <div class="buyer-search-results"></div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+ 
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+
+ 
+
+}
+<script>
+        function AutoFit() {
+        
+       
+        fitInputWidth("JISVOH_MS_Number", 20, 30);
+        fitInputWidth("JISVOH_JW_Customer_Name", 40, 50);
+        fitInputWidth("JISVOH_Currency_Number", 10, 10);
+        fitInputWidth("JISVOH_PaymentTerms", 30, 40);
+        fitInputWidth("JISVOH_DeliveryTerms", 30, 40);
+        fitInputWidth("JISVOH_DeliveryMode", 30, 40);
+        fitInputWidth("JISVOH_Tax", 40, 40);
+        fitInputWidth("JISVOH_TDC", 40, 40);
+        fitInputWidth("JISVOH_Remarks", 40, 40);
+    }
+    let isMouseSelectingBuyer = false;
+    
+    $(document).ready(function () {
+            AutoFit();
+    //#region Header AutoFit - KeyUp
+
+    $(document).on("keyup change input",
+        " #JISVOH_ServiceOrderNo, #JISVOH_MS_Number, #JISVOH_JW_Customer_Name, #JISVOH_Currency_Number, #JISVOH_PaymentTerms, #JISVOH_DeliveryTerms, #JISVOH_DeliveryMode, #JISVOH_Tax, #JISVOH_TDC, #JISVOH_Remarks",
+        function () {
+
+            const widths = {
+              
+                JISVOH_ServiceOrderNo: [20, 25],
+                JISVOH_MS_Number: [20, 30],
+                JISVOH_JW_Customer_Name: [40, 50],
+                JISVOH_Currency_Number: [10, 10],
+                JISVOH_PaymentTerms: [30, 40],
+                JISVOH_DeliveryTerms: [30, 40],
+                JISVOH_DeliveryMode: [30, 40],
+                JISVOH_Tax: [40, 40],
+                JISVOH_TDC: [40, 40],
+                JISVOH_Remarks: [40, 40]
+            };
+
+            const [min, max] = widths[this.id];
+            fitInputWidth(this, min, max);
+        });
+
+    //#endregion
+            $(document).on("input", "#JISVOH_JW_Customer_Name", function () {
+
+            if ($(this).val().trim() === "") {
+
+                $("#JISVOH_JW_Customer_Number").val(0);
+                $("#JISVOH_Currency_Number").val(0);
+            }
+        });
+
+         $(document).on("focusout", "#JISVOH_JW_Customer_Name", function () {
+
+            if (isMouseSelectingBuyer)
+                return;
+
+            // If empty, clear values and close popup
+            if ($(this).val().trim() === "") {
+
+                $("#JISVOH_JW_Customer_Number").val(0);
+                $("#JISVOH_Currency_Number").val(0);
+
+                $("#BuyerMessage").hide().text("");
+
+                $("#RightPane")
+                    .removeClass("show")
+                    .find(".buyer-search-results")
+                    .hide()
+                    .empty();
+
+                return;
+            }
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+        });
+            $(document).on("keydown", "#JISVOH_JW_Customer_Name", function (e) {
+
+                 if (e.key === "Escape" || e.key === "Tab") {
+
+                $("#RightPane")
+                    .removeClass("show")
+                    .find(".buyer-search-results")
+                    .hide()
+                    .empty();
+
+                $("#BuyerMessage").hide().text("");
+
+                return;
+            }
+
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+
+                HandleSearchKeyDown(
+                    e,
+                    this,
+                    "#RightPane",
+                    ".buyer-search-results",
+                    "#BuyerMessage"
+                );
+            }
+        });
+
+     });
+
+
+        function ShowCustomerPane() {
+            $("#RightPane").show();
+            $("#RightPane").addClass("show");
+            $("#RightPane .buyer-search-results").show();
+        }
+    
+        //#region JW Customer Search Functions
+    
+    function OnBuyerSelect(inputElement, rightPaneId, resultClass) {
+
+        var rightPane = $(rightPaneId);
+        var resultsDiv = rightPane.find(resultClass);
+
+        if (resultsDiv.find("tbody tr").length > 0) {
+
+            rightPane.addClass("show");
+            resultsDiv.show();
+
+            let rows = resultsDiv.find("tbody tr");
+
+            if (rows.filter(".current-row").length === 0) {
+                $(inputElement).removeData("selectedIndex");
+            }
+        }
+        else {
+            SearchBuyer(inputElement);
+        }
+    }
+ 
+        function OnBuyerSelectCall(inputElement) {
+   
+            OnBuyerSelect(inputElement, "#RightPane",".buyer-search-results");
+        }
+
+        function OnBuyerInput(inputElement) {
+
+            if (inputElement.selectionStart !== inputElement.selectionEnd) {
+                return;
+            }
+            SearchBuyer(inputElement);
+     
+        }
+ 
+        function SearchBuyer(inputElement) {
+
+            var buyer = inputElement.value;
+            buyer = buyer.trim();
+            var soDate = new Date().toISOString().split('T')[0];
+
+            var resultsDiv = $("#RightPane").find(".buyer-search-results");
+
+            $.ajax({
+                url: '/jobinward/transactions/receipt-note/cutomer',
+                type: 'GET',
+                data: {
+                    Buyer: buyer,
+                    SIHDate: soDate
+                },
+                success: function (data) {
+
+                    resultsDiv.empty();
+                    $("#BuyerMessage").hide().text("");
+                    if (data && data.length > 0) {
+
+                        $("#RightPane").addClass("show");
+                        resultsDiv.show();
+                        let selectedIndex = -1;
+                        var table = $(`
+        <div class="card-body modal-content batchPopup p-0"
+             style="z-index:999;">
+                                <table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">
+                                    <thead>
+                                        <tr class="table-info">
+                                            <th>JW Customer Name</th>
+                                 
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        `);
+
+                        $.each(data, function (i, cust) {
+
+                            var row = $("<tr></tr>").css("height", "24px");
+                            row.data("customer", cust);
+                            row.append("<td>" + cust.cuS_Name + "</td>");
+                  
+                            row.on("click", function () {
+
+                                $("#BuyerMessage").hide().text("");
+                                const clickedCust = $(this).data("customer");
+
+                                $("#JISVOH_JW_Customer_Name").val(clickedCust.cuS_Name);
+                                $("#JISVOH_JW_Customer_Number").val(clickedCust.cuS_Number);
+
+                                // Currency (dropdown)
+                                $("#JISVOH_Currency_Number").val(clickedCust.cuS_CUR_Number);
+
+                                $("#RightPane")
+                                    .removeClass("show")
+                                    .find(".buyer-search-results")
+                                    .hide()
+                                    .empty();
+                                setTimeout(function () {
+                                    $("#JISVOH_Currency_Number").focus();
+                                }, 100);
+
+                            });
+                            table.find("tbody").append(row);
+
+                        });
+ 
+                        table.find("tbody").on("mousedown", "tr", function (e) {
+                            console.log("buyer row clicked");
+                              $("#BuyerMessage").hide().text("");
+                            e.preventDefault();
+
+                            const clickedCust = $(this).data("customer");
+                            isMouseSelectingBuyer = true;
+                            SelectBuyer(
+                                clickedCust,
+                                "#JISVOH_JW_Customer_Name",
+                                "#JISVOH_JW_Customer_Number",
+                                "#JISVOH_Currency_Number",
+                                "#RightPane",
+                                ".buyer-search-results"
+                            );
+                 
+                            $("#RightPane").removeClass("show");
+                            $("#RightPane .buyer-search-results").hide();
+
+                
+                            setTimeout(function () {
+                                $("#JISVOH_Currency_Number").focus();
+                            }, 100);
+                        });
+
+                        resultsDiv.append(table);
+
+                        resultsDiv.append(`
+
+        <div id="BuyerMessage"
+             style="
+                display:none;
+                background:#bdbdbd;
+                border-top:1px solid #ced4da;
+                color:#dc3545;
+                font-weight:bold;
+                text-align:center;
+                padding:4px 52px;
+                font-size:18px;
+                position:absolute;
+                bottom:0;
+                left:-2px;
+                right:0;
+                z-index:10;
+                box-sizing:border-box;">
+        </div>
+        `);
+                        //#region search logic highlight
+
+                        let rows = resultsDiv.find("tbody tr");
+
+                        rows.removeClass("match-row current-row");
+
+                        $(inputElement).removeData("selectedIndex");
+
+                        let searchText = buyer.trim().toLowerCase();
+
+                        let firstMatch = -1;
+                        let lastMatch = -1;
+
+                        rows.each(function (i) {
+
+                            let customer = $(this).find("td:first").text().trim().toLowerCase();
+
+                            if (searchText !== "" && customer.startsWith(searchText)) {
+
+                                $(this).addClass("match-row");
+
+                                if (firstMatch === -1)
+                                    firstMatch = i;
+
+                                lastMatch = i;
+                            }
+                        });
+
+                        if (firstMatch >= 0) {
+
+                            $(inputElement).data("firstMatch", firstMatch);
+                            $(inputElement).data("lastMatch", lastMatch);
+                        }
+                        else {
+
+                            $(inputElement).removeData("firstMatch");
+                            $(inputElement).removeData("lastMatch");
+                        }
+
+                        //#endregion
+             
+                    } else {
+                        resultsDiv.append(GetBuyerEmptyView());
+                        $("#RightPane").addClass("show");
+                        $("#RightPane .buyer-search-results").show();
+
+                    }
+                },
+                error: function () {
+                    resultsDiv.text("Error loading data.").show();
+                }
+            });
+        }
+
+    function SelectBuyer(
+        cust,
+        customerNameId,
+        customerNumberId,
+        currencyNumberId,
+        rightPaneId,
+        resultClass
+    ) {
+        console.log("SelectBuyer");
+   
+        // Customer
+        $(customerNameId).val(cust.cuS_Name);
+        $(customerNumberId).val(cust.cuS_Number);
+    
+        // Currency (dropdown)
+        $(currencyNumberId).val(cust.cuS_CUR_Number);
+
+        $(rightPaneId)
+            .removeClass("show")
+            .find(resultClass)
+            .hide()
+            .empty();
+        setTimeout(function () {
+            $(currencyNumberId).focus();
+            $(document).trigger("click");
+        }, 100);
+
+    }
+
+
+    function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsSelector) {
+
+        input = $(input);
+        rows = $(rows);
+
+        let txt = $.trim(input.val());
+
+        if (rows.length === 1) {
+            rows.eq(0).trigger("click");
+            return;
+        }
+        console.log("HandleSearchSelection");
+
+        let currentRow = rows.filter(".current-row");
+        console.log(currentRow.length);
+        if (currentRow.length === 1) {
+            currentRow.trigger("click");
+            console.log("trigger finished");
+            return;
+        }
+
+        let matchedRows = rows.filter(".match-row");
+
+        if (matchedRows.length === 1) {
+            matchedRows.trigger("click");
+            return;
+        }
+
+        if (matchedRows.length > 1 || rows.length > 1) {
+
+            input.removeData("selectedIndex");
+
+            $(messageSelector)
+                .html("Too many Choices!<br/>Select any one.")
+                .show();
+            input.focus();
+            $(rightPane).addClass("show");
+            $(resultsSelector).show();
+        }
+        if (rows.length === 0) {
+
+            input.removeData("selectedIndex");
+
+            $(messageSelector)
+                .html("No records found.")
+                .show();
+
+            input.focus();
+            $(rightPane).addClass("show");
+            $(resultsSelector).show();
+
+            return;
+        }
+    }
+
+
+</script>
+<script>
+        $(document).on("click", "input[name='Mode'][value='Submit']", function (e) {
+
+        e.preventDefault();
+
+        var dto = GetServiceOrderDTO();
+
+        $.ajax({
+            url: "/jobinward/transactions/service-order/save",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(dto),
+
+            success: function (res) {
+
+                   if (res.success) {
+            location.reload();
+        }
+            },
+
+            error: function (xhr) {
+                console.error(xhr.responseText);
+            }
+        });
+
+    });
+    $(document).on("click", "input[name='Mode'][value='Clear All']", function (e) {
+            e.preventDefault();
+            location.reload();
+        });
+    // Prevent native form submit from firing alongside the AJAX call
+    $(document).on("submit", "form", function (e) {
+        e.preventDefault();
+    });
+
+     function GetServiceOrderDTO() {
+
+        return {
+            JISVOH_Number: $("input.Number").val() || 0,
+            JISVOH_ServiceOrderNo: $("#JISVOH_ServiceOrderNo").val(),
+            JISVOH_JW_Customer_Number: $("#JISVOH_JW_Customer_Number").val() || 0,
+            JISVOH_Currency_Number: $("#JISVOH_Currency_Number").val() || 0,
+            JISVOH_PaymentTerms: $("#JISVOH_PaymentTerms").val(),
+            JISVOH_DeliveryTerms: $("#JISVOH_DeliveryTerms").val(),
+            JISVOH_DeliveryMode: $("#JISVOH_DeliveryMode").val(),
+            JISVOH_Tax: $("#JISVOH_Tax").val(),
+            JISVOH_TDC: $("#JISVOH_TDC").val(),
+            JISVOH_Remarks: $("#JISVOH_Remarks").val(),
+    JISVOH_MS_Number: $("#JISVOH_MS_Number").val() || 0
+        };
+    }
+</script>

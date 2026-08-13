@@ -1,8 +1,248 @@
-﻿
+﻿$(document).ready(function () {
+    //#region JW_Customer – Focus In
+    // JW_Customer – Focus In
+    // 1. List of customers must be displayed in the list box.
+    $(document).on("focusin", "#JWC_Name", function () {
+        OnBuyerSelectCall(this);
+    });
+    //#endregion
+
+    //#region JW_Customer – Text change
+    // JW_Customer – Text change
+    // 1. Based on letters typed in the textbox, it should short-list the customer list.
+    $(document).on("input", "#JWC_Name", function () {
+        OnBuyerInput(this);
+    });
+    //#endregion
+
+    //#region JW_Customer – Keydown
+    // JW_Customer – Keydown
+    // 1. Tab/Enter – auto-select or "Too many choices" (Tab via Focus Out)
+    // 2. Arrow Up – highlight + move to top match
+    // 3. Arrow Down – highlight + move to bottom match
+    // 4. Enter, no record selected -> auto-select first record + close popup
+    $(document).on("keydown", "#JWC_Name", function (e) {
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+            return;
+        }
+
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+// Enter, no record selected (empty textbox, full unfiltered
+        // list) -> auto-select first record + close popup, same as
+        // Tab does via Focus Out point 3.
+        if (e.key === "Enter" &&
+            $.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            e.preventDefault();
+
+            let firstCust = rows.first().data("customer");
+
+            // Prevent our own focus-move below from re-triggering the
+            // #JWC_Name focusout handler (which would otherwise see the
+            // now-empty results list and reopen the popup as "No
+            // records found").
+            isMouseSelectingBuyer = true;
+
+            if (firstCust) {
+                SelectBuyer(
+                    firstCust,
+                    "#JWC_Name",
+                    "#JWC_Number",
+                    "#Currency_Name",
+                    "#Currency_Number",
+                    "#WH_Number",
+                    "#RightPane",
+                    ".buyer-search-results"
+                );
+            }
+
+            $("#RightPane").removeClass("show");
+            $("#RightPane .buyer-search-results").hide();
+
+            $("#Currency_Name").focus();
+            isMouseSelectingBuyer = false;
+            return;
+        }
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane",
+            ".buyer-search-results",
+            "#BuyerMessage"
+        );
+    });
+    //#endregion
+
+    //#region JW_Customer – Focus Out
+    // JW_Customer – Focus Out
+    // 1. Mouse selecting buyer – skip (handled by list mousedown)
+    // 2. Mouse click elsewhere – auto-select or "Too many choices"
+    // JW_Customer – Focus Out
+    // 3. No record selected + Tab/click outside -> auto-select first record
+    $(document).on("focusout", "#JWC_Name", function () {
+        if (isMouseSelectingBuyer)
+            return;
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        if ($.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            let firstCust = rows.first().data("customer");
+
+            if (firstCust) {
+                SelectBuyer(
+                    firstCust,
+                    "#JWC_Name",
+                    "#JWC_Number",
+                    "#Currency_Name",
+                    "#Currency_Number",
+                    "#WH_Number",
+                    "#RightPane",
+                    ".buyer-search-results"
+                );
+            }
+
+            $("#RightPane").removeClass("show");
+            $("#RightPane .buyer-search-results").hide();
+            return;
+        }
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#BuyerMessage",
+            "#RightPane",
+            "#RightPane .buyer-search-results"
+        );
+    });
+    //#endregion
+
+    //#region Item_Code – Focus In
+    // Item_Code – Focus In
+    // 1. List of items must be displayed in the list box.
+    $(document).on("focusin", ".Item_Code", function () {
+
+        // Guard against a feedback loop: HandleSearchSelection's own
+        // input.focus() (to keep a message visible) can synchronously
+        // re-fire this handler. Row count alone is unreliable here
+        // (a still-in-flight search can transiently report 0 rows),
+        // so also treat a currently-visible message as "already open,
+        // don't re-search."
+        let resultsDiv = $("#RightPane_Item").find(".search-results");
+        let messageVisible = $("#ItemMessage").is(":visible");
+        let alreadyOpen = $("#RightPane_Item").hasClass("show") &&
+            (resultsDiv.find("tbody tr").length > 0 || messageVisible);
+
+        if (alreadyOpen) {
+            return;
+        }
+
+        OnFocus(this);
+    });
+    //#endregion
+
+    //#region Item_Code – Text change
+    // Item_Code – Text change
+    // 1. Based on letters typed in the textbox, it should short-list the item list.
+    $(document).on("input", ".Item_Code", function () {
+        if (this.selectionStart !== this.selectionEnd) {
+            return;
+        }
+        OnInput(this);
+    });
+    //#endregion
+
+    //#region Item_Code – Keydown
+    // Item_Code – Keydown
+    // 1. Tab/Enter – auto-select or "Too many choices"
+    // 2. Arrow Up – highlight + move to top match
+    // 3. Arrow Down – highlight + move to bottom match
+    // 4. Enter, no record selected -> auto-select first record + close popup
+    $(document).on("keydown", ".Item_Code", function (e) {
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+            return;
+        }
+
+        let row = $(this).closest("tr");
+        let rows = $("#RightPane_Item .search-results tbody tr");
+     
+        if (e.key === "Enter" &&
+            $.trim($(this).val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            e.preventDefault();
+
+            isSelectingItem = true;
+
+            rows.first().trigger("mousedown");
+
+            $("#RightPane_Item").removeClass("show");
+            $("#RightPane_Item .search-results").hide();
+
+            isSelectingItem = false;
+            return;
+        }
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#MS_Number"
+        );
+    });
+    //#endregion
+
+    //#region Item_Code – Focus Out
+    // Item_Code – Focus Out
+    // 1. Mouse selecting item – skip (handled by list mousedown)
+    // 2. Mouse click elsewhere – auto-select or "Too many choices"
+    // 3. No record selected + Tab/click outside -> auto-select first record
+    $(document).on("focusout", ".Item_Code", function () {
+
+        if (isSelectingItem)
+            return;
+
+        let input = $(this);
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        if ($.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            isSelectingItem = true;
+            rows.first().trigger("mousedown");
+            isSelectingItem = false;
+
+            $("#RightPane_Item").removeClass("show");
+            $("#RightPane_Item .search-results").hide();
+            return;
+        }
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#ItemMessage",
+            "#RightPane_Item",
+            "#RightPane_Item .search-results"
+        );
+    });
+    //#endregion
+
+});
+
+
+
 //#region  field width
 const ItemTableFields = [
     { cls: ".PRS_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
-    { cls: ".Item_Code", min: 10, max: 15, align: "left" },
+    { cls: ".Item_Code", min: 12, max: 15, align: "left" },
     { cls: ".Description", min: 40, max: 40, align: "left" },
     { cls: ".OuterDia", min: 8, max: 8, align: "center" },
     { cls: ".Thickness", min: 8, max: 8, align: "center" },
@@ -21,6 +261,7 @@ const ItemTableFields = [
 //#endregion
 
 let isMouseSelectingBuyer = false;
+let isSelectingItem = false;
 
 //#region show right panes
  
@@ -254,140 +495,72 @@ function OpenItemCodeSearch(inputElement) {
 
     searchItemJIDNI(inputElement);
 }
+function LoadDefaultFormSetting() {
+    $.ajax({
+        url: '/jobinward/transactions/receipt-note/getinfo',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response && response.success && response.data) {
+                var data = response.data;
 
+                if (data.dfS_JIRNH_JW_CustomerDC_No) {
+                    $('#JW_CustomerDC_No').val(data.dfS_JIRNH_JW_CustomerDC_No);
+                }
+                if (data.dfS_JIRNH_MS_Number) {
+                    $('#MS_Number').val(data.dfS_JIRNH_MS_Number).trigger('change');
+                }
+                if (data.dfS_JIRNH_JWC_Number) {
+                    $('#JWC_Number').val(data.dfS_JIRNH_JWC_Number);
+                    $('#JWC_Name').val(data.cuS_Name);
+                }
+                if (data.dfS_JIRNH_Currency_Number) {
+                    $('#Currency_Number').val(data.dfS_JIRNH_Currency_Number);
+                    $('#Currency_Name').val(data.currency_Name);
+                }
+                if (data.dfS_JIRNH_WH_Number) {
+                    $('#WH_Number').val(data.dfS_JIRNH_WH_Number).trigger('change');
+                }
+                if (data.dfS_JIRNH_Remarks) {
+                    $('#Remarks').val(data.dfS_JIRNH_Remarks);
+                }
+            }
+        },
+        error: function (xhr) {
+            console.error('Failed to load default form setting', xhr);
+        }
+    });
+}
 $(document).ready(function () {
+    LoadDefaultFormSetting();
+
     //#region #JWC_Name----------------------
-    $(document).on("keydown", "#JWC_Name", function (e) {
 
-        if (e.key !== "Enter")
-            return;
-
-        e.preventDefault();
-
-       
-
-            let currentRow = $("#RightPane .buyer-search-results tbody tr.current-row");
-
-            if (!currentRow.length)
-                currentRow = $("#RightPane .buyer-search-results tbody tr.match-row:first");
-
-            if (!currentRow.length)
-                return;
-
-            let clickedCust = currentRow.data("customer");
-
-            if (!clickedCust)
-                return;
-
-            $("#BuyerMessage").hide().text("");
-
-            // Customer
-            $("#JWC_Name").val(clickedCust.cuS_Name);
-            $("#JWC_Number").val(clickedCust.cuS_Number);
-
-            // Currency
-            $("#Currency_Name").val(clickedCust.cuS_CUR_Name);
-            $("#Currency_Number").val(clickedCust.cuS_CUR_Number);
-
-            // Warehouse
-            $("#WH_Number").val(clickedCust.cuS_WH_Number);
-
-            // Hide search pane
-          
+    // JW_Customer – Focus In: moved to <script> block (see JW_Customer – Focus In section)
 
 
- 
-        setTimeout(function () {
-            $("#RightPane")
-                .removeClass("show")
-                .find(".buyer-search-results")
-                .hide()
-                .empty();
+    // JW_Customer – Text change: moved to <script> block (see JW_Customer – Text change section)
 
-            $("#Currency_Name").focus();
-        $(document).trigger("mouse");
-    }, 300);
-    });
+    // JW_Customer – Focus Out: moved to <script> block
 
-    $(document).on("focusout", "#JWC_Name", function () {
-        if (isMouseSelectingBuyer)
-            return;
-        let input = $(this);
-        let rows = $("#RightPane .buyer-search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#BuyerMessage",
-            "#RightPane",
-            "#RightPane .buyer-search-results"
-        );
-    });
-
-
-
-    $(document).on("keydown", "#JWC_Name", function (e) {
-
-        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-
-        //    let input = $(this);
-        //    let rows = $("#RightPane .buyer-search-results tbody tr");
-
-        //    HandleSearchSelection(
-        //        input,
-        //        rows,
-        //        "#BuyerMessage",
-        //        "#RightPane",
-        //        "#RightPane .buyer-search-results"
-        //    );
-
-        //    $("#Currency_Name").focus();
-        //}
-        //else {
-
-            HandleSearchKeyDown(
-                e,
-                this,
-                "#RightPane",
-                ".buyer-search-results",
-                "#BuyerMessage"
-            );
-       }
-    });
-
+    // JW_Customer – Keydown: moved to <script> block
     //#endregion #JWC_Name----------------------
 
 
     //#region item code right pane search
-    $(document).on("keydown mousedown", ".Item_Code", function (e) {
 
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage",
-            "#MS_Number"
-        );
 
-        if (e.type === "mousedown") {
-            OpenItemCodeSearch(this);
-        }
+    // Item_Code – Focus In: moved to <script> block (see Item_Code – Focus In section)
+
+    // Item_Code – Keydown: moved to <script> block
+
+    $(document).on("mousedown", ".Item_Code", function (e) {
+        OpenItemCodeSearch(this);
     });
    
-    $(document).on("focusout", ".Item_Code", function () {
+    // Item_Code – Text change: moved to <script> block
 
-        let input = $(this);
-        let rows = $("#RightPane_Item .search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#ItemMessage",
-            "#RightPane_Item",
-            "#RightPane_Item .search-results"
-        );
-    });
+    // Item_Code – Focus Out: moved to <script> block
     $(document).on("keydown", function (e) {
         if (e.key === "Escape") {
             let input = $(".Item_Code:focus");
@@ -558,11 +731,12 @@ $(document).ready(function () {
             data: JSON.stringify(dto),
             success: function (res) {
              
-                ClearAll();    
-            
-                showAlert('Record Inserted')
-                DateBind();
-                $("#AddRowButton").trigger("click");
+                
+              
+                $('#ModelAlert').one('hidden.bs.modal', function () {
+                    location.reload();
+                });
+                showAlert('Record Inserted');
            
                   //  window.location.href = res.redirectUrl;
               
@@ -573,7 +747,16 @@ $(document).ready(function () {
         });
 
     });
+    function ShowCustomerPane() {
+        $("#RightPane").show();
+        $("#RightPane").addClass("show");
+        $("#RightPane .buyer-search-results").show();
+        //-----------------------------------------------
 
+        $("#RightPane_Item").hide();
+        $("#RightPane_Item").removeClass("show");
+        $("#RightPane_Item .search-results").hide();
+    }
 
 
     $(document).on("click focusin", "#IBatTableBody input", function (e) {
@@ -883,27 +1066,26 @@ function GetReceiptNoteNumber() {
     if (!date)
         return;
 
-    // Convert dd-MMM-yyyy to yyyyMMdd
-    let d = new Date(date);
-
-    let poDate =
-        d.getFullYear().toString() +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        String(d.getDate()).padStart(2, '0');
-
     $.ajax({
-        url: "/receiptnote/transactions/receiptnote/numbering",
+        url: "/receiptnote/transactions/receiptnote/next-rn-number",
         type: "GET",
-        data: { PODate: poDate },
+        data: { RNDate: date },
         success: function (response) {
+            if (!response || response.trim() === "") {
+                alert("Please set numbering for this date range.");
+                $("#RN_No").val("");
+                DateBind();
+
+                return;
+            }
+
             $("#RN_No").val(response);
+
         },
         error: function () {
-           // alert("Unable to generate Receipt Note Number.");
         }
     });
 }
-
 //#endregion
 
 //#region SUBMIT VALIDATION
@@ -1435,7 +1617,7 @@ function OnFocus(inputElement) {
 
     OpenItemCodeSearch(inputElement);
 }
-let itemSearchXHR = null;
+ 
 function searchItemJIDNI(inputElement) {
     if (itemSearchXHR) itemSearchXHR.abort()
     let itemCode = inputElement.value.trim();
@@ -1490,7 +1672,15 @@ function searchItemJIDNI(inputElement) {
 
                     table.find("tbody").append(tr);
 
-                    tr.on("click", function () {
+                    tr.on("mousedown", function (e) {
+
+                        e.preventDefault();
+
+                        // Prevent the focus-move to Qty below from
+                        // re-triggering .Item_Code's focusout handler
+                        // (which would otherwise see the popup not yet
+                        // hidden and reopen it as "Too many choices").
+                        isSelectingItem = true;
 
                         $("#ItemMessage").hide().text("");
 
@@ -1518,6 +1708,7 @@ function searchItemJIDNI(inputElement) {
 
                         setTimeout(function () {
                             qtyInput.select();
+                            isSelectingItem = false;
                         }, 100);
 
                         qtyInput.val(formatIndianQty(qtyInput.val()));
@@ -1634,6 +1825,8 @@ function OnBuyerInput(inputElement) {
      
 }
  
+let buyerSearchXHR = null;
+
 function SearchBuyer(inputElement) {
 
     var buyer = inputElement.value;
@@ -1642,7 +1835,15 @@ function SearchBuyer(inputElement) {
 
     var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
-    $.ajax({
+    // Cancel any still-in-flight search so a stale response (e.g. from
+    // a character the user has since deleted) can't rebuild the rows
+    // with leftover match-row/current-row classes after the field is
+    // actually empty.
+    if (buyerSearchXHR) {
+        buyerSearchXHR.abort();
+    }
+
+    buyerSearchXHR = $.ajax({
         url: '/jobinward/transactions/receipt-note/cutomer',
         type: 'GET',
         data: {
@@ -1679,51 +1880,52 @@ function SearchBuyer(inputElement) {
                     row.data("customer", cust);
                     row.append("<td>" + cust.cuS_Name + "</td>");
                   
-                    row.on("click", function () {
+                    //row.on("click", function () {
 
-                        $("#BuyerMessage").hide().text("");
-                        const clickedCust = $(this).data("customer");
+                    //    $("#BuyerMessage").hide().text("");
+                    //    const clickedCust = $(this).data("customer");
 
-                        $("#JWC_Name").val(clickedCust.cuS_Name);
-                        $("#JWC_Number").val(clickedCust.cuS_Number);
+                    //    $("#JWC_Name").val(clickedCust.cuS_Name);
+                    //    $("#JWC_Number").val(clickedCust.cuS_Number);
 
-                        // Currency
-                        $("#Currency_Name").val(clickedCust.cuS_CUR_Name);
-                        $("#Currency_Number").val(clickedCust.cuS_CUR_Number);
+                    //    // Currency
+                    //    $("#Currency_Name").val(clickedCust.cuS_CUR_Name);
+                    //    $("#Currency_Number").val(clickedCust.cuS_CUR_Number);
 
-                        // Warehouse
-                        $("#WH_Number").val(clickedCust.cuS_WH_Number);
-                        $("#RightPane")
-                            .removeClass("show")
-                            .find(".buyer-search-results")
-                            .hide()
-                            .empty();
-                        setTimeout(function () {
-                            $("#Currency_Name").focus();
-                        }, 100);
+                    //    // Warehouse
+                    //    $("#WH_Number").val(clickedCust.cuS_WH_Number);
+                    //    $("#RightPane")
+                    //        .removeClass("show")
+                    //        .find(".buyer-search-results")
+                    //        .hide()
+                    //        .empty();
+                    //    setTimeout(function () {
+                    //        $("#Currency_Name").focus();
+                    //    }, 100);
                       
                        
                     
-                        //$(document).trigger("click");
-                        //setTimeout(function () {
-                        //    isMouseSelectingBuyer = false;
-                        //}, 100);
+                    //    //$(document).trigger("click");
+                    //    //setTimeout(function () {
+                    //    //    isMouseSelectingBuyer = false;
+                    //    //}, 100);
                     
                      
-                    });
+                    //});
                     table.find("tbody").append(row);
 
               
 
                 });
- 
+                // List box – click or Enter: select record → move to textbox
                 table.find("tbody").on("mousedown", "tr", function (e) {
-                    console.log("buyer row clicked");
-                      $("#BuyerMessage").hide().text("");
+
+                    $("#BuyerMessage").hide().text("");
                     e.preventDefault();
 
                     const clickedCust = $(this).data("customer");
                     isMouseSelectingBuyer = true;
+
                     SelectBuyer(
                         clickedCust,
                         "#JWC_Name",
@@ -1734,13 +1936,16 @@ function SearchBuyer(inputElement) {
                         "#RightPane",
                         ".buyer-search-results"
                     );
-                 
+
                     $("#RightPane").removeClass("show");
                     $("#RightPane .buyer-search-results").hide();
-                
-                
+
                     setTimeout(function () {
                         $("#Currency_Name").focus();
+                        // Reset the flag so the NEXT focusout on #JWC_Name
+                        // is evaluated normally (spec 4.2: mouse click
+                        // outside the list box).
+                        isMouseSelectingBuyer = false;
                     }, 100);
                 });
 
@@ -1818,7 +2023,11 @@ function SearchBuyer(inputElement) {
 
             }
         },
-        error: function () {
+        error: function (xhr, status) {
+
+            if (status === "abort") {
+                return;
+            }
             resultsDiv.text("Error loading data.").show();
         }
     });

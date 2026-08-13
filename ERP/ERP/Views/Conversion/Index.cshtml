@@ -1029,7 +1029,7 @@
 
                                                                                <input id="JIDNI_Item_Code" autocomplete="off"
                                                                                class="form-control JIDNI_Item_Code"
-                                                                                 oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                                                                 oninput="OnInput(this)" onfocus="OnFocus(this)"  onkeydown="HandleSearchKeyDown(event, this, '#RightPane_Item', '.search-results', '#ItemMessage', '#Header_JIDNH_MS_Number')"/>
 
                                                                               
                                                                             </td>
@@ -1158,7 +1158,7 @@
                                                                                 <input name="Items[0].JIDNI_Item_Code"
                                                                                 autocomplete="off"
                                                                                        class="form-control JIDNI_Item_Code"
-                                                                       oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                                                       oninput="OnInput(this)" onfocus="OnFocus(this)"  onkeydown="HandleSearchKeyDown(event, this, '#RightPane_Item', '.search-results', '#ItemMessage', '#Header_JIDNH_MS_Number')"/>
 
                                                                                
 
@@ -1583,7 +1583,7 @@
                                                                                 <input name="Items[0].JIDNI_Item_Code"
                                                                                        autocomplete="off"
                                                                                        class="form-control JIDNI_Item_Code"
-                                                                                       oninput="OnInput(this)" onfocus="OnFocus(this)"/>
+                                                                       oninput="OnInput(this)" onfocus="OnFocus(this)" onkeydown="HandleSearchKeyDown(event, this, '#RightPane_Item', '.search-results', '#ItemMessage', '#Header_JIDNH_MS_Number')" />
 
                                                                               
 
@@ -2004,7 +2004,7 @@
                                                                                 <input name="Items[0].JIDNI_Item_Code"
                                                                                        autocomplete="off"
                                                                                        class="form-control JIDNI_Item_Code"
-                                                                                      oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                                                                      oninput="OnInput(this)" onfocus="OnFocus(this)"  onkeydown="HandleSearchKeyDown(event, this, '#RightPane_Item', '.search-results', '#ItemMessage', '#Header_JIDNH_MS_Number')"/>
 
                                                                             
 
@@ -2208,6 +2208,7 @@
     </script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
       <script src="~/js/code/ItemGrid.js" asp-append-version="true"></script>
+    <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
         <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
     <script src="~/js/conversion/conversion.js" asp-append-version="true"></script>
     <script src="~/js/conversion/conversion_batch.js" asp-append-version="true"></script>

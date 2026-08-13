@@ -51,10 +51,40 @@ $(window).on("load", function () {
     }, 200);
 
 });
-$(document).ready(function () {
-    $(document).on("change", "#Header_JIDNH_DN_Date", function () {
-        GetConversionNumber();
+function LoadDefaultFormSetting() {
+    $.ajax({
+        url: '/jobinward/transactions/conversion/get',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response && response.success && response.data) {
+                var data = response.data;
+
+                if (data.dfS_JICNVH_SFT_Number) {
+                    $('#Header_JIDNH_Shift_Number').val(data.dfS_JICNVH_SFT_Number).trigger('change');
+                }
+                if (data.dfS_JICNVH_WC_Number) {
+                    $('#Header_JIDNH_WC_Number').val(data.dfS_JICNVH_WC_Number).trigger('change');
+                }
+                if (data.dfS_JICNVH_Operator) {
+                    $('#Header_JIDNH_Operator_Number').val(data.dfS_JICNVH_Operator);
+                }
+                if (data.dfS_JICNVH_PRS_Number) {
+                    $('#Header_JIDNH_PRS_Number').val(data.dfS_JICNVH_PRS_Number).trigger('change');
+                }
+                if (data.dfS_JICNVH_MS_Number) {
+                    $('#Header_JIDNH_MS_Number').val(data.dfS_JICNVH_MS_Number).trigger('change');
+                }
+            }
+        },
+        error: function (xhr) {
+            console.error('Failed to load default form setting', xhr);
+        }
     });
+}
+$(document).ready(function () {
+    LoadDefaultFormSetting();
+ 
  
 
     $(document).on("keyup", "#ItemTable input", function () {
@@ -870,11 +900,11 @@ $(document).ready(function () {
 
  
 
-});
-
+}); 
 //#region GetConversionNumber
-
-
+$(document).on("change", "#Header_JIDNH_DN_Date", function () {
+    GetConversionNumber();
+});
 
 function GetConversionNumber() {
 
@@ -883,27 +913,26 @@ function GetConversionNumber() {
     if (!date)
         return;
 
-    // Convert dd-MMM-yyyy to yyyyMMdd
-    let d = new Date(date);
-
-    let poDate =
-        d.getFullYear().toString() +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        String(d.getDate()).padStart(2, '0');
-
     $.ajax({
-        url: "/conversion/transactions/conversion/numbering",
+        url: "/conversion/transactions/conversion/next-cnv-number",
         type: "GET",
-        data: { PODate: poDate },
+        data: { CNVDate: date },
         success: function (response) {
+            if (!response || response.trim() === "") {
+                alert("Please set numbering for this date range.");
+                $("#Header_JIDNH_DN_No").val("");
+                DateBind();
+
+                return;
+            }
+
             $("#Header_JIDNH_DN_No").val(response);
+
         },
         error: function () {
-            // alert("Unable to generate Conversion Number.");
         }
     });
 }
-
 //#endregion
 
 //#region ADD  ADDRESS ROW GRID ,VALIDATE ADDRESS GRID,VALIDATE TEMP ROW

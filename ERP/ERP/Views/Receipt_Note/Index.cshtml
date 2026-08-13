@@ -646,7 +646,8 @@
                 </div>
             </div>
             <!-- HEADER -->
-                <!-- BODY has ITEM -->
+             
+            <!-- BODY has ITEM -->
             <div class="card rounded-0 bg-transparent shadow-none" id="CardBody">
                 <div class="card-body h-100">
                     <div class="row h-100">
@@ -757,8 +758,7 @@
                                                             <td>
                                                                 <input id="Item_Number" class="Item_Number" type="hidden" />
                                                                 <input id="Item_Index" class="Item_Index" type="hidden" />
-                                                                <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
-                                                              
+                                                                <input class="form-control Item_Code" oninput="OnInput(this)" />
                                                             </td>
                                                             <td>
                                                                 <label class="form-control Description"></label>
@@ -819,7 +819,7 @@
                                                                         <input name="Items[@i].Item_Number"
                                                                                class="form-control Item_Number"
                                                                                value="@Model.Items[i].Item_Number"
-                                                                               oninput="OnInput(this)" onfocus="OnFocus(this)" />
+                                                                               oninput="OnInput(this)" />
                                                                         
                                                                     </td>
 
@@ -978,9 +978,10 @@
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote_batch.js" asp-append-version="true"></script>
-    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
+
 
  
 }

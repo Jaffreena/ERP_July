@@ -452,7 +452,7 @@ function ApplyConsumptionBatchFieldWidths(tbodySelector = "#DeliveryNoteBatchTab
         });
     });
 
-    ResizeBatchPopup($table[0], modalSelector);
+    ResizeBatchPopup(tbodySelector, modalSelector);
 }
 
 $(document).on("input change blur", "#IBatTableBody_P input, #IBatTableBody_P textarea, #IBatTableBody_P select", function () {
@@ -469,3 +469,286 @@ $(document).on("input change blur", "#IBatTableBody_S input, #IBatTableBody_S te
 
 //#endregion
 //#endregion
+function OnFocus(inputElement) {
+
+    $(inputElement).data("oldItemCode", $(inputElement).val());
+    $(inputElement).data("oldItemNumber",
+        $(inputElement).closest("tr").find(".Item_Number").val());
+
+    if (inputElement.value) {
+        $(inputElement).select();
+    }
+
+    OpenItemCodeSearch(inputElement);
+}
+
+function OpenItemCodeSearch(inputElement) {
+
+    if ($.trim($("#Header_JIDNH_MS_Number").val()) === "" || $("#Header_JIDNH_MS_Number").val() === "0") {
+        $("#Header_JIDNH_MS_Number").prop("selectedIndex", 1);
+    }
+
+    $("#RightPane").hide();
+    $("#RightPane").removeClass("show");
+    $("#RightPane .buyer-search-results").hide();
+
+    $("#RightPane_Item").show();
+    $("#RightPane_Item").addClass("show");
+    $("#RightPane_Item .search-results").show();
+
+    searchItemJIDNI(inputElement);
+}
+
+ 
+function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsSelector) {
+
+
+    input = $(input);
+    rows = $(rows);
+
+    let txt = $.trim(input.val());
+
+    // Empty textbox -> first row
+    //if (txt === "") {
+
+    //    if (rows.length)
+    //        rows.eq(0).trigger("click");
+
+    //    return;
+    //}
+
+    // Only one row
+    if (rows.length === 1) {
+        rows.eq(0).trigger("click");
+        return;
+    }
+    console.log("HandleSearchSelection");
+
+    // Highlighted row
+    let currentRow = rows.filter(".current-row");
+    console.log(currentRow.length);
+    if (currentRow.length === 1) {
+        currentRow.trigger("click");
+        console.log("trigger finished");
+        return;
+    }
+
+    // Matching row
+    let matchedRows = rows.filter(".match-row");
+
+    if (matchedRows.length === 1) {
+        matchedRows.trigger("click");
+        return;
+    }
+
+    if (matchedRows.length > 1 || rows.length > 1) {
+
+        input.removeData("selectedIndex");
+
+        $(messageSelector)
+            .html("Too many Choices!<br/>Select any one.")
+            .show();
+        input.focus();
+        $(rightPane).addClass("show");
+        $(resultsSelector).show();
+    }
+    // No records found
+    if (rows.length === 0) {
+
+        input.removeData("selectedIndex");
+
+        $(messageSelector)
+            .html("No records found.")
+            .show();
+
+        input.focus();
+        $(rightPane).addClass("show");
+        $(resultsSelector).show();
+
+        return;
+    }
+}
+
+
+let itemSearchXHR = null;
+function HighlightRow(rows, index) {
+
+    rows.removeClass("current-row");
+
+    if (index < 0 || index >= rows.length)
+        return;
+
+    $(rows[index]).addClass("current-row");
+
+    rows[index].scrollIntoView({
+        block: "nearest"
+    });
+}
+function searchItemJIDNI(inputElement) {
+    if (itemSearchXHR) itemSearchXHR.abort()
+    let itemCode = inputElement.value.trim();
+    let row = $(inputElement).closest("tr");
+
+    let resultsDiv = $("#RightPane_Item").find(".search-results");
+
+    let material = $("#Header_JIDNH_MS_Number").val();
+
+    if (!material) return;
+
+    itemSearchXHR = $.ajax({
+        url: '/jobinward/transactions/conversion/item',
+        type: 'GET',
+        data: {
+            ItemCode: itemCode,
+            MS: material
+        },
+        success: function (data) {
+
+            resultsDiv.empty();
+            $("#ItemMessage").hide().text("");
+
+            if (data && data.length > 0) {
+
+                $("#RightPane_Item").addClass("show");
+                resultsDiv.show();
+
+                let table = $(`
+<div class="card-body modal-content batchPopup p-0" style="z-index:999;">
+    <table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100" id="tblsearch">
+        <thead>
+            <tr class="table-info">
+                  <th style="width:30%;">Item Code</th>
+        <th style="width:70%;">Description</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+`);
+
+                $.each(data, function (i, item) {
+
+                    let tr = $("<tr></tr>").css({
+                        height: "24px",
+                        cursor: "pointer"
+                    });
+
+                    tr.append('<td style="width:30%;">' + item.itemCode + '</td>');
+                    tr.append('<td style="width:70%;">' + item.itemDescription + '</td>');
+
+                    table.find("tbody").append(tr);
+
+                    tr.on("click", function () {
+
+                        $("#ItemMessage").hide().text("");
+
+                        row.find(".JIDNI_Item_Code").val(item.itemCode);
+                        row.find(".JIDNI_Item_Number").val(item.itemNumber);
+
+                        $(inputElement).data("oldItemCode", item.itemCode);
+                        $(inputElement).data("oldItemNumber", item.itemNumber);
+
+                        row.find(".JIDNI_Item_Description").val(item.itemDescription);
+                        row.find(".JIDNI_OuterDia").val(item.outerDia);
+                        row.find(".JIDNI_Thickness").val(item.thickness);
+                        row.find(".JIDNI_Length").val(item.length);
+                        row.find(".JIDNI_Width").val(item.width);
+                        row.find(".JIDNI_MaterialGrade").val(item.materialGrade);
+                        row.find(".JIDNI_ItemGroup").val(item.itemGroup);
+
+                        row.find(".JIDNI_UoM_Number").val(item.uoM);
+                        row.find(".JIDNI_WH_Number").val(item.saleWarehouse);
+
+                        let qtyInput = row.find(".JIDNI_Qty");
+
+                        qtyInput.focus();
+
+                        setTimeout(function () {
+                            qtyInput.select();
+                        }, 100);
+
+                        qtyInput.val(formatIndianQty(qtyInput.val()));
+
+                        resultsDiv.hide();
+                        $("#RightPane_Item").removeClass("show");
+                    });
+
+                });
+
+                resultsDiv.append(table);
+
+                resultsDiv.append(`
+<div id="ItemMessage"
+     style="
+        display:none;
+        background:#bdbdbd;
+        border-top:1px solid #ced4da;
+        color:#dc3545;
+        font-weight:bold;
+        text-align:center;
+        padding:4px 52px;
+        font-size:18px;
+        position:absolute;
+        bottom:0;
+        left:-2px;
+        right:0;
+        z-index:10;
+        box-sizing:border-box;">
+</div>
+`);
+                // Keyboard Navigation
+                //#region search logic highlight
+
+                let rows = resultsDiv.find("tbody tr");
+
+                rows.removeClass("match-row current-row");
+
+                $(inputElement).removeData("selectedIndex");
+
+                let searchText = itemCode.trim().toLowerCase();
+
+                let firstMatch = -1;
+                let lastMatch = -1;
+
+                rows.each(function (i) {
+
+                    let code = $(this).find("td:first").text().trim().toLowerCase();
+
+                    if (searchText !== "" && code.startsWith(searchText)) {
+
+                        $(this).addClass("match-row");
+
+                        if (firstMatch === -1)
+                            firstMatch = i;
+
+                        lastMatch = i;
+                    }
+                });
+
+                if (firstMatch >= 0) {
+
+                    $(inputElement).data("firstMatch", firstMatch);
+                    $(inputElement).data("lastMatch", lastMatch);
+                }
+                else {
+
+                    $(inputElement).removeData("firstMatch");
+                    $(inputElement).removeData("lastMatch");
+                }
+
+                //#endregion
+
+            } else {
+
+                resultsDiv.append(GetItemEmptyView());
+
+                $("#RightPane_Item").addClass("show");
+                $("#RightPane_Item .search-results").show();
+            }
+        },
+        error: function () {
+
+            resultsDiv.text("Error loading data.").show();
+        }
+    });
+}
