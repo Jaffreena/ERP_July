@@ -1,4 +1,69 @@
-﻿var addressIndex = 0;
+﻿
+//#region Item_Code – Keydown / Focus Out (JIDNI_Item_Code) — Conversion only
+// Item_Code – Keydown
+// 1. Tab/Enter – auto-select or "Too many choices"
+// 2. Arrow Up – highlight + move to top match
+// 3. Arrow Down – highlight + move to bottom match
+// 4. Enter, no record selected -> auto-select first record + close popup
+$(document).on("keydown", ".JIDNI_Item_Code", function (e) {
+
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+        return;
+    }
+
+    let rows = $("#RightPane_Item .search-results tbody tr");
+
+    if (e.key === "Enter" &&
+        $.trim($(this).val()) === "" && rows.length > 0 &&
+        !rows.filter(".current-row, .match-row").length) {
+
+        e.preventDefault();
+
+        isSelectingItem = true;
+        rows.first().trigger("mousedown");
+        return;
+    }
+
+    HandleSearchKeyDown(
+        e,
+        this,
+        "#RightPane_Item",
+        ".search-results",
+        "#ItemMessage",
+        "#Header_JIDNH_MS_Number"
+    );
+});
+
+// Item_Code – Focus Out
+// 1. Mouse selecting item – skip (handled by list mousedown)
+// 2. Mouse click elsewhere – auto-select or "Too many choices"
+// 3. No record selected + Tab/click outside -> auto-select first record
+$(document).on("focusout", ".JIDNI_Item_Code", function () {
+
+    if (isSelectingItem)
+        return;
+
+    let input = $(this);
+    let rows = $("#RightPane_Item .search-results tbody tr");
+
+    if ($.trim(input.val()) === "" && rows.length > 0 &&
+        !rows.filter(".current-row, .match-row").length) {
+
+        isSelectingItem = true;
+        rows.first().trigger("mousedown");
+        return;
+    }
+
+    HandleSearchSelection(
+        input,
+        rows,
+        "#ItemMessage",
+        "#RightPane_Item",
+        "#RightPane_Item .search-results"
+    );
+});
+//#endregion
+var addressIndex = 0;
  
 function AutoFit() {
     fitInputWidth("Header_JIDNH_DN_No", 20, 30);

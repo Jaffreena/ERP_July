@@ -147,6 +147,8 @@ function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, ms
 
             // First ArrowDown after search: select the last matched row.
             let lastMatch = input.data("lastMatch");
+            console.log("ARROW DOWN. lastMatch=" + lastMatch + " rows.length=" + rows.length +
+                " row0text=" + $(rows[0]).find("td:first").text());
 
             if (lastMatch !== undefined) {
 
@@ -179,6 +181,8 @@ function HandleSearchKeyDown(e, textbox, rightPaneId, resultClass, messageId, ms
 
             // First ArrowUp after search: select the first matched row.
             let firstMatch = input.data("firstMatch");
+            console.log("ARROW UP. firstMatch=" + firstMatch + " rows.length=" + rows.length +
+                " row0text=" + $(rows[0]).find("td:first").text());
 
             if (firstMatch !== undefined) {
 
@@ -247,7 +251,6 @@ function SelectBuyer(
     rightPaneId,
     resultClass
 ) {
-    console.log("SelectBuyer");
    
     // Customer
     $(customerNameId).val(cust.cuS_Name);
@@ -277,6 +280,16 @@ function SelectBuyer(
 
 }
 function OnBuyerSelect(inputElement, rightPaneId, resultClass) {
+
+    // Skip re-searching while a selection is still settling —
+    // SelectBuyer's own delayed focus-move to the Currency field can
+    // cause a stray blur/refocus on this field before the flag would
+    // otherwise be reset, and without this guard that refocus
+    // restarts the whole search (the loop that caused SelectBuyer to
+    // fire twice).
+    if (isMouseSelectingBuyer) {
+        return;
+    }
 
     // Symmetric to OpenItemCodeSearch: opening the customer list must
     // close the item list, so only one popup shows at a time.
@@ -663,10 +676,17 @@ function GetBuyerEmptyView() {
 
 </div>`;
 }
-
 function GetItemEmptyView() {
+    // Renamed the outer wrapper id from "ItemMessage" to
+    // "ItemEmptyView" — it was colliding with the separate flash
+    // #ItemMessage div (used by HandleSearchSelection for "Too many
+    // choices"/"No records found"). With the same id, $("#ItemMessage")
+    // matched BOTH elements, so calling .html() on Enter/Tab wiped out
+    // this view's header table + styled message text, replacing the
+    // whole thing with plain unstyled text — looking like the message
+    // had disappeared.
     return `
-<div id="ItemMessage"
+<div id="ItemEmptyView"
      style="
         position:absolute;
         top:0;

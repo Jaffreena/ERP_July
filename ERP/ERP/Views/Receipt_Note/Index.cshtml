@@ -153,13 +153,17 @@
     background:#dbeafe !important;
 }
     </style>
-    <style>
- .batchPopup thead th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-    </style>
+<style>
+    .batchPopup thead th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+        padding-top: 4px !important;
+        padding-bottom: 2px !important;
+        line-height: 1.1 !important;
+        height: 24px;
+    }
+</style>
 <form asp-action="CreateReceiptNote" class="h-100">
     <!-- Alert Popup -->
     <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">

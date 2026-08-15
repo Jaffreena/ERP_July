@@ -1,4 +1,195 @@
-﻿//#region address width
+﻿$(document).ready(function () {
+    //#region JW_Customer – Focus In
+    // Handled via inline onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+    // in the .cshtml — no delegated binding needed.
+    //#endregion
+
+    //#region JW_Customer – Text change
+    // Handled via inline oninput="OnBuyerInput(this)" in the .cshtml.
+    //#endregion
+
+    //#region JW_Customer – Focus Out
+    $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
+        if (isMouseSelectingBuyer)
+            return;
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        if ($.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#BuyerMessage",
+            "#RightPane",
+            "#RightPane .buyer-search-results"
+        );
+    });
+    //#endregion
+
+    //#region JW_Customer – Keydown
+    $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp" &&
+            e.key !== "Enter" && e.key !== "Escape") {
+            return;
+        }
+
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        // Enter or Escape on an empty textbox (no record selected,
+        // full unfiltered list) -> auto-select first record + close
+        // popup, same behavior for both keys.
+        if ((e.key === "Enter" || e.key === "Escape") &&
+            $.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            e.preventDefault();
+
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        if (e.key === "Escape") {
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+            return;
+        }
+
+        if (e.key === "Enter") {
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+            return;
+        }
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane",
+            ".buyer-search-results",
+            "#BuyerMessage"
+        );
+    });
+    //#endregion
+
+    //#region Item_Code – Focus In
+    // Handled via inline onfocus="ShowItemPane();OnFocusItem(this)"
+    // in the .cshtml — the re-trigger-loop guard lives inside
+    // OnFocusItem itself.
+    //#endregion
+
+    //#region Item_Code – Text change
+    // Handled via inline oninput="OnInputItem(this)" in the .cshtml.
+    //#endregion
+
+    //#region Item_Code – Keydown
+    $(document).on("keydown", ".JIDNI_Item_Code", function (e) {
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+            return;
+        }
+
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        if (e.key === "Enter" &&
+            $.trim($(this).val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            e.preventDefault();
+
+            isSelectingItem = true;
+            rows.first().trigger("mousedown");
+            isSelectingItem = false;
+
+            $("#RightPane_Item").removeClass("show");
+            $("#RightPane_Item .search-results").hide();
+            return;
+        }
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#Header_JIDNH_MS_Number"
+        );
+    });
+
+    // mousedown -> (re)open the item pane and load/refresh the search.
+    $(document).on("mousedown", ".JIDNI_Item_Code", function (e) {
+        OpenItemCodeSearch(this);
+    });
+
+    // Item_Code Escape (unscoped — pre-existing, left as-is; not part
+    // of this pass's scope since it's a logic concern, not a
+    // relocation concern).
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape") {
+            let input = $(".JIDNI_Item_Code");
+            let rows = $("#RightPane_Item .search-results tbody tr");
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#ItemMessage",
+                "#RightPane_Item",
+                "#RightPane_Item .search-results"
+            );
+        }
+    });
+    //#endregion
+
+    //#region Item_Code – Focus Out
+    $(document).on("focusout", ".JIDNI_Item_Code", function () {
+
+        if (isSelectingItem)
+            return;
+
+        let input = $(this);
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        if ($.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            isSelectingItem = true;
+            rows.first().trigger("mousedown");
+            isSelectingItem = false;
+
+            $("#RightPane_Item").removeClass("show");
+            $("#RightPane_Item .search-results").hide();
+            return;
+        }
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#ItemMessage",
+            "#RightPane_Item",
+            "#RightPane_Item .search-results"
+        );
+    });
+    //#endregion
+
+});
+
+//#region address width
 const DeliveryNoteAddressFields = [
     { cls: ".JIDNA_ADTP_Number", min: 10, max: 25, align: "left", extraPadding: 20 },
     { cls: ".JIDNA_Address_ID", min: 10, max: 25, align: "left", extraPadding: 20 },
@@ -31,6 +222,7 @@ const ItemTableFields = [
     { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" }
 ];
 let isMouseSelectingBuyer = false;
+ 
 var addressIndex = 0;
 //#region batch grid alignment
 function GetTableWidth(container = "#DeliveryNoteBatchList") {
@@ -373,94 +565,14 @@ $(document).ready(function () {
     LoadDefaultFormSetting();
 
     //#region Header_JIDNH_JW_Customer_Name
-
-    $(document).on("focusout", "#Header_JIDNH_JW_Customer_Name", function () {
-        if (isMouseSelectingBuyer)
-            return;
-        let input = $(this);
-        let rows = $("#RightPane .buyer-search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#BuyerMessage",
-            "#RightPane",
-            "#RightPane .buyer-search-results"
-        );
-    });
-
-
-
-    $(document).on("keydown", "#Header_JIDNH_JW_Customer_Name", function (e) {
-
-        if (e.key === "Escape" || e.key === "Enter") {
-
-
-
-            let input = $(this);
-            let rows = $("#RightPane .buyer-search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#BuyerMessage",
-                "#RightPane",
-                "#RightPane .buyer-search-results"
-            );
-        } else {
-            HandleSearchKeyDown(
-                e,
-                this,
-                "#RightPane",
-                ".buyer-search-results",
-                "#BuyerMessage"
-            );
-        }
-    });
+    // JW_Customer – Focus Out: moved to <script> block
+    // JW_Customer – Keydown: moved to <script> block
     //#endregion
     //#region item code right pane search JIDNI_Item_Code
-    $(document).on("keydown mousedown", ".JIDNI_Item_Code", function (e) {
-
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage",
-            "#Header_JIDNH_MS_Number"
-        );
-
-        if (e.type === "mousedown") {
-            OpenItemCodeSearch(this);
-        }
-    });
-    $(document).on("focusout", ".JIDNI_Item_Code", function () {
-
-        let input = $(this);
-        let rows = $("#RightPane_Item .search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#ItemMessage",
-            "#RightPane_Item",
-            "#RightPane_Item .search-results"
-        );
-    });
-    $(document).on("keydown", function (e) {
-        if (e.key === "Escape") {
-            let input = $(".JIDNI_Item_Code");
-            let rows = $("#RightPane_Item .search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#ItemMessage",
-                "#RightPane_Item",
-                "#RightPane_Item .search-results"
-            );
-        }
-    });
+    // Item_Code – Keydown (incl. Escape): moved to <script> block
+    // Item_Code – Mousedown: moved to <script> block
+    // Item_Code – Focus Out: moved to <script> block
+    //#endregion
     //#endregion
     $(document).on("mousedown", ".search-results tbody tr", function () {
 
@@ -528,6 +640,7 @@ $(document).ready(function () {
     $(document).on("change", "#ItemTable select", function () {
         ResizeColumn(this);
     });
+    
     //#endregion
 
     AutoFit();
@@ -1635,15 +1748,19 @@ function OnBuyerInput(inputElement) {
     SearchBuyer(inputElement);
 }
 
+let buyerSearchXHR = null;
+
 function SearchBuyer(inputElement) {
 
     var JWCustomer = inputElement.value;
     var SIHDate = $("input[name='Header.JIDNH_DN_Date']").val();
     var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
+    if (buyerSearchXHR) {
+        buyerSearchXHR.abort();
+    }
 
-
-    $.ajax({
+    buyerSearchXHR = $.ajax({
         url: '/jobinward/transactions/delivery-note/cutomer',
         type: 'GET',
         data: {
@@ -1681,58 +1798,10 @@ function SearchBuyer(inputElement) {
 
                     table.find("tbody").append(row);
 
-                    row.on("click", function () {
-                        $("#BuyerMessage").hide().text("");
-                        SelectBuyer(
-                            cust,
-                            "#Header_JIDNH_JW_Customer_Name",
-                            "#Header_JIDNH_JW_Customer_Number",
-                            "#Header_JIDNH_Currency_Name",
-                            "#Header_JIDNH_Currency_Number",
-                            "#Header_JIDNH_WH_Number",
-                            "#RightPane",
-                            ".buyer-search-results"
-                        );
-
-                        //-------------------------------
-                        // DISPLAY VALUE
-                        $(inputElement).val(cust.cuS_Name);
-
-                        // HIDDEN VALUE
-                        $("#Header_JIDNH_JW_Customer_Number")
-                            .val(cust.cuS_Number);
-
-                        // OTHER VALUES
-                        $("#Currency_Name")
-                            .val(cust.cuS_CUR_Name);
-
-                        $("#Currency_Number")
-                            .val(cust.cuS_CUR_Number);
-
-                        $("#SIH_CUR_Number")
-                            .val(cust.cuS_CUR_Number);
-
-                        $("#SIH_BUY_LOC_Number")
-                            .val(cust.cuS_LOC_Number);
-
-                        $("#SIH_CUR_DecimalPlaces")
-                            .val(cust.cuS_CUR_DecimalPlaces);
-
-                        $("#SIH_WHT_Number")
-                            .val(cust.cuS_WHT_Number);
-
-                        $("#WH_Number")
-                            .val(cust.cuS_WH_Number);
-                        //--------------------------------
-
-                        $(document).trigger("click");
-                        setTimeout(function () {
-                            isMouseSelectingBuyer = false;
-                        }, 0);
-                    });
-
+                    // Removed: duplicate row "click" handler (raced with
+                    // the "mousedown" handler below; extra field
+                    // population merged into it).
                 });
-
 
                 table.find("tbody").on("mousedown", "tr", function (e) {
 
@@ -1740,16 +1809,50 @@ function SearchBuyer(inputElement) {
 
                     const clickedCust = $(this).data("customer");
                     isMouseSelectingBuyer = true;
+
                     SelectBuyer(
                         clickedCust,
                         "#Header_JIDNH_JW_Customer_Name",
                         "#Header_JIDNH_JW_Customer_Number",
-                        "#Header_JIDNH_Currency_Number",
+                        "#Header_JIDNH_Currency_Name",
                         "#Header_JIDNH_Currency_Number",
                         "#Header_JIDNH_WH_Number",
                         "#RightPane",
                         ".buyer-search-results"
                     );
+
+                    $(inputElement).val(clickedCust.cuS_Name);
+
+                    $("#Header_JIDNH_JW_Customer_Number")
+                        .val(clickedCust.cuS_Number);
+
+                    $("#Currency_Name")
+                        .val(clickedCust.cuS_CUR_Name);
+
+                    $("#Currency_Number")
+                        .val(clickedCust.cuS_CUR_Number);
+
+                    $("#SIH_CUR_Number")
+                        .val(clickedCust.cuS_CUR_Number);
+
+                    $("#SIH_BUY_LOC_Number")
+                        .val(clickedCust.cuS_LOC_Number);
+
+                    $("#SIH_CUR_DecimalPlaces")
+                        .val(clickedCust.cuS_CUR_DecimalPlaces);
+
+                    $("#SIH_WHT_Number")
+                        .val(clickedCust.cuS_WHT_Number);
+
+                    $("#WH_Number")
+                        .val(clickedCust.cuS_WH_Number);
+
+                    $("#RightPane").removeClass("show");
+                    $("#RightPane .buyer-search-results").hide();
+
+                    setTimeout(function () {
+                        isMouseSelectingBuyer = false;
+                    }, 100);
                 });
 
                 resultsDiv.append(table);
@@ -1825,11 +1928,19 @@ function SearchBuyer(inputElement) {
 
             }
         },
-        error: function () {
+        error: function (xhr, status) {
+
+            if (status === "abort") {
+                return;
+            }
             resultsDiv.text("Error loading data.").show();
         }
     });
 }
+
+// Hide search when clicking outside
+
+//#endregion customer Search Functions
 
 // Hide search when clicking outside
 
@@ -1971,13 +2082,19 @@ function OnInputItem(inputElement) {
 
 function OnFocusItem(inputElement) {
 
+    let resultsDiv = $("#RightPane_Item").find(".search-results");
+    let messageVisible = $("#ItemMessage").is(":visible") ||
+        $("#ItemEmptyView").is(":visible");
+    let alreadyOpen = $("#RightPane_Item").hasClass("show") &&
+        (resultsDiv.find("tbody tr").length > 0 || messageVisible);
+
+    if (alreadyOpen) {
+        return;
+    }
+
     $(inputElement).data("oldItemCode", $(inputElement).val());
     $(inputElement).data("oldItemNumber",
         $(inputElement).closest("tr").find(".JIDNI_Item_Number").val());
-
-    if (inputElement.value) {
-        $(inputElement).select();
-    }
 
     OpenItemCodeSearch(inputElement);
 }
@@ -1994,7 +2111,11 @@ function searchItemJIDNI(inputElement) {
 
     if (!material) return;
 
-    $.ajax({
+    if (itemSearchXHR) {
+        itemSearchXHR.abort();
+    }
+
+    itemSearchXHR = $.ajax({
         url: '/jobinward/transactions/delivery-note/item',
         type: 'GET',
         data: {
@@ -2034,8 +2155,16 @@ function searchItemJIDNI(inputElement) {
                         </tr>
                     `);
                     tr.css("height", "24px");
-                    // CLICK SELECT
-                    tr.on("click", function () {
+                    // Changed from "click" to "mousedown" so that the
+                    // common HandleSearchSelection's rows.trigger("mousedown")
+                    // (used for Tab/Enter auto-select and "Too many
+                    // choices") actually fires row selection here.
+                    tr.on("mousedown", function (e) {
+
+                        e.preventDefault();
+
+                        isSelectingItem = true;
+
                         $("#ItemMessage").hide().text("");
                         // ✔ Visible field
                         row.find(".JIDNI_Item_Code").val(item.itemCode);
@@ -2065,6 +2194,7 @@ function searchItemJIDNI(inputElement) {
                         setTimeout(function () {
                             qtyInput.select();
                             DeleteItemRowTempTable(inputElement);
+                            isSelectingItem = false;
                         }, 100);
 
                         // ✔ Decimal format (if needed)
@@ -2074,9 +2204,7 @@ function searchItemJIDNI(inputElement) {
                         let qtyUnitpriceVal = qtyUnitprice.val();
                         qtyInput.val(formatIndianQty(qtyVal));
                         qtyUnitprice.val(formatIndianCurrency(qtyUnitpriceVal));
-                    
-                         
-                       
+
                         resultsDiv.hide();
                         $("#RightPane_Item").removeClass("show");
                     });
@@ -2159,12 +2287,18 @@ function searchItemJIDNI(inputElement) {
                 $("#RightPane_Item .search-results").show();
             }
         },
-        error: function () {
+        error: function (xhr, status) {
+
+            if (status === "abort") {
+                return;
+            }
             resultsDiv.text("Error loading data.");
             resultsDiv.show();
         }
     });
 }
+
+//#endregion item grid fetch item details
 
 //#endregion item grid fetch item details
 

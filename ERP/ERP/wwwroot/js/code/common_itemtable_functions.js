@@ -32,7 +32,7 @@ $("#ItemTable").on("click", ".CheckItem", function (e) {
 });
 //#endregion
 
-$(document).on("click focusin", "#ItemTable input", function (e) {
+$(document).on("click focusin", "#ItemTable input:not(.Item_Code):not(.JIDNI_Item_Code):not(.JISVOI_Item_Code)", function (e) {
     e.stopPropagation();
 
     let input = this;
@@ -469,17 +469,45 @@ $(document).on("input change blur", "#IBatTableBody_S input, #IBatTableBody_S te
 
 //#endregion
 //#endregion
+let isSelectingItem = false;
+
+//#endregion
+
+ 
+
 function OnFocus(inputElement) {
+
+    if (isSelectingItem) {
+        return;
+    }
+
+    // Guard against a feedback loop: HandleSearchSelection's own
+    // input.focus() (to keep a message/empty-view visible) can
+    // synchronously re-fire this handler.
+    let resultsDiv = $("#RightPane_Item").find(".search-results");
+    let messageVisible = $("#ItemMessage").is(":visible") ||
+        $("#ItemEmptyView").is(":visible");
+    let alreadyOpen = $("#RightPane_Item").hasClass("show") &&
+        (resultsDiv.find("tbody tr").length > 0 || messageVisible);
+
+    if (alreadyOpen) {
+        return;
+    }
 
     $(inputElement).data("oldItemCode", $(inputElement).val());
     $(inputElement).data("oldItemNumber",
-        $(inputElement).closest("tr").find(".Item_Number").val());
-
-    if (inputElement.value) {
-        $(inputElement).select();
-    }
+        $(inputElement).closest("tr").find(".JIDNI_Item_Number").val());
 
     OpenItemCodeSearch(inputElement);
+}
+
+function OnInput(inputElement) {
+
+    if (inputElement.selectionStart !== inputElement.selectionEnd) {
+        return;
+    }
+
+    searchItemJIDNI(inputElement);
 }
 
 function OpenItemCodeSearch(inputElement) {
@@ -499,76 +527,7 @@ function OpenItemCodeSearch(inputElement) {
     searchItemJIDNI(inputElement);
 }
 
- 
-function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsSelector) {
-
-
-    input = $(input);
-    rows = $(rows);
-
-    let txt = $.trim(input.val());
-
-    // Empty textbox -> first row
-    //if (txt === "") {
-
-    //    if (rows.length)
-    //        rows.eq(0).trigger("click");
-
-    //    return;
-    //}
-
-    // Only one row
-    if (rows.length === 1) {
-        rows.eq(0).trigger("click");
-        return;
-    }
-    console.log("HandleSearchSelection");
-
-    // Highlighted row
-    let currentRow = rows.filter(".current-row");
-    console.log(currentRow.length);
-    if (currentRow.length === 1) {
-        currentRow.trigger("click");
-        console.log("trigger finished");
-        return;
-    }
-
-    // Matching row
-    let matchedRows = rows.filter(".match-row");
-
-    if (matchedRows.length === 1) {
-        matchedRows.trigger("click");
-        return;
-    }
-
-    if (matchedRows.length > 1 || rows.length > 1) {
-
-        input.removeData("selectedIndex");
-
-        $(messageSelector)
-            .html("Too many Choices!<br/>Select any one.")
-            .show();
-        input.focus();
-        $(rightPane).addClass("show");
-        $(resultsSelector).show();
-    }
-    // No records found
-    if (rows.length === 0) {
-
-        input.removeData("selectedIndex");
-
-        $(messageSelector)
-            .html("No records found.")
-            .show();
-
-        input.focus();
-        $(rightPane).addClass("show");
-        $(resultsSelector).show();
-
-        return;
-    }
-}
-
+  
 
 let itemSearchXHR = null;
 function HighlightRow(rows, index) {
@@ -638,7 +597,15 @@ function searchItemJIDNI(inputElement) {
 
                     table.find("tbody").append(tr);
 
-                    tr.on("click", function () {
+                    // Changed from "click" to "mousedown" so that the
+                    // common HandleSearchSelection's rows.trigger("mousedown")
+                    // (used for Tab/Enter auto-select and "Too many
+                    // choices") actually fires row selection here.
+                    tr.on("mousedown", function (e) {
+
+                        e.preventDefault();
+
+                        isSelectingItem = true;
 
                         $("#ItemMessage").hide().text("");
 
@@ -665,6 +632,7 @@ function searchItemJIDNI(inputElement) {
 
                         setTimeout(function () {
                             qtyInput.select();
+                            isSelectingItem = false;
                         }, 100);
 
                         qtyInput.val(formatIndianQty(qtyInput.val()));

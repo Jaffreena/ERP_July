@@ -128,13 +128,13 @@
     $(document).on("focusin", ".Item_Code", function () {
 
         // Guard against a feedback loop: HandleSearchSelection's own
-        // input.focus() (to keep a message visible) can synchronously
-        // re-fire this handler. Row count alone is unreliable here
-        // (a still-in-flight search can transiently report 0 rows),
-        // so also treat a currently-visible message as "already open,
-        // don't re-search."
+        // input.focus() (to keep a message/empty-state visible) can
+        // synchronously re-fire this handler. Check for either the
+        // flash message (#ItemMessage) or the "no records" empty view
+        // (#ItemEmptyView) currently visible, not just rows.
         let resultsDiv = $("#RightPane_Item").find(".search-results");
-        let messageVisible = $("#ItemMessage").is(":visible");
+        let messageVisible = $("#ItemMessage").is(":visible") ||
+            $("#ItemEmptyView").is(":visible");
         let alreadyOpen = $("#RightPane_Item").hasClass("show") &&
             (resultsDiv.find("tbody tr").length > 0 || messageVisible);
 
@@ -261,7 +261,7 @@ const ItemTableFields = [
 //#endregion
 
 let isMouseSelectingBuyer = false;
-let isSelectingItem = false;
+ 
 
 //#region show right panes
  
@@ -1611,10 +1611,6 @@ function OnFocus(inputElement) {
     $(inputElement).data("oldItemNumber",
         $(inputElement).closest("tr").find(".Item_Number").val());
 
-    if (inputElement.value) {
-        $(inputElement).select();
-    }
-
     OpenItemCodeSearch(inputElement);
 }
  
@@ -1788,10 +1784,16 @@ function searchItemJIDNI(inputElement) {
 
             } else {
 
+                console.log("NO RECORDS branch: appending GetItemEmptyView, itemCode=[" + itemCode + "]");
+
                 resultsDiv.append(GetItemEmptyView());
-               
+
                 $("#RightPane_Item").addClass("show");
                 $("#RightPane_Item .search-results").show();
+
+                console.log("after append+show, #ItemMessage count=" + $("#ItemMessage").length +
+                    " visible=" + $("#ItemMessage").is(":visible") +
+                    " RightPane_Item hasShow=" + $("#RightPane_Item").hasClass("show"));
             }
         },
         error: function () {

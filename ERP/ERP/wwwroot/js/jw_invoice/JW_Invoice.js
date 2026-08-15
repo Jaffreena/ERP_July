@@ -1,4 +1,88 @@
-﻿//#region address width
+﻿$(document).ready(function () {
+    //#region JW_Customer – Focus In
+    // Handled via inline onfocus (ShowCustomerPane/OnBuyerSelectCall
+    // or equivalent) in the .cshtml — no delegated binding needed.
+    //#endregion
+
+    //#region JW_Customer – Text change
+    // Handled via inline oninput (OnBuyerInput or equivalent) in the
+    // .cshtml.
+    //#endregion
+
+    //#region JW_Customer – Focus Out
+    $(document).on("focusout", "#Header_JISVIH_JW_Customer_Name", function () {
+        if (isMouseSelectingBuyer)
+            return;
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        if ($.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            isMouseSelectingBuyer = true;
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#BuyerMessage",
+            "#RightPane",
+            "#RightPane .buyer-search-results"
+        );
+    });
+    //#endregion
+
+    //#region JW_Customer – Keydown
+    // 1. Tab/Enter – auto-select or "Too many choices" (Tab via Focus Out)
+    // 2. Arrow Up – highlight + move to top match
+    // 3. Arrow Down – highlight + move to bottom match
+    // 4. Enter/Escape, no record selected -> auto-select first record + close popup
+    $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp" &&
+            e.key !== "Enter" && e.key !== "Escape") {
+            return;
+        }
+
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        if ((e.key === "Enter" || e.key === "Escape") &&
+            $.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            e.preventDefault();
+
+            isMouseSelectingBuyer = true;
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        if (e.key === "Escape" || e.key === "Enter") {
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+            return;
+        }
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane",
+            ".buyer-search-results",
+            "#BuyerMessage"
+        );
+    });
+    //#endregion
+
+});
+//#region address width
 const DeliveryNoteAddressFields = [
     { cls: ".JIDNA_ADTP_Number", min: 10, max: 25, align: "left", extraPadding: 20 },
     { cls: ".JIDNA_Address_ID", min: 10, max: 25, align: "left", extraPadding: 20 },
@@ -276,46 +360,7 @@ $(document).ready(function () {
     $(document).on("change", "#ItemTable select", function () {
         ResizeColumns();
     });
-    //#region item code right pane search JISVII_ItemCode
-    $(document).on("keydown", ".Item_Code", function (e) {
-
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage","#Header_JISVIH_MS_Number"
-        );
-
-    });
-    $(document).on("focusout", ".Item_Code", function () {
-
-        let input = $(this);
-        let rows = $("#RightPane_Item .search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#ItemMessage",
-            "#RightPane_Item",
-            "#RightPane_Item .search-results"
-        );
-    });
-    $(document).on("keydown", function (e) {
-        if (e.key === "Escape") {
-            let input = $(".Item_Code");
-            let rows = $("#RightPane_Item .search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#ItemMessage",
-                "#RightPane_Item",
-                "#RightPane_Item .search-results"
-            );
-        }
-    });
-    //#endregion
+ 
     //#region item grid alignment
 
     //#endregion
@@ -342,52 +387,11 @@ $(document).ready(function () {
             fitInputWidth(this, min, max);
         });
     //#endregion
-   
 
-    $(document).on("focusout", "#Header_JISVIH_JW_Customer_Name", function () {
-        if (isMouseSelectingBuyer)
-            return;
-        let input = $(this);
-        let rows = $("#RightPane .buyer-search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#BuyerMessage",
-            "#RightPane",
-            "#RightPane .buyer-search-results"
-        );
-    });
-
- 
-
-    $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
-
-        if (e.key === "Escape" || e.key === "Enter") {
-
-
-
-            let input = $(this);
-            let rows = $("#RightPane .buyer-search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#BuyerMessage",
-                "#RightPane",
-                "#RightPane .buyer-search-results"
-            );
-        } else {
-            HandleSearchKeyDown(
-                e,
-                this,
-                "#RightPane",
-                ".buyer-search-results",
-                "#BuyerMessage"
-            );
-        }
-    }); 
-    
+    //#region Header_JISVIH_JW_Customer_Name
+    // JW_Customer – Focus Out: moved to <script> block
+    // JW_Customer – Keydown: moved to <script> block
+    //#endregion
 
     //#region call service order onclick
     $(document).on("focus", ".JISVII_JISVOH_Number", function () {
@@ -924,15 +928,19 @@ function OnBuyerInput(inputElement) {
     SearchBuyer(inputElement);
 }
 
+let buyerSearchXHR = null;
+
 function SearchBuyer(inputElement) {
 
     var JWCustomer = inputElement.value;
     var SIHDate = $("input[name='Header.JISVIH_InvoiceDate']").val();
-   var resultsDiv = $("#RightPane").find(".buyer-search-results");
+    var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
+    if (buyerSearchXHR) {
+        buyerSearchXHR.abort();
+    }
 
-
-    $.ajax({
+    buyerSearchXHR = $.ajax({
         url: '/jobinward/transactions/delivery-note/cutomer',
         type: 'GET',
         data: {
@@ -970,69 +978,47 @@ function SearchBuyer(inputElement) {
 
                     table.find("tbody").append(row);
 
-                    row.on("click", function () {
-                        $("#BuyerMessage").hide().text("");
-                        SelectBuyer(
-                            cust,
-                            "Header_JISVIH_JW_Customer_Name",
-                            "Header_JISVIH_JW_Customer_Number",
-                            "Header_JISVIH_Currency_Name",
-                            "Header_JISVIH_Currency_Number",
-                            "Header_JISVIH_WH_Number",
-                            "RightPane",
-                            ".buyer-search-results"
-                        );
-                        
-                        $("#Header_JISVIH_JW_Customer_Number").val(cust.cuS_Number);
-
-                        //   $("#Currency_Name").val(cust.cuS_CUR_Name);
-                        $("#Header_JISVIH_Currency_Number").val(cust.cuS_CUR_Number);
-
-
-                        // OTHER VALUES
-                        $("#Header_JISVIH_JW_Customer_Name")
-                            .val(cust.cuS_Name);
-
-                        $("#Header_JISVIH_Currency_Name")
-                            .val(cust.cuS_CUR_Number);
-                        $("#Header_JISVIH_Currency_Number")
-                            .focus();
-                        $("#RightPane").removeClass("show");
-                        $("#RightPane .buyer-search-results").hide();
-                     //   $(document).trigger("click");
-                        setTimeout(function () {
-                            isMouseSelectingBuyer = false;
-                        }, 0);
-                 
-
-                       
-                        loadTaxCluster();
-                      
-                    });
-
+                    // Removed: duplicate row "click" handler (raced
+                    // with the "mousedown" handler below; also used
+                    // SelectBuyer id args without "#" prefixes, so
+                    // SelectBuyer's own $(id) lookups silently
+                    // matched nothing).
                 });
+
                 table.find("tbody").on("mousedown", "tr", function (e) {
 
                     e.preventDefault();
 
                     const clickedCust = $(this).data("customer");
                     isMouseSelectingBuyer = true;
+
                     SelectBuyer(
                         clickedCust,
-                        "Header_JISVIH_JW_Customer_Name",
-                        "Header_JISVIH_JW_Customer_Number",
-                        "Header_JISVIH_Currency_Name",
-                        "Header_JISVIH_Currency_Number",
-                        "Header_JISVIH_WH_Number",
-                        "RightPane",
+                        "#Header_JISVIH_JW_Customer_Name",
+                        "#Header_JISVIH_JW_Customer_Number",
+                        "#Header_JISVIH_Currency_Name",
+                        "#Header_JISVIH_Currency_Number",
+                        "#Header_JISVIH_WH_Number",
+                        "#RightPane",
                         ".buyer-search-results"
                     );
-                    setTimeout(function () {
-                        $(document).trigger("click");
-                    }, 200);
-                   
-                });
 
+                    $("#BuyerMessage").hide().text("");
+
+                    $("#Header_JISVIH_JW_Customer_Number").val(clickedCust.cuS_Number);
+                    $("#Header_JISVIH_Currency_Number").val(clickedCust.cuS_CUR_Number);
+                    $("#Header_JISVIH_JW_Customer_Name").val(clickedCust.cuS_Name);
+                    $("#Header_JISVIH_Currency_Name").val(clickedCust.cuS_CUR_Number);
+
+                    $("#RightPane").removeClass("show");
+                    $("#RightPane .buyer-search-results").hide();
+
+                    setTimeout(function () {
+                        $("#Header_JISVIH_Currency_Number").focus();
+                        isMouseSelectingBuyer = false;
+                        loadTaxCluster();
+                    }, 100);
+                });
 
                 resultsDiv.append(table);
 
@@ -1108,11 +1094,18 @@ function SearchBuyer(inputElement) {
 
             }
         },
-        error: function () {
+        error: function (xhr, status) {
+
+            if (status === "abort") {
+                return;
+            }
             resultsDiv.text("Error loading data.").show();
         }
     });
 }
+
+
+//#endregion customer Search Functions
 
  
 //#endregion customer Search Functions

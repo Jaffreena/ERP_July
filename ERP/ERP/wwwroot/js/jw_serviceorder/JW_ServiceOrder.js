@@ -1,4 +1,206 @@
-﻿const ItemTableFields = [
+﻿$(document).ready(function () {
+    //#region JW_Customer – Focus In
+    // Handled via inline onfocus in the .cshtml — no delegated
+    // binding needed.
+    //#endregion
+
+    //#region JW_Customer – Text change
+    // Handled via inline oninput in the .cshtml.
+    //#endregion
+
+    //#region JW_Customer – Focus Out
+    $(document).on("focusout", "#Header_JISVOH_JW_Customer_Name", function () {
+        if (isMouseSelectingBuyer)
+            return;
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        if ($.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            isMouseSelectingBuyer = true;
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#BuyerMessage",
+            "#RightPane",
+            "#RightPane .buyer-search-results"
+        );
+    });
+    //#endregion
+
+    //#region JW_Customer – Keydown
+    // 1. Tab/Enter – auto-select or "Too many choices" (Tab via Focus Out)
+    // 2. Arrow Up – highlight + move to top match
+    // 3. Arrow Down – highlight + move to bottom match
+    // 4. Enter/Escape, no record selected -> auto-select first record + close popup
+    $(document).on("keydown", "#Header_JISVOH_JW_Customer_Name", function (e) {
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp" &&
+            e.key !== "Enter" && e.key !== "Escape") {
+            return;
+        }
+
+        let input = $(this);
+        let rows = $("#RightPane .buyer-search-results tbody tr");
+
+        // Enter or Escape on an empty textbox (no record selected,
+        // full unfiltered list) -> auto-select first record + close
+        // popup, same behavior for both keys.
+        if ((e.key === "Enter" || e.key === "Escape") &&
+            $.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            e.preventDefault();
+
+            isMouseSelectingBuyer = true;
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        if (e.key === "Escape") {
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+            return;
+        }
+
+        if (e.key === "Enter") {
+            HandleSearchSelection(
+                input,
+                rows,
+                "#BuyerMessage",
+                "#RightPane",
+                "#RightPane .buyer-search-results"
+            );
+            return;
+        }
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane",
+            ".buyer-search-results",
+            "#BuyerMessage"
+        );
+    });
+    //#endregion
+
+    //#region Item_Code – Focus In
+    // Handled via inline onfocus (OnFocusItem or equivalent) in the
+    // .cshtml — the re-trigger-loop guard lives inside that function.
+    //#endregion
+
+    //#region Item_Code – Text change
+    // Handled via inline oninput in the .cshtml.
+    //#endregion
+
+    //#region Item_Code – Keydown
+    $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
+
+        if (e.key !== "ArrowDown" && e.key !== "ArrowUp" &&
+            e.key !== "Enter" && e.key !== "Escape") {
+            return;
+        }
+
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        if ((e.key === "Enter" || e.key === "Escape") &&
+            $.trim($(this).val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            e.preventDefault();
+
+            isSelectingItem = true;
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        if (e.key === "Escape") {
+
+            let input = $(this);
+
+            HandleSearchSelection(
+                input,
+                rows,
+                "#ItemMessage",
+                "#RightPane_Item",
+                "#RightPane_Item .search-results"
+            );
+
+            e.preventDefault();
+            return;
+        }
+
+        HandleSearchKeyDown(
+            e,
+            this,
+            "#RightPane_Item",
+            ".search-results",
+            "#ItemMessage",
+            "#Header_JISVOH_MS_Number"
+        );
+    });
+
+    // mousedown -> (re)open the item pane and load/refresh the search.
+    $(document).on("mousedown", ".JISVOI_Item_Code", function (e) {
+
+        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
+            $("#Header_JISVOH_MS_Number").prop("selectedIndex", 1);
+            return;
+        }
+
+        SearchServiceOrderItem(this);
+
+        $("#RightPane").removeClass("show");
+        $("#RightPane .buyer-search-results").hide();
+
+        $("#RightPane_Item").addClass("show");
+        $("#RightPane_Item .search-results").show();
+    });
+    //#endregion
+
+    //#region Item_Code – Focus Out
+    $(document).on("focusout", ".JISVOI_Item_Code", function () {
+
+        if (isSelectingItem)
+            return;
+
+        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
+            return;
+        }
+
+        let input = $(this);
+        let rows = $("#RightPane_Item .search-results tbody tr");
+
+        if ($.trim(input.val()) === "" && rows.length > 0 &&
+            !rows.filter(".current-row, .match-row").length) {
+
+            isSelectingItem = true;
+            rows.first().trigger("mousedown");
+            return;
+        }
+
+        HandleSearchSelection(
+            input,
+            rows,
+            "#ItemMessage",
+            "#RightPane_Item",
+            "#RightPane_Item .search-results"
+        );
+    });
+    //#endregion
+
+});
+const ItemTableFields = [
     { cls: ".JISVOI_PRS_Number", min: 10, max: 25, align: "left" },   // Process
     { cls: ".JISVOI_Item_Code", min: 10, max: 15, align: "left" },   // Item Code
     { cls: ".Description", min: 40, max: 40, align: "left" },   // Description
@@ -20,6 +222,7 @@
     { cls: ".JISVOI_DeliveryDate", min: 10, max: 10, align: "center" }  // Delivery Date
 ];
 let isMouseSelectingBuyer = false;
+ 
  
 //#region item grid alignment 
 function getTextWidth(text, element) {
@@ -167,126 +370,18 @@ $(document).ready(function () {
         $(this).addClass("current-row");
     });
     //#region item code right pane search JISVOI_Item_Code
-    $(document).on("keydown mousedown", ".JISVOI_Item_Code", function (e) {
-
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage",
-            "#Header_JISVOH_MS_Number"
-        );
-
-        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
-            $("#Header_JISVOH_MS_Number").prop("selectedIndex", 1);
-            // return;
-        }
-
-        if ($.trim($(this).val()) !== "") {
-
-
-            SearchServiceOrderItem(this);
-            $("#RightPane").hide();
-            $("#RightPane").removeClass("show");
-            $("#RightPane .buyer-search-results").hide();
-            //------------------------------------------
-            $("#RightPane_Item").show();
-            $("#RightPane_Item").addClass("show");
-            $("#RightPane_Item .search-results").show();
-
-        }
-    });
-   
-    $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
-
-        HandleSearchKeyDown(
-            e,
-            this,
-            "#RightPane_Item",
-            ".search-results",
-            "#ItemMessage","#Header_JISVOH_MS_Number"
-        );
-
-    });
-    $(document).on("focusout", ".JISVOI_Item_Code", function () {
-
-        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
-            return;
-        }
-
-        let input = $(this);
-        let rows = $("#RightPane_Item .search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#ItemMessage",
-            "#RightPane_Item",
-            "#RightPane_Item .search-results"
-        );
-    });
-    $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
-
-        if (e.key === "Escape") {
-
-            let input = $(this);
-            let rows = $("#RightPane_Item .search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#ItemMessage",
-                "#RightPane_Item",
-                "#RightPane_Item .search-results"
-            );
-
-            e.preventDefault();
-        }
-    });
+    // Item_Code – Keydown
+    // 1. Tab/Enter – auto-select or "Too many choices"
+    // 2. Arrow Up – highlight + move to top match
+    // 3. Arrow Down – highlight + move to bottom match
+    // 4. Enter/Escape, no record selected -> auto-select first record + close popup
+    //#region Item_Code – Keydown/Mousedown/Focus Out: moved to <script> block
+    //#endregion
+    //#region Header_JISVOH_JW_Customer_Name
+    // JW_Customer – Focus Out: moved to <script> block
+    // JW_Customer – Keydown: moved to <script> block
     //#endregion
 
-    $(document).on("focusout", "#Header_JISVOH_JW_Customer_Name", function () {
-        if (isMouseSelectingBuyer)
-            return;
-        let input = $(this);
-        let rows = $("#RightPane .buyer-search-results tbody tr");
-
-        HandleSearchSelection(
-            input,
-            rows,
-            "#BuyerMessage",
-            "#RightPane",
-            "#RightPane .buyer-search-results"
-        );
-    });
-    $(document).on("keydown", "#Header_JISVOH_JW_Customer_Name", function (e) {
-
-        if (e.key === "Escape" || e.key === "Enter") {
-
-
-
-            let input = $(this);
-            let rows = $("#RightPane .buyer-search-results tbody tr");
-
-            HandleSearchSelection(
-                input,
-                rows,
-                "#BuyerMessage",
-                "#RightPane",
-                "#RightPane .buyer-search-results"
-            );
-        } else {
-            HandleSearchKeyDown(
-                e,
-                this,
-                "#RightPane",
-                ".buyer-search-results",
-                "#BuyerMessage"
-            );
-        }
-    }); 
- 
     //#region item grid alignment
     ApplyFieldWidths({
         fields: ItemTableFields,
@@ -305,6 +400,8 @@ $(document).ready(function () {
             searchTable: "#tblsearch"
         });
     });
+    //#endregion
+
     //#endregion
   
     AutoFit();
@@ -334,85 +431,8 @@ $(document).ready(function () {
 
     //#endregion
 
-    $(document).on("keydown", "#Header_JISVOH_JW_Customer_Name", function (e) {
-
-        let input = $(this);
-        let resultsDiv = input.siblings(".jwcustomer-search-results");
-        let rows = resultsDiv.find("tbody tr");
-
-        if (!resultsDiv.is(":visible") || rows.length === 0)
-            return;
-
-        let selectedIndex = input.data("selectedIndex");
-
-        let firstMatch = input.data("firstMatch");
-        let lastMatch = input.data("lastMatch");
-
-        switch (e.key) {
-
-            case "ArrowDown":
-
-                e.preventDefault();
-
-                if (selectedIndex == null) {
-
-                    if (lastMatch >= 0)
-                        selectedIndex = lastMatch;
-                    else
-                        selectedIndex = rows.length - 1;
-                }
-                else if (selectedIndex < rows.length - 1) {
-
-                    selectedIndex++;
-                }
-
-                break;
-
-            case "ArrowUp":
-
-                e.preventDefault();
-
-                if (selectedIndex == null) {
-
-                    if (firstMatch >= 0)
-                        selectedIndex = firstMatch;
-                    else
-                        selectedIndex = 0;
-                }
-                else if (selectedIndex > 0) {
-
-                    selectedIndex--;
-                }
-
-                break;
-
-            case "Enter":
-
-                e.preventDefault();
-
-                if (selectedIndex != null)
-                    $(rows[selectedIndex]).trigger("click");
-
-                return;
-
-            case "Escape":
-
-                e.preventDefault();
-
-                resultsDiv.hide();
-
-                input.removeData("selectedIndex");
-
-                return;
-
-            default:
-                return;
-        }
-
-        HighlightRow(rows, selectedIndex);
-
-        input.data("selectedIndex", selectedIndex);
-    });
+    // Removed: dead/legacy duplicate keydown handler. It targeted
+   
 
  
     //#region Initialize Flatpickr
@@ -1062,15 +1082,19 @@ function OnBuyerInput(inputElement) {
     SearchBuyer(inputElement);
 }
 
+let buyerSearchXHR = null;
+
 function SearchBuyer(inputElement) {
 
     var JWCustomer = inputElement.value;
     var RegDate = $("input[name='Header.JISVOH_RegDate']").val();
     var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
+    if (buyerSearchXHR) {
+        buyerSearchXHR.abort();
+    }
 
-
-    $.ajax({
+    buyerSearchXHR = $.ajax({
         url: '/jobinward/transactions/delivery-note/cutomer',
         type: 'GET',
         data: {
@@ -1107,62 +1131,51 @@ function SearchBuyer(inputElement) {
 
 
                     table.find("tbody").append(row);
+                  // Removed: duplicate row "click" handler (raced
+                  // with the "mousedown" handler below; also used
+                  // SelectBuyer id args without "#" prefixes, so
+                  // SelectBuyer's own $(id) lookups silently
+                  // matched nothing — its manual $(...).val() lines
+                  // below were the only thing actually working).
+              });
 
-                    row.on("click", function () {
-                        $("#BuyerMessage").hide().text("");
-                        SelectBuyer(
-                            cust,
-                            "Header_JISVOH_JW_Customer_Name",
-                            "Header_JISVOH_JW_Customer_Number",
-                            "Header_JISVOH_Currency_Name",
-                            "Header_JISVOH_Currency_Number",
-                            "Header_JISVOH_WH_Number",
-                            "RightPane",
-                            ".buyer-search-results"
-                        );
-                        // Display customer name
-                        $(inputElement).val(cust.cuS_Name);
-
-                        // Hidden JW Customer ID
-                        $("#Header_JISVOH_JW_Customer_Number")
-                            .val(cust.cuS_Number);
-                        $("#Header_JISVOH_JW_Customer_Name")
-                            .val(cust.cuS_Name);
-                        // Currency dropdown
-                        $("#Header_JISVOH_Currency_Number")
-                            .val(cust.cuS_CUR_Number)
-                            .trigger("change");
-                        $("#Header_JISVOH_Currency_Number")
-                            .focus();
-                        $("#RightPane").removeClass("show");
-                        $("#RightPane .buyer-search-results").hide();
-                        $("#RightPane").hide();
-
-                        resultsDiv.hide();
-                       
-                    });
-
-                });
                 table.find("tbody").on("mousedown", "tr", function (e) {
 
                     e.preventDefault();
 
                     const clickedCust = $(this).data("customer");
                     isMouseSelectingBuyer = true;
+
                     SelectBuyer(
                         clickedCust,
-                        "Header_JISVOH_JW_Customer_Name",
-                        "Header_JISVOH_JW_Customer_Number",
-                        "Header_JISVOH_Currency_Name",
-                        "Header_JISVOH_Currency_Number",
-                        "Header_JISVOH_WH_Number",
-                        "RightPane",
+                        "#Header_JISVOH_JW_Customer_Name",
+                        "#Header_JISVOH_JW_Customer_Number",
+                        "#Header_JISVOH_Currency_Name",
+                        "#Header_JISVOH_Currency_Number",
+                        "#Header_JISVOH_WH_Number",
+                        "#RightPane",
                         ".buyer-search-results"
                     );
 
+                    $("#BuyerMessage").hide().text("");
 
+                    $(inputElement).val(clickedCust.cuS_Name);
+
+                    $("#Header_JISVOH_JW_Customer_Number")
+                        .val(clickedCust.cuS_Number);
+
+                    $("#Header_JISVOH_Currency_Number")
+                        .val(clickedCust.cuS_CUR_Number)
+                        .trigger("change");
+
+                    $("#RightPane").removeClass("show");
+                    $("#RightPane .buyer-search-results").hide();
+
+                    setTimeout(function () {
+                        $("#Header_JISVOH_Currency_Number").focus();
+                        isMouseSelectingBuyer = false;
+                    }, 100);
                 });
-
 
                 resultsDiv.append(table);
 
@@ -1239,11 +1252,18 @@ function SearchBuyer(inputElement) {
 
             }
         },
-        error: function () {
+        error: function (xhr, status) {
+
+            if (status === "abort") {
+                return;
+            }
             resultsDiv.text("Error loading data.").show();
         }
     });
 }
+
+
+//#endregion customer Search Functions
 
 
 //#endregion customer Search Functions
@@ -1253,13 +1273,22 @@ function OnInputItem(inputElement) {
 }
 
 function OnFocusItem(inputElement) {
-    var value = inputElement.value;
 
-    if (!value) {
-        SearchServiceOrderItem(inputElement);
-    } else {
-        $(inputElement).select();
+    if (isSelectingItem) {
+        return;
     }
+
+    let resultsDiv = $("#RightPane_Item").find(".search-results");
+    let messageVisible = $("#ItemMessage").is(":visible") ||
+        $("#ItemEmptyView").is(":visible");
+    let alreadyOpen = $("#RightPane_Item").hasClass("show") &&
+        (resultsDiv.find("tbody tr").length > 0 || messageVisible);
+
+    if (alreadyOpen) {
+        return;
+    }
+
+    SearchServiceOrderItem(inputElement);
 }
 function SearchServiceOrderItem(inputElement) {
 
@@ -1270,7 +1299,11 @@ function SearchServiceOrderItem(inputElement) {
 
     if (!material) return;
 
-    $.ajax({
+    if (itemSearchXHR) {
+        itemSearchXHR.abort();
+    }
+
+    itemSearchXHR = $.ajax({
         url: '/jobinward/transactions/service-order/item',
         type: 'GET',
         data: {
@@ -1309,7 +1342,15 @@ function SearchServiceOrderItem(inputElement) {
 </tr>
 `);
 
-                    tr.on("click", function () {
+                    // Changed from "click" to "mousedown" so that the
+                    // common HandleSearchSelection's rows.trigger("mousedown")
+                    // (used for Tab/Enter auto-select and "Too many
+                    // choices") actually fires row selection here.
+                    tr.on("mousedown", function (e) {
+
+                        e.preventDefault();
+
+                        isSelectingItem = true;
 
                         row.find(".JISVOI_Item_Code").val(item.itemCode);
                         row.find(".JISVOI_Item_Number").val(item.itemNumber);
@@ -1325,6 +1366,10 @@ function SearchServiceOrderItem(inputElement) {
                         row.find(".JISVOI_UoM_Number").val(item.uoM);
 
                         row.find(".JISVOI_Qty").focus();
+
+                        setTimeout(function () {
+                            isSelectingItem = false;
+                        }, 100);
 
                         resultsDiv.hide();
                         $("#RightPane_Item").removeClass("show");
@@ -1408,8 +1453,11 @@ function SearchServiceOrderItem(inputElement) {
                 resultsDiv.show();
             }
         },
-        error: function () {
+        error: function (xhr, status) {
 
+            if (status === "abort") {
+                return;
+            }
             resultsDiv.html("Error loading data.");
             resultsDiv.show();
         }

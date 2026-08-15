@@ -24,9 +24,13 @@
 </style>
 <style>
     .batchPopup thead th {
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+        padding-top: 4px !important;
+        padding-bottom: 2px !important;
+        line-height: 1.1 !important;
+        height: 24px;
     }
 </style>
 <style>
@@ -1270,7 +1274,7 @@
                                                                 <input name="Items[0].JIDNI_Item_Code"
                                                                        autocomplete="off"
                                                                        class="form-control JIDNI_Item_Code"
-                                                                       oninput="OnInputItem(this)" onfocus="OnFocusItem(this)" />
+                                                                       oninput="OnInputItem(this)" onfocus="ShowItemPane();OnFocusItem(this)" />
 
  
                                                             </td>
