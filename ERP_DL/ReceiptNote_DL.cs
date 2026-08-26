@@ -187,8 +187,9 @@ namespace ERP_DL
                         RN_ITM_Length = Convert.ToString(dr["ITM_Length"]),
                         RN_ITM_MaterialGrade = Convert.ToString(dr["ITM_MaterialGrade"]),
 
-                           RN_Qty = MH.DecimalConvertQty(Convert.ToDouble(dr["JIRNI_Qty"])),
-                       // RN_Qty="0",
+                        RN_Qty = MH.DecimalConvertQty(
+                               dr["JIRNI_Qty"] == DBNull.Value ? 0 : Convert.ToDouble(dr["JIRNI_Qty"])),
+                        // RN_Qty="0",
                         RN_UoM_Name = Convert.ToString(dr["UOM_Name"]),
 
                         RN_NoOfItem = Convert.ToString(dr["JIRNH_NoOfItem"]),

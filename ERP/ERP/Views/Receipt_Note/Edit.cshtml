@@ -705,6 +705,9 @@
                                                             <th class="text-center">@Html.DisplayNameFor(m => m.Items.First().AmendQty)</th>
                                                             <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().UnitPrice)</th>
                                                             <th class="text-end">@Html.DisplayNameFor(m => m.Items.First().Amount)</th>
+
+                                                            <th class="table-width-md text-center">Freight Applicable</th>
+                                                            <th>Freight SO No.</th>
                                                         </tr>
                                                     </thead>
 
@@ -764,6 +767,19 @@
                                                             <td>
                                                                 <input class="form-control Amount" readonly />
                                                                 <input type="hidden" class="IsDeleted" value="0" />
+                                                            </td>
+
+                                                            <!-- FREIGHT APPLICABLE -->
+                                                            <td class="text-center p-2">
+                                                                <input type="checkbox" class="form-check-input Freight_Applicable" />
+                                                            </td>
+
+                                                            <!-- FREIGHT NO -->
+                                                            <td>
+                                                                <select class="form-select Freight_ServiceOrder_Number">
+                                                                    <option value="0"></option>
+                                                                </select>
+                                                                <input type="hidden" class="JISVOI_Number_FRT_Row" value="0" />
                                                             </td>
                                                         </tr>
 
@@ -897,6 +913,30 @@
                                                                                value="@Model.Items[i].IsDeleted" />
                                                                     </td>
 
+                                                                    <!-- FREIGHT APPLICABLE -->
+                                                                    <td class="text-center p-2">
+                                                                        <input type="checkbox"
+                                                                               name="Items[@i].Freight_Applicable"
+                                                                               class="form-check-input Freight_Applicable"
+                                                                               value="Yes"
+                                                                               checked="@(Model.Items[i].Freight_Applicable == "Yes")" />
+                                                                    </td>
+
+                                                                    <!-- FREIGHT NO -->
+                                                                    <td>
+                                                                        <select name="Items[@i].Freight_ServiceOrder_Number"
+                                                                                class="form-select Freight_ServiceOrder_Number">
+                                                                            <option value="0"></option>
+                                                                            @if (!string.IsNullOrEmpty(Model.Items[i].Freight_ServiceOrder_Number) && Model.Items[i].Freight_ServiceOrder_Number != "0")
+                                                                            {
+                                                                                <option value="@Model.Items[i].Freight_ServiceOrder_Number" selected>
+                                                                                    @Model.Items[i].Freight_ServiceOrder_Number
+                                                                                </option>
+                                                                            }
+                                                                        </select>
+                                                                        <input type="hidden" class="JISVOI_Number_FRT_Row" value="@Model.Items[i].JISVOI_Number_FRT" />
+                                                                    </td>
+
                                                                 </tr>
                                                             }
                                                         }
@@ -907,7 +947,7 @@
                                                     <tfoot>
                                                         <tr class="table-info">
                                                             <td colspan="12" class="text-end">Total</td>
-                                                              <td></td>
+                                                            <td></td>
                                                             <td></td>
                                                             <td>
                                                                 <input id="TotalQty" class="form-control text-center" readonly />
@@ -916,6 +956,8 @@
                                                             <td>
                                                                 <input id="TotalAmount" style="text-align:right" class="form-control" readonly />
                                                             </td>
+                                                            <td></td>
+                                                            <td></td>
                                                         </tr>
                                                     </tfoot>
 

@@ -155,6 +155,7 @@ namespace ERP_DTO.JobInwardTransaction
         [Display(Name = "Qty")]
         [Required(ErrorMessage = "Qty is Required")]
         public string? Qty { get; set; }
+        public string? Qty_Kg { get; set; }
         public string? AmendQty { get; set; }
         public string? OriginalQty { get; set; }
         public string? UsedQty { get; set; }
@@ -168,6 +169,13 @@ namespace ERP_DTO.JobInwardTransaction
         public string? Amount { get; set; }
 
         public string? IsDeleted { get; set; }
+
+        // NEW: Freight logic
+        public string? Freight_Applicable { get; set; }
+        public string? Freight_ServiceOrder_Number { get; set; }
+        public string? JISVOI_Number_FRT { get; set; }
+        public string? FromWH { get; set; }
+        public string? ToWH { get; set; }
 
         public void Reset()
         {
@@ -185,9 +193,15 @@ namespace ERP_DTO.JobInwardTransaction
             this.WH_Number = "";
             this.UoM_Number = "";
             this.Qty = "";
+            this.Qty_Kg = "";
             this.UnitPrice = "";
             this.Amount = "";
             this.IsDeleted = "";
+            this.Freight_Applicable = "";
+            this.Freight_ServiceOrder_Number = "";
+            this.JISVOI_Number_FRT = "";
+            this.FromWH = "";
+            this.ToWH = "";
         }
     }
     public class ReceiptNoteHead_DTO
@@ -232,6 +246,9 @@ namespace ERP_DTO.JobInwardTransaction
         [Required(ErrorMessage = "Warehouse is Required")]
         public string? WH_Number { get; set; }
 
+        [Display(Name = "Freight Applicable")]
+        public string? Freight_Applicable { get; set; }
+
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
 
@@ -252,6 +269,7 @@ namespace ERP_DTO.JobInwardTransaction
             this.JWC_Number = null;
             this.Currency_Number = null;
             this.WH_Number = null;
+            this.Freight_Applicable = null;
             this.Remarks = "";
             this.Mode_ID = 0;
             this.Items = null;
@@ -662,6 +680,7 @@ namespace ERP_DTO.JobInwardTransaction
         public Int64 JIRNH_Currency_Number { get; set; }
         public Int64 JIRNH_WH_Number { get; set; }
         public String? JIRNH_Remarks { get; set; }
+        public String? JIRNH_Freight_Applicable { get; set; }
 
         //public int RNH_Date { get; set; } // For Numbering Purpose Only (Important ❗)
 
@@ -686,9 +705,15 @@ namespace ERP_DTO.JobInwardTransaction
         public String? JIRNI_ITM_Code { get; set; }
         public Int64 JIRNI_UoM_Number { get; set; }
         public Double JIRNI_Qty { get; set; }
+        public Double JIRNI_Qty_Kg { get; set; }
         public Double JIRNI_UnitPrice { get; set; }
         public Double JIRNI_Amount { get; set; }
-
+        // NEW: Freight logic
+        public String? JIRNI_Freight_Applicable { get; set; }
+        public String? JIRNI_Freight_ServiceOrder_Number { get; set; }
+        public Int64 JIRNI_JISVOI_Number_FRT { get; set; }
+        public Int64? JIRNI_FromWH { get; set; }
+        public Int64? JIRNI_ToWH { get; set; }
         // =======================
         // BATCH (JIRNI_BCH)
         // =======================
@@ -745,9 +770,11 @@ namespace ERP_DTO.JobInwardTransaction
             JIRNI_Qty = 0;
             JIRNI_UnitPrice = 0;
             JIRNI_Amount = 0;
-
-            // Batch
-            JIRNI_BCH_JIRNH_Number = 0;
+        JIRNI_Freight_Applicable = "";
+        JIRNI_Freight_ServiceOrder_Number = "";
+        JIRNI_JISVOI_Number_FRT = 0;
+        // Batch
+        JIRNI_BCH_JIRNH_Number = 0;
             JIRNI_BCH_JIRNI_Number = 0;
             JIRNI_BCH_Number = 0;
             JIRNI_BCH_WH_Number = 0;

@@ -191,6 +191,7 @@ let isMouseSelectingBuyer = false;
  
 let buyerSearchXHR = null;
 
+const FREIGHT_PRS_NUMBER = 40008;
 const ItemTableFields = [
     { cls: ".PRS_Number", min: 10, max: 25, align: "left" },
     { cls: ".Item_Code", min: 10, max: 15, align: "left" },
@@ -203,12 +204,15 @@ const ItemTableFields = [
     { cls: ".ItemGroup", min: 10, max: 30, align: "left" },
     { cls: ".WH_Number", min: 10, max: 25, align: "left" },
     { cls: ".UoM_Number", min: 10, max: 15, align: "center" },
-    
+
     { cls: ".OriginalQty", min: 10, max: 20, align: "center" },
     { cls: ".UsedQty", min: 10, max: 20, align: "center" },
     { cls: ".AmendQty", min: 10, max: 20, align: "center", extraPadding: 8 },
     { cls: ".UnitPrice", min: 11, max: 20, align: "right", extraPadding: 8 },
-    { cls: ".Amount", min: 13, max: 25, align: "right", extraPadding: 8 }
+    { cls: ".Amount", min: 13, max: 25, align: "right", extraPadding: 8 },
+
+    // NEW: Freight logic
+    { cls: ".Freight_ServiceOrder_Number", min: 10, max: 25, align: "left" }
 ];
 function ShowCustomerPane() {
     $("#RightPane").addClass("show");
@@ -551,12 +555,33 @@ function BindItems_Edit(items) {
 
         row.find(".Amount").val(formatIndianCurrency(item.JIRNI_Amount));
 
+        // NEW: Freight logic
+        row.find(".Freight_Applicable").prop("checked", item.JIRNI_Freight_Applicable === "Yes");
+        row.find(".JISVOI_Number_FRT_Row").val(item.JIRNI_JISVOI_Number_FRT || "0");
+
+        if (item.JIRNI_Freight_Applicable === "Yes" && item.JIRNI_Freight_ServiceOrder_Number && item.JIRNI_Freight_ServiceOrder_Number != "0") {
+            row.find(".Freight_ServiceOrder_Number").attr("data-saved-value", item.JIRNI_Freight_ServiceOrder_Number);
+        }
+
         $("#TableBody").append(row);
 
     });
 
+    // NEW: Freight logic — options fetch panna row already DOM-la irukkanum, adhanala append aana pinnadi call pannirom
+    $("#TableBody tr.NewRow").each(function () {
+        let row = $(this);
+        if (row.find(".Freight_Applicable").is(":checked")) {
+            BindFreightServiceOrder(
+                row,
+                $("#JWC_Number").val(),
+                row.find(".Item_Number").val(),
+                row.find(".UoM_Number").val()
+            );
+        }
+    });
+
     calculateTotal_rn();
-  
+
 }
 function ResizeColumn(control) {
 
@@ -1020,7 +1045,6 @@ $(document).ready(function () {
     $(document).on("input", "#ItemTable input", function () {
         ResizeColumn(this);
     });
-
     $(document).on("change", "#ItemTable select", function () {
         ResizeColumn(this);
     });
@@ -1028,6 +1052,29 @@ $(document).ready(function () {
     $(document).on("focusin", ".Amount", function () {
         ResizeColumn(this);
     });
+
+    // NEW: Freight logic
+    $(document).on(
+        "change",
+        ".Freight_Applicable, .Item_Code, .UoM_Number",
+        function () {
+
+            let row = $(this).closest("tr");
+
+            if (row.find(".Freight_Applicable").is(":checked")) {
+
+                BindFreightServiceOrder(
+                    row,
+                    $("#JWC_Number").val(),
+                    row.find(".Item_Number").val(),
+                    row.find(".UoM_Number").val()
+                );
+
+            } else {
+                row.find(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+            }
+        }
+    );
     //#endregion
 
 });
@@ -1170,7 +1217,12 @@ function GetItems_Edit() {
                 UnitPrice: String(unitPrice),
                 Amount: String(amount),
 
-                IsDeleted: "0"
+                IsDeleted: "0",
+
+                // NEW: Freight logic
+                Freight_Applicable: row.find(".Freight_Applicable").is(":checked") ? "Yes" : "No",
+                Freight_ServiceOrder_Number: row.find(".Freight_ServiceOrder_Number").val() || "",
+                JISVOI_Number_FRT: row.find(".JISVOI_Number_FRT_Row").val() || "0"
             });
         }
     });
@@ -1190,6 +1242,100 @@ function DateBind() {
     var fp = document.getElementById("RN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
 }
+
+
+// NEW: Freight logic (row-scoped — multiple rows can have different items/UoM/SO simultaneously)
+function BindFreightServiceOrder(row, customerId, itemNumber = null, uomNumber = null) {
+
+    let dropdown = row.find(".Freight_ServiceOrder_Number");
+    let selectedValue = dropdown.attr("data-saved-value") || dropdown.val();
+
+    dropdown.html('<option value="0"></option>');
+    if (!customerId) return;
+
+    $.get("/receiptnote/transactions/receiptnote/get-freight-service-order",
+        { customerId, prsNumber: FREIGHT_PRS_NUMBER, itemNumber, uomNumber },
+        function (data) {
+            $.each(data, function (_, item) {
+                if (!item.value || item.value === "" || item.value === "0") return;
+
+                dropdown.append(`<option value="${item.value}">${item.text}</option>`);
+            });
+
+            dropdown.val(selectedValue);
+            dropdown.removeAttr("data-saved-value");
+        }
+    );
+}
+
+// NEW: Freight logic — OtherRowsQty(SO) = Σ AmendQty for rows sharing this Freight SO, excluding current row
+function GetOtherRowsQtyForFreightSO(freightSO, currentRow) {
+    let total = 0;
+
+    $("#TableBody tr.NewRow:visible").each(function () {
+        let row = $(this);
+
+        if (row.is(currentRow)) return;
+        if (row.find(".IsDeleted").val() === "1") return;
+
+        let rowFreightSO = row.find(".Freight_ServiceOrder_Number").val() || 0;
+
+        if (rowFreightSO == freightSO) {
+            total += parseFloat(removeCommas(row.find(".AmendQty").val())) || 0;
+        }
+    });
+
+    return total;
+}
+
+// NEW: Freight logic — Qty Allowed check against Freight SO
+function CheckFreightQtyExceeded(row) {
+
+    let freightSO = row.find(".Freight_ServiceOrder_Number").val();
+    if (!freightSO || freightSO === "0") return;
+
+    let itemNumber = row.find(".Item_Number").val();
+    let uomNumber = row.find(".UoM_Number").val();
+    let originalQty = parseFloat(removeCommas(row.find(".AmendQty").val())) || 0;
+
+    $.get("/receiptnote/transactions/receiptnote/check-delivered-qty-exceeded-freight", {
+        jisvohNumber: freightSO,
+        prsNumber: FREIGHT_PRS_NUMBER,
+        itemNumber,
+        uomNumber
+    }, function (res) {
+
+        if (!res || res.length === 0) return;
+
+        let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+        let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
+
+        // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(Freight SO)
+        let otherRowsQty = GetOtherRowsQtyForFreightSO(freightSO, row);
+        let realDeliveredQty = deliveredQty + otherRowsQty;
+
+        // FORMULA: IsExceeded  <=>  (RealDeliveredQty + CurrentQty) > SVO_Qty
+        if ((realDeliveredQty + originalQty) > jisvoiQty) {
+
+            // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
+            alert("Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty));
+            setTimeout(function () {
+                row.find(".AmendQty").focus().select();
+                row.find(".Freight_ServiceOrder_Number").val("0");
+            }, 300);
+        }
+    });
+}
+
+$(document).on("change", ".Freight_ServiceOrder_Number", function () {
+    CheckFreightQtyExceeded($(this).closest("tr"));
+});
+
+$(document).on("focusout", ".AmendQty", function () {
+    CheckFreightQtyExceeded($(this).closest("tr"));
+});
+
+//#region SUBMIT VALIDATION
 //#region SUBMIT VALIDATION
 function validateHeaderById_RN() {
 

@@ -1,4 +1,27 @@
-﻿$(document).ready(function () {
+﻿// FORMULA: OtherRowsQty(SO) = Σ FRTII_Qty  for all rows where RowSO = SO, RowSO ≠ CurrentRow
+function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
+    let total = 0;
+
+    $("#TableBody tr.NewRow").each(function () {
+        let row = $(this);
+
+        if (row.is(currentRow)) return;
+        if (row.attr("data-deleted") === "1") return;
+
+        // CHANGED: .FRTII_ServiceOrder_Number only exists on dropdown/INVOICE
+        // rows — DELIVERY NOTE (label) rows have no such element, so .val()
+        // returned undefined and their qty was never counted. .FRTII_ServiceOrderHidden
+        // exists on every row regardless of label/dropdown.
+        let rowSO = row.find(".FRTII_ServiceOrderHidden").val() || 0;
+
+        if (rowSO == jisvohNumber) {
+            total += parseFloat(removeCommas(row.find(".FRTII_Qty").val())) || 0;
+        }
+    });
+
+    return total;
+}
+$(document).ready(function () {
     //#region JW_Customer – Focus In
     // Handled via inline onfocus (ShowCustomerPane/OnBuyerSelectCall
     // or equivalent) in the .cshtml — no delegated binding needed.
@@ -10,7 +33,7 @@
     //#endregion
 
     //#region JW_Customer – Focus Out
-    $(document).on("focusout", "#Header_JISVIH_JW_Customer_Name", function () {
+    $(document).on("focusout", "#Header_FRTIH_JW_Customer_Name", function () {
         if (isMouseSelectingBuyer)
             return;
         let input = $(this);
@@ -39,7 +62,7 @@
     // 2. Arrow Up – highlight + move to top match
     // 3. Arrow Down – highlight + move to bottom match
     // 4. Enter/Escape, no record selected -> auto-select first record + close popup
-    $(document).on("keydown", "#Header_JISVIH_JW_Customer_Name", function (e) {
+    $(document).on("keydown", "#Header_FRTIH_JW_Customer_Name", function (e) {
 
         if (e.key !== "ArrowDown" && e.key !== "ArrowUp" &&
             e.key !== "Enter" && e.key !== "Escape") {
@@ -97,31 +120,31 @@ const DeliveryNoteAddressFields = [
 let isMouseSelectingBuyer = false;
 let buyerSearchXHR = null;
 const ItemTableFields = [
-    { cls: ".JISVII_JISVOH_Number", min: 20, max: 25, align: "left" },    // Service Order Number
-    { cls: ".JISVII_DN_No", min: 20, max: 25, align: "left" },    // Delivery Note Number
-    { cls: ".JISVII_Process", min: 10, max: 25, align: "left" },    // Process
-    { cls: ".JISVII_ItemCode", min: 10, max: 15, align: "left" },    // Item Code
-    { cls: ".JISVII_ItemDescription", min: 40, max: 40, align: "left" },    // Description
+    { cls: ".FRTII_ServiceOrder_Number", min: 20, max: 25, align: "left" },    // Service Order Number
+    { cls: ".FRTII_DN_No", min: 20, max: 25, align: "left" },    // Delivery Note Number
+    { cls: ".FRTII_Process", min: 10, max: 25, align: "left" },    // Process
+    { cls: ".FRTII_ItemCode", min: 10, max: 15, align: "left" },    // Item Code
+    { cls: ".FRTII_ItemDescription", min: 40, max: 40, align: "left" },    // Description
 
-    { cls: ".JISVII_OuterDia", min: 8, max: 8, align: "center" },  // Outer Dia
-    { cls: ".JISVII_Thickness", min: 8, max: 8, align: "center" },  // Thickness
-    { cls: ".JISVII_Length", min: 8, max: 8, align: "center" },  // Length
-    { cls: ".JISVII_Width", min: 8, max: 8, align: "center" },  // Width
+    { cls: ".FRTII_OuterDia", min: 8, max: 8, align: "center" },  // Outer Dia
+    { cls: ".FRTII_Thickness", min: 8, max: 8, align: "center" },  // Thickness
+    { cls: ".FRTII_Length", min: 8, max: 8, align: "center" },  // Length
+    { cls: ".FRTII_Width", min: 8, max: 8, align: "center" },  // Width
 
-    { cls: ".JISVII_MaterialGrade", min: 10, max: 25, align: "left" },    // Material Grade
-    { cls: ".JISVII_ItemGroup", min: 10, max: 30, align: "left" },    // Item Group
-    { cls: ".JISVII_UoM", min: 10, max: 15, align: "center" },  // UoM
+    { cls: ".FRTII_MaterialGrade", min: 10, max: 25, align: "left" },    // Material Grade
+    { cls: ".FRTII_ItemGroup", min: 10, max: 30, align: "left" },    // Item Group
+    { cls: ".FRTII_UoM", min: 10, max: 15, align: "center" },  // UoM
 
-    { cls: ".JISVII_DeliveredQty", min: 10, max: 20, align: "center" },  // Delivery Note Qty
-    { cls: ".JISVII_PrevInvoiceQty", min: 10, max: 20, align: "center" },  // Already Invoiced Qty
-    { cls: ".JISVII_Qty", min: 10, max: 20, align: "center" },  // Invoice Qty
-    { cls: ".JISVII_AmendQty", min: 10, max: 20, align: "center" },  // Extra field
+    { cls: ".FRTII_DeliveredQty", min: 10, max: 20, align: "center" },  // Delivery Note Qty
+    { cls: ".FRTII_PrevInvoiceQty", min: 10, max: 20, align: "center" },  // Already Invoiced Qty
+    { cls: ".FRTII_Qty", min: 10, max: 20, align: "center" },  // Invoice Qty
+    { cls: ".FRTII_AmendQty", min: 10, max: 20, align: "center" },  // Extra field
 
-    { cls: ".JISVII_UnitPrice", min: 10, max: 20, align: "right", extraPadding: 20 },   // Unit Price
-    { cls: ".JISVII_Amount", min: 13, max: 25, align: "right" },   // Amount
+    { cls: ".FRTII_UnitPrice", min: 10, max: 20, align: "right", extraPadding: 20 },   // Unit Price
+    { cls: ".FRTII_Amount", min: 13, max: 25, align: "right" },   // Amount
 
-    { cls: ".JISVII_SAC_Number", min: 8, max: 8, align: "left" },    // SAC
-    { cls: ".JISVII_GST_Amount", min: 13, max: 25, align: "right" }    // GST Amount
+    { cls: ".FRTII_SAC_Number", min: 8, max: 8, align: "left" },    // SAC
+    { cls: ".FRTII_GST_Amount", min: 13, max: 25, align: "right" }    // GST Amount
 ];
 $(window).on("load", function () {
     setTimeout(function () {
@@ -226,14 +249,14 @@ function HighlightRow(rows, index) {
     });
 }
 function AutoFit() {
-    fitInputWidth("Header_JISVIH_InvoiceNo", 20, 25);
-    fitInputWidth("Header_JISVIH_MS_Number", 20, 30);
-    fitInputWidth("Header_JISVIH_JW_Customer_Name", 40, 50);
-    fitInputWidth("Header_JISVIH_Currency_Number", 10, 10);
-    fitInputWidth("Header_JISVIH_TCT_Number", 20, 25);
-    fitInputWidth("Header_JISVIH_PaymentTerms", 30, 40);
-    fitInputWidth("Header_JISVIH_PaymentMethod", 30, 40);
-    fitInputWidth("Header_JISVIH_Remarks", 40, 40);
+    fitInputWidth("Header_FRTIH_InvoiceNo", 20, 25);
+    fitInputWidth("Header_FRTIH_MS_Number", 20, 30);
+    fitInputWidth("Header_FRTIH_JW_Customer_Name", 40, 50);
+    fitInputWidth("Header_FRTIH_Currency_Number", 10, 10);
+    fitInputWidth("Header_FRTIH_TCT_Number", 20, 25);
+    fitInputWidth("Header_FRTIH_PaymentTerms", 30, 40);
+    fitInputWidth("Header_FRTIH_PaymentMethod", 30, 40);
+    fitInputWidth("Header_FRTIH_Remarks", 40, 40);
 }
 function ResizeColumn(control) {
 
@@ -291,33 +314,33 @@ $(document).ready(function () {
     });
     //#region comma format on focusout
     $(document).on("focusout",
-        ".JISVII_DeliveredQty, .JISVII_PrevInvoiceQty, .JISVII_AmendQty, .JISVII_UnitPrice, .JISVII_Amount, .JISVII_GST_Amount",
+        ".FRTII_DeliveredQty, .FRTII_PrevInvoiceQty, .FRTII_AmendQty, .FRTII_UnitPrice, .FRTII_Amount, .FRTII_GST_Amount",
         function () {
-            let isQty = $(this).is(".JISVII_DeliveredQty, .JISVII_PrevInvoiceQty, .JISVII_AmendQty");
+            let isQty = $(this).is(".FRTII_DeliveredQty, .FRTII_PrevInvoiceQty, .FRTII_AmendQty");
             let type = isQty ? "q" : "c";
             $(this).val(addComma($(this).val(), type));
         });
     //#endregion
     AutoFit();
-    //#region Header_JISVIH_JW_Customer_Name
+    //#region Header_FRTIH_JW_Customer_Name
     // JW_Customer – Focus Out: moved to <script> block
     // JW_Customer – Keydown: moved to <script> block
     //#endregion
     //#region Header AutoFit - KeyUp
 
     $(document).on("keyup change input",
-        "#Header_JISVIH_InvoiceNo, #Header_JISVIH_MS_Number, #Header_JISVIH_JW_Customer_Name, #Header_JISVIH_Currency_Number, #Header_JISVIH_TCT_Number, #Header_JISVIH_PaymentTerms, #Header_JISVIH_PaymentMethod, #Header_JISVIH_Remarks",
+        "#Header_FRTIH_InvoiceNo, #Header_FRTIH_MS_Number, #Header_FRTIH_JW_Customer_Name, #Header_FRTIH_Currency_Number, #Header_FRTIH_TCT_Number, #Header_FRTIH_PaymentTerms, #Header_FRTIH_PaymentMethod, #Header_FRTIH_Remarks",
         function () {
 
             const widths = {
-                Header_JISVIH_InvoiceNo: [20, 25],
-                Header_JISVIH_MS_Number: [20, 30],
-                Header_JISVIH_JW_Customer_Name: [40, 50],
-                Header_JISVIH_Currency_Number: [10, 10],
-                Header_JISVIH_TCT_Number: [20, 25],
-                Header_JISVIH_PaymentTerms: [30, 40],
-                Header_JISVIH_PaymentMethod: [30, 40],
-                Header_JISVIH_Remarks: [40, 40]
+                Header_FRTIH_InvoiceNo: [20, 25],
+                Header_FRTIH_MS_Number: [20, 30],
+                Header_FRTIH_JW_Customer_Name: [40, 50],
+                Header_FRTIH_Currency_Number: [10, 10],
+                Header_FRTIH_TCT_Number: [20, 25],
+                Header_FRTIH_PaymentTerms: [30, 40],
+                Header_FRTIH_PaymentMethod: [30, 40],
+                Header_FRTIH_Remarks: [40, 40]
             };
 
             const [min, max] = widths[this.id];
@@ -325,44 +348,28 @@ $(document).ready(function () {
         });
 
     //#endregion
-
-    //#region JISVII_JISVOH_Number focus
-    $(document).on("focus", ".JISVII_JISVOH_Number", function () {
+  
+    //#region FRTII_ServiceOrder_Number focus
+    $(document).on("focus", ".FRTII_ServiceOrder_Number", function () {
         console.log("dropdown focused");
 
         let dropdown = $(this);
         LoadServiceOrderDropdown(dropdown);
     });
 
-    //#region load JISVII_JISVOH_Number -LoadServiceOrderDropdown
+    //#region load FRTII_ServiceOrder_Number -LoadServiceOrderDropdown
     function LoadServiceOrderDropdown(dropdown) {
 
         let row = $(dropdown).closest("tr");
 
-        // NEW: skip reload if this dropdown already has real options
-        // loaded (more than just the blank default) — reloading on every
-        // focus was racing with the user's selection and resetting it.
-        if ($(dropdown).find("option").length > 1) {
-            return;
-        }
-
-        let customerId = $("#Header_JISVIH_JW_Customer_Number").val();
-        let prsNumber = row.find(".JISVII_PRS_Number").val();
-        let itemNumber = row.find(".JISVII_Item_Number").val();
-        let uomNumber = row.find(".JISVII_UoM_Number").val();
-        console.log(row.find(".JISVII_PRS_Number").length);
-        console.log(row.find(".JISVII_Item_Number").length);
-        console.log(row.find(".JISVII_UoM_Number").length);
-
-        // NEW: abort any previous in-flight load for this exact dropdown
-        // before starting a new one — prevents a late/stale response from
-        // overwriting a value the user has already picked.
-        let prevXHR = $(dropdown).data('soDropdownXHR');
-        if (prevXHR && prevXHR.readyState !== 4) {
-            prevXHR.abort();
-        }
-
-        let xhrCall = $.ajax({
+        let customerId = $("#Header_FRTIH_JW_Customer_Number").val();
+        let prsNumber = row.find(".FRTII_PRS_Number").val();
+        let itemNumber = row.find(".FRTII_Item_Number").val();
+        let uomNumber = row.find(".FRTII_UoM_Number").val();
+        console.log(row.find(".FRTII_PRS_Number").length);
+        console.log(row.find(".FRTII_Item_Number").length);
+        console.log(row.find(".FRTII_UoM_Number").length);
+        $.ajax({
             url: "/DeliveryNote/GetServiceOrder",
             type: "GET",
             data: {
@@ -377,80 +384,51 @@ $(document).ready(function () {
                 let options = '<option value="0"></option>';
 
                 $.each(response, function (_, item) {
-                    // NEW: skip entries with no real value/text — server
-                    // occasionally returns a blank item, which was
-                    // duplicating the default blank option in the dropdown.
-                    if (!item.value || item.value === "" || item.value === "0") return;
-
                     options += `<option value="${item.value}">
                             ${item.text}
                         </option>`;
                 });
 
-                let previousValue = row.find(".JISVII_ServiceOrderHidden").val() || "0";
-
                 $(dropdown).html(options);
-                $(dropdown).val(previousValue);
-
-                if (!$(dropdown).val() || $(dropdown).val() === "0") {
-                    row.find(".JISVOI_Number").val(0);
-                    row.find(".JISVII_UnitPrice").val(0).prop("readonly", false);
-                    row.find(".JISVII_Amount").val(0).prop("readonly", false);
-                }
             }, error: function (xhr, status, error) {
-
-                if (status === "abort") return;   // NEW: ignore aborted calls
 
                 console.log("AJAX Error");
                 console.log("Status:", status);
                 console.log("Error:", error);
                 console.log("Response:", xhr.responseText);
+
+                // alert("Failed to load Service Orders.");
             }
         });
-
-        $(dropdown).data('soDropdownXHR', xhrCall);   // NEW: track this call
     }
     //#endregion
 
 
     //#endregion
 
-    //#region JISVII_JISVOH_Number empty check
-    $(document).on("input change", ".JISVII_JISVOH_Number", function () {
-
-        let val = $(this).val();
-
-        if (!val || val === "0") {
-            let row = $(this).closest("tr");
-            row.find(".JISVOI_Number").val(0);
-            row.find(".JISVII_UnitPrice").val(0).prop("readonly", false);
-            row.find(".JISVII_Amount").val(0).prop("readonly", false);
-        }
-    });
-    //#endregion
-
-    //#region JISVII_JISVOH_Number change
-    $(document).on("change", ".JISVII_JISVOH_Number", function () {
+    //#region FRTII_ServiceOrder_Number change
+ 
+    $(document).on("change", ".FRTII_ServiceOrder_Number", function () {
 
         let row = $(this).closest("tr");
         let jisvohNumber = $(this).val();
-        row.find(".JISVII_ServiceOrderHidden").val(jisvohNumber)
-        row.find(".JISVII_SO_AssignFlag").val("INVOICE"); // NEW: manual change = direct SO invoice
-        console.log('JISVII_ServiceOrderHidden:--' + row.find(".JISVII_ServiceOrderHidden").val())
-        row.find(".JISVOH_Number").val(jisvohNumber);
+        row.find(".FRTII_ServiceOrderHidden").val(jisvohNumber)
+        console.log('FRTII_ServiceOrderHidden:--' + row.find(".FRTII_ServiceOrderHidden").val())
+        row.find(".Freight_ServiceOrder_Number").val(jisvohNumber);
+        row.find(".FRTII_SO_AssignFlag").val("INVOICE"); // NEW: manual pick = direct SO invoice
 
-        $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
+        $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
             jisvohNumber: jisvohNumber,
-            prsNumber: row.find(".JISVII_PRS_Number").val(),
-            itemNumber: row.find(".JISVII_Item_Number").val(),
-            uomNumber: row.find(".JISVII_UoM_Number").val()
+            prsNumber: row.find(".FRTII_PRS_Number").val(),
+            itemNumber: row.find(".FRTII_Item_Number").val(),
+            uomNumber: row.find(".FRTII_UoM_Number").val()
         }, function (res) {
 
             if (res && res.length > 0) {
 
                 let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
                 let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
-                let originalQty = parseFloat(row.find(".JISVII_AmendQty").val()) || 0;
+                let originalQty = parseFloat(row.find(".FRTII_AmendQty").val()) || 0;
 
                 // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(SO)
                 let otherRowsQty = GetOtherRowsQtyForSO(jisvohNumber, row);
@@ -460,29 +438,26 @@ $(document).ready(function () {
                 if ((realDeliveredQty + originalQty) > jisvoiQty) {
                     // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
                     alert("Qty Allowed: " + (jisvoiQty - realDeliveredQty));
-                    row.find(".JISVII_AmendQty").focus().select();
-                    // CHANGED: removed "return" — Unit Price/Amount must
-                    // still fetch even when qty is exceeded. The alert
-                    // just warns about qty; it's a separate concern from
-                    // filling the SO's unit price on selection.
+                    row.find(".FRTII_AmendQty").focus().select();
+                    return; // stop second ajax if qty invalid
                 }
             }
 
             // SECOND AJAX (runs after first success)
             $.ajax({
-                url: '/JobworkInvoice/GetServiceOrderItemInfo',
+                url: '/FreightInvoice/GetServiceOrderItemInfo',
                 type: 'GET',
                 data: {
-                    JISVOH_Number: jisvohNumber,
-                    PRS_Number: row.find(".JISVII_PRS_Number").val(),
-                    Item_Number: row.find(".JISVII_Item_Number").val(),
-                    UoM_Number: row.find(".JISVII_UoM_Number").val()
+                    Freight_ServiceOrder_Number: jisvohNumber,
+                    PRS_Number: row.find(".FRTII_PRS_Number").val(),
+                    Item_Number: row.find(".FRTII_Item_Number").val(),
+                    UoM_Number: row.find(".FRTII_UoM_Number").val()
                 },
                 success: function (response) {
 
-                    var unitPriceBox = row.find(".JISVII_UnitPrice");
-                    var amountBox = row.find(".JISVII_Amount");
-                    var serviceOrderItemBox = row.find(".JISVOI_Number");
+                    var unitPriceBox = row.find(".FRTII_UnitPrice");
+                    var amountBox = row.find(".FRTII_Amount");
+                    var serviceOrderItemBox = row.find(".Freight_ServiceOrder_Number");
 
                     console.log("GetServiceOrderItemInfo--");
                     console.log(JSON.stringify(response));
@@ -518,11 +493,11 @@ $(document).ready(function () {
         });
     });
     //#endregion
+ 
 
+  
 
-
-
-
+     
 
     //#region #ItemTable  #TableBody click
     $(document).on("click", "#TableBody tr, #TableBody tr input, #TableBody tr select, #TableBody tr textarea, #TableBody tr label", function () {
@@ -585,16 +560,16 @@ $(document).ready(function () {
         dialog.style.setProperty("width", popupWidth + "px", "important");
         dialog.style.setProperty("max-width", popupWidth + "px", "important");
     }
-
-
+   
+    
     //#region #AddressButton click
     $("#AddressButton").on("click", function () {
         ShowBuyerAddressPopup();
     });
-
+   
     //#endregion
 
-
+   
     $(document).on('click', '#RemoveItemRowButton', function () {
 
         //#region REMOVE CHECKED ROWS
@@ -618,8 +593,8 @@ $(document).ready(function () {
 
     });
 
-    //#region #Header_JISVIH_InvoiceDate change
-    $("#Header_JISVIH_InvoiceDate").on("change", function () {
+    //#region #Header_FRTIH_InvoiceDate change
+    $("#Header_FRTIH_InvoiceDate").on("change", function () {
         console.log("Date changed:", $(this).val());
 
         loadTaxCluster(); // your function
@@ -633,17 +608,17 @@ $(document).ready(function () {
         if (CheckedCheckbox) {
             var currentRow = $(CheckedCheckbox).closest('tr.NewRow');
             CurrentGSTRow = currentRow.index();
-            var ItemNumber = currentRow.find('input.JISVII_Item_Number').val();
+            var ItemNumber = currentRow.find('input.FRTII_Item_Number').val();
             //var Index = currentRow.find('input.SII_Index').val();
             var SACNumber = currentRow.find('input.SAC_Number').val();
 
 
-            var Cluster = $("#Header_JISVIH_TCT_Number").val();
-            var SIHDate = $("#Header_JISVIH_InvoiceDate").val();
+            var Cluster = $("#Header_FRTIH_TCT_Number").val();
+            var SIHDate = $("#Header_FRTIH_InvoiceDate").val();
 
-            var qty = parseFloat(removeCommas(currentRow.find("input.JISVII_AmendQty").val())) || 0;
-            var unitPrice = parseFloat(removeCommas(currentRow.find("input.JISVII_UnitPrice").val())) || 0;
-            var Amount = parseFloat(removeCommas(currentRow.find("input.JISVII_Amount").val())) || 0;
+            var qty = parseFloat(removeCommas(currentRow.find("input.FRTII_AmendQty").val())) || 0;
+            var unitPrice = parseFloat(removeCommas(currentRow.find("input.FRTII_UnitPrice").val())) || 0;
+            var Amount = parseFloat(removeCommas(currentRow.find("input.FRTII_Amount").val())) || 0;
 
             var BaseAmount = parseFloat(removeCommas(Amount));
 
@@ -675,84 +650,73 @@ $(document).ready(function () {
 
     //#endregion
 
-    //#region .JISVII_AmendQty change
-    $(document).on("input", ".JISVII_AmendQty", function () {
-        SanitizeNumericInput(this);   // NEW: strip non-numeric chars live
-    });
-    // 2) Final check on blur — reject 0 / blank / invalid, silently
-    $(document).on("blur", "#TableBody .JISVII_AmendQty", function () {
-        var $this = $(this);
-        var num = parseInt($this.val(), 10);
+    //#region .FRTII_AmendQty change
 
-        if (isNaN(num) || num <= 0) {
-            $this.val("");
-        } else {
-            $this.val(num);
-        }
-    });
-
-    $(document).on("keyup change", ".JISVII_AmendQty, .JISVII_UnitPrice", function () {
+    $(document).on("keyup change", ".FRTII_AmendQty, .FRTII_UnitPrice", function () {
 
         var row = $(this).closest("tr");
 
-        var qty = parseFloat(removeCommas(row.find(".JISVII_AmendQty").val())) || 0;
+        var qty = parseFloat(removeCommas(row.find(".FRTII_AmendQty").val())) || 0;
 
-        var unitPrice = parseFloat(removeCommas(row.find(".JISVII_UnitPrice").val())) || 0;
+        var unitPrice = parseFloat(removeCommas(row.find(".FRTII_UnitPrice").val())) || 0;
 
         var amount = qty * unitPrice;
 
-        row.find(".JISVII_Amount")
+        row.find(".FRTII_Amount")
             .val(addComma(amount, "c"));
 
         CalculateTotals();
     });
     //#endregion
 
+    
 
-
-    //#region .JISVII_AmendQty change
-    $(document).on("focusout", ".JISVII_AmendQty", function () {
+    //#region .FRTII_AmendQty change
+    $(document).on("focusout", ".FRTII_AmendQty", function () {
 
         var row = $(this).closest("tr");
 
         var deliveredQty = parseFloat(
-            removeCommas(row.find(".JISVII_DeliveredQty").text())
+            removeCommas(row.find(".FRTII_DeliveredQty").text())
         ) || 0;
 
         var prevInvoiceQty = parseFloat(
-            removeCommas(row.find(".JISVII_PrevInvoiceQty").val())
+            removeCommas(row.find(".FRTII_PrevInvoiceQty").val())
         ) || 0;
 
         var currentQty = parseFloat(
-            removeCommas(row.find(".JISVII_AmendQty").val())
+            removeCommas(row.find(".FRTII_AmendQty").val())
         ) || 0;
 
         var balanceQty = deliveredQty - prevInvoiceQty;
 
         // Prevent negative
         if (currentQty < 0) {
-            row.find(".JISVII_AmendQty").val(0);
+            row.find(".FRTII_AmendQty").val(0);
             currentQty = 0;
         }
 
         // Balance validation
         if (currentQty > balanceQty) {
             alert("Current Invoice Qty cannot exceed Balance Qty (" + balanceQty + ")");
-            row.find(".JISVII_AmendQty").val(balanceQty);
+            row.find(".FRTII_AmendQty").val(balanceQty);
             currentQty = balanceQty;
-            row.find(".JISVII_AmendQty").focus().select();
+            row.find(".FRTII_AmendQty").focus().select();
         }
 
-        let jisvohNumber = row.find(".JISVII_JISVOH_Number").val() || 0;
+        // CHANGED: .FRTII_ServiceOrder_Number only exists on the select element
+        // (rows currently being manually assigned); .FRTII_ServiceOrderHidden
+        // exists on every row regardless of label/dropdown.
+        let jisvohNumber = row.find(".FRTII_ServiceOrderHidden").val() || 0;
 
         // With Service Order
         if (jisvohNumber > 0) {
 
-            $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
+            $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
                 jisvohNumber: jisvohNumber,
-                prsNumber: row.find(".JISVII_PRS_Number").val() || 0,
-                itemNumber: row.find(".JISVII_Item_Number").val() || 0,
-                uomNumber: row.find(".JISVII_UoM_Number").val() || 0
+                prsNumber: row.find(".FRTII_PRS_Number").val() || 0,
+                itemNumber: row.find(".FRTII_Item_Number").val() || 0,
+                uomNumber: row.find(".FRTII_UoM_Number").val() || 0
             }, function (res) {
 
                 if (res && res.length > 0) {
@@ -772,17 +736,17 @@ $(document).ready(function () {
                     if (currentQty > allowedQty) {
                         alert("Allowed Qty: " + allowedQty);
                         currentQty = allowedQty;
-                        row.find(".JISVII_AmendQty").val(allowedQty);
+                        row.find(".FRTII_AmendQty").val(allowedQty);
                     }
                 }
 
                 var unitPrice = parseFloat(
-                    removeCommas(row.find(".JISVII_UnitPrice").val())
+                    removeCommas(row.find(".FRTII_UnitPrice").val())
                 ) || 0;
 
                 var amount = currentQty * unitPrice;
 
-                row.find(".JISVII_Amount")
+                row.find(".FRTII_Amount")
                     .val(addComma(amount, "c"));
 
                 CalculateTotals();
@@ -793,12 +757,12 @@ $(document).ready(function () {
         else {
 
             var unitPrice = parseFloat(
-                removeCommas(row.find(".JISVII_UnitPrice").val())
+                removeCommas(row.find(".FRTII_UnitPrice").val())
             ) || 0;
 
             var amount = currentQty * unitPrice;
 
-            row.find(".JISVII_Amount")
+            row.find(".FRTII_Amount")
                 .val(addComma(amount, "c"));
 
             CalculateTotals();
@@ -807,19 +771,19 @@ $(document).ready(function () {
     //#endregion
 
 
-    $(document).on("input", ".JISVII_AmendQty, .JISVII_UnitPrice", async function () {
+    $(document).on("input", ".FRTII_AmendQty, .FRTII_UnitPrice", async function () {
 
         const $row = $(this).closest("tr");
 
-        const qty = parseFloat(removeCommas($row.find(".JISVII_AmendQty").val())) || 0;
+        const qty = parseFloat(removeCommas($row.find(".FRTII_AmendQty").val())) || 0;
 
-        const unitPrice = parseFloat(removeCommas($row.find(".JISVII_UnitPrice").val())) || 0;
+        const unitPrice = parseFloat(removeCommas($row.find(".FRTII_UnitPrice").val())) || 0;
 
         const baseAmount = qty * unitPrice;
 
-        const cluster = $("#Header_JISVIH_TCT_Number").val();
+        const cluster = $("#Header_FRTIH_TCT_Number").val();
 
-        const invoiceDate = $("#Header_JISVIH_InvoiceDate").val();
+        const invoiceDate = $("#Header_FRTIH_InvoiceDate").val();
 
         const sacNumber = $row.find("input.SAC_Number").val();
 
@@ -837,35 +801,35 @@ $(document).ready(function () {
 
         gstAmount = parseFloat(gstAmount || 0).toFixed(2);
 
-        $row.find(".JISVII_GST_Amount").val(gstAmount);
+        $row.find(".FRTII_GST_Amount").val(gstAmount);
 
     });
     const params = new URLSearchParams(window.location.search);
     const siNo = params.get("SI_No");
 
+   
 
+    GetFreightInvoice(siNo);
+    $("#Header_FRTIH_Number").val(siNo);
+    LoadFreightInvoiceAddress();
 
-    GetJobworkInvoice(siNo);
-    $("#Header_JISVIH_Number").val(siNo);
-    LoadJobworkInvoiceAddress();
+  
 
-
-
-    $(document).on("input change", ".JISVII_Qty, .JISVII_UnitPrice", async function () {
+    $(document).on("input change", ".FRTII_Qty, .FRTII_UnitPrice", async function () {
 
         const $row = $(this).closest("tr");
 
+ 
 
+        const qty = parseFloat(removeCommas($row.find(".FRTII_Qty").val())) || 0;
 
-        const qty = parseFloat(removeCommas($row.find(".JISVII_Qty").val())) || 0;
-
-        const unitPrice = parseFloat(removeCommas($row.find(".JISVII_UnitPrice").val())) || 0;
+        const unitPrice = parseFloat(removeCommas($row.find(".FRTII_UnitPrice").val())) || 0;
 
         const baseAmount = qty * unitPrice;
 
-        const cluster = $("#Header_JISVIH_TCT_Number").val();
+        const cluster = $("#Header_FRTIH_TCT_Number").val();
 
-        const invoiceDate = $("#Header_JISVIH_InvoiceDate").val();
+        const invoiceDate = $("#Header_FRTIH_InvoiceDate").val();
 
         const sacNumber = $row.find("input.SAC_Number").val();
 
@@ -880,9 +844,9 @@ $(document).ready(function () {
                 baseAmount
             );
         }
-        gstAmount = addComma(parseFloat(gstAmount || 0), "c");
+        gstAmount = addComma(parseFloat(gstAmount || 0), "c");   
 
-        $row.find(".JISVII_GST_Amount").val(gstAmount);
+        $row.find(".FRTII_GST_Amount").val(gstAmount);
 
     });
 
@@ -917,7 +881,7 @@ function DateBind() {
 
     var formattedDate = day + "-" + months[today.getMonth()] + "-" + today.getFullYear();
 
-    var fp = document.getElementById("Header_JISVIH_InvoiceDate")._flatpickr;
+    var fp = document.getElementById("Header_FRTIH_InvoiceDate")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
 }
 
@@ -941,28 +905,6 @@ async function GetGSTAmount(cluster, invoiceDate, sacNumber, baseAmount) {
 
     return response;
 }
-// FORMULA: OtherRowsQty(SO) = Σ JISVII_AmendQty  for all rows where RowSO = SO, RowSO ≠ CurrentRow
-function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
-    let total = 0;
-
-    $("#TableBody tr.NewRow").each(function () {
-        let row = $(this);
-
-        if (row.is(currentRow)) return;
-        if (row.attr("data-deleted") === "1") return;
-
-        let rowSO = row.find(".JISVII_JISVOH_Number").val() || 0;
-
-        if (rowSO == jisvohNumber) {
-            let currentQty = parseFloat(removeCommas(row.find(".JISVII_AmendQty").val())) || 0;
-            let originalQty = parseFloat(row.find(".JISVII_OriginalQty").val()) || 0;
-
-            total += (currentQty - originalQty);
-        }
-    });
-
-    return total;
-}
 function CalculateTotals() {
 
     var totalDeliveredQty = 0;
@@ -975,26 +917,26 @@ function CalculateTotals() {
     $("#TableBody tr.NewRow:visible").each(function () {
 
         totalDeliveredQty += parseFloat(
-            removeCommas($(this).find(".JISVII_DeliveredQty").text())
+            removeCommas($(this).find(".FRTII_DeliveredQty").text())
         ) || 0;
 
         totalPrevInvoiceQty += parseFloat(
-            removeCommas($(this).find(".JISVII_PrevInvoiceQty").val())
+            removeCommas($(this).find(".FRTII_PrevInvoiceQty").val())
         ) || 0;
 
         totalQty += parseFloat(
-            removeCommas($(this).find(".JISVII_AmendQty").val())
+            removeCommas($(this).find(".FRTII_AmendQty").val())
         ) || 0;
 
         totalAmount += parseFloat(
-            removeCommas($(this).find(".JISVII_Amount").val())
+            removeCommas($(this).find(".FRTII_Amount").val())
         ) || 0;
 
         totalGSTAmount += parseFloat(
-            removeCommas($(this).find(".JISVII_GST_Amount").val())
+            removeCommas($(this).find(".FRTII_GST_Amount").val())
         ) || 0;
         totalAmendedQty += parseFloat(
-            removeCommas($(this).find(".JISVII_AmendQty").val())
+            removeCommas($(this).find(".FRTII_AmendQty").val())
         ) || 0;
 
     });
@@ -1013,7 +955,7 @@ function CalculateTotals() {
     $("#TotalAmount").val(addComma(totalAmount, "c"));
     $("#TotalGSTAmount").val(addComma(totalGSTAmount, "c"));
     $("#TotalAmendedQty").val(addComma(totalAmendedQty, "q"));
-
+    
 
 }
 
@@ -1105,15 +1047,15 @@ function ClusterTaxView(data) {
 
 function loadTaxCluster() {
 
-    var customerNumber = $("#Header_JISVIH_JW_Customer_Number").val();
-    var invoiceDate = $("#Header_JISVIH_InvoiceDate").val();
+    var customerNumber = $("#Header_FRTIH_JW_Customer_Number").val();
+    var invoiceDate = $("#Header_FRTIH_InvoiceDate").val();
 
     if (customerNumber === "" || invoiceDate === "") {
         return;
     }
 
     $.ajax({
-        url: '/JobworkInvoice/Get_JW_Invoice_Taxcluster',
+        url: '/FreightInvoice/Get_Freight_Invoice_Taxcluster',
         type: 'GET',
         data: {
             JWC_Number: customerNumber,
@@ -1122,7 +1064,7 @@ function loadTaxCluster() {
 
         success: function (data) {
 
-            var ddl = $("#Header_JISVIH_TCT_Number");
+            var ddl = $("#Header_FRTIH_TCT_Number");
 
             ddl.empty();
 
@@ -1222,27 +1164,27 @@ function SearchBuyer(inputElement) {
 
                     SelectBuyer(
                         clickedCust,
-                        "#Header_JISVIH_JW_Customer_Name",
-                        "#Header_JISVIH_JW_Customer_Number",
-                        "#Header_JISVIH_Currency_Name",
-                        "#Header_JISVIH_Currency_Number",
-                        "#Header_JISVIH_WH_Number",
+                        "#Header_FRTIH_JW_Customer_Name",
+                        "#Header_FRTIH_JW_Customer_Number",
+                        "#Header_FRTIH_Currency_Name",
+                        "#Header_FRTIH_Currency_Number",
+                        "#Header_FRTIH_WH_Number",
                         "#RightPane",
                         ".buyer-search-results"
                     );
 
                     $("#BuyerMessage").hide().text("");
 
-                    $("#Header_JISVIH_JW_Customer_Number").val(clickedCust.cuS_Number);
-                    $("#Header_JISVIH_Currency_Number").val(clickedCust.cuS_CUR_Number);
-                    $("#Header_JISVIH_JW_Customer_Name").val(clickedCust.cuS_Name);
-                    $("#Header_JISVIH_Currency_Name").val(clickedCust.cuS_CUR_Number);
+                    $("#Header_FRTIH_JW_Customer_Number").val(clickedCust.cuS_Number);
+                    $("#Header_FRTIH_Currency_Number").val(clickedCust.cuS_CUR_Number);
+                    $("#Header_FRTIH_JW_Customer_Name").val(clickedCust.cuS_Name);
+                    $("#Header_FRTIH_Currency_Name").val(clickedCust.cuS_CUR_Number);
 
                     $("#RightPane").removeClass("show");
                     $("#RightPane .buyer-search-results").hide();
 
                     setTimeout(function () {
-                        $("#Header_JISVIH_Currency_Number").focus();
+                        $("#Header_FRTIH_Currency_Number").focus();
                         isMouseSelectingBuyer = false;
                         loadTaxCluster();
                     }, 100);
@@ -1343,25 +1285,25 @@ function SearchBuyer(inputElement) {
 $("#LoadDeliveryNote").click(function () {
     // 4. Material Segregation
     if (
-        $("#Header_JISVIH_MS_Number").val() === "" ||
-        $("#Header_JISVIH_MS_Number").val() === "0"
+        $("#Header_FRTIH_MS_Number").val() === "" ||
+        $("#Header_FRTIH_MS_Number").val() === "0"
     ) {
         showAlert(
             'Material Seggregation is required',
-            '#Header_JISVIH_MS_Number'
+            '#Header_FRTIH_MS_Number'
         );
         return false;
     }
     // 3. JW Customer
     if (
-        $("#Header_JISVIH_JW_Customer_Number").val().trim() === "" ||
-        $("#Header_JISVIH_JW_Customer_Number").val() === "0" ||
-        $("#Header_JISVIH_JW_Customer_Name").val().trim() === ""
+        $("#Header_FRTIH_JW_Customer_Number").val().trim() === "" ||
+        $("#Header_FRTIH_JW_Customer_Number").val() === "0" ||
+        $("#Header_FRTIH_JW_Customer_Name").val().trim() === ""
     ) {
 
         showAlert(
             'JW Customer is required',
-            '#Header_JISVIH_JW_Customer_Name'
+            '#Header_FRTIH_JW_Customer_Name'
         );
 
         return false;
@@ -1373,24 +1315,21 @@ $("#LoadDeliveryNote").click(function () {
 // Load delivery note items from SP and fill table
 function LoadDeliveryNoteItems() {
 
-    var customerNumber = $("#Header_JISVIH_JW_Customer_Number").val();
+    var customerNumber = $("#Header_FRTIH_JW_Customer_Number").val();
 
     var resultsDiv = $("#DeliveryNoteTableView");
     var headers = GetDistinctDeliveryNoteHeaders();
-    var msNumber = $("#Header_JISVIH_MS_Number").val();
+    var msNumber = $("#Header_FRTIH_MS_Number").val();
 
     $.ajax({
 
-        url: '/JobworkInvoice/GetDeliveryNote_GroupItem',
+        url: '/FreightInvoice/GetDeliveryNote_GroupItemFreight',
 
         type: 'GET',
 
         data: {
             CustomerNumber: customerNumber,
-            MSNumber: msNumber,
-            // NEW: pass current invoice number so its own qty consumption
-            // gets added back into RemainingQty (see formula above)
-            JISVIH_Number: parseInt($("#Header_JISVIH_Number").val()) || 0
+            MSNumber: msNumber
         },
 
 
@@ -1586,11 +1525,11 @@ function LoadDeliveryNoteItems() {
 
 function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selectedDN) {
 
-    var customerNumber = $("#Header_JISVIH_JW_Customer_Number").val();
+    var customerNumber = $("#Header_FRTIH_JW_Customer_Number").val();
 
     $.ajax({
 
-        url: '/JobworkInvoice/GetDeliveryNote_ForInvoice',
+        url: '/FreightInvoice/GetDeliveryNote_ForFreightInvoice',
 
         type: 'GET',
 
@@ -1604,7 +1543,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
             console.log('check1: ' + JSON.stringify(response));
 
             $.each(response, function (index, item) {
-
+              
                 console.log('check2: ' + JSON.stringify(item));
                 var headerId = item.jidnI_JIDNH_Number.toString();
 
@@ -1653,7 +1592,7 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
                     }
 
-                    return; // skip re-adding a row already in the table
+                    return;
                 }
 
                 //#endregion
@@ -1667,46 +1606,47 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
                 //#endregion
                 var deliveredQty = parseFloat(item.jidnI_Qty) || 0;
                 var prevInvoiceQty = parseFloat(item.invoicedQty) || 0;
-                var jisviiNumber = parseInt(item.JISVII_Number) || 0;
+                var jisviiNumber = parseInt(item.FRTII_Number) || 0;
 
-
+             
 
                 var amendQty = deliveredQty - prevInvoiceQty;
                 //#region condition
                 let serviceOrderCell =
                     (item.hasServiceOrder == 1
-                        ? `<label class="form-control JISVII_ServiceOrderLabel">
+                        ? `<label class="form-control FRTII_ServiceOrderLabel">
                ${item.serviceOrderNo ?? ''}
            </label>`
-                        // qty check, and GetServiceOrderItemInfo — no separate wiring needed.
-                        : `<select name="Items[${rowCount}].JISVII_JISVOH_Number"
-                  class="form-select JISVII_JISVOH_Number">
+                        : `<select name="Items[${rowCount}].FRTII_ServiceOrder_Number"
+                  class="form-select FRTII_ServiceOrder_Number">
            </select>`)
                     +
-                    `<input name="Items[${rowCount}].JISVII_JISVOH_Number"
+                    `<input name="Items[${rowCount}].FRTII_ServiceOrder_Number"
             type="hidden"
             value="${item.serviceOrderId ?? item.jisvoH_Number ?? 0}"
-            class="JISVII_ServiceOrderHidden" />`
+            class="FRTII_ServiceOrderHidden" />`
                     +
-                    // NEW: SO Item ID — was missing, needed by the save
-                    // model and qty double-count-prevention formula
-                    `<input name="Items[${rowCount}].JISVOI_Number"
-            type="hidden"
-            value="${item.jISVOI_Number ?? 0}"
-            class="JISVOI_Number" />`
-                    +
-                    // NEW: mirrors Create's SO_Assign flag, matches BindItems()'
-                    // pattern for already-saved rows
-                    `<input name="Items[${rowCount}].JISVII_SO_Assign"
+                    // NEW: default SO_Assign — DELIVERY NOTE if a Service Order
+                    // already came attached via the Delivery Note row, INVOICE otherwise
+                    `<input name="Items[${rowCount}].FRTII_SO_Assign"
             type="hidden"
             value="${item.hasServiceOrder == 1 ? 'DELIVERY NOTE' : 'INVOICE'}"
-            class="JISVII_SO_AssignFlag" />`;
+            class="FRTII_SO_AssignFlag" />`
+                    +
+                    // NEW: SO Item ID, mirrors the Create page fix (Change #8) —
+                    // note: jisvoI_Number, not JISVOI_Number — this response is a
+                    // real C# object subject to camelCase policy, unlike BindItems'
+                    // passthrough SP response
+                    `<input name="Items[${rowCount}].Freight_ServiceOrder_Number"
+            type="hidden"
+            value="${item.jisvoI_Number ?? 0}"
+            class="Freight_ServiceOrder_Number" />`;
 
                 let unitPriceCell = item.hasServiceOrder == 1
-                    ? `<label class="form-control JISVII_UnitPriceLabel text-end">${item.jisvoI_UnitPrice ?? 0} </label>
+                    ? `<label class="form-control FRTII_UnitPriceLabel text-end">${item.jisvoI_UnitPrice ?? 0} </label>
        <input name="Items[${rowCount}].ServiceOrderId" type="hidden" value="${item.serviceOrderId ?? 0}" class="ServiceOrderId" />
-       <input name="Items[${rowCount}].JISVII_UnitPrice" type="hidden" value="${item.jisvoI_UnitPrice ?? 0}" class="JISVII_UnitPrice" />`
-                    : `<input name="Items[${rowCount}].JISVII_UnitPrice" value="${item.jisvoI_UnitPrice ?? 0}" class="form-control JISVII_UnitPrice text-end" />`;
+       <input name="Items[${rowCount}].FRTII_UnitPrice" type="hidden" value="${item.jisvoI_UnitPrice ?? 0}" class="FRTII_UnitPrice" />`
+                    : `<input name="Items[${rowCount}].FRTII_UnitPrice" value="${item.jisvoI_UnitPrice ?? 0}" class="form-control FRTII_UnitPrice text-end" />`;
                 //#endregion
                 var row = `
 
@@ -1722,9 +1662,9 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_DN_No"
+        <input name="Items[${rowCount}].FRTII_DN_No"
                value="${item.jidnH_DN_No ?? ''}"
-               class="form-control JISVII_DN_No"
+               class="form-control FRTII_DN_No"
                readonly />
     </td>
 
@@ -1737,115 +1677,115 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
     <td>
       
-        <input type="hidden" value="${item.jidnI_JIDNH_Number}" class="JISVII_JIDNH_Number" />
+        <input type="hidden" value="${item.jidnI_JIDNH_Number}" class="FRTII_JIDNH_Number" />
             <input type="hidden" value="${item.jidnI_Number ?? 0}" class="JIDNI_Number" />
-        <input name="Items[${rowCount}].JISVII_Number" type="hidden" value="${item.JISVII_Number}" class="JISVII_Number" />
-        <input name="Items[${rowCount}].JISVII_Item_Number" type="hidden" value="${item.jidnI_Item_Number}" class="JISVII_Item_Number" />
-        <input name="Items[${rowCount}].JISVII_PRS_Number" type="hidden" value="${item.jidnI_PRS_Number}" class="JISVII_PRS_Number" />
-        <input name="Items[${rowCount}].JISVII_UoM_Number" type="hidden" value="${item.jidnI_UoM_Number}" class="JISVII_UoM_Number" />
-        <input name="Items[${rowCount}].JISVII_ItemCode"
+        <input name="Items[${rowCount}].FRTII_Number" type="hidden" value="${item.FRTII_Number}" class="FRTII_Number" />
+        <input name="Items[${rowCount}].FRTII_Item_Number" type="hidden" value="${item.jidnI_Item_Number}" class="FRTII_Item_Number" />
+        <input name="Items[${rowCount}].FRTII_PRS_Number" type="hidden" value="${item.jidnI_PRS_Number}" class="FRTII_PRS_Number" />
+        <input name="Items[${rowCount}].FRTII_UoM_Number" type="hidden" value="${item.jidnI_UoM_Number}" class="FRTII_UoM_Number" />
+        <input name="Items[${rowCount}].FRTII_ItemCode"
                value="${item.itemCode ?? ''}"
-               class="form-control JISVII_ItemCode"
+               class="form-control FRTII_ItemCode"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_ItemDescription"
+        <input name="Items[${rowCount}].FRTII_ItemDescription"
                value="${item.itemDescription ?? ''}"
-               class="form-control JISVII_ItemDescription"
+               class="form-control FRTII_ItemDescription"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_OuterDia"
+        <input name="Items[${rowCount}].FRTII_OuterDia"
                value="${item.outerDia ?? ''}"
-               class="form-control JISVII_OuterDia text-end"
+               class="form-control FRTII_OuterDia text-end"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_Thickness"
+        <input name="Items[${rowCount}].FRTII_Thickness"
                value="${item.thickness ?? ''}"
-               class="form-control JISVII_Thickness text-end"
+               class="form-control FRTII_Thickness text-end"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_Length"
+        <input name="Items[${rowCount}].FRTII_Length"
                value="${item.length ?? ''}"
-               class="form-control JISVII_Length text-end"
+               class="form-control FRTII_Length text-end"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_Width"
+        <input name="Items[${rowCount}].FRTII_Width"
                value="${item.itm_Width ?? ''}"
-               class="form-control JISVII_Width text-end"
+               class="form-control FRTII_Width text-end"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_MaterialGrade"
+        <input name="Items[${rowCount}].FRTII_MaterialGrade"
                value="${item.materialGrade ?? ''}"
-               class="form-control JISVII_MaterialGrade"
+               class="form-control FRTII_MaterialGrade"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_ItemGroup"
+        <input name="Items[${rowCount}].FRTII_ItemGroup"
                value="${item.itemGroup ?? ''}"
-               class="form-control JISVII_ItemGroup"
+               class="form-control FRTII_ItemGroup"
                readonly />
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_UoM"
+        <input name="Items[${rowCount}].FRTII_UoM"
                value="${item.uom ?? ''}"
-               class="form-control JISVII_UoM text-center"
+               class="form-control FRTII_UoM text-center"
                readonly />
     </td>
 
     <td class="text-center">
-        <input name="Items[${rowCount}].JISVII_Qty"
+        <input name="Items[${rowCount}].FRTII_Qty"
                type="hidden"
                value="${item.jidnI_Qty ?? 0}" />
-        <label class="form-control text-center JISVII_DeliveredQty">
+        <label class="form-control text-center FRTII_DeliveredQty">
             ${item.jidnI_Qty ?? 0}
         </label>
     </td>
 
     <td class="text-center">
-        <input name="Items[${rowCount}].JISVII_Qty"
+        <input name="Items[${rowCount}].FRTII_Qty"
                type="hidden"
                value="${item.InvoicedQty ?? 0}" />
-        <input name="Items[${rowCount}].JISVII_PrevInvoiceQty"
+        <input name="Items[${rowCount}].FRTII_PrevInvoiceQty"
                value="${item.invoicedQty ?? 0}"
-               class="form-control JISVII_PrevInvoiceQty text-center"
+               class="form-control FRTII_PrevInvoiceQty text-center"
                readonly />
     </td>
 
   <td>
-    <input name="Items[${rowCount}].JISVII_Qty"
+    <input name="Items[${rowCount}].FRTII_Qty"
            value="${jisviiNumber === 0 ? 0 : (item.jidnI_Qty ?? 0)}"
-           class="form-control JISVII_Qty text-center"
+           class="form-control FRTII_Qty text-center"
            readonly />
 </td>
 
 
 
 <td>
-    <input name="Items[${rowCount}].JISVII_Qty"
+    <input name="Items[${rowCount}].FRTII_Qty"
            value="${amendQty}"
-           class="form-control JISVII_AmendQty text-center" />
+           class="form-control FRTII_AmendQty text-center" />
 </td>
    <td>
     ${unitPriceCell}
 </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_Amount"
+        <input name="Items[${rowCount}].FRTII_Amount"
                value="${0}"
-               class="form-control JISVII_Amount text-end"
+               class="form-control FRTII_Amount text-end"
                readonly />
     </td>
 
@@ -1860,9 +1800,9 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
     </td>
 
     <td>
-        <input name="Items[${rowCount}].JISVII_GST_Amount"
+        <input name="Items[${rowCount}].FRTII_GST_Amount"
                value="0"
-               class="form-control JISVII_GST_Amount text-end"
+               class="form-control FRTII_GST_Amount text-end"
                readonly />
     </td>
 
@@ -1895,11 +1835,11 @@ function ValidateUnitPriceAndAmount() {
             return true;
 
         var unitPrice = parseFloat(
-            removeCommas(row.find(".JISVII_UnitPrice").val())
+            removeCommas(row.find(".FRTII_UnitPrice").val())
         ) || 0;
 
         var amount = parseFloat(
-            removeCommas(row.find(".JISVII_Amount").val())
+            removeCommas(row.find(".FRTII_Amount").val())
         ) || 0;
 
         row.removeClass("error-row");
@@ -1912,7 +1852,7 @@ function ValidateUnitPriceAndAmount() {
                 "Row " + (index + 1) +
                 " : Unit Price cannot be 0";
 
-            row.find(".JISVII_UnitPrice").focus();
+            row.find(".FRTII_UnitPrice").focus();
 
             isValid = false;
             return false;
@@ -1926,7 +1866,7 @@ function ValidateUnitPriceAndAmount() {
                 "Row " + (index + 1) +
                 " : Amount cannot be 0";
 
-            row.find(".JISVII_Amount").focus();
+            row.find(".FRTII_Amount").focus();
 
             isValid = false;
             return false;
@@ -1946,22 +1886,22 @@ function ValidateUnitPriceAndAmount() {
 function validateHeaderById() {
 
     // 1. Invoice No
-    if ($("#Header_JISVIH_InvoiceNo").val().trim() === "") {
+    if ($("#Header_FRTIH_InvoiceNo").val().trim() === "") {
 
         showAlert(
             'Invoice No is required',
-            '#Header_JISVIH_InvoiceNo'
+            '#Header_FRTIH_InvoiceNo'
         );
 
         return false;
     }
 
     // 2. Invoice Date
-    if ($("#Header_JISVIH_InvoiceDate").val().trim() === "") {
+    if ($("#Header_FRTIH_InvoiceDate").val().trim() === "") {
 
         showAlert(
             'Invoice Date is required',
-            '#Header_JISVIH_InvoiceDate'
+            '#Header_FRTIH_InvoiceDate'
         );
 
         return false;
@@ -1969,14 +1909,14 @@ function validateHeaderById() {
 
     // 3. JW Customer
     if (
-        $("#Header_JISVIH_JW_Customer_Number").val().trim() === "" ||
-        $("#Header_JISVIH_JW_Customer_Number").val() === "0" ||
-        $("#Header_JISVIH_JW_Customer_Name").val().trim() === ""
+        $("#Header_FRTIH_JW_Customer_Number").val().trim() === "" ||
+        $("#Header_FRTIH_JW_Customer_Number").val() === "0" ||
+        $("#Header_FRTIH_JW_Customer_Name").val().trim() === ""
     ) {
 
         showAlert(
             'JW Customer is required',
-            '#Header_JISVIH_JW_Customer_Name'
+            '#Header_FRTIH_JW_Customer_Name'
         );
 
         return false;
@@ -1984,13 +1924,13 @@ function validateHeaderById() {
 
     // 4. Currency
     if (
-        $("#Header_JISVIH_Currency_Number").val() === "" ||
-        $("#Header_JISVIH_Currency_Number").val() === "0"
+        $("#Header_FRTIH_Currency_Number").val() === "" ||
+        $("#Header_FRTIH_Currency_Number").val() === "0"
     ) {
 
         showAlert(
             'Currency is required',
-            '#Header_JISVIH_Currency_Number'
+            '#Header_FRTIH_Currency_Number'
         );
 
         return false;
@@ -1998,13 +1938,13 @@ function validateHeaderById() {
 
     // 5. Terms & Conditions
     if (
-        $("#Header_JISVIH_TCT_Number").val() === "" ||
-        $("#Header_JISVIH_TCT_Number").val() === "0"
+        $("#Header_FRTIH_TCT_Number").val() === "" ||
+        $("#Header_FRTIH_TCT_Number").val() === "0"
     ) {
 
         showAlert(
             'Terms & Conditions is required',
-            '#Header_JISVIH_TCT_Number'
+            '#Header_FRTIH_TCT_Number'
         );
 
         return false;
@@ -2024,16 +1964,16 @@ $("#btnSave").on("click", function (e) {
         e.preventDefault();
         return false;
     }
-
+        
     else {
 
-        var model = CreateJobworkInvoiceModel();
+        var model = CreateFreightInvoiceModel();
 
-        console.log('-----update data------'+JSON.stringify(model));
+        console.log(JSON.stringify(model));
 
         $.ajax({
 
-            url: '/JobworkInvoice/UpdateJobworkInvoice',
+            url: '/FreightInvoice/UpdateFreightInvoice',
 
             type: 'POST',
 
@@ -2091,7 +2031,7 @@ function showAlert(message, focusSelector = null) {
 
 //#region CREATE MODEL
 
-function CreateJobworkInvoiceItemModel() {
+function CreateFreightInvoiceItemModel() {
 
     var items = [];
 
@@ -2106,76 +2046,75 @@ function CreateJobworkInvoiceItemModel() {
 
         let item = {
 
-            JISVII_Number:
-                parseInt(row.find(".JISVII_Number").val()) || 0,
+            FRTII_Number:
+                parseInt(row.find(".FRTII_Number").val()) || 0,
 
-            // NEW: was missing entirely — the SO Item ID never got sent
-            // to the server on Update, so it always saved as 0
-            JISVOI_Number:
-                parseInt(row.find(".JISVOI_Number").val()) || 0,
+            // CHANGED: .FRTII_ServiceOrder_Number only exists on select-rendered
+            // rows — label-rendered (DELIVERY NOTE) rows have no such element.
+            // .FRTII_ServiceOrderHidden exists on every row regardless.
+            FRTII_ServiceOrder_Number:
+                String(row.find(".FRTII_ServiceOrderHidden").val() || 0),
 
-            JISVII_JISVOH_Number:
-                parseInt(row.find(".JISVII_JISVOH_Number").val()) || 0,
+            FRTII_Item_Number:
+                parseInt(row.find(".FRTII_Item_Number").val()) || 0,
 
-            JISVII_Item_Number:
-                parseInt(row.find(".JISVII_Item_Number").val()) || 0,
+            FRTII_DN_No:
+                row.find(".FRTII_DN_No").val(),
 
-            JISVII_DN_No:
-                row.find(".JISVII_DN_No").val(),
-
-            JISVII_Process:
+            FRTII_Process:
                 row.find(".PRS_ProcessName").val(),
 
-            JISVII_ItemCode:
-                row.find(".JISVII_ItemCode").val(),
+            FRTII_ItemCode:
+                row.find(".FRTII_ItemCode").val(),
 
-            JISVII_ItemDescription:
-                row.find(".JISVII_ItemDescription").val(),
+            FRTII_ItemDescription:
+                row.find(".FRTII_ItemDescription").val(),
 
-            JISVII_OuterDia:
-                parseFloat(row.find(".JISVII_OuterDia").val()) || 0,
+            FRTII_OuterDia:
+                parseFloat(row.find(".FRTII_OuterDia").val()) || 0,
 
-            JISVII_Thickness:
-                parseFloat(row.find(".JISVII_Thickness").val()) || 0,
+            FRTII_Thickness:
+                parseFloat(row.find(".FRTII_Thickness").val()) || 0,
 
-            JISVII_Length:
-                parseFloat(row.find(".JISVII_Length").val()) || 0,
+            FRTII_Length:
+                parseFloat(row.find(".FRTII_Length").val()) || 0,
 
-            JISVII_Width:
-                parseFloat(row.find(".JISVII_Width").val()) || 0,
+            FRTII_Width:
+                parseFloat(row.find(".FRTII_Width").val()) || 0,
 
-            JISVII_MaterialGrade:
-                row.find(".JISVII_MaterialGrade").val(),
+            FRTII_MaterialGrade:
+                row.find(".FRTII_MaterialGrade").val(),
 
-            JISVII_ItemGroup:
-                row.find(".JISVII_ItemGroup").val(),
+            FRTII_ItemGroup:
+                row.find(".FRTII_ItemGroup").val(),
 
-            JISVII_UoM_Number:
-                row.find(".JISVII_UoM_Number").val(),
+            FRTII_UoM_Number:
+                row.find(".FRTII_UoM_Number").val(),
 
-            JISVII_Qty:
-                parseFloat(removeCommas(row.find(".JISVII_AmendQty").val())) || 0,
+            FRTII_Qty:
+                parseFloat(removeCommas(row.find(".FRTII_AmendQty").val())) || 0,
 
-            JISVII_UnitPrice:
-                parseFloat(removeCommas(row.find(".JISVII_UnitPrice").val())) || 0,
+            FRTII_UnitPrice:
+                parseFloat(removeCommas(row.find(".FRTII_UnitPrice").val())) || 0,
 
-            JISVII_Amount:
-                parseFloat(removeCommas(row.find(".JISVII_Amount").val())) || 0,
+            FRTII_Amount:
+                parseFloat(removeCommas(row.find(".FRTII_Amount").val())) || 0,
 
-            JISVII_SAC_Number:
+            FRTII_SAC_Number:
                 parseInt(row.find(".SAC_Number").val()) || 0,
 
-            JISVII_SO_Assign:                                 // NEW
-                row.find(".JISVII_SO_AssignFlag").val() || "INVOICE",
-
-            JISVII_GST_Amount:
-                parseFloat(removeCommas(row.find(".JISVII_GST_Amount").val())) || 0,
-            JISVII_PRS_Number:
-                parseFloat(row.find(".JISVII_PRS_Number").val()) || 0,
-            JISVII_JIDNH_Number:
-                parseFloat(row.find(".JISVII_JIDNH_Number").val()) || 0,
+            FRTII_GST_Amount:
+                parseFloat(removeCommas(row.find(".FRTII_GST_Amount").val())) || 0,
+            FRTII_PRS_Number:
+                parseFloat(row.find(".FRTII_PRS_Number").val()) || 0,
+            FRTII_JIDNH_Number:
+                parseFloat(row.find(".FRTII_JIDNH_Number").val()) || 0,
             JIDNI_Number:
-                parseFloat(row.find(".JIDNI_Number").val()) || 0
+                parseFloat(row.find(".JIDNI_Number").val()) || 0,
+            FRTII_SO_Assign:
+                row.find(".FRTII_SO_AssignFlag").val() || "INVOICE",
+            JISVOI_Number:
+                parseInt(row.find(".Freight_ServiceOrder_Number").val()) || 0
         };
 
         items.push(item);
@@ -2184,7 +2123,7 @@ function CreateJobworkInvoiceItemModel() {
 
     return items;
 }
-function CreateJobworkInvoiceModel() {
+function CreateFreightInvoiceModel() {
 
     //=====================================
     // HEADER
@@ -2192,34 +2131,37 @@ function CreateJobworkInvoiceModel() {
 
     var header = {
 
-        JISVIH_Number:
-            parseInt($("#Header_JISVIH_Number").val()) || 0,
+        FRTIH_Number:
+            parseInt($("#Header_FRTIH_Number").val()) || 0,
 
-        JISVIH_InvoiceNo:
-            $("#Header_JISVIH_InvoiceNo").val(),
+        FRTIH_InvoiceNo:
+            $("#Header_FRTIH_InvoiceNo").val(),
 
-        JISVIH_InvoiceDate:
-            new Date($("#Header_JISVIH_InvoiceDate").val())
+        FRTIH_InvoiceDate:
+            new Date($("#Header_FRTIH_InvoiceDate").val())
                 .toISOString(),
+        FRTIH_JW_Customer_Number:
+            parseInt($("#Header_FRTIH_JW_Customer_Number").val()) || 0,
 
-        JISVIH_JW_Customer_Number:
-            parseInt($("#Header_JISVIH_JW_Customer_Number").val()) || 0,
-        JISVIH_MS_Number:
-            parseInt($("#Header_JISVIH_MS_Number").val()) || 0,
-        JISVIH_Currency_Number:
-            parseInt($("#Header_JISVIH_Currency_Number").val()) || 0,
+        // NEW: DTO requires the Customer's name as text too, not just the ID
+        FRTIH_JW_Customer_Name:
+            $("#Header_FRTIH_JW_Customer_Number option:selected").text() || "",
+        FRTIH_MS_Number:
+            parseInt($("#Header_FRTIH_MS_Number").val()) || 0,
+        FRTIH_Currency_Number:
+            parseInt($("#Header_FRTIH_Currency_Number").val()) || 0,
 
-        JISVIH_TCT_Number:
-            parseInt($("#Header_JISVIH_TCT_Number").val()) || 0,
+        FRTIH_TCT_Number:
+            parseInt($("#Header_FRTIH_TCT_Number").val()) || 0,
 
-        JISVIH_PaymentTerms:
-            $("#Header_JISVIH_PaymentTerms").val(),
+        FRTIH_PaymentTerms:
+            $("#Header_FRTIH_PaymentTerms").val(),
 
-        JISVIH_PaymentMethod:
-            $("#Header_JISVIH_PaymentMethod").val(),
+        FRTIH_PaymentMethod:
+            $("#Header_FRTIH_PaymentMethod").val(),
 
-        JISVIH_Remarks:
-            $("#Header_JISVIH_Remarks").val()
+        FRTIH_Remarks:
+            $("#Header_FRTIH_Remarks").val()
     };
 
 
@@ -2236,16 +2178,16 @@ function CreateJobworkInvoiceModel() {
         if (!row.find(".JIDNA_Address_ID").val()) return true;
 
         let address = {
-            JISVIA_JISVIH_Number: parseInt(row.find(".JIDNA_Number").val()) || 0,
-            JISVIA_Number: parseInt(row.find(".JIDNA_Number").val()) || 0,
-            JISVIA_ADTP_Number: parseInt(row.find(".JIDNA_ADTP_Number").val()) || 0,
-            JISVIA_Address_ID: row.find(".JIDNA_Address_ID").val() || "",
-            JISVIA_Address: row.find(".JIDNA_Address").text() || "",
-            JISVIA_City: row.find(".JIDNA_City").val() || "",
-            JISVIA_State: row.find(".JIDNA_State").val() || "",
-            JISVIA_Country: row.find(".JIDNA_Country").val() || "",
-            JISVIA_PIN: row.find(".JIDNA_PIN").val() || "",
-            JISVIA_GSTIN: row.find(".JIDNA_GSTIN").val() || ""
+            FRTIA_FRTIH_Number: parseInt(row.find(".JIDNA_Number").val()) || 0,
+            FRTIA_Number: parseInt(row.find(".JIDNA_Number").val()) || 0,
+            FRTIA_ADTP_Number: parseInt(row.find(".JIDNA_ADTP_Number").val()) || 0,
+            FRTIA_Address_ID: row.find(".JIDNA_Address_ID").val() || "",
+            FRTIA_Address: row.find(".JIDNA_Address").text() || "",
+            FRTIA_City: row.find(".JIDNA_City").val() || "",
+            FRTIA_State: row.find(".JIDNA_State").val() || "",
+            FRTIA_Country: row.find(".JIDNA_Country").val() || "",
+            FRTIA_PIN: row.find(".JIDNA_PIN").val() || "",
+            FRTIA_GSTIN: row.find(".JIDNA_GSTIN").val() || ""
         };
 
         addresses.push(address);
@@ -2259,7 +2201,7 @@ function CreateJobworkInvoiceModel() {
     var jobworkInvoiceModel = {
 
         Header: header,
-        Items: CreateJobworkInvoiceItemModel(),
+        Items: CreateFreightInvoiceItemModel(),
         Addresses: addresses
 
     };
@@ -2384,7 +2326,7 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
     var currentRow = $(this).closest('tr.AddNewRow');
 
     var ADTPNumber = currentRow.find('.JIDNA_ADTP_Number').val();
-    var Buyer = $('#Header_JISVIH_JW_Customer_Number').val(); // keep if same field exists
+    var Buyer = $('#Header_FRTIH_JW_Customer_Number').val(); // keep if same field exists
 
     var ADDAddress = currentRow.find('.JIDNA_Address');
     var ADDCity = currentRow.find('.JIDNA_City');
@@ -2439,7 +2381,7 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
                 ADDGSTIN.val(AddressDefault.buY_ADD_GSTIN);
             }
         },
-        error: function (xhr) {
+          error: function (xhr) {
 
             console.log("ERROR");
             console.log(xhr.responseText);
@@ -2579,10 +2521,10 @@ function validateTempRow() {
 //#region jwc address
 function LoadJWCAddress() {
 
-    var jwcNumber = $("#Header_JISVIH_JW_Customer_Number").val();
+    var jwcNumber = $("#Header_FRTIH_JW_Customer_Number").val();
 
     $.ajax({
-        url: '/JobworkInvoice/GetJWCAddress',
+        url: '/FreightInvoice/GetJWCAddress',
         type: 'GET',
         data: {
             JWCNumber: jwcNumber
@@ -2661,13 +2603,13 @@ function LoadJWCAddress() {
 }
 //#endregion
 //#region JOBWORK INVOICE ADDRESS
-function LoadJobworkInvoiceAddress() {
-    var jisvihNumber = $("#Header_JISVIH_Number").val();
+function LoadFreightInvoiceAddress() {
+    var jisvihNumber = $("#Header_FRTIH_Number").val();
 
     $.ajax({
-        url: '/JobworkInvoice/GetJobworkInvoiceAddress',
+        url: '/FreightInvoice/GetFreightInvoiceAddress',
         type: 'GET',
-        data: { JISVIHNumber: jisvihNumber },
+        data: { FRTIHNumber: jisvihNumber },
         success: function (response) {
             console.log('---address---json ' + JSON.stringify(response));
 
@@ -2686,8 +2628,8 @@ function LoadJobworkInvoiceAddress() {
                     var row = index === 0
                         ? $("#AddTableBody tr.AddNewRow:not(#AddTempRow):first")
                         : (addAddressRow(), $("#AddTableBody tr.AddNewRow:last"));
-                    console.log('----1----' + row.find(".JIDNA_Address_ID option").length);
-                    console.log('---2----' + row.find(".JIDNA_Address_ID").html());
+                    console.log('----1----'+row.find(".JIDNA_Address_ID option").length);
+                    console.log('---2----'+row.find(".JIDNA_Address_ID").html());
 
                     row.find(".JIDNA_ADTP_Number").val(addr.jisviA_ADTP_Number);
                     row.find(".JIDNA_Address_ID").val(addr.jisviA_Address_ID);
@@ -2705,20 +2647,20 @@ function LoadJobworkInvoiceAddress() {
 //#endregion
 
 //#region GET DELIVERY NOTE
-function GetJobworkInvoice(invoiceNumber) {
+function GetFreightInvoice(invoiceNumber) {
 
     $.ajax({
-        url: '/JobworkInvoice/GetJobworkInvoice',
+        url: '/FreightInvoice/GetFreightInvoice',
         type: 'GET',
-        data: { JISVIH_Number: invoiceNumber },
-
+        data: { FRTIH_Number: invoiceNumber },
+         
         success: function (data) {
             BindHeader(data.Header[0]);
             BindItems(data.Items);
             BindAddress(data.Addressess)
             console.log(data);
-            $("#Header_JISVIH_InvoiceDate").trigger("change");
-
+            $("#Header_FRTIH_InvoiceDate").trigger("change");
+           
         },
 
         error: function (xhr) {
@@ -2732,37 +2674,37 @@ function BindHeader(header) {
 
     if (!header) return;
 
-    $("#Header_JISVIH_InvoiceNo")
-        .val(header.JISVIH_InvoiceNo);
+    $("#Header_FRTIH_InvoiceNo")
+        .val(header.FRTIH_InvoiceNo);
 
-    $("#Header_JISVIH_InvoiceDate")
-        .val(header.JISVIH_InvoiceDate);
+    $("#Header_FRTIH_InvoiceDate")
+        .val(header.FRTIH_InvoiceDate);
 
-    $("#Header_JISVIH_JW_Customer_Number")
-        .val(header.JISVIH_JW_Customer_Number).trigger("change");
+    $("#Header_FRTIH_JW_Customer_Number")
+        .val(header.FRTIH_JW_Customer_Number).trigger("change");
 
-    $("#Header_JISVIH_JW_Customer_Name")
+    $("#Header_FRTIH_JW_Customer_Name")
         .val(header.CUS_Name);
 
-    $("#Header_JISVIH_Currency_Number")
-        .val(header.JISVIH_Currency_Number);
+    $("#Header_FRTIH_Currency_Number")
+        .val(header.FRTIH_Currency_Number);
 
-    $("#Header_JISVIH_TCT_Number")
-        .val(header.JISVIH_TCT_Number);
+    $("#Header_FRTIH_TCT_Number")
+        .val(header.FRTIH_TCT_Number);
 
-    $("#Header_JISVIH_PaymentTerms")
-        .val(header.JISVIH_PaymentTerms);
+    $("#Header_FRTIH_PaymentTerms")
+        .val(header.FRTIH_PaymentTerms);
 
-    $("#Header_JISVIH_PaymentMethod")
-        .val(header.JISVIH_PaymentMethod);
+    $("#Header_FRTIH_PaymentMethod")
+        .val(header.FRTIH_PaymentMethod);
 
-    $("#Header_JISVIH_Remarks")
-        .val(header.JISVIH_Remarks);
-    $("#Header_JISVIH_Number")
-        .val(header.JISVIH_Number);
-    $("#Header_JISVIH_MS_Number")
-        .val(header.JISVIH_MS_Number);
-
+    $("#Header_FRTIH_Remarks")
+        .val(header.FRTIH_Remarks);
+    $("#Header_FRTIH_Number")
+        .val(header.FRTIH_Number);
+    $("#Header_FRTIH_MS_Number")
+        .val(header.FRTIH_MS_Number);
+    
 
 }
 
@@ -2790,53 +2732,42 @@ function BindItems(items) {
 
     $.each(items, function (index, item) {
 
+        // NEW: label vs dropdown, mirrors JWI's BindItems — DELIVERY NOTE
+        // (auto-assigned) rows show a locked label, INVOICE (manual) rows
+        // show an editable dropdown. Also preserves FRTII_SO_Assign and
+        // the SO Item ID (JISVOI_Number) hidden fields on every row.
+        let serviceOrderCell =
+            (item.FRTII_SO_Assign === 'DELIVERY NOTE'
+                ? `<label class="form-control FRTII_ServiceOrderLabel">${item.FRTII_ServiceOrder_Number ?? ''}</label>
+                   <input name="Items[${index}].FRTII_ServiceOrder_Number" type="hidden" value="${item.FRTII_ServiceOrder_Number ?? 0}" class="FRTII_ServiceOrderHidden" />`
+                : `<select name="Items[${index}].FRTII_ServiceOrder_Number"
+                          class="form-select FRTII_ServiceOrder_Number">
+                        ${GetSONOptions(item.FRTII_ServiceOrder_Number)}
+                   </select>
+                   <input type="hidden" value="${item.FRTII_ServiceOrder_Number ?? 0}" class="FRTII_ServiceOrderHidden" />`)
+            +
+            `<input name="Items[${index}].FRTII_SO_Assign" type="hidden" value="${item.FRTII_SO_Assign ?? 'INVOICE'}" class="FRTII_SO_AssignFlag" />`
+            +
+            `<input name="Items[${index}].Freight_ServiceOrder_Number" type="hidden" value="${item.JISVOI_Number ?? 0}" class="Freight_ServiceOrder_Number" />`;
+
         var row = `
 
 <tr class="NewRow"
     data-rowid="${index + 1}"
-    data-dn="${item.JISVII_JIDNH_Number ?? 0}"
-    data-item="${item.JISVII_Number ?? 0}"
+    data-dn="${item.FRTII_JIDNH_Number ?? 0}"
+    data-item="${item.FRTII_Number ?? 0}"
     data-deleted="0">
 
     <td class="p-2 del">
         <input type="checkbox" class="CheckItem form-check-input">
     </td>
 
-<td>
-    <!--
-         (JISVII_SO_Assign = 'DELIVERY NOTE'), matching Create's
-         manually assigned on the invoice itself (SO_Assign = 'INVOICE').
-    -->
-    ${item.JISVII_SO_Assign === 'DELIVERY NOTE'
-                ? `<label class="form-control JISVII_ServiceOrderLabel"
-                  data-jisvoi-number="${item.JISVOI_Number ?? 0}">
-               ${item.serviceOrderNo ?? ''}
-           </label>
-
-           <input name="Items[${index}].JISVII_JISVOH_Number"
-                  type="hidden"
-                  value="${item.JISVII_JISVOH_Number ?? 0}"
-                  class="JISVII_JISVOH_Number" />`
-                : `<select name="Items[${index}].JISVII_JISVOH_Number"
-                   class="form-select JISVII_JISVOH_Number">
-               ${GetSONOptions(item.JISVII_JISVOH_Number)}
-           </select>`}
-
-    <!-- SO Assign -->
-    <input name="Items[${index}].JISVII_SO_Assign"
-           type="hidden"
-           value="${item.JISVII_SO_Assign ?? 'INVOICE'}"
-           class="JISVII_SO_AssignFlag" />
-
-    <!-- SO Item ID -->
-    <input name="Items[${index}].JISVOI_Number"
-           type="hidden"
-           value="${item.JISVOI_Number ?? 0}"
-           class="JISVOI_Number" />
-</td>
+      <td>
+        ${serviceOrderCell}
+    </td>
 
     <td>
-        <input name="Items[${index}].JISVII_DN_No" value="${item.JIDNH_DN_No ?? ''}" class="form-control JISVII_DN_No" readonly />
+        <input name="Items[${index}].FRTII_DN_No" value="${item.JIDNH_DN_No ?? ''}" class="form-control FRTII_DN_No" readonly />
     </td>
 
     <td>
@@ -2844,85 +2775,79 @@ function BindItems(items) {
     </td>
 
     <td>
-            <input name="Items[${index}].JISVII_Number"
-       value="${item.JISVII_Number ?? 0}"
-       class="JISVII_Number"
+    <input name="Items[${index}].FRTII_Number"
+       value="${item.FRTII_Number ?? 0}"
+       class="FRTII_Number"
        type="hidden" />
-        <input type="hidden" value="${item.JISVII_JIDNH_Number ?? 0}" class="JISVII_JIDNH_Number" />
+        <input type="hidden" value="${item.FRTII_JIDNH_Number ?? 0}" class="FRTII_JIDNH_Number" />
         <input type="hidden" value="${item.JIDNI_Number ?? 0}" class="JIDNI_Number" />
-      
-       
-        <input name="Items[${index}].JISVII_Number" type="hidden" value="${item.JISVII_Number ?? 0}" class="JISVII_Number" />
-        <input name="Items[${index}].JISVII_Item_Number" type="hidden" value="${item.JISVII_Item_Number ?? 0}" class="JISVII_Item_Number" />
-        <input name="Items[${index}].JISVII_PRS_Number" type="hidden" value="${item.JISVII_PRS_Number ?? 0}" class="JISVII_PRS_Number" />
-        <input name="Items[${index}].JISVII_UoM_Number" type="hidden" value="${item.JISVII_UoM_Number ?? 0}" class="JISVII_UoM_Number" />
-        <input name="Items[${index}].JISVII_ItemCode" value="${item.ItemCode ?? ''}" class="form-control JISVII_ItemCode" readonly />
+        <input name="Items[${index}].FRTII_Number" type="hidden" value="${item.FRTII_Number ?? 0}" class="FRTII_Number" />
+        <input name="Items[${index}].FRTII_Item_Number" type="hidden" value="${item.FRTII_Item_Number ?? 0}" class="FRTII_Item_Number" />
+        <input name="Items[${index}].FRTII_PRS_Number" type="hidden" value="${item.FRTII_PRS_Number ?? 0}" class="FRTII_PRS_Number" />
+        <input name="Items[${index}].FRTII_UoM_Number" type="hidden" value="${item.FRTII_UoM_Number ?? 0}" class="FRTII_UoM_Number" />
+        <input name="Items[${index}].FRTII_ItemCode" value="${item.ItemCode ?? ''}" class="form-control FRTII_ItemCode" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_ItemDescription" value="${item.ItemDescription ?? ''}" class="form-control JISVII_ItemDescription" readonly />
+        <input name="Items[${index}].FRTII_ItemDescription" value="${item.ItemDescription ?? ''}" class="form-control FRTII_ItemDescription" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_OuterDia" value="${item.OuterDia ?? ''}" class="form-control JISVII_OuterDia text-end" readonly />
+        <input name="Items[${index}].FRTII_OuterDia" value="${item.OuterDia ?? ''}" class="form-control FRTII_OuterDia text-end" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_Thickness" value="${item.Thickness ?? ''}" class="form-control JISVII_Thickness text-end" readonly />
+        <input name="Items[${index}].FRTII_Thickness" value="${item.Thickness ?? ''}" class="form-control FRTII_Thickness text-end" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_Length" value="${item.Length ?? ''}" class="form-control JISVII_Length text-end" readonly />
+        <input name="Items[${index}].FRTII_Length" value="${item.Length ?? ''}" class="form-control FRTII_Length text-end" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_Width" value="${item.ITM_Width ?? ''}" class="form-control JISVII_Width text-end" readonly />
+        <input name="Items[${index}].FRTII_Width" value="${item.ITM_Width ?? ''}" class="form-control FRTII_Width text-end" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_MaterialGrade" value="${item.MaterialGrade ?? ''}" class="form-control JISVII_MaterialGrade" readonly />
+        <input name="Items[${index}].FRTII_MaterialGrade" value="${item.MaterialGrade ?? ''}" class="form-control FRTII_MaterialGrade" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_ItemGroup" value="${item.ItemGroup ?? ''}" class="form-control JISVII_ItemGroup" readonly />
+        <input name="Items[${index}].FRTII_ItemGroup" value="${item.ItemGroup ?? ''}" class="form-control FRTII_ItemGroup" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_UoM" value="${item.UnitCode ?? ''}" class="form-control JISVII_UoM text-center" readonly />
+        <input name="Items[${index}].FRTII_UoM" value="${item.UnitCode ?? ''}" class="form-control FRTII_UoM text-center" readonly />
     </td>
 
     <td class="text-end">
-        <label class="form-control text-center JISVII_DeliveredQty">
+        <label class="form-control text-center FRTII_DeliveredQty">
             ${item.DeliveredQty ?? 0}
         </label>
     </td>
 
     <td class="text-end">
-        <input value="${item.InvoicedQty ?? 0}" class="form-control JISVII_PrevInvoiceQty text-center" readonly />
+        <input value="${item.InvoicedQty ?? 0}" class="form-control FRTII_PrevInvoiceQty text-center" readonly />
     </td>
 
     <td>
-        <input value="${item.JISVII_Qty ?? 0}" class="form-control JISVII_BalanceQty text-center" readonly />
-    </td>
-
-     <td>
-        <input name="Items[${index}].JISVII_Qty" value="${item.JISVII_Qty ?? 0}" class="form-control JISVII_AmendQty text-center" />
-        <!-- NEW: snapshot of the DB-saved qty at page load, used to
-             compute this row's delta contribution in GetOtherRowsQtyForSO
-             (avoids double-counting already-saved rows' full qty) -->
-        <input type="hidden" value="${item.JISVII_Qty ?? 0}" class="JISVII_OriginalQty" />
+        <input value="${item.FRTII_Qty ?? 0}" class="form-control FRTII_BalanceQty text-center" readonly />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_UnitPrice" value="${item.JISVII_UnitPrice ?? 0}" class="form-control JISVII_UnitPrice text-end" />
+        <input name="Items[${index}].FRTII_Qty" value="${item.FRTII_Qty ?? 0}" class="form-control FRTII_AmendQty text-center" />
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_Amount" value="${item.JISVII_Amount ?? 0}" class="form-control JISVII_Amount text-end" readonly />
+        <input name="Items[${index}].FRTII_UnitPrice" value="${item.FRTII_UnitPrice ?? 0}" class="form-control FRTII_UnitPrice text-end" />
     </td>
 
     <td>
-        <input name="Items[${index}].SAC_Number" value="${item.JISVII_SAC_Number ?? 0}" type="hidden" class="SAC_Number" />
+        <input name="Items[${index}].FRTII_Amount" value="${item.FRTII_Amount ?? 0}" class="form-control FRTII_Amount text-end" readonly />
+    </td>
+
+    <td>
+        <input name="Items[${index}].SAC_Number" value="${item.FRTII_SAC_Number ?? 0}" type="hidden" class="SAC_Number" />
 
         <label class="form-control text-end SAC">
             ${item.SAC_Code ?? ''}
@@ -2930,14 +2855,14 @@ function BindItems(items) {
     </td>
 
     <td>
-        <input name="Items[${index}].JISVII_GST_Amount" value="${item.JISVII_GST_Amount ?? 0}" class="form-control JISVII_GST_Amount text-end" readonly />
+        <input name="Items[${index}].FRTII_GST_Amount" value="${item.FRTII_GST_Amount ?? 0}" class="form-control FRTII_GST_Amount text-end" readonly />
     </td>
 
 </tr>`;
 
         $("#TableBody").append(row);
-        //row.find(".JISVII_AmendQty").trigger("change");
-        //row.find(".JISVII_UnitPrice").trigger("change");
+        //row.find(".FRTII_AmendQty").trigger("change");
+        //row.find(".FRTII_UnitPrice").trigger("change");
     });
 
     CalculateTotals();
@@ -2967,14 +2892,14 @@ function BindAddress(addresses) {
             row = $("#AddTableBody tr.AddNewRow:last");
         }
 
-        row.find(".JISVIA_ADTP_Number").val(addr.jisviA_ADTP_Number);
-        row.find(".JISVIA_Address_ID").val(addr.jisviA_Address_ID);
-        row.find(".JISVIA_Address").val(addr.jisviA_Address);
-        row.find(".JISVIA_City").val(addr.jisviA_City);
-        row.find(".JISVIA_State").val(addr.jisviA_State);
-        row.find(".JISVIA_Country").val(addr.jisviA_Country);
-        row.find(".JISVIA_PIN").val(addr.jisviA_PIN);
-        row.find(".JISVIA_GSTIN").val(addr.jisviA_GSTIN);
+        row.find(".FRTIA_ADTP_Number").val(addr.jisviA_ADTP_Number);
+        row.find(".FRTIA_Address_ID").val(addr.jisviA_Address_ID);
+        row.find(".FRTIA_Address").val(addr.jisviA_Address);
+        row.find(".FRTIA_City").val(addr.jisviA_City);
+        row.find(".FRTIA_State").val(addr.jisviA_State);
+        row.find(".FRTIA_Country").val(addr.jisviA_Country);
+        row.find(".FRTIA_PIN").val(addr.jisviA_PIN);
+        row.find(".FRTIA_GSTIN").val(addr.jisviA_GSTIN);
     });
 }
 //#endregion

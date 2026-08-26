@@ -1,17 +1,17 @@
-﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobInwardTransaction.ReceiptNoteSummary_DTO>
+﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobInwardTransaction.FreightInvoiceDetail_DTO>
 @using System.Globalization;
 @{
     CultureInfo India = new CultureInfo("hi-IN");
 }
 
 @{
-    ViewData["Title"] = "Receipt Note Summary";
+    ViewData["Title"] = "FreightInvoice Detailed";
 }
-<form asp-action="ReciptNoteSummary" class="h-100">
+<form asp-action="JWInvoiceDetailed" class="h-100">
     <div class="row align-items-center panel-header gx-2">
         <div class="col h-100">
             <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
-                Receipt Note Summary
+                FreightInvoice Detailed
                 <a asp-controller="JobworkInward" asp-action="Index" class="float-end btn p-0 shadow-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -28,10 +28,10 @@
                         <div class="card-body text-black nav-tab-fix h-100">
                             <ul class="nav nav-tabs tab-header">
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page">Summary</a>
+                                    <a class="nav-link" aria-current="page" asp-controller="FreightInvoice" asp-action="JWInvoiceSummary">Summary</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="ReceiptNote" asp-action="ReciptNoteSummaryDetailed">Detailed</a>
+                                    <a class="nav-link active">Detailed</a>
                                 </li>
                             </ul>
                             <div class="tab-content tab-body">
@@ -95,53 +95,64 @@
                                                 <thead class="thead table-first-header">
                                                     <tr class="table-info table-first-header-top">
                                                         <th class="px-2 del"></th>
-                                                        <th colspan="2" class="text-center">Receipt Note</th>
-                                                      
+                                                        <th colspan="2" class="text-center">Freight Invoice</th>
+                                                        <th colspan="2" class="text-center">Delivery Note</th>
                                                         <th colspan="2" class="text-center">Service Order</th>
 
-                                                        <th colspan="7" class="text-center">JW Customer Details</th>
-                                                        <th colspan="5" class="text-center">Item Details</th>
+                                                        <th colspan="4" class="text-center">JW Customer Details</th>
+                                                        <th colspan="15" class="text-center">Item Details</th>
+
                                                      
-                                                   
                                                     </tr>
                                                     <tr class="table-info">
                                                         <th class="px-2 del">
                                                             <input type="checkbox" class="selectAllCheckbox form-check-input border-white" name="selectAllCheckbox" id="selectAllCheckbox">
                                                         </th>
-                                                   @*      Receipt Note *@
+                                                        @*      Receipt Note *@
                                                         <th>
-                                                            <a asp-action="ReciptNoteSummary" asp-route-sortOrder="@ViewData["KeySort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-PageNumber="@ViewData["PageNumber"]">Number</a>
+                                                            <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["KeySort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-PageNumber="@ViewData["PageNumber"]">Number</a>
                                                         </th>
+                                                        <th class="datetype text-center">Date</th>
+                                                        @*      delivery note *@
+                                                        <th>Number</th>
                                                         <th class="datetype text-center">Date</th>
                                                         @*      Service Order *@
                                                         <th>Number</th>
                                                         <th class="datetype text-center">Date</th>
-                                                        @*      Customer Details *@ 
-                                                        <th>Group</th>
-                                                        <th>Category</th>
-                                                      
+                                                        @*     customer details *@
+                                                        <th class="table-col-xxl">Group </th>
+                                                        <th class="table-col-xxl">Category</th>
                                                         <th class="table-col-xxl">Name</th>
                                                         <th class="table-col-xxl">Currency</th>
-                                                          <th class="table-col-xxl">Warehouse</th>
-                                                        <th class="table-col-xxl">Delivery Challan No.</th>
-                                                        <th class="table-col-xxl">Delivery Challan Date</th>
-                                                        @*      Item Details *@
-                                                        <th>Material Segregation</th>
-                                                        <th class="table-width-md text-center">No.of Items</th>
-                                                        <th class="table-width-md text-center">Warehouse</th>
-                                                        <th class="table-width-xxl text-center">Qty</th>
-                                                        <th class="table-width-lg text-end">Amount</th>
+                                                        @*     item details *@
+                                                        <th class="table-col-xxl">Material Segregation</th>
+                                                        <th class="table-col-xxl">Process</th>
+                                                        <th class="table-col-xxl">Item Group</th>
+                                                        <th class="table-col-xxl">Item Code</th>
+                                                        <th class="table-col-xxl">Item Description</th>
+                                                        <th class="table-col-xxl">Outer Dia</th>
+                                                        <th class="table-col-xxl">Thickness</th>
+                                                        <th class="table-col-xxl">Length</th>
+                                                        <th class="table-col-xxl">Width</th>
+                                                        <th class="table-col-xxl">Material Grade</th>
+                                                        <th class="table-col-xxl">UOM</th>
+                                                   
                                                        
+                                                        <th class="table-width-md text-center">Warehouse</th>
+                                                      
+                                                        <th class="table-width-xxl text-center">Qty</th>
+                                                        <th class="table-width-lg text-end">Invoice Amount</th>
+
+                                                        <th class="table-width-lg text-end">GST Amount</th>
                                                     
-                                                        
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach (var item in Model)
                                                     {
-                                                        String OrderNo="";
-                                                        String OrderDate="May-01-2025";
-                                                      @*   @if (item.SI_SOH_OrderCount > 1)
+                                                        String OrderNo = "";
+                                                        String OrderDate = "May-01-2025";
+                                                        @*   @if (item.SI_SOH_OrderCount > 1)
                                                         {
                                                             var FirstPO = item.SI_SOH_OrderNo?.Split(',', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
                                                             var PO = FirstPO.Split('|', StringSplitOptions.RemoveEmptyEntries);
@@ -157,82 +168,78 @@
 
                                                         <tr>
                                                             <td class="p-2 del">
-                                                                <input type="checkbox" class="DeleteNumber form-check-input" name="DeleteNumber" value="@item.RN_Number">
+                                                                <input type="checkbox" class="DeleteNumber form-check-input" name="DeleteNumber" value="@item.FRTIH_Number">
                                                             </td>
                                                             <td>
-                                                                <a asp-controller="ReceiptNote" asp-action="PreviewReceiptNote" class="icon-link-hover" asp-all-route-data="@(new Dictionary<String, String> { { "SI_No", @item.RN_Number.ToString() } })">
-                                                                    @item.RN_No
+                                                                <a asp-controller="ReceiptNote" asp-action="PreviewReceiptNote" class="icon-link-hover" asp-all-route-data="@(new Dictionary<String, String> { { "SI_No", @item.FRTIH_Number.ToString() } })">
+                                                                    @item.FRTIH_InvoiceNo
                                                                 </a>
                                                             </td>
-                                                            <td class="datetype text-center">@Convert.ToDateTime(item.RN_Date).ToString("dd-MMM-yyyy")</td>
-                                                            <td>
-                                                            @*     @if (item.SI_SOH_OrderCount > 1) *@
-                                                                @if (true)
-                                                                {
-                                                                          <a tabindex="0" role="button" data-bs-toggle="popover" data-bs-title="Sale Order" data-bs-trigger="focus" data-bs-html="true" data-bs-content="123">
-
-                                                              @*       <a tabindex="0" role="button" data-bs-toggle="popover" data-bs-title="Sale Order" data-bs-trigger="focus" data-bs-html="true" data-bs-content="@Html.Raw(item.SI_SOH_OrderNo.Replace(",", "</br>"))">
- *@                                                                        @OrderNo
-                                                                     @*    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
-                                                                            <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
-                                                                        </svg> *@
-                                                                    </a>
-                                                                }
-                                                                else
-                                                                {
-                                                                   @*  @OrderNo *@
-                                                                }
-                                                            </td>
-                                                            <td class="datetype text-center">
-                                                                @if (!string.IsNullOrEmpty(OrderDate))
-                                                                {
-                                                                  @*   @Convert.ToDateTime(@OrderDate).ToString("dd-MMM-yyyy") *@
-                                                                }
-                                                            </td>
-                                                           @*  jw customer details *@
-                                                            <td>@item.RN_ITM_Group</td>
-                                                            <td>@item.RN_ITM_Category </td>
+                                                            <td class="datetype text-center">@Convert.ToDateTime(item.FRTIH_InvoiceDate).ToString("dd-MMM-yyyy")</td>
                                                           
-                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.RN_JWC_Name)</td>
-                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.RN_CUR_Name)</td>
-                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.RN_WH_Name)</td>
-                                                              <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.RN_JW_CustomerDC_No)</td>
-                                                            <td class="table-col-xxl">
-                                                                @Convert.ToDateTime(item.RN_JW_CustomerDC_Date).ToString("dd-MMM-yyyy")
-                                                             </td>
-                                                          @*   item details *@
-                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.RN_MS_Number)</td>
-                                                            <td class="table-width-md text-center">@item.RN_NoOfItem</td>
-                                                            <td>@Html.DisplayFor(modelItem => item.RN_WH_Name)</td>
+                                                                 
+                                                               <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.JIDNH_DN_No)</td>
+                                                         @*    <td class="datetype text-center">@Convert.ToDateTime(item.JIDNH_DN_Date).ToString("dd-MMM-yyyy")</td> *@
+                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.JIDNH_DN_Date)</td>
+                                                           
+                                                            <td></td>
+                                                            <td></td>
+                                                            @*  jw customer details *@
                                                          
-                                                            <td class="table-width-xl text-center">
-                                                                @item.RN_Qty
+                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.CustomerGroup)</td>
+                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.CustomerCategory)</td>
+                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.CUS_Name)</td>
+                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.CurrencyCode)</td>
+                                                            
+                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.Segregation)</td>
+                                                            <td class="table-col-xxl">@item.PRS_ProcessName</td>
+                                                            <td class="table-col-xxl">@item.ItemGroup</td>
+                                                            <td class="table-col-xxl">@item.ItemCode</td>
+                                                            <td class="table-col-xxl">@item.ItemDescription</td>
+                                                            <td class="table-col-xxl">@item.OuterDia</td>
+                                                            <td class="table-col-xxl">@item.Thickness</td>
+                                                            <td class="table-col-xxl">@item.Length</td>
+                                                            <td class="table-col-xxl">@item.ITM_Width</td>
+                                                            <td class="table-col-xxl">@item.MaterialGrade</td>
+                                                            <td class="table-col-xxl">@item.UOM</td>
+                                                        
+                                                            <td class="table-width-md text-center">@item.WarehouseCode</td>
+                                                        <td class="Qty table-width-md text-center">   @item.FRTII_Qty</td>
+                                                          
+                                                         
+                                                                                                                    <td class="Amount table-width-xl text-end">
+                                                                @String.Format(India, "{0:N2}", Convert.ToDouble(item.FRTII_Amount))
                                                             </td>
-                                                            <td class="table-width-xl text-end">
-
-                                                                @String.Format(India, "{0:N2}", string.IsNullOrWhiteSpace(item.RN_MaterialValue) ? 0 : Convert.ToDouble(item.RN_MaterialValue))
-                                                             
+                                                            <td class="GST table-width-xl text-end">
+                                                                @String.Format(India, "{0:N2}", Convert.ToDouble(item.FRTII_GST_Amount))
                                                             </td>
                                                                 
-                                                      
-                                                          </tr>
+                                                        </tr>
                                                     }
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="table-info">
-                                                        <td colspan="10" class="text-end"></td>
+                                                        <td colspan="18" class="text-end"></td>
                                                         <td class="table-width-md text-center"></td>
                                                         <td class="table-width-xl text-end">
-                                                        
                                                         </td>
                                                         <td class="table-width-lg text-center">Total</td>
                                                         <td class="table-width-3xl text-center">@ViewBag.SumOfItem</td>
                                                         <td class="table-width-3xl text-end"> </td>
-                                                        <td class="table-width-3xl text-center">    @String.Format(India, "{0:#,0.##}", @ViewBag.SumOfQty)</td>
-                                                 <td class="table-width-3xl text-end"> @String.Format(new CultureInfo("en-IN"),"{0:#,0.##}",
-        Convert.ToDouble(ViewBag.SumOfMatrialValue))</td>       
-                                                      
+                                                        <td>
+                                                            <input id="TotalQty" class="form-control text-center"
+                                                                   value="@ViewBag.SumOfQty" readonly />
+                                                        </td>
                                                         
+                                                        <td>
+                                                           
+                                                            <input id="TotalAmount" class="form-control text-end"
+                                                                   value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfAmount))" readonly />
+                                                        </td>
+                                                        
+                                                        <td>
+                                                            <input id="TotalGST" class="form-control text-end"
+                                                                   value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfGST))" readonly />
                                                     </tr>
                                                 </tfoot>
                                             </table>
@@ -245,7 +252,7 @@
                                     }
                                     <div class="row table-cal align-items-center">
                                         <div class="col align-items-center">
-                                            <form asp-action="ReciptNoteSummary" method="get">
+                                            <form asp-action="JWInvoiceDetailed" method="get">
                                                 <div class="row align-items-center">
                                                     <div class="col py-1">
                                                         @{
@@ -279,7 +286,7 @@
                                                         <nav>
                                                             <ul class="pagination float-end mb-0">
                                                                 <li class="page-item">
-                                                                    <a asp-action="ReciptNoteSummary" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="1" class="page-link @prevDisabled">
+                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="1" class="page-link @prevDisabled">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
                                                                             <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
                                                                             <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
@@ -287,7 +294,7 @@
                                                                     </a>
                                                                 </li>
                                                                 <li class="page-item">
-                                                                    <a asp-action="ReciptNoteSummary" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex - 1)" class="page-link @prevDisabled">
+                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex - 1)" class="page-link @prevDisabled">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
                                                                             <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
                                                                         </svg>
@@ -299,14 +306,14 @@
                                                                     </a>
                                                                 </li>
                                                                 <li class="page-item">
-                                                                    <a asp-action="ReciptNoteSummary" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex + 1)" class="page-link @nextDisabled">
+                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex + 1)" class="page-link @nextDisabled">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
                                                                             <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
                                                                         </svg>
                                                                     </a>
                                                                 </li>
                                                                 <li class="page-item">
-                                                                    <a asp-action="ReciptNoteSummary" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@ViewData["PageCount"]" class="page-link @nextDisabled">
+                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@ViewData["PageCount"]" class="page-link @nextDisabled">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
                                                                             <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
                                                                             <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
@@ -329,6 +336,16 @@
         </div>
     </div>
 </form>
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/frt_invoice/FRT_InvoiceDetailed.js" asp-append-version="true"></script>
+
+        
+    
+}
+
 <script>
     $(document).ready(function () {
         const $tableBody = $('#MyTable tbody');

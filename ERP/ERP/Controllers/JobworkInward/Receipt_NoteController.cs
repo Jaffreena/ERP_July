@@ -5,9 +5,9 @@ using ERP_DTO.JobInwardTransaction;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json;
 using System.Transactions;
-
 namespace ERP.Controllers.JobworkInward
 {
     public class Receipt_NoteController : Controller
@@ -261,6 +261,7 @@ namespace ERP.Controllers.JobworkInward
                                 SI_DTO.JIRNH_MS_Number = Convert.ToInt64(S_DTO.MS_Number);
                                 SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.Remarks);
                                 SI_DTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.WH_Number);
+                                SI_DTO.JIRNH_Freight_Applicable = S_DTO.Freight_Applicable;
                                 SI_DTO.JIRN_Id = 21;
 
                                 DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
@@ -288,13 +289,27 @@ namespace ERP.Controllers.JobworkInward
                                     itemDTO.JIRNI_WH_Number = Convert.ToInt64(Item.WH_Number);
                                     itemDTO.JIRNI_UoM_Number = Convert.ToInt64(Item.UoM_Number);
                                     itemDTO.JIRNI_Qty = Convert.ToDouble(Item.Qty);
+                                    itemDTO.JIRNI_Qty_Kg = Convert.ToDouble(Item.Qty_Kg);
                                     itemDTO.JIRNI_UnitPrice = Convert.ToDouble(Item.UnitPrice);
                                     itemDTO.JIRNI_Amount = Convert.ToDouble(Item.Amount);
                                     itemDTO.JIRNI_PRS_Number = Convert.ToInt64(Item.PRS_Number);
+
+                                    // NEW: Freight logic
+                                    itemDTO.JIRNI_Freight_Applicable = Item.Freight_Applicable;
+                                    itemDTO.JIRNI_Freight_ServiceOrder_Number = Item.Freight_ServiceOrder_Number;
+                                    itemDTO.JIRNI_JISVOI_Number_FRT = string.IsNullOrEmpty(Item.JISVOI_Number_FRT)
+                                        ? 0
+                                        : Convert.ToInt64(Item.JISVOI_Number_FRT);
+                                    itemDTO.JIRNI_FromWH = string.IsNullOrEmpty(Item.FromWH)
+                                        ? (long?)null
+                                        : Convert.ToInt64(Item.FromWH);
+                                    itemDTO.JIRNI_ToWH = string.IsNullOrEmpty(Item.ToWH)
+                                        ? (long?)null
+                                        : Convert.ToInt64(Item.ToWH);
+
                                     itemDTO.JIRN_Id = 22;
 
                                     var itemResult = SI_DAO.JI_ReceiptNoteDB(itemDTO);
-
                                     if (itemResult == null || itemResult.Tables.Count == 0 || itemResult.Tables[0].Rows.Count == 0)
                                         throw new Exception("Item insert failed");
 
@@ -507,7 +522,79 @@ namespace ERP.Controllers.JobworkInward
 
         #endregion
 
-    
+        // NEW: Freight logic
+        #region Get Freight Service Order
+        [HttpGet]
+        [Route("receiptnote/transactions/receiptnote/get-freight-service-order")]
+        public JsonResult GetFreightServiceOrder(long customerId, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)
+        {
+            var dt = SI_DAO
+                .GetFreightServiceOrderDB(customerId, prsNumber, itemNumber, uomNumber)
+                .Tables[0];
+
+            return new JsonResult(
+                dt.AsEnumerable().Select(r => new
+                {
+                    value = r["JISVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOH_Number"]),
+                    text = r["JISVOH_ServiceOrderNo"]?.ToString() ?? "",
+                    jisvoiNumber = r["JISVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOI_Number"]) // NEW
+                }).ToList(),
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                });
+        }
+        #endregion
+
+
+        #region Check Delivered Qty Exceeded - Freight
+        [HttpGet]
+        [Route("receiptnote/transactions/receiptnote/check-delivered-qty-exceeded-freight")]
+        public JsonResult CheckDeliveredQtyExceededFreight(long jisvohNumber, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)
+        {
+            var dt = SI_DAO
+                .CheckDeliveredQtyExceededFreightDB(jisvohNumber, prsNumber, itemNumber, uomNumber)
+                .Tables[0];
+
+            var result = dt.AsEnumerable().Select(r => new
+            {
+                deliveredQty = r["DeliveredQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["DeliveredQty"]),
+                jisvoiQty = r["JISVOI_Qty"] == DBNull.Value ? 0 : Convert.ToDouble(r["JISVOI_Qty"]),
+                isExceeded = r["IsExceeded"] != DBNull.Value && Convert.ToBoolean(r["IsExceeded"])
+            }).ToList();
+
+            return new JsonResult(result, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+        }
+        #endregion
+
+        [HttpGet]
+        [Route("receiptnote/transactions/receiptnote/get-item-unit-conversion")]
+        public JsonResult GetItemUnitConversion(long itemNumber, long fromUnit)
+        {
+            var dt = SI_DAO.GetItemUnitConversionDB(itemNumber, fromUnit).Tables[0];
+
+            if (dt.Rows.Count == 0)
+            {
+                return new JsonResult(new { fromQty = 0, toQty = 0 });
+            }
+
+            var row = dt.Rows[0];
+
+            return new JsonResult(new
+            {
+                fromQty = row["FromQty"] == DBNull.Value ? 0 : Convert.ToDecimal(row["FromQty"]),
+                toQty = row["ToQty"] == DBNull.Value ? 0 : Convert.ToDecimal(row["ToQty"])
+            },
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+        }
 
 
     }

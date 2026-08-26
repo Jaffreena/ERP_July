@@ -246,14 +246,15 @@ const ItemTableFields = [
     { cls: ".JIDNI_UoM_Number", min: 10, max: 15, align: "center" },
 
     { cls: ".JIDNI_OriginalQty", min: 10, max: 20, align: "center" }, // Extra field
+    { cls: ".JIDNI_InvoicedQty", min: 10, max: 20, align: "center" }, // Extra field
     { cls: ".JIDNI_Qty", min: 10, max: 20, align: "center" },
 
     { cls: ".JIDNI_UnitPrice", min: 10, max: 20, align: "right" },
     { cls: ".JIDNI_Amount", min: 13, max: 25, align: "right" },
 
-    { cls: ".JIDNI_JW_InvoiceTracking", min: 8, max: 8, align: "center" },
-
-    { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" } // Extra field
+     
+    { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" } ,// Extra field
+    { cls: ".Freight_ServiceOrder_Number", min: 10, max: 25, align: "left" }
 ];
 //#region batch grid alignment
 
@@ -620,6 +621,7 @@ function HighlightRow(rows, index) {
         block: "nearest"
     });
 }
+const FREIGHT_PRS_NUMBER = 40008;
 function AutoFit() {
     fitInputWidth("Header_JIDNH_DN_No", 20, 25);
     fitInputWidth("Header_JIDNH_MS_Number", 20, 30);
@@ -634,6 +636,19 @@ function AutoFit() {
     fitInputWidth("Header_JIDNH_Remarks", 40, 40);
 }
 $(document).ready(function () {
+    // NEW: page load ஆகும்போதே, ஏற்கனவே Freight_Applicable=checked rows-க்கு
+    // dropdown options populate பண்ணு — "change" event காத்திருக்காம
+    $("#ItemTable tbody tr.NewRow").each(function () {
+        let row = $(this);
+        if (row.find(".Freight_Applicable").is(":checked")) {
+            BindFreightServiceOrder(
+                row,
+                $("#Header_JIDNH_JW_Customer_Number").val(),
+                row.find(".JIDNI_Item_Number").val(),
+                row.find(".JIDNI_UoM_Number").val()
+            );
+        }
+    });
     //#region item code right pane search JIDNI_Item_Code
     // Item_Code – Keydown (incl. Escape): moved to <script> block
     // Item_Code – Mousedown: moved to <script> block
@@ -754,6 +769,59 @@ $(document).ready(function () {
             }
         }
     );
+
+    // NEW: mirrors the JIDNI_JW_InvoiceTracking handler above, for Freight_Applicable
+
+
+    $(document).on(
+        "change",
+        ".Freight_Applicable, .JIDNI_Item_Code, .JIDNI_UoM_Number",
+        function () {
+
+            let row = $(this).closest("tr");
+
+            if (row.find(".Freight_Applicable").is(":checked")) {
+                BindFreightServiceOrder(
+                    row,
+                    $("#Header_JIDNH_JW_Customer_Number").val(),
+                    row.find(".JIDNI_Item_Number").val(),
+                    row.find(".JIDNI_UoM_Number").val()
+                );
+            } else {
+                row.find(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+            }
+        }
+    );
+
+    function BindFreightServiceOrder(row, customerId, itemNumber = null, uomNumber = null) {
+
+        let dropdown = row.find(".Freight_ServiceOrder_Number");
+        // CHANGED: read the saved value from the data attribute (set by
+        // Razor at page render), not from the dropdown itself — the
+        // dropdown is empty on first load, so .val() would return nothing
+        let selectedValue = dropdown.attr("data-saved-value") || dropdown.val();
+
+        dropdown.html('<option value="0"></option>');
+
+        if (!customerId) return;
+
+        $.get("/DeliveryNote/GetServiceOrder",
+            { customerId, prsNumber: FREIGHT_PRS_NUMBER, itemNumber, uomNumber },
+            function (data) {
+
+                $.each(data, function (_, item) {
+                    if (!item.value || item.value === "" || item.value === "0") return;
+
+                    dropdown.append(
+                        `<option value="${item.value}">${item.text}</option>`
+                    );
+                });
+
+                dropdown.val(selectedValue);
+            }
+        );
+    }
+
     function BindServiceOrder(row, customerId, prsNumber = null, itemNumber = null, uomNumber = null) {
 
         let dropdown = row.find(".JISVOH_Number");
@@ -768,6 +836,11 @@ $(document).ready(function () {
             function (data) {
 
                 $.each(data, function (_, item) {
+                    // NEW: skip entries with no real value/text — server
+                    // occasionally returns a blank item, duplicating the
+                    // default blank option.
+                    if (!item.value || item.value === "" || item.value === "0") return;
+
                     dropdown.append(
                         `<option value="${item.value}">${item.text}</option>`
                     );
@@ -778,6 +851,25 @@ $(document).ready(function () {
         );
     }
 
+    function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
+        let total = 0;
+
+        $("#ItemTable tbody tr.NewRow").each(function () {
+            let row = $(this);
+
+            if (row.is(currentRow)) return;
+            if (row.find(".JIDNI_IsDeleted").val() === "1" ||
+                row.find(".JIDNI_IsDeleted").val() === "true") return;
+
+            let rowSO = row.find(".JISVOH_Number").val() || 0;
+
+            if (rowSO == jisvohNumber) {
+                total += parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
+            }
+        });
+
+        return total;
+    }
 
     $(document).on("change", ".JISVOH_Number", function () {
 
@@ -789,6 +881,18 @@ $(document).ready(function () {
         let uomNumber = row.find(".JIDNI_UoM_Number").val();
         let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
         let rowIndex = row.index();
+
+        // NEW: fetch and store the SO Item ID — needed by
+        // USP_CheckDeliveredQtyExceeded_Freight's DN-side calculation
+        $.get("/JobworkInvoice/GetServiceOrderItemInfo", {
+            JISVOH_Number: jisvohNumber,
+            PRS_Number: prsNumber,
+            Item_Number: itemNumber,
+            UoM_Number: uomNumber
+        }, function (soRes) {
+            row.find(".JISVOI_Number_Row").val(soRes && soRes.jisvoI_Number ? soRes.jisvoI_Number : 0);
+        });
+
         $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
             jisvohNumber,
             prsNumber,
@@ -799,8 +903,15 @@ $(document).ready(function () {
             if (!res || res.length === 0) return;
             let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
             let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
-            if ((deliveredQty + originalQty) > jisvoiQty) {
-                alert("Qty Allowed: " + (jisvoiQty - deliveredQty));
+
+            // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(SO)
+            let otherRowsQty = GetOtherRowsQtyForSO(jisvohNumber, row);
+            let realDeliveredQty = deliveredQty + otherRowsQty;
+
+            // FORMULA: IsExceeded  <=>  (RealDeliveredQty + CurrentQty) > SVO_Qty
+            if ((realDeliveredQty + originalQty) > jisvoiQty) {
+                // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
+                alert("Qty Allowed: " + (jisvoiQty - realDeliveredQty));
                 setTimeout(function () {
                     row.find(".JIDNI_Qty")
                         .focus()
@@ -832,14 +943,106 @@ $(document).ready(function () {
             if (!res || res.length === 0) return;
             let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
             let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
-            if ((deliveredQty + originalQty) > jisvoiQty) {
 
-                alert("Qty Allowed: " + (jisvoiQty - deliveredQty));
+            // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(SO)
+            let otherRowsQty = GetOtherRowsQtyForSO(jisvohNumber, row);
+            let realDeliveredQty = deliveredQty + otherRowsQty;
+
+            // FORMULA: IsExceeded  <=>  (RealDeliveredQty + CurrentQty) > SVO_Qty
+            if ((realDeliveredQty + originalQty) > jisvoiQty) {
+
+                // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
+                alert("Qty Allowed: " + (jisvoiQty - realDeliveredQty));
                 setTimeout(function () {
                     row.find(".JIDNI_Qty")
                         .focus()
                         .select();
                     row.find(".JISVOH_Number").val("0");
+                }, 300);
+            }
+        });
+    });
+
+    // NEW: mirrors the .JISVOH_Number change handler above, using the
+    // dedicated Freight endpoint (CheckDeliveredQtyExceededFreight) and
+    // the JISVOI_Number_FRT field per the confirmed SP logic
+    $(document).on("change", ".Freight_ServiceOrder_Number", function () {
+
+        let row = $(this).closest("tr");
+        let freightSO = $(this).val();
+        row.find(".Freight_ServiceOrder_Number").val(freightSO)
+        let itemNumber = row.find(".JIDNI_Item_Number").val();
+        let uomNumber = row.find(".JIDNI_UoM_Number").val();
+        let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
+
+        if (!freightSO || freightSO === "0") return;
+
+        // NEW: fetch and store the SO Item ID for Freight — feeds
+        // JISVOI_Number_FRT, needed by the SP's DN-side calculation
+        $.get("/FreightInvoice/GetServiceOrderItemInfo", {
+            Freight_ServiceOrder_Number: freightSO,
+            PRS_Number: FREIGHT_PRS_NUMBER,
+            Item_Number: itemNumber,
+            UoM_Number: uomNumber
+        }, function (soRes) {
+            row.find(".JISVOI_Number_FRT_Row").val(soRes && soRes.jisvoI_Number ? soRes.jisvoI_Number : 0);
+        });
+
+        $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+            jisvohNumber: freightSO,
+            prsNumber: FREIGHT_PRS_NUMBER,
+            itemNumber,
+            uomNumber
+        }, function (res) {
+
+            if (!res || res.length === 0) return;
+            let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+            let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
+
+            let otherRowsQty = GetOtherRowsQtyForSO(freightSO, row);
+            let realDeliveredQty = deliveredQty + otherRowsQty;
+
+            if ((realDeliveredQty + originalQty) > jisvoiQty) {
+                alert("Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty));
+                setTimeout(function () {
+                    row.find(".JIDNI_Qty")
+                        .focus()
+                        .select();
+                    row.find(".Freight_ServiceOrder_Number").val("0");
+                }, 300);
+            }
+        });
+    });
+
+    $(document).on("focusout", ".JIDNI_Qty", function () {
+
+        let row = $(this).closest("tr");
+        let freightSO = row.find(".Freight_ServiceOrder_Number").val();
+        if (!freightSO || freightSO === "0") return;
+        let itemNumber = row.find(".JIDNI_Item_Number").val();
+        let uomNumber = row.find(".JIDNI_UoM_Number").val();
+        let originalQty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+
+        $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+            jisvohNumber: freightSO,
+            prsNumber: FREIGHT_PRS_NUMBER,
+            itemNumber,
+            uomNumber
+        }, function (res) {
+            if (!res || res.length === 0) return;
+            let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+            let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
+
+            let otherRowsQty = GetOtherRowsQtyForSO(freightSO, row);
+            let realDeliveredQty = deliveredQty + otherRowsQty;
+
+            if ((realDeliveredQty + originalQty) > jisvoiQty) {
+                alert("Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty));
+                setTimeout(function () {
+                    row.find(".JIDNI_Qty")
+                        .focus()
+                        .select();
+                    row.find(".Freight_ServiceOrder_Number").val("0");
                 }, 300);
             }
         });
@@ -910,7 +1113,6 @@ $(document).ready(function () {
         });
     }
     //#endregion Initialize Flatpickr
-
     //#region onkeypress qty and unit
     $(document).on("keyup change", ".JIDNI_Qty, .JIDNI_UnitPrice", function () {
 
@@ -931,6 +1133,22 @@ $(document).ready(function () {
         autoAddRow(row);
     });
     //#endregion onkeypress qty and unitS
+
+    //#region validate amend qty against invoiced qty
+    // FORMULA: if AmendQty < InvoicedQty -> alert + reset AmendQty = InvoicedQty
+    $(document).on("change", ".JIDNI_Qty", function () {
+
+        let row = $(this).closest("tr");
+
+        let amendQty = parseFloat(removeComma($(this).val())) || 0;
+        let invoicedQty = parseFloat(removeComma(row.find(".JIDNI_InvoicedQty").val())) || 0;
+
+        if (amendQty < invoicedQty) {
+            alert("Amend Qty cannot be less than Invoiced Qty (" + invoicedQty + ")");
+            $(this).val(addComma(invoicedQty, "q"));
+        }
+    });
+    //#endregion validate amend qty against invoiced qty
 
     //#region auto add row function
     function autoAddRow(currentRow) {
@@ -1074,6 +1292,12 @@ $(document).ready(function () {
             else if (el.hasClass("JIDNI_IsDeleted")) {
 
                 el.val("false");
+            }
+
+            // INVOICED QTY - new row has nothing invoiced yet
+            else if (el.hasClass("JIDNI_InvoicedQty")) {
+
+                el.val("0");
             }
 
             // NORMAL INPUT / TEXTAREA
@@ -3231,7 +3455,22 @@ function CreateDeliveryNoteModel_Edit() {
                     : "No",
 
             JISVOH_Number:
-                parseInt(row.find(".JISVOH_Number").val()) || 0
+                parseInt(row.find(".JISVOH_Number").val()) || 0,
+            Freight_Applicable:
+                row.find(".Freight_Applicable").is(":checked")
+                    ? "Yes"
+                    : "No",
+
+            Freight_ServiceOrder_Number:
+                row.find(".Freight_ServiceOrder_Number").val() || "",
+
+            // NEW: SO Item IDs — needed by USP_CheckDeliveredQtyExceeded_Freight's
+            // DN-side calculation
+            JISVOI_Number:
+                parseInt(row.find(".JISVOI_Number_Row").val()) || 0,
+
+            JISVOI_Number_FRT:
+                parseInt(row.find(".JISVOI_Number_FRT_Row").val()) || 0
         };
 
         items.push(item);

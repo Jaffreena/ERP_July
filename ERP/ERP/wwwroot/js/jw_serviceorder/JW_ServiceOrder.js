@@ -213,13 +213,17 @@ const ItemTableFields = [
     { cls: ".MaterialGrade", min: 10, max: 25, align: "left" },   // Material Grade
     { cls: ".ItemGroup", min: 10, max: 30, align: "left" },   // Item Group
 
+    { cls: ".JISVOI_WH_Number", min: 10, max: 25, align: "left" }, // Warehouse
+
     { cls: ".JISVOI_UoM_Number", min: 10, max: 15, align: "center" }, // UoM
 
     { cls: ".JISVOI_Qty", min: 10, max: 20, align: "center" }, // Qty
     { cls: ".JISVOI_UnitPrice", min: 10, max: 20, align: "right" },  // Unit Price
     { cls: ".JISVOI_Amount", min: 13, max: 25, align: "right" },  // Amount
 
-    { cls: ".JISVOI_DeliveryDate", min: 10, max: 10, align: "center" }  // Delivery Date
+    { cls: ".JISVOI_DeliveryDate", min: 10, max: 10, align: "center" },  // Delivery Date
+    { cls: ".JISVOI_FromWH", min: 10, max: 25, align: "left" }, // From WH
+    { cls: ".JISVOI_ToWH", min: 10, max: 25, align: "left" }  // To WH
 ];
 let isMouseSelectingBuyer = false;
  
@@ -271,6 +275,7 @@ function AutoFit() {
     fitInputWidth("Header_JISVOH_MS_Number", 20, 30);
     fitInputWidth("Header_JISVOH_JW_Customer_Name", 40, 50);
     fitInputWidth("Header_JISVOH_Currency_Number", 10, 10);
+    fitInputWidth("Header_JISVOH_Category", 20, 20);
     fitInputWidth("Header_JISVOH_PaymentTerms", 30, 40);
     fitInputWidth("Header_JISVOH_DeliveryTerms", 30, 40);
     fitInputWidth("Header_JISVOH_DeliveryMode", 30, 40);
@@ -472,6 +477,25 @@ $(document).ready(function () {
     //#region add row item grid
     let rowIndex = 1; // start from 1 because 0 already exists
 
+    // NEW: Freight Service Order toggle
+    function ToggleFreightColumns() {
+        let isFreight = $("#Header_JISVOH_Freight_Applicable").is(":checked");
+
+        if (isFreight) {
+            $(".DeliveryDateHeader, .DeliveryDateCell").hide();
+            $(".FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell").show();
+        } else {
+            $(".DeliveryDateHeader, .DeliveryDateCell").show();
+            $(".FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell").hide();
+        }
+    }
+
+    $(document).on("change", "#Header_JISVOH_Freight_Applicable", function () {
+        ToggleFreightColumns();
+    });
+
+    ToggleFreightColumns();
+
     $("#AddRowButton").on("click", function () {
 
         let isValid = true;
@@ -552,7 +576,7 @@ $(document).ready(function () {
         $newRow.attr("data-rowid", rowID);
 
         $("#TableBody").append($newRow);
-        $newRow.find("td:last").html(`
+        $newRow.find("td.DeliveryDateCell").html(`
     <input name="Items[${rowIndex}].JISVOI_DeliveryDate"
            type="text"
            class="form-control datepicker JISVOI_DeliveryDate" />
@@ -892,11 +916,20 @@ function CreateServiceOrderModel() {
         JISVOH_Remarks:
             $("#Header_JISVOH_Remarks").val(),
 
+        JISVOH_Category:
+            $("#Header_JISVOH_Category").val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE",
+
+        JISVOH_MS_Number:
+            parseInt($("#Header_JISVOH_MS_Number").val()) || null,
+
         SVO_Id:
             parseInt($("#Header_SVO_Id").val()) || 0,
 
         JISVOI_Item_Code:
-            $("#Header_JISVOI_Item_Code").val()
+            $("#Header_JISVOI_Item_Code").val(),
+
+        JISVOH_Freight_Applicable:
+            $("#Header_JISVOH_Freight_Applicable").is(":checked") ? "Yes" : "No"
     };
 
     // =========================
@@ -932,6 +965,9 @@ function CreateServiceOrderModel() {
             JISVOI_Item_Number:
                 parseInt(row.find(".JISVOI_Item_Number").val()) || 0,
 
+            JISVOI_WH_Number:
+                parseInt(row.find(".JISVOI_WH_Number").val()) || 0,
+
             JISVOI_UoM_Number:
                 parseInt(row.find(".JISVOI_UoM_Number").val()) || 0,
 
@@ -949,7 +985,16 @@ function CreateServiceOrderModel() {
                     ? new Date(
                         row.find(".JISVOI_DeliveryDate").val()
                     ).toISOString()
-                    : null
+                    : null,
+
+            JISVOI_Category:
+                $("#Header_JISVOH_Category").val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE",
+
+            JISVOI_FromWH:
+                parseInt(row.find(".JISVOI_FromWH").val()) || null,
+
+            JISVOI_ToWH:
+                parseInt(row.find(".JISVOI_ToWH").val()) || null
         };
 
         items.push(item);
@@ -1363,6 +1408,7 @@ function SearchServiceOrderItem(inputElement) {
                         row.find(".Width").val(item.width);
                         row.find(".MaterialGrade").val(item.materialGrade);
                         row.find(".ItemGroup").val(item.itemGroup);
+                        row.find(".JISVOI_WH_Number").val(item.saleWarehouse);
                         row.find(".JISVOI_UoM_Number").val(item.uoM);
 
                         row.find(".JISVOI_Qty").focus();
@@ -1509,6 +1555,7 @@ function validateItemGrid() {
 
     let hasValidRow = false;
     let isValid = true;
+    let rowNumber = 0;
 
     $("#ItemTable tbody tr").each(function () {
 
@@ -1535,6 +1582,7 @@ function validateItemGrid() {
         // empty row → skip
         if (!isRowStarted) return;
 
+        rowNumber++;
         hasValidRow = true;
 
         // Process
@@ -1560,7 +1608,7 @@ function validateItemGrid() {
         // Qty
         if (!qty || qty.trim() === "" || qty.trim() === "0") {
             showAlert(
-                'Qty is required',
+                'Row ' + rowNumber + ': Qty is required',
                 row.find(".JISVOI_Qty")
             );
             isValid = false;
@@ -1574,11 +1622,36 @@ function validateItemGrid() {
             unitPrice.trim() === "0"
         ) {
             showAlert(
-                'Unit Price is required',
+                'Row ' + rowNumber + ': Unit Price is required',
                 row.find(".JISVOI_UnitPrice")
             );
             isValid = false;
             return false;
+        }
+
+        // NEW: Freight Service Order - From WH / To WH mandatory
+        if ($("#Header_JISVOH_Freight_Applicable").is(":checked")) {
+
+            let fromWH = row.find(".JISVOI_FromWH").val();
+            let toWH = row.find(".JISVOI_ToWH").val();
+
+            if (!fromWH || fromWH.trim() === "" || fromWH.trim() === "0") {
+                showAlert(
+                    'Row ' + rowNumber + ': From WH is required',
+                    row.find(".JISVOI_FromWH")
+                );
+                isValid = false;
+                return false;
+            }
+
+            if (!toWH || toWH.trim() === "" || toWH.trim() === "0") {
+                showAlert(
+                    'Row ' + rowNumber + ': To WH is required',
+                    row.find(".JISVOI_ToWH")
+                );
+                isValid = false;
+                return false;
+            }
         }
 
     });

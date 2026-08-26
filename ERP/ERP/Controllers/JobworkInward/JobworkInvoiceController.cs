@@ -358,10 +358,13 @@ namespace ERP.Controllers.JobworkInward
         #region GET DELIVERY NOTE GROUP ITEMS
 
         [HttpGet]
-        public JsonResult GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber)
+       
+        public JsonResult GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber, long? JISVIH_Number = null)
         {
             JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
-            DataTable dt = dao.GetDeliveryNote_GroupItem(CustomerNumber, MSNumber).Tables[0];
+            // CHANGED: pass JISVIH_Number through so the SP can add back
+            // this invoice's own already-consumed qty when editing
+            DataTable dt = dao.GetDeliveryNote_GroupItem(CustomerNumber, MSNumber, JISVIH_Number).Tables[0];
 
             var data = dt.AsEnumerable().Select(r => new
             {
@@ -614,11 +617,19 @@ namespace ERP.Controllers.JobworkInward
                ? 0
                : Convert.ToInt64(r["JIDNH_MS_Number"]),
                 JISVOH_Number = r["JISVOH_Number"] == DBNull.Value
-               ? 0
-               : Convert.ToInt64(r["JISVOH_Number"]),
+           ? 0
+           : Convert.ToInt64(r["JISVOH_Number"]),
+
+                // NEW: SO Item ID — was missing, needed so it can be preserved
+                // through Create → Edit and used in the qty double-count
+                // prevention formula
+                JISVOI_Number = r["JISVOI_Number"] == DBNull.Value
+           ? 0
+           : Convert.ToInt64(r["JISVOI_Number"]),
+
                 JISVOI_UnitPrice = r["JISVOI_UnitPrice"] == DBNull.Value
-               ? 0
-               : Convert.ToInt64(r["JISVOI_UnitPrice"]),                
+           ? 0
+           : Convert.ToInt64(r["JISVOI_UnitPrice"]),
 
                 JIDNH_JW_Customer_Number = r["JIDNH_JW_Customer_Number"] == DBNull.Value
                ? 0

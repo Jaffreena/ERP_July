@@ -216,6 +216,11 @@
         display: none;
     }
 
+    /* Category dropdown */
+    #Header_JISVOH_Category {
+        width: 100% !important;
+        max-width: none !important;
+    }
    
 
      
@@ -361,6 +366,22 @@
                                                 <select asp-for="Header.JISVOH_Currency_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Currency">
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- NEW: Category (hardcoded, mirrors Freight Invoice's Header_SourceCategory) -->
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-3 col-form-label ps-0">
+                                                Category
+                                            </label>
+
+                                            <div class="col-sm-7 position-relative">
+                                                <select id="Header_JISVOH_Category"
+                                                        name="Header.JISVOH_Category"
+                                                        class="form-select">
+                                                    <option value="DN" selected>Delivery Note</option>
+                                                    <option value="RN">Receipt Note</option>
                                                 </select>
                                             </div>
                                         </div>

@@ -164,10 +164,20 @@ namespace ERP_DTO.JobInwardTransaction
         public string? JIDNI_ItemGroup { get; set; }
         public string? JIDNI_IsDeleted { get; set; }
         public long? CustomerNumber { get; set; }
+
         public long? JISVOH_Number { get; set; }
         public long? JISVOI_Number { get; set; }
-       
 
+        [Display(Name = "Freight Applicable")]
+        [StringLength(3)]
+        public string? Freight_Applicable { get; set; }
+
+        [Display(Name = "Freight No")]
+        public string? Freight_ServiceOrder_Number { get; set; }
+
+        // NEW: Freight SO Item ID — needed by
+        // USP_CheckDeliveredQtyExceeded_Freight's DN-side calculation
+        public long? JISVOI_Number_FRT { get; set; }
 
 
     }

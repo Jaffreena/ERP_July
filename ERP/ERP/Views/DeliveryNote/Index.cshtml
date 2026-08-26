@@ -9,10 +9,7 @@
 
 <style>
   
-    .JIDNI_JW_InvoiceTracking {
-        width: 14px !important;
-        height: 14px !important;
-    }
+   
     .match-row td {
         color: blue !important;
         font-weight: 600;
@@ -1055,12 +1052,17 @@
                                                             </th>
 
                                                             <th class="table-width-md text-center">
-                                                                JI
+                                                                JWI Applicable
                                                             </th>
                                                             <th>
-                                                                Service Order No
+                                                                JWI SO No.
                                                             </th>
-
+                                                            <th class="table-width-md text-center">
+                                                                Freight Applicable
+                                                            </th>
+                                                            <th>
+                                                                Freight SO No.
+                                                            </th>
                                                         </tr>
 
                                                     </thead>
@@ -1219,7 +1221,7 @@
                                                             </td>
 
                                                             <!-- JW INVOICE -->
-                                                            <td class="text-center">
+                                                            <td class="text-center p-2">
 
                                                                 <input type="checkbox"
                                                                        id="JIDNI_JW_InvoiceTracking"
@@ -1236,6 +1238,25 @@
                                                                         class="form-select JISVOH_Number"
                                                                         asp-items="@ViewBag.SON">
                                                                 </select>
+                                                                <!-- NEW: SO Item ID, needed by qty formula -->
+                                                                <input type="hidden" class="JISVOI_Number_Row" value="0" />
+                                                            </td>
+                                                            <!-- FREIGHT APPLICABLE -->
+                                                            <td class="text-center p-2">
+                                                                <input type="checkbox"
+                                                                       id="Freight_Applicable"
+                                                                       class="form-check-input Freight_Applicable" />
+                                                                <input type="hidden"
+                                                                       class="Freight_Applicable_Value" />
+                                                            </td>
+                                                            <!-- FREIGHT NO -->
+                                                            <td>
+                                                                <select id="Freight_ServiceOrder_Number"
+                                                                        class="form-select Freight_ServiceOrder_Number">
+                                                                    <option value="0"></option>
+                                                                </select>
+                                                                <!-- NEW: Freight SO Item ID, needed by qty formula -->
+                                                                <input type="hidden" class="JISVOI_Number_FRT_Row" value="0" />
                                                             </td>
                                                         </tr>
 
@@ -1391,13 +1412,13 @@
                                                             </td>
 
                                                             <!-- JW INVOICE -->
-                                                            <td class="text-center">
+                                                            <td class="text-center p-2">
 
                                                                 <input type="checkbox"
                                                                        name="Items[0].JIDNI_JW_InvoiceTracking"
-                                                                       class="form-check-input form-check-input-sm JIDNI_JW_InvoiceTracking" />
-
-                                                                <input type="hidden"
+                                                                       class="form-check-input JIDNI_JW_InvoiceTracking" />
+                                                              
+                                                                       <input type="hidden"
                                                                        name="Items[0].JIDNI_IsDeleted"
                                                                        class="JIDNI_IsDeleted"
                                                                        value="false" />
@@ -1408,6 +1429,26 @@
                                                                         class="form-select JISVOH_Number"
                                                                         asp-items="@ViewBag.SON">
                                                                 </select>
+                                                                <!-- NEW: SO Item ID, needed by qty formula -->
+                                                                <input type="hidden" name="Items[0].JISVOI_Number" class="JISVOI_Number_Row" value="0" />
+                                                            </td>
+                                                            <!-- FREIGHT APPLICABLE -->
+                                                            <td class="text-center p-2">
+                                                                <input type="checkbox"
+                                                                       name="Items[0].Freight_Applicable"
+                                                                       class="form-check-input Freight_Applicable" />
+                                                                <input type="hidden"
+                                                                       class="Freight_Applicable_Value"
+                                                                       value="false" />
+                                                            </td>
+                                                            <!-- FREIGHT NO -->
+                                                            <td>
+                                                                <select name="Items[0].Freight_ServiceOrder_Number"
+                                                                        class="form-select Freight_ServiceOrder_Number">
+                                                                    <option value="0"></option>
+                                                                </select>
+                                                                <!-- NEW: Freight SO Item ID, needed by qty formula -->
+                                                                <input type="hidden" name="Items[0].JISVOI_Number_FRT" class="JISVOI_Number_FRT_Row" value="0" />
                                                             </td>
                                                         </tr>
 
@@ -1447,6 +1488,10 @@
 
                                                             </td>
 
+                                                            <td>
+                                                            </td>
+                                                            <td>
+                                                            </td>
                                                             <td>
                                                             </td>
                                                             <td>

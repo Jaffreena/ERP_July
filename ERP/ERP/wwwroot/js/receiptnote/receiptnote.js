@@ -240,6 +240,7 @@
 
 
 //#region  field width
+const FREIGHT_PRS_NUMBER = 40008;
 const ItemTableFields = [
     { cls: ".PRS_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
     { cls: ".Item_Code", min: 12, max: 15, align: "left" },
@@ -253,10 +254,16 @@ const ItemTableFields = [
     { cls: ".WH_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
     { cls: ".UoM_Number", min: 10, max: 15, align: "center", extraPadding: 8 },
     { cls: ".Qty", min: 10, max: 20, align: "center", extraPadding: 8 },
+    { cls: ".Qty_Kg", min: 10, max: 20, align: "center", extraPadding: 8 },
     { cls: ".UnitPrice", min: 11, max: 20, align: "right", extraPadding: 8 },
-    { cls: ".Amount", min: 13, max: 25, align: "right", extraPadding: 8 }
-];
+    { cls: ".Amount", min: 13, max: 25, align: "right", extraPadding: 8 },
 
+    // NEW: Freight logic
+   
+    { cls: ".FromWH", min: 10, max: 25, align: "left" },
+    { cls: ".ToWH", min: 10, max: 25, align: "left" },
+    { cls: ".Freight_ServiceOrder_Number", min: 10, max: 25, align: "left" }
+];
 
 //#endregion
 
@@ -596,7 +603,70 @@ $(document).ready(function () {
     $(document).on("change", "#ItemTable select", function () {
         ResizeColumns();
     });
-  
+
+    // NEW: Qty to Kg conversion
+    $(document).on("input", ".Qty", function () {
+        let row = $(this).closest("tr");
+        CalculateQtyKg(row);
+    });
+
+    $(document).on("change", ".UoM_Number", function () {
+        let row = $(this).closest("tr");
+        let itemNumber = row.find(".Item_Number").val();
+        let fromUnit = $(this).val();
+
+        if (!itemNumber || !fromUnit) return;
+
+        $.ajax({
+            url: '/receiptnote/transactions/receiptnote/get-item-unit-conversion',
+            type: 'GET',
+            data: { itemNumber: itemNumber, fromUnit: fromUnit },
+            success: function (res) {
+                row.find(".FromQty").val(res.fromQty);
+                row.find(".ToQty").val(res.toQty);
+                CalculateQtyKg(row);
+            }
+        });
+    });
+
+    // NEW: Header Freight Applicable toggle
+    function ToggleFreightColumns_RN() {
+        let isFreight = $("#Header_Freight_Applicable").is(":checked");
+
+        if (isFreight) {
+            $(".FreightApplicableHeader, .FreightApplicableCell, .FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell, .FreightSOHeader, .FreightSOCell").show();
+        } else {
+            $(".FreightApplicableHeader, .FreightApplicableCell, .FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell, .FreightSOHeader, .FreightSOCell").hide();
+        }
+    }
+
+    $(document).on("change", "#Header_Freight_Applicable", function () {
+        ToggleFreightColumns_RN();
+    });
+
+    ToggleFreightColumns_RN();
+
+    // NEW: Freight logic
+    $(document).on(
+        "change",
+        ".Freight_Applicable, .Item_Code, .UoM_Number",
+        function () {
+
+            let row = $(this).closest("tr");
+
+            if (row.find(".Freight_Applicable").is(":checked")) {
+
+                BindFreightServiceOrder(
+                    $("#JWC_Number").val(),
+                    row.find(".Item_Number").val(),
+                    row.find(".UoM_Number").val()
+                );
+
+            } else {
+                row.find(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+            }
+        }
+    );
    
 
     $(document).on("focusin", ".Amount", function () {
@@ -952,6 +1022,7 @@ function GetReceiptNoteDTO() {
 
     return dto;
 }
+
 function GetHeader() {
 
     return {
@@ -970,7 +1041,9 @@ function GetHeader() {
 
         Remarks: $("#Remarks").val(),
 
-        WH_Number: $("#WH_Number").val()
+        WH_Number: $("#WH_Number").val(),
+
+        Freight_Applicable: $("#Header_Freight_Applicable").is(":checked") ? "Yes" : "No"
 
     };
 
@@ -1012,6 +1085,7 @@ function GetItemBatches() {
 
     return batches;
 }
+
 function GetItems() {
 
     var items = [];
@@ -1032,9 +1106,17 @@ function GetItems() {
                 WH_Number: row.find(".WH_Number").val(),
                 UoM_Number: row.find(".UoM_Number").val(),
                 Qty: String(row.find(".Qty").attr("data-value") || "0"),
+                Qty_Kg: String(row.find(".Qty_Kg").val() || "0"),
                 UnitPrice: String(row.find(".UnitPrice").attr("data-value") || "0"),
                 Amount: String(row.find(".Amount").attr("data-value") || "0"),
-                IsDeleted: "0"
+                IsDeleted: "0",
+
+                // NEW: Freight logic
+                Freight_Applicable: row.find(".Freight_Applicable").is(":checked") ? "Yes" : "No",
+                Freight_ServiceOrder_Number: row.find(".Freight_ServiceOrder_Number").val() || "",
+                JISVOI_Number_FRT: row.find(".JISVOI_Number_FRT_Row").val() || "0",
+                FromWH: row.find(".FromWH").val() || "",
+                ToWH: row.find(".ToWH").val() || ""
             });
         }
     });
@@ -1054,6 +1136,98 @@ function DateBind() {
     var fp = document.getElementById("RN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
 }
+
+// NEW: Freight logic
+function BindFreightServiceOrder(customerId, itemNumber = null, uomNumber = null) {
+    $(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+    if (!customerId) return;
+    $.get("/receiptnote/transactions/receiptnote/get-freight-service-order",
+        { customerId, prsNumber: FREIGHT_PRS_NUMBER, itemNumber, uomNumber },
+        data => $.each(data, (_, item) => {
+            if (!item.value || item.value === "" || item.value === "0") return;
+
+            $(".Freight_ServiceOrder_Number").append(
+                `<option value="${item.value}" data-jisvoi="${item.jisvoiNumber || 0}">${item.text}</option>`
+            )
+        })
+    );
+}
+
+// NEW: Freight logic — OtherRowsQty(SO) = Σ Qty for rows sharing this Freight SO, excluding current row
+function GetOtherRowsQtyForFreightSO(freightSO, currentRow) {
+    let total = 0;
+
+    $("#TableBody tr.NewRow:visible").each(function () {
+        let row = $(this);
+
+        if (row.is(currentRow)) return;
+        if (row.find(".IsDeleted").val() === "1") return;
+
+        let rowFreightSO = row.find(".Freight_ServiceOrder_Number").val() || 0;
+
+        if (rowFreightSO == freightSO) {
+            total += parseFloat(row.find(".Qty").attr("data-value") || removeCommas(row.find(".Qty").val())) || 0;
+        }
+    });
+
+    return total;
+}
+
+// NEW: Freight logic — Qty Allowed check against Freight SO
+function CheckFreightQtyExceeded(row) {
+
+    let freightSO = row.find(".Freight_ServiceOrder_Number").val();
+    if (!freightSO || freightSO === "0") return;
+
+    let itemNumber = row.find(".Item_Number").val();
+    let uomNumber = row.find(".UoM_Number").val();
+    let originalQty = parseFloat(row.find(".Qty").attr("data-value") || removeCommas(row.find(".Qty").val())) || 0;
+
+    $.get("/receiptnote/transactions/receiptnote/check-delivered-qty-exceeded-freight", {
+        jisvohNumber: freightSO,
+        prsNumber: FREIGHT_PRS_NUMBER,
+        itemNumber,
+        uomNumber
+    }, function (res) {
+
+        if (!res || res.length === 0) return;
+
+        let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+        let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
+
+        // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(Freight SO)
+        let otherRowsQty = GetOtherRowsQtyForFreightSO(freightSO, row);
+        let realDeliveredQty = deliveredQty + otherRowsQty;
+
+        // FORMULA: IsExceeded  <=>  (RealDeliveredQty + CurrentQty) > SVO_Qty
+        if ((realDeliveredQty + originalQty) > jisvoiQty) {
+
+            // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
+            alert("Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty));
+            setTimeout(function () {
+                row.find(".Qty").focus().select();
+                row.find(".Freight_ServiceOrder_Number").val("0");
+            }, 300);
+        }
+    });
+}
+
+$(document).on("change", ".Freight_ServiceOrder_Number", function () {
+
+    let row = $(this).closest("tr");
+    let selectedJisvoi = $(this).find("option:selected").attr("data-jisvoi") || 0;
+
+    row.find(".JISVOI_Number_FRT_Row").val(selectedJisvoi);
+
+    CheckFreightQtyExceeded(row);
+});
+
+
+$(document).on("focusout", ".Qty", function () {
+    CheckFreightQtyExceeded($(this).closest("tr"));
+});
+
+//#region Receipt Note Number
 
 //#region Receipt Note Number
 $(document).on("change", "#RN_Date", function () {
@@ -1219,6 +1393,27 @@ function validateItemGrid_RN() {
             showAlert("Qty is required.", row.find(".Qty"));
             isValid = false;
             return false;
+        }
+
+        // NEW: Freight Applicable - From WH / To WH mandatory
+        if (row.find(".Freight_Applicable").is(":checked")) {
+
+            let fromWH = row.find(".FromWH").val();
+            let toWH = row.find(".ToWH").val();
+
+            if (!fromWH || fromWH.trim() === "" || fromWH === "0") {
+
+                showAlert("From WH is required.", row.find(".FromWH"));
+                isValid = false;
+                return false;
+            }
+
+            if (!toWH || toWH.trim() === "" || toWH === "0") {
+
+                showAlert("To WH is required.", row.find(".ToWH"));
+                isValid = false;
+                return false;
+            }
         }
 
     });
@@ -1600,6 +1795,16 @@ function calculateTotal_rn() {
 
 //#endregion Calculate Total
 
+function CalculateQtyKg(row) {
+    let qty = parseFloat((row.find(".Qty").val() || "0").replace(/,/g, "")) || 0;
+    let fromQty = parseFloat(row.find(".FromQty").val()) || 0;
+    let toQty = parseFloat(row.find(".ToQty").val()) || 0;
+
+    let qtyKg = fromQty > 0 ? (qty * (toQty / fromQty)) : 0;
+
+    row.find(".Qty_Kg").val(qtyKg === 0 ? "" : qtyKg.toFixed(2));
+}
+
 //#region item grid fetch item details
 function OnInput(inputElement) {
     searchItemJIDNI(inputElement);
@@ -1696,6 +1901,18 @@ function searchItemJIDNI(inputElement) {
 
                         row.find(".UoM_Number").val(item.uoM);
                         row.find(".WH_Number").val(item.saleWarehouse);
+
+                        // NEW: Qty to Kg conversion - fetch FromQty/ToQty
+                        $.ajax({
+                            url: '/receiptnote/transactions/receiptnote/get-item-unit-conversion',
+                            type: 'GET',
+                            data: { itemNumber: item.itemNumber, fromUnit: item.uoM },
+                            success: function (res) {
+                                row.find(".FromQty").val(res.fromQty);
+                                row.find(".ToQty").val(res.toQty);
+                                CalculateQtyKg(row);
+                            }
+                        });
 
                         let qtyInput = row.find(".Qty");
                         let qtyUnitprice = row.find(".UnitPrice");
@@ -1880,43 +2097,9 @@ function SearchBuyer(inputElement) {
 
                     var row = $("<tr></tr>").css("height", "24px");
                     row.data("customer", cust);
-                    row.append("<td>" + cust.cuS_Name + "</td>");
-                  
-                    //row.on("click", function () {
-
-                    //    $("#BuyerMessage").hide().text("");
-                    //    const clickedCust = $(this).data("customer");
-
-                    //    $("#JWC_Name").val(clickedCust.cuS_Name);
-                    //    $("#JWC_Number").val(clickedCust.cuS_Number);
-
-                    //    // Currency
-                    //    $("#Currency_Name").val(clickedCust.cuS_CUR_Name);
-                    //    $("#Currency_Number").val(clickedCust.cuS_CUR_Number);
-
-                    //    // Warehouse
-                    //    $("#WH_Number").val(clickedCust.cuS_WH_Number);
-                    //    $("#RightPane")
-                    //        .removeClass("show")
-                    //        .find(".buyer-search-results")
-                    //        .hide()
-                    //        .empty();
-                    //    setTimeout(function () {
-                    //        $("#Currency_Name").focus();
-                    //    }, 100);
-                      
-                       
-                    
-                    //    //$(document).trigger("click");
-                    //    //setTimeout(function () {
-                    //    //    isMouseSelectingBuyer = false;
-                    //    //}, 100);
-                    
-                     
-                    //});
-                    table.find("tbody").append(row);
-
-              
+                    row.append("<td>" + cust.cuS_Name + "</td>");                 
+                   
+                    table.find("tbody").append(row);              
 
                 });
                 // List box – click or Enter: select record → move to textbox
@@ -1973,7 +2156,7 @@ function SearchBuyer(inputElement) {
         box-sizing:border-box;">
 </div>
 `);
-                // Keyboard Navigation
+             
                 //#region search logic highlight
 
                 // Store all rows

@@ -145,6 +145,12 @@ namespace ERP_DTO.JobInwardTransaction
         public string JISVOI_Item_Code { get; set; }
         [Display(Name = "Material Seggregation")]
         public long? JISVOH_MS_Number { get; set; }
+
+        [Display(Name = "Category")]
+        public string JISVOH_Category { get; set; } = "DELIVERY NOTE";
+
+        [Display(Name = "Freight Service Order")]
+        public string? JISVOH_Freight_Applicable { get; set; }
     }
     public class JI_ServiceOrder_DTO
     {
@@ -171,6 +177,8 @@ namespace ERP_DTO.JobInwardTransaction
         public string JISVOI_ItemGroup { get; set; }
 
         public long JISVOI_WH_Number { get; set; }
+        public long? JISVOI_FromWH { get; set; }
+        public long? JISVOI_ToWH { get; set; }
         public long JISVOI_UoM_Number { get; set; }
 
         public double JISVOI_Qty { get; set; }
@@ -180,5 +188,7 @@ namespace ERP_DTO.JobInwardTransaction
         public DateTime? JISVOI_DeliveryDate { get; set; }
 
         public bool JISVOI_IsDeleted { get; set; }
+
+        public string JISVOI_Category { get; set; }
     }
 }

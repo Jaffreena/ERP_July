@@ -728,19 +728,29 @@ namespace ERP.Controllers.JobworkInward
             Double Pages = Convert.ToDouble(Record) / Convert.ToDouble(DPageSize);
             Int32 PageCounts = Convert.ToInt32(Math.Ceiling(Pages));
 
-            ViewBag.SumOfItem = Key.Sum(item => Convert.ToDouble(item.RN_NoOfItem));
-            ViewBag.SumOfQty = Key.Sum(item => Convert.ToDouble(item.RN_Qty));
-            ViewBag.SumOfMatrialValue = Key.Sum(item => Convert.ToDouble(item.RN_MaterialValue));
-         //  ViewBag.SumOfItemIncome = Key.Sum(item => Convert.ToDouble(item.RN_TotalItemIncome));
-          //  ViewBag.SumOfHeadIncome = Key.Sum(item => Convert.ToDouble(item.RN_TotalHeadIncome));
-            ViewBag.SumOfAmount = Key.Sum(item => Convert.ToDouble(item.RN_TotalAmount));
-            ViewBag.SumOfItemGst = Key.Sum(item => Convert.ToDouble(item.RN_ItemGST_Amount));
-            ViewBag.SumOfHeadGst = Key.Sum(item => Convert.ToDouble(item.RN_HeadGST_Amount));
-            ViewBag.SumOfInvoice = Key.Sum(item => Convert.ToDouble(item.RN_InvoiceAmount));
-            ViewBag.SumOfItemWHT = Key.Sum(item => Convert.ToDouble(item.RN_ItemWHT_Amount));
-            ViewBag.SumOfHeadWHT = Key.Sum(item => Convert.ToDouble(item.RN_HeadWHT_Amount));
-            ViewBag.SumOfRound = Key.Sum(item => Convert.ToDouble(item.RN_RoundOff));
-         //   ViewBag.SumOfReceivable = Key.Sum(item => Convert.ToDouble(item.RN_BuyerReceivable));
+            ViewBag.SumOfItem = Key.Sum(item =>
+  string.IsNullOrWhiteSpace(item.RN_NoOfItem) ? 0 : Convert.ToDouble(item.RN_NoOfItem));
+            ViewBag.SumOfQty = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_Qty) ? 0 : Convert.ToDouble(item.RN_Qty));
+            ViewBag.SumOfMatrialValue = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_MaterialValue) ? 0 : Convert.ToDouble(item.RN_MaterialValue));
+            //  ViewBag.SumOfItemIncome = Key.Sum(item => Convert.ToDouble(item.RN_TotalItemIncome));
+            //  ViewBag.SumOfHeadIncome = Key.Sum(item => Convert.ToDouble(item.RN_TotalHeadIncome));
+            ViewBag.SumOfAmount = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_TotalAmount) ? 0 : Convert.ToDouble(item.RN_TotalAmount));
+            ViewBag.SumOfItemGst = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_ItemGST_Amount) ? 0 : Convert.ToDouble(item.RN_ItemGST_Amount));
+            ViewBag.SumOfHeadGst = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_HeadGST_Amount) ? 0 : Convert.ToDouble(item.RN_HeadGST_Amount));
+            ViewBag.SumOfInvoice = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_InvoiceAmount) ? 0 : Convert.ToDouble(item.RN_InvoiceAmount));
+            ViewBag.SumOfItemWHT = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_ItemWHT_Amount) ? 0 : Convert.ToDouble(item.RN_ItemWHT_Amount));
+            ViewBag.SumOfHeadWHT = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_HeadWHT_Amount) ? 0 : Convert.ToDouble(item.RN_HeadWHT_Amount));
+            ViewBag.SumOfRound = Key.Sum(item =>
+       string.IsNullOrWhiteSpace(item.RN_RoundOff) ? 0 : Convert.ToDouble(item.RN_RoundOff));
+            //   ViewBag.SumOfReceivable = Key.Sum(item => Convert.ToDouble(item.RN_BuyerReceivable));
 
             ViewBag.Page = Help.PageSize(PSize.ToString());
             ViewData["PageNumber"] = DPageNumber;

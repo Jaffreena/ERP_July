@@ -51,13 +51,18 @@ namespace ERP_DAO.JobInwardTransaction
             return db.ExecuteDataSet(cmd);
         }
 
-        public DataSet GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber)
+        public DataSet GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber, long? JISVIH_Number = null)
         {
             Database db = new SqlDatabase(DB.Connection());
             DbCommand cmd = db.GetStoredProcCommand("JI_GetDeliveryNote_GroupItem_SP");
 
             db.AddInParameter(cmd, "@CustomerNumber", DbType.Int64, CustomerNumber);
             db.AddInParameter(cmd, "@MSNumber", DbType.Int64, MSNumber);
+
+            // NEW: NULL in Create mode (formula unaffected), actual invoice
+            // number in Edit mode (adds back this invoice's own consumption)
+            db.AddInParameter(cmd, "@JISVIH_Number", DbType.Int64,
+                JISVIH_Number.HasValue ? (object)JISVIH_Number.Value : DBNull.Value);
 
             return db.ExecuteDataSet(cmd);
         }
@@ -450,6 +455,7 @@ namespace ERP_DAO.JobInwardTransaction
             dt.Columns.Add("JISVII_Amount", typeof(double));
             dt.Columns.Add("JISVII_SAC_Number", typeof(long));
             dt.Columns.Add("JISVII_GST_Amount", typeof(double));
+            dt.Columns.Add("JISVII_SO_Assign", typeof(string)); // NEW
 
             foreach (var item in Invoice_DTO.Items)
             {
@@ -468,6 +474,7 @@ namespace ERP_DAO.JobInwardTransaction
                     , item.JISVII_Amount
                     , item.JISVII_SAC_Number
                     , item.JISVII_GST_Amount
+                    , item.JISVII_SO_Assign    // NEW
                 );
             }
 
@@ -790,6 +797,7 @@ namespace ERP_DAO.JobInwardTransaction
             dt.Columns.Add("JISVII_Amount", typeof(decimal));       // 12
             dt.Columns.Add("JISVII_SAC_Number", typeof(long));      // 13
             dt.Columns.Add("JISVII_GST_Amount", typeof(decimal));   // 14
+            dt.Columns.Add("JISVII_SO_Assign", typeof(string));     // 15 NEW
 
             foreach (var item in DN_DTO.Items)
             {
@@ -807,7 +815,8 @@ namespace ERP_DAO.JobInwardTransaction
                     item.JISVII_UnitPrice,         // 11
                     item.JISVII_Amount,            // 12
                     item.JISVII_SAC_Number,        // 13
-                    item.JISVII_GST_Amount         // 14
+                    item.JISVII_GST_Amount,        // 14
+                    item.JISVII_SO_Assign          // 15 NEW
                 );
             }
 

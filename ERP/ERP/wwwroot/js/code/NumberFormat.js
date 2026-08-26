@@ -1,4 +1,15 @@
-﻿function formatIndianQty(amount) {
+﻿function SanitizeNumericInput(el) {
+    let val = el.value;
+
+    val = val.replace(/[^0-9]/g, '');           // digits only, no dot/minus/letters/symbols
+    val = val.replace(/^0+(?=\d)/, '');          // drop leading zeros (e.g. "07" -> "7")
+
+    if (val !== el.value) {
+        el.value = val;
+    }
+}
+
+function formatIndianQty(amount) {
     if (amount == null || amount == "" || isNaN(amount))
         return "0";
 

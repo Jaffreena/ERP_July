@@ -147,6 +147,7 @@
 .match-row td{
     color:blue !important;
     font-weight:600;
+    
 }
 
 .current-row td{
@@ -607,8 +608,17 @@
 
                                         </div>
                                     </div>
+
+                                    <div class="row align-items-center gx-2">
+                                        <label class="col-sm-4 col-lg-2 col-form-label ps-0">Freight Applicable</label>
+                                        <div class="col-sm-7 col-lg-5">
+                                            <input type="checkbox"
+                                                   id="Header_Freight_Applicable"
+                                                   class="form-check-input" />
+                                        </div>
+                                    </div>
+
                                 
-          
                                 </div>
                                 
                                 
@@ -738,12 +748,29 @@
                                                                 @Html.DisplayNameFor(m => m.Items.First().Qty)
                                                             </th>
 
+                                                            <th class="Qty_Kg">
+                                                                Qty (Kg)
+                                                            </th>
+
                                                             <th class="UnitPrice">
                                                                 @Html.DisplayNameFor(m => m.Items.First().UnitPrice)
                                                             </th>
 
                                                             <th class="Amount">
                                                                 @Html.DisplayNameFor(m => m.Items.First().Amount)
+                                                            </th>
+
+                                                            <th class="table-width-md text-center FreightApplicableHeader">
+                                                                Freight Applicable
+                                                            </th>
+                                                            <th class="FromWHHeader">
+                                                                From WH
+                                                            </th>
+                                                            <th class="ToWHHeader">
+                                                                To WH
+                                                            </th>
+                                                            <th class="FreightSOHeader">
+                                                                Freight SO No.
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -789,6 +816,12 @@
                                                             </td>
 
                                                             <td>
+                                                                <input class="form-control Qty_Kg text-center" readonly />
+                                                                <input type="hidden" class="FromQty" />
+                                                                <input type="hidden" class="ToQty" />
+                                                            </td>
+
+                                                            <td>
                                                                 <input class="form-control UnitPrice text-end" />
                                                             </td>
 
@@ -796,7 +829,36 @@
                                                                 <input class="form-control Amount text-end" readonly />
                                                                 <input type="hidden" class="IsDeleted" value="0" />
                                                             </td>
+
+                                                            <!-- FREIGHT APPLICABLE -->
+                                                            <td class="text-center p-2 FreightApplicableCell">
+                                                                <input type="checkbox" class="form-check-input Freight_Applicable" />
+                                                            </td>
+
+                                                            <!-- FROM WH -->
+                                                            <td class="FromWHCell">
+                                                                <select class="form-select FromWH" asp-items="@ViewBag.Warehouse">
+                                                                    <option value=""></option>
+                                                                </select>
+                                                            </td>
+
+                                                            <!-- TO WH -->
+                                                            <td class="ToWHCell">
+                                                                <select class="form-select ToWH" asp-items="@ViewBag.Warehouse">
+                                                                    <option value=""></option>
+                                                                </select>
+                                                            </td>
+
+                                                            <!-- FREIGHT NO -->
+                                                            <td class="FreightSOCell">
+                                                                <select class="form-select Freight_ServiceOrder_Number">
+                                                                    <option value="0"></option>
+                                                                </select>
+                                                                <input type="hidden" class="JISVOI_Number_FRT_Row" value="0" />
+                                                            </td>
                                                         </tr>
+
+                                                        <!-- 🔹 EXISTING DATA -->
 
                                                         <!-- 🔹 EXISTING DATA -->
                                                         @if (Model != null)
@@ -900,6 +962,14 @@
                                                                     </td>
 
                                                                     <td>
+                                                                        <input name="Items[@i].Qty_Kg"
+                                                                               class="form-control Qty_Kg text-center"
+                                                                               value="@Model.Items[i].Qty_Kg" readonly />
+                                                                        <input type="hidden" class="FromQty" />
+                                                                        <input type="hidden" class="ToQty" />
+                                                                    </td>
+
+                                                                    <td>
                                                                         <input name="Items[@i].UnitPrice"
                                                                                class="form-control UnitPrice text-end"
                                                                                value="@Model.Items[i].UnitPrice" />
@@ -916,12 +986,63 @@
                                                                                value="@Model.Items[i].IsDeleted" />
                                                                     </td>
 
+                                                                    <!-- FREIGHT APPLICABLE -->
+                                                                    <td class="text-center p-2 FreightApplicableCell">
+                                                                        <input type="checkbox"
+                                                                               name="Items[@i].Freight_Applicable"
+                                                                               class="form-check-input Freight_Applicable"
+                                                                               value="Yes"
+                                                                               checked="@(Model.Items[i].Freight_Applicable == "Yes")" />
+                                                                    </td>
+
+                                                                    <!-- FROM WH -->
+                                                                    <td class="FromWHCell">
+                                                                        <select name="Items[@i].FromWH" class="form-select FromWH">
+                                                                            <option value=""></option>
+                                                                            @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
+                                                                            {
+                                                                                <option value="@w.Value"
+                                                                                        selected="@(w.Value == Model.Items[i].FromWH)">
+                                                                                    @w.Text
+                                                                                </option>
+                                                                            }
+                                                                        </select>
+                                                                    </td>
+
+                                                                    <!-- TO WH -->
+                                                                    <td class="ToWHCell">
+                                                                        <select name="Items[@i].ToWH" class="form-select ToWH">
+                                                                            <option value=""></option>
+                                                                            @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
+                                                                            {
+                                                                                <option value="@w.Value"
+                                                                                        selected="@(w.Value == Model.Items[i].ToWH)">
+                                                                                    @w.Text
+                                                                                </option>
+                                                                            }
+                                                                        </select>
+                                                                    </td>
+
+                                                                    <!-- FREIGHT NO -->
+                                                                    <td class="FreightSOCell">
+                                                                        <select name="Items[@i].Freight_ServiceOrder_Number"
+                                                                                class="form-select Freight_ServiceOrder_Number">
+                                                                            <option value="0"></option>
+                                                                            @if (!string.IsNullOrEmpty(Model.Items[i].Freight_ServiceOrder_Number) && Model.Items[i].Freight_ServiceOrder_Number != "0")
+                                                                            {
+                                                                                <option value="@Model.Items[i].Freight_ServiceOrder_Number" selected>
+                                                                                    @Model.Items[i].Freight_ServiceOrder_Number
+                                                                                </option>
+                                                                            }
+                                                                        </select>
+                                                                        <input type="hidden" class="JISVOI_Number_FRT_Row" value="@Model.Items[i].JISVOI_Number_FRT" />
+                                                                    </td>
+
                                                                 </tr>
                                                             }
                                                         }
 
                                                     </tbody>
-
                                                     <!-- ================= FOOTER ================= -->
                                                     <tfoot>
                                                         <tr class="table-info">
@@ -933,6 +1054,8 @@
                                                             <td>
                                                                 <input id="TotalAmount" style="text-align:right" class="form-control text-end" readonly />
                                                             </td>
+                                                            <td></td>
+                                                           
                                                         </tr>
                                                     </tfoot>
 

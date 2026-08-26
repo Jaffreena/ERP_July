@@ -1136,11 +1136,14 @@
                                                                                 <th>Warehouse</th>
                                                             <th class="text-center">UOM</th>
                                                                                 <th>Original Qty</th>
+                                                            <th>Invoiced Qty</th>
                                                                                 <th>Amend Qty</th>
                                                                                 <th>Unit Price</th>
                                                                                 <th>Amount</th>
-                                                                                <th> JI</th>
+                                                                                <th> JWI Applicable</th>
                                                                                 <th>Service Order No</th>
+                                                            <th class="text-center">Freight Applicable</th>
+                                                            <th>Freight No</th>
                                                                             </tr>
 
                                                                         </thead>
@@ -1268,23 +1271,34 @@
 
                                                                                     </td>
 
-                                                                                    <!-- QTY -->
-                                                                                    <td>
+                                                                <!-- QTY -->
+                                                                <td>
 
-                                                                                        <input asp-for="Items[i].JIDNI_Qty"
-                                                                                               autocomplete="off" readonly
-                                                                                               class="form-control JIDNI_OriginalQty" />
+                                                                    <input asp-for="Items[i].JIDNI_Qty"
+                                                                           autocomplete="off" readonly
+                                                                           class="form-control JIDNI_OriginalQty" />
 
-                                                                                    </td>
-                                                
-                                                                                    <!-- QTY -->
-                                                                                    <td>
+                                                                </td>
 
-                                                                                        <input asp-for="Items[i].JIDNI_Qty"
-                                                                                               autocomplete="off"
-                                                                                               class="form-control JIDNI_Qty" />
+                                                                
+                                                                <!-- INVOICED QTY -->
+                                                                <td>
 
-                                                                                    </td>
+                                                                    <input type="text"
+                                                                           value="@Model.Items[i].JIDNI_Qty"
+                                                                           autocomplete="off" readonly
+                                                                           class="form-control JIDNI_InvoicedQty text-end" />
+
+                                                                </td>
+                                            
+                                                                <!-- QTY -->
+                                                                <td>
+
+                                                                    <input asp-for="Items[i].JIDNI_Qty"
+                                                                           autocomplete="off"
+                                                                           class="form-control JIDNI_Qty" />
+
+                                                                </td>
                                                                                     <!-- PRICE -->
                                                                                     <td>
 
@@ -1319,15 +1333,33 @@
                                                                                                class="JIDNI_IsDeleted" />
 
                                                                                     </td>
-                                                                                    <!-- SO Dropdown -->
-                                                                                    <td>
-                                                                                        <select asp-for="Items[i].JISVOH_Number"
-                                                                                                class="form-select JISVOH_Number"
-                                                                                              
-                                                                                                asp-items="@ViewBag.SON">
-                                                                                        </select>
-                                                                                    </td>
-
+                                                                <!-- SO Dropdown -->
+                                                                <td>
+                                                                    <select asp-for="Items[i].JISVOH_Number"
+                                                                            class="form-select JISVOH_Number"
+                                                                            asp-items="@ViewBag.SON">
+                                                                    </select>
+                                                                    <!-- NEW: SO Item ID -->
+                                                                    <input type="hidden" asp-for="Items[i].JISVOI_Number" class="JISVOI_Number_Row" />
+                                                                </td>
+                                                                <!-- FREIGHT APPLICABLE -->
+                                                                <td class="text-center p-2">
+                                                                    <input type="checkbox"
+                                                                           class="form-check-input Freight_Applicable"
+                                                                    @(Model.Items[i].Freight_Applicable == "Yes" ? "checked" : "") />
+                                                                    <input asp-for="Items[i].Freight_Applicable"
+                                                                           type="hidden"
+                                                                           class="Freight_Applicable_Value" />
+                                                                </td>
+                                                                <!-- FREIGHT NO -->
+                                                                   <td>
+        <select class="form-select Freight_ServiceOrder_Number"
+                name="Items[@i].Freight_ServiceOrder_Number"
+                data-saved-value="@Model.Items[i].Freight_ServiceOrder_Number">
+        </select>
+        
+        <input type="hidden" asp-for="Items[i].JISVOI_Number_FRT" class="JISVOI_Number_FRT_Row" />
+    </td>
                                                                                 </tr>
                                                                             }
 
@@ -1346,7 +1378,9 @@
                                                             </td>
                                                             
                                                               <td></td>
+                                                            <td></td>   
                                                             <td></td>
+
                                                         </tr>
                                                     </tfoot>
                                                                     </table>

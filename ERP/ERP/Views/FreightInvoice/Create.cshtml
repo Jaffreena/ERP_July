@@ -1,0 +1,1109 @@
+﻿@model ERP_DTO.JobInwardTransaction.FreightInvoiceCreate_DTO
+@{
+    ViewData["Title"] = "Freight Invoice Create";
+}
+<style>
+
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
+
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
+
+<style>
+    #RightPane {
+        position: fixed;
+        top: 80px;
+        bottom: 0; /* Touch bottom of viewport */
+        /* Hidden position */
+        right: calc(-(50ch +4px));
+        /* 50ch content + padding + border */
+        width: calc(50ch + 4px);
+        background: #c6e0e7;
+        border: 1px solid #6c757d;
+        box-sizing: border-box;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 9999;
+        transition: right .25s ease, opacity .25s ease;
+    }
+
+        #RightPane.show {
+            right: calc(2px);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #RightPane .p-2 {
+            padding: 0 !important; /* Remove Bootstrap padding */
+            margin: 0 !important;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        #RightPane .buyer-search-results {
+            background: #c6e0e7;
+            margin-left: -2px !important;
+            width: 50ch !important;
+            min-width: 50ch !important;
+            max-width: 50ch !important;
+            height: auto !important;
+            min-height: 100% !important;
+            max-height: none !important;
+            overflow: visible !important;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+            box-sizing: border-box !important;
+        }
+
+         
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td {
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                vertical-align: top;
+            }
+
+            #RightPane .buyer-search-results table,
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td,
+            #RightPane .buyer-search-results tr {
+                border: none !important;
+            }
+
+            #RightPane .buyer-search-results table {
+                width: 100%;
+                table-layout: fixed;
+                border-collapse: collapse;
+                margin-left: -2px !important;
+            }
+</style>
+<!-----search logic highlight---->
+
+<style>
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
+
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
+<style>
+    .batchPopup thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+</style>
+<style>
+
+    .jwcustomer-search-results {
+        width: 500px !important;
+        max-width: 600px;
+    }
+
+    /* Equal spacing for all form rows */
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    /* Labels */
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+    }
+
+    /* Input containers */
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Column 1 (Label = col-md-3, Input = col-md-7) */
+    .row > .col-md-3.col-form-label {
+        flex: 0 0 30%;
+        max-width: 30%;
+    }
+
+    .row > .col-md-7 {
+        flex: 0 0 70%;
+        max-width: 70%;
+    }
+
+    /* Column 2 (Label = col-sm-4, Input = col-sm-7) */
+    .row > .col-sm-4.col-form-label {
+        flex: 0 0 35%;
+        max-width: 35%;
+    }
+
+        .row > .col-sm-4.col-form-label + .col-sm-7 {
+            flex: 0 0 65%;
+            max-width: 65%;
+        }
+
+    /* Inputs, Selects & Textarea */
+    .form-control,
+    .flatpickr-input,
+    .form-select,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        resize: vertical;
+        overflow: auto;
+    }
+
+    /* Textarea */
+    textarea.form-control {
+        min-height: 60px !important;
+    }
+
+    /* Invoice No */
+   
+
+    /* Invoice Date (Flatpickr) */
+    #Header_FRTIH_InvoiceDate,
+    #Header_FRTIH_InvoiceDate + input,
+    input.flatpickr-input.form-control {
+        width: 15ch !important;
+        max-width: 15ch !important;
+        padding-right: 30px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px 16px;
+        cursor: pointer;
+    }
+
+ 
+
+    /* Job Work Customer */
+    #Header_FRTIH_JW_Customer_Name {
+      
+        padding-right: 24px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+    }
+
+    /* Hidden Customer Number */
+    #Header_FRTIH_JW_Customer_Number {
+        display: none;
+    }
+ 
+ 
+
+  
+</style>
+
+
+<form asp-action="FreightInvoiceCreate" method="post" id="FreightInvoiceCreateForm">
+    <!-- GST Popup -->
+    <div class="modal modal-lg fade" id="GSTView" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title">GST</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs tab-header">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page">Overview</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content tab-body tab-body-h-o">
+                        <div class="tab-pane fade show active p-2 border border-top-0 h-100" tabindex="0">
+                            <div class="row h-100">
+                                <div id="GSTTableView" class="w-100 table-responsive"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Note Popup -->
+    <div class="modal modal-lg fade"
+         id="DNView"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="DNViewLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <p class="modal-title" id="DNViewLabel">
+                        Delivery Note
+                    </p>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <ul class="nav nav-tabs tab-header">
+
+                        <li class="nav-item">
+
+                            <a class="nav-link active"
+                                   aria-current="page">
+                                Overview
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                    <div class="tab-content tab-body tab-body-h-o">
+
+                        <div class="tab-pane fade show active p-2 border border-top-0 h-100"
+                             tabindex="0">
+
+                            <div class="row h-100">
+
+                                <div id="DeliveryNoteTableView"
+                                     class="w-100 table-responsive">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Receipt Note Popup -->
+    <div class="modal modal-lg fade"
+         id="RNView"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="RNViewLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <p class="modal-title" id="RNViewLabel">
+                        Receipt Note
+                    </p>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <ul class="nav nav-tabs tab-header">
+
+                        <li class="nav-item">
+
+                            <a class="nav-link active"
+                                   aria-current="page">
+                                Overview
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                    <div class="tab-content tab-body tab-body-h-o">
+
+                        <div class="tab-pane fade show active p-2 border border-top-0 h-100"
+                             tabindex="0">
+
+                            <div class="row h-100">
+
+                                <div id="ReceiptNoteTableView"
+                                     class="w-100 table-responsive">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Alert Popup -->
+    <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header draggable-modal-header">
+                    <p class="modal-title mb-0">Warning</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body py-4 text-dark fs-6 text-center">
+                    <img src="~/img/danger.png" class="img-fluid mb-2" />
+                    <div id="AlertMessage">@Html.Raw(ViewBag.ErrorMessage)</div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-4" id="AlertOkay" data-bs-dismiss="modal">Ok</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Address Popup -->
+    <div class="modal modal-lg modal-xl fade"
+         id="BuyerAddress"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <p class="modal-title">Address</p>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs tab-header" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active"
+                                    id="overview-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#overview-tab-pane"
+                                    type="button"
+                                    role="tab">
+                                Overview
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content tab-body">
+
+                        <div class="tab-pane fade show active p-2 border border-top-0 h-100"
+                             id="overview-tab-pane"
+                             role="tabpanel">
+
+                            <table class="table table-bordered table-hover mb-0"
+                                   id="AddressTable">
+
+                                <thead>
+                                    <tr class="table-info">
+                                        <th>Type</th>
+                                        <th>Address ID</th>
+                                        <th style="width:auto; min-width:300px; max-width:500px;">
+                                            Address
+                                        </th>
+                                        <th>City</th>
+                                        <th>State</th>
+                                        <th>Country</th>
+                                        <th>PIN</th>
+                                        <th>GSTIN</th>
+                                        <th style="text-align:center">Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="AddTableBody">
+
+                                    <!-- 🔥 TEMPLATE ROW (USED FOR CLONE ONLY) -->
+                                    <tr id="AddTempRow" style="display:none">
+
+                                        <td>
+                                            <select class="form-select JIDNA_ADTP_Number"
+                                                    asp-items="@ViewBag.AddressType"></select>
+                                        </td>
+
+                                        <td>
+                                            <select class="form-select JIDNA_Address_ID"
+                                                    asp-items="@ViewBag.AddressID"></select>
+                                        </td>
+
+                                        <td>
+                                            <div class="form-control JIDNA_Address"></div>
+                                        </td>
+
+                                        <td>
+                                            <input class="form-control JIDNA_City" readonly>
+                                        </td>
+
+                                        <td>
+                                            <input class="form-control JIDNA_State" readonly>
+                                        </td>
+
+                                        <td>
+                                            <input class="form-control JIDNA_Country" readonly>
+                                        </td>
+
+                                        <td>
+                                            <input class="form-control JIDNA_PIN" readonly>
+                                        </td>
+
+                                        <td>
+                                            <input class="form-control JIDNA_GSTIN" readonly>
+                                        </td>
+
+                                        <td class="text-center align-middle">
+                                            <input type="hidden" class="JIDNA_Number" value="0">
+                                            <input type="hidden" class="JIDNA_IsDeleted" value="0">
+
+                                            <a class="AddRowRemove text-danger"
+                                                   title="Delete"
+                                                   style="cursor:pointer;">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer justify-content-between">
+
+                    <button type="button"
+                            id="AddressAddButton"
+                            class="btn btn-primary">
+                        Add Row
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary px-4"
+                            data-bs-dismiss="modal"
+                            autofocus>
+                        OK
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+  
+
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Freight Invoice
+                <a asp-controller="JobworkInward" asp-action="Index" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- item grid in body -->
+    <div class="row panel-body gx-2">
+
+        <div class="col-12 panel-card-fixed h-100">
+
+            <div class="w-100 rounded-0 h-100 border border-primary bg-transparent"
+                 id="BodyHeight">
+
+                <!-- HEADER -->  <!-- HEADER -->
+                <div class="card rounded-0 bg-transparent shadow-none"
+                     id="CardHeader">
+
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
+                       
+                        
+                        <div class="row">
+
+                        
+
+                    
+                            <div class="col-auto left-menu text-black">
+                                 
+                                <div class="row ">
+
+                                    <!-- COLUMN 1 -->
+                                    <div class="col-12 col-md-4">
+
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_InvoiceNo"
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-md-6 col-lg-7">
+
+                                                <input asp-for="Header.FRTIH_InvoiceNo"
+                                                       class="form-control Key KeyDup" maxlength="25"
+                                                       autocomplete="off" />
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_InvoiceDate"
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-md-6 col-lg-7">
+
+                                                <input asp-for="Header.FRTIH_InvoiceDate" type="date"
+                                                       class="form-control Key datepicker"
+                                                       autocomplete="off" />
+
+                                            </div>
+
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_MS_Number"
+                                                   class="col-md-3 col-lg-3 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-md-6 col-lg-7">
+
+                                                <select asp-for="Header.FRTIH_MS_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.MaterialSegregation">
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label class="col-md-3 col-lg-3 col-form-label ps-0">
+                                                Category
+                                            </label>
+
+                                            <div class="col-md-6 col-lg-7">
+
+                                                <select id="Header_SourceCategory"
+                                                        class="form-select">
+                                                    <option value="DN" selected>Delivery Note</option>
+                                                    <option value="RN">Receipt Note</option>
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+
+ 
+                                    </div>
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-4" >
+                                        
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_JW_Customer_Number"
+                                                   class="col-sm-4  col-lg-3 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-sm-7 col-lg-7">
+
+                                                <!-- HIDDEN VALUE -->
+                                                <input asp-for="Header.FRTIH_JW_Customer_Number"
+                                                       type="hidden"
+                                                       class="form-control" />
+
+                                                <!-- DISPLAY TEXT -->
+                                                <input asp-for="Header.FRTIH_JW_Customer_Name"
+                                                       class="form-control"
+                                                       autocomplete="off"
+                                                       onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                       oninput="OnBuyerInput(this)" />
+
+                                                
+
+                                            </div>
+
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_Currency_Number"
+                                                   class="col-sm-4  col-lg-3 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-sm-7 col-lg-7">
+
+                                                <select asp-for="Header.FRTIH_Currency_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.Currency">
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_TCT_Number"
+                                                   class="col-sm-4 col-lg-3 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-sm-7 col-lg-7">
+
+                                                <select asp-for="Header.FRTIH_TCT_Number"
+                                                        class="form-select">
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+
+                                    
+                                    </div>
+
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3">
+
+                                  
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_PaymentTerms"
+                                                   class="col-sm-4 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-sm-7">
+
+                                                <input asp-for="Header.FRTIH_PaymentTerms"
+                                                       class="form-control" maxlength="50"
+                                                       autocomplete="off" />
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_PaymentMethod"
+                                                   class="col-sm-4 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-sm-7">
+
+                                                <input asp-for="Header.FRTIH_PaymentMethod"
+                                                       class="form-control" maxlength="50"
+                                                       autocomplete="off" />
+
+                                            </div>
+
+                                        </div>
+
+                                 
+
+                                        <div class="row align-items-center gx-2 mb-0">
+
+                                            <label asp-for="Header.FRTIH_Remarks" class="col-sm-4 col-form-label ps-0">
+                                            </label>
+
+                                            <div class="col-sm-7">
+
+                                                <textarea asp-for="Header.FRTIH_Remarks" class="form-control" maxlength="250"
+                                                          ></textarea>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-auto right-menu text-center border-start">
+
+                              
+                                <input id="btnSave"
+                                       name="Mode"
+                                       value="Save"
+                                       class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+
+                                <a asp-controller="FreightInvoice"
+                                       asp-action="Create"
+                                       class="btn btn-primary btn-sm px-2 w-100 mb-1">
+                                    Clear All
+                                </a>
+
+                                <button type="button" id="AddressButton"
+                                        class="btn btn-primary btn-sm px-1 w-100 mb-1">
+
+                                    Address
+
+                                </button>
+
+                                <!-- DELIVERY NOTE -->
+                                <button type="button"
+                                        id="LoadDeliveryNote"
+                                        class="btn btn-primary btn-sm px-2 w-100 mb-1 me-3">
+
+                                    Delivery Note
+
+                                </button>
+
+                                <!-- RECEIPT NOTE -->
+                                <button type="button"
+                                        id="LoadReceiptNote"
+                                        class="btn btn-primary btn-sm px-2 w-100 mb-1 me-3"
+                                        style="display:none;">
+
+                                    Receipt Note
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+          
+                <!-- BODY has ITEM -->
+                <div class="card rounded-0 bg-transparent shadow-none" id="CardBody">
+                    <div class="card-body h-100">
+                        <div class="row h-100">
+                            <div class="col-auto left-menu h-100">
+                                <ul class="nav nav-tabs tab-header d-flex align-items-end">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" aria-current="page">Item</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark">Other</a>
+                                    </li>
+                                    <li class="ms-auto me-2 mb-2">
+                                       
+
+                                        <button type="button" id="RemoveItemRowButton" class="btn btn-danger btn-sm RowRemove">
+                                            Delete Row
+                                        </button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content tab-body tab-body-h-o">
+                                    <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" tabindex="0">
+                                        <div class="row h-100">
+                                            <!-------------------------item-------------------------------------------------------------------->
+                                            <div class="col table-fixed h-100">
+                                                <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
+
+                                                    <table class="table table-one table-striped table-bordered table-hover align-middle w-100"
+                                                           id="ItemTable">
+
+                                                        <thead>
+                                                            <tr class="table-info">
+                                                                <th class="px-2 del text-center">
+                                                                    <input type="checkbox" class="IndexAllCheckItem form-check-input border-white" id="IndexAllCheckItem">
+                                                                </th>
+                                                                <th>Service Order Number</th>
+                                                                <th>Delivery Note Number</th>
+                                                                <th>Process</th>
+                                                                <th>Item Code</th>
+                                                                <th>Description</th>
+                                                                <th class="table-width-xl text-end">Outer Dia</th>
+                                                                <th class="table-width-xl text-end">Thickness</th>
+                                                                <th class="table-width-xl text-end">Length</th>
+                                                                <th class="table-width-xl text-end">Width</th>
+                                                                <th>Material Grade</th>
+                                                                <th>Item Group</th>
+                                                                <th class="table-width-md text-center">UOM</th>
+                                                                <th class="table-width-xl text-center">
+                                                                    Delivered Qty
+                                                                </th>
+
+                                                                <th class="table-width-xl text-center">
+                                                                    Previously Invoiced Qty
+                                                                </th>
+
+                                                                <th class="table-width-xl text-center">
+                                                                    Current Invoice Qty
+                                                                </th>
+                                                                <th class="table-width-xl text-end">Unit Price</th>
+                                                                <th class="table-width-xl text-end">Amount</th>
+                                                                <th>SAC</th>
+                                                                <th class="table-width-xl text-end">GST Amount</th>
+                                                            </tr>
+
+                                                                            
+
+                                                        </thead>
+
+                                                        <tbody id="TableBody">
+
+                                                            <!-- TEMP ROW -->
+                                                            <tr id="TempRow" style="display:none;">
+
+                                                                <td class="p-2 del"><input type="checkbox" class="CheckItem form-check-input"></td>
+
+                                                                <!-- SERVICE ORDER -->
+                                                                <td>
+                                                                    <select class="form-select FRTII_ServiceOrder_Number" asp-items="@ViewBag.SON"></select>
+                                                                </td>
+
+                                                                <!-- DELIVERY NOTE -->
+                                                                <td>
+                                                                    <input class="form-control FRTII_DN_No" readonly />
+                                                                </td>
+
+                                                                <!-- PROCESS -->
+                                                                <td>
+                                                                    <input class="form-control FRTII_Process" readonly />
+                                                                </td>
+
+                                                                <!-- ITEM CODE -->
+                                                                <td>
+                                                                    <input type="hidden" class="FRTII_Number" />
+                                                                    <input type="hidden" class="FRTII_Item_Number" />
+                                                                    <input class="form-control FRTII_ItemCode" readonly />
+                                                                </td>
+
+                                                                <!-- DESCRIPTION -->
+                                                                <td>
+                                                                    <textarea class="form-control FRTII_ItemDescription"  readonly></textarea>
+                                                                 
+                                                                </td>
+
+                                                                <!-- OUTER DIA -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control FRTII_OuterDia" readonly />
+                                                                </td>
+
+                                                                <!-- THICKNESS -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control FRTII_Thickness" readonly />
+                                                                </td>
+
+                                                                <!-- LENGTH -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control FRTII_Length" readonly />
+                                                                </td>
+
+                                                                <!-- WIDTH -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control FRTII_Width" readonly />
+                                                                </td>
+
+                                                                <!-- MATERIAL GRADE -->
+                                                                <td>
+                                                                    <input class="form-control FRTII_MaterialGrade" readonly />
+                                                                </td>
+
+                                                                <!-- ITEM GROUP -->
+                                                                <td>
+                                                                    <input class="form-control FRTII_ItemGroup" readonly />
+                                                                </td>
+
+                                                                <!-- UOM -->
+                                                                <td class="table-width-md">
+                                                                    <select class="form-select FRTII_UoM" asp-items="@ViewBag.UOM"></select>
+                                                                </td>
+                                                                <!-- DELIVERED QTY -->
+                                                                <td class="table-width-md">
+                                                                    <input class="form-control FRTII_DeliveredQty"
+                                                                           autocomplete="off"
+                                                                           readonly />
+                                                                </td>
+
+                                                                <!-- PREVIOUSLY INVOICED QTY -->
+                                                                <td class="table-width-md">
+                                                                    <input class="form-control FRTII_PrevInvoiceQty"
+                                                                           autocomplete="off"
+                                                                           readonly />
+                                                                </td>
+                                                                <!-- QTY -->
+                                                                <td class="table-width-md">
+                                                                    <input class="form-control FRTII_Qty" autocomplete="off" />
+                                                                </td>
+
+                                                                <!-- UNIT PRICE -->
+                                                                <td class="table-width-md">
+                                                                    <input class="form-control FRTII_UnitPrice" autocomplete="off" />
+                                                                </td>
+
+                                                                <!-- AMOUNT -->
+                                                                <td class="table-width-md">
+                                                                    <input class="form-control FRTII_Amount" readonly />
+                                                                </td>
+
+                                                                <!-- SAC -->
+                                                                <td>
+                                                                    <select class="form-select FRTII_SAC_Number" asp-items="@ViewBag.SAC"></select>
+                                                                </td>
+
+                                                                <!-- GST AMOUNT -->
+                                                                <td class="table-width-md">
+                                                                    <input class="form-control FRTII_GST_Amount" readonly />
+                                                                </td>
+
+                                                            </tr>
+
+                                                                       
+                                                        </tbody>
+                                                        <tfoot>
+
+                                                            <tr class="table-info">
+
+                                                                <td colspan="13" class="text-end py-2">
+                                                                    <span class="float-end pe-3">Total</span>
+                                                                </td>
+                                                                <td>
+                                                                    <input id="TotalDeliveredQty" class="form-control text-center" readonly />
+                                                                </td>
+                                                                <td>
+                                                                    <input id="TotalPrevInvoiceQty" class="form-control text-center" readonly />
+                                                                </td>
+
+
+                                                                <td>
+                                                                    <input id="TotalQty" class="form-control text-center" readonly />
+                                                                </td>
+
+                                                                <td></td>
+
+                                                                <td>
+                                                                    <input id="TotalAmount" class="form-control text-end" readonly />
+                                                                </td>
+
+                                                                <td></td>
+
+                                                                <td>
+                                                                    <input id="TotalGSTAmount" class="form-control text-end" readonly />
+                                                                </td>
+
+                                                            </tr>
+
+                                                        </tfoot>
+
+                                                    </table>
+                                                       
+                                                </div>
+
+                                             
+                                            </div>
+
+                                            <!-------------------item----------------------------------------------------------->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto right-menu text-center border-start">
+                            
+                                <button type="button"
+                                        class="btn btn-primary GSTView btn-sm px-2 w-100 mb-1 mt-5 me-3">
+
+                                    GST
+
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- BODY has ITEM -->
+
+           
+              
+
+            </div>
+
+        </div>
+        <div id="RightPane">
+            <div class="p-2">
+                <div class="buyer-search-results"></div>
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
+    <script>
+        var sonList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.SON));
+        console.log("sonList from cshtml:", sonList);
+    </script>
+    <script src="~/js/code/ItemGrid.js" asp-append-version="true"></script>
+    <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
+    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+    <script src="~/js/frt_invoice/FRT_Invoice.js" asp-append-version="true"></script>
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
+        
+    
+}

@@ -217,12 +217,19 @@
         background-position: right 8px center;
     }
 
+  
+
     /* Hide Customer Number */
     #Header_JISVOH_JW_Customer_Number {
         display: none;
     }
 
-   
+    /* Category dropdown */
+    #Header_JISVOH_Category {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
   
    
 
@@ -378,7 +385,35 @@
                                             </div>
                                         </div>
 
-                                 
+                                        <!-- NEW: Category (hardcoded, mirrors Freight Invoice's Header_SourceCategory) -->
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
+                                            <label class="col-sm-5 col-form-label ps-0">
+                                                Category
+                                            </label>
+
+                                            <div class="col-sm-7 position-relative" style="padding-right: 5rem;">
+                                                <select id="Header_JISVOH_Category"
+                                                        name="Header.JISVOH_Category"
+                                                        class="form-select">
+                                                    <option value="DN" selected>Delivery Note</option>
+                                                    <option value="RN">Receipt Note</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- NEW: Freight Service Order checkbox -->
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
+                                            <label class="col-sm-5 col-form-label ps-0">
+                                                Freight<br /> Service<br /> Order
+                                            </label>
+
+                                            <div class="col-sm-7 position-relative" style="padding-right: 5rem;">
+                                                <input type="checkbox"
+                                                       id="Header_JISVOH_Freight_Applicable"
+                                                       name="Header.JISVOH_Freight_Applicable"
+                                                       class="form-check-input" />
+                                            </div>
+                                        </div>
 
                                     </div>
 
@@ -522,13 +557,16 @@
                                                                 <th style="text-align:center;">Width</th>
                                                                 <th style="text-align:left;">Material Grade</th>
                                                                 <th style="text-align:left;">Item Group</th>
+                                                                <th style="text-align:center;">Warehouse</th>
                                                                 <th style="text-align:center;">UOM</th>
                                                                 <th style="text-align:center;">Qty</th>
                                                                 <th style="text-align:right;">Unit Price</th>
                                                                 <th style="text-align:right;">Amount</th>
-                                                                <th style="text-align:center;">Delivery Date</th>
-                                                                            </tr>
-                                                                        </thead>
+                                                                <th style="text-align:center;" class="DeliveryDateHeader">Delivery Date</th>
+                                                                <th style="text-align:center;display:none;" class="FromWHHeader">From WH</th>
+                                                                <th style="text-align:center;display:none;" class="ToWHHeader">To WH</th>
+                                                            </tr>
+                                                        </thead>
 
                                                                         <tbody id="TableBody">
                                                                             <tr id="TempRow" style="display:none">
@@ -613,17 +651,24 @@
                                                                                            readonly />
                                                                                 </td>
 
-                                                                                <td>
-                                                                                    <select name="Items[0].JISVOI_UoM_Number"
-                                                                            class="form-select JISVOI_UoM_Number text-center"
-                                                                                            asp-items="@ViewBag.UOM">
-                                                                                    </select>
-                                                                                </td>
+                                                                <td>
+                                                                    <select name="Items[0].JISVOI_WH_Number"
+                                                                            class="form-select JISVOI_WH_Number text-center"
+                                                                            asp-items="@ViewBag.Warehouse">
+                                                                    </select>
+                                                                </td>
 
-                                                                                <td>
-                                                                                    <input name="Items[0].JISVOI_Qty"
-                                                                                           class="form-control JISVOI_Qty text-center" />
-                                                                                </td>
+                                                                <td>
+                                                                    <select name="Items[0].JISVOI_UoM_Number"
+                                                                            class="form-select JISVOI_UoM_Number text-center"
+                                                                            asp-items="@ViewBag.UOM">
+                                                                    </select>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input name="Items[0].JISVOI_Qty"
+                                                                           class="form-control JISVOI_Qty text-center" />
+                                                                </td>
 
                                                                                 <td>
                                                                                     <input name="Items[0].JISVOI_UnitPrice"
@@ -636,14 +681,28 @@
                                                                                            readonly />
                                                                                 </td>
 
-                                                                                <td>
-                                                                                    <input name="Items[0].JISVOI_DeliveryDate"
-                                                                                           type="date"
+                                                                <td class="DeliveryDateCell">
+                                                                    <input name="Items[0].JISVOI_DeliveryDate"
+                                                                           type="date"
                                                                            class="form-control datepicker JISVOI_DeliveryDate text-center" />
-                                                                                </td>
+                                                                </td>
 
-                                                                            </tr>
-                                                                            <tr class="NewRow" data-rowid="1">
+                                                                <td class="FromWHCell" style="display:none;">
+                                                                    <select name="Items[0].JISVOI_FromWH"
+                                                                            class="form-select JISVOI_FromWH"
+                                                                            asp-items="@ViewBag.Warehouse">
+                                                                    </select>
+                                                                </td>
+
+                                                                <td class="ToWHCell" style="display:none;">
+                                                                    <select name="Items[0].JISVOI_ToWH"
+                                                                            class="form-select JISVOI_ToWH"
+                                                                            asp-items="@ViewBag.Warehouse">
+                                                                    </select>
+                                                                </td>
+
+                                                            </tr>
+                                                            <tr class="NewRow" data-rowid="1">
 
                                                                                 <td class="p-2 del">
                                                                                     <input type="checkbox"
@@ -723,17 +782,24 @@
                                                                                            readonly />
                                                                                 </td>
 
-                                                                                <td>
-                                                                                    <select name="Items[0].JISVOI_UoM_Number"
-                                                                                            class="form-select JISVOI_UoM_Number"
-                                                                                            asp-items="@ViewBag.UOM">
-                                                                                    </select>
-                                                                                </td>
+                                                                <td>
+                                                                    <select name="Items[0].JISVOI_WH_Number"
+                                                                            class="form-select JISVOI_WH_Number"
+                                                                            asp-items="@ViewBag.Warehouse">
+                                                                    </select>
+                                                                </td>
 
-                                                                                <td>
-                                                                                    <input name="Items[0].JISVOI_Qty"
-                                                                                           class="form-control JISVOI_Qty text-center" />
-                                                                                </td>
+                                                                <td>
+                                                                    <select name="Items[0].JISVOI_UoM_Number"
+                                                                            class="form-select JISVOI_UoM_Number"
+                                                                            asp-items="@ViewBag.UOM">
+                                                                    </select>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input name="Items[0].JISVOI_Qty"
+                                                                           class="form-control JISVOI_Qty text-center" />
+                                                                </td>
 
                                                                                 <td>
                                                                                     <input name="Items[0].JISVOI_UnitPrice"
@@ -745,15 +811,28 @@
                                                                                            class="form-control JISVOI_Amount text-end"
                                                                                            readonly />
                                                                                 </td>
-
-                                                                                <td>
-                                                                                    <input name="Items[0].JISVOI_DeliveryDate"
-                                                                                           type="date"
+                                                                <td class="DeliveryDateCell">
+                                                                    <input name="Items[0].JISVOI_DeliveryDate"
+                                                                           type="date"
                                                                            class="form-control datepicker JISVOI_DeliveryDate text-center" />
-                                                                                </td>
+                                                                </td>
 
-                                                                            </tr>
-                                                                        </tbody>
+                                                                <td class="FromWHCell" style="display:none;">
+                                                                    <select name="Items[0].JISVOI_FromWH"
+                                                                            class="form-select JISVOI_FromWH"
+                                                                            asp-items="@ViewBag.Warehouse">
+                                                                    </select>
+                                                                </td>
+
+                                                                <td class="ToWHCell" style="display:none;">
+                                                                    <select name="Items[0].JISVOI_ToWH"
+                                                                            class="form-select JISVOI_ToWH"
+                                                                            asp-items="@ViewBag.Warehouse">
+                                                                    </select>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
 
                                                                         <tfoot>
                                                                             <tr class="table-info">
@@ -774,8 +853,9 @@
                                                                                            class="form-control text-end"
                                                                                            readonly />
                                                                                 </td>
-
+                                                                <td></td>
                                                                                 <td></td>
+
                                                                             </tr>
                                                                         </tfoot>
 

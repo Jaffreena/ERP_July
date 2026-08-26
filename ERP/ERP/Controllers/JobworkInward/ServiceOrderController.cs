@@ -254,12 +254,12 @@ namespace ERP.Controllers.JobworkInward
 
             DataSet DS = new DataSet();
             DS = SVO_DAO.ServiceOrderDB(SVO_DTO);
-
             ViewBag.Currency = Help.GetCat(DS.Tables[0]);
             ViewBag.UoM = Help.GetCat(DS.Tables[1]);
-        
+
             ViewBag.Process = Help.GetCat(DS.Tables[2]);
             ViewBag.MaterialSegregation = Help.GetCat(DS.Tables[3]);
+            ViewBag.Warehouse = Help.GetCat(DS.Tables[4]);
         }
         [Route("jobinward/transactions/service-order/item")]
         public IActionResult SaleItem(String? ItemCode, long? MS)
@@ -499,18 +499,17 @@ namespace ERP.Controllers.JobworkInward
                 Convert.ToInt32(Math.Ceiling(Pages));
 
             ViewBag.SumOfQty =
-        DS.Tables[1].Rows.Count > 0
-            ? Convert.ToDouble(DS.Tables[1].Rows[0]["TotalQty"])
-            : 0;
-
+               DS.Tables[1].Rows.Count > 0 && DS.Tables[1].Rows[0]["TotalQty"] != DBNull.Value
+                   ? Convert.ToDouble(DS.Tables[1].Rows[0]["TotalQty"])
+                   : 0;
             ViewBag.SumOfAmount =
-                DS.Tables[1].Rows.Count > 0
-                    ? Convert.ToDouble(DS.Tables[1].Rows[0]["TotalAmount"])
-                    : 0;
+      DS.Tables[1].Rows.Count > 0 && DS.Tables[1].Rows[0]["TotalAmount"] != DBNull.Value
+          ? Convert.ToDouble(DS.Tables[1].Rows[0]["TotalAmount"])
+          : 0;
             ViewBag.SumOfItem =
-    DS.Tables[1].Rows.Count > 0
-        ? Convert.ToInt32(DS.Tables[1].Rows[0]["TotalItems"])
-        : 0;
+            DS.Tables[1].Rows.Count > 0 && DS.Tables[1].Rows[0]["TotalItems"] != DBNull.Value
+                ? Convert.ToInt32(DS.Tables[1].Rows[0]["TotalItems"])
+                : 0;
 
             ViewBag.Page =
                 Help.PageSize(PSize.ToString());

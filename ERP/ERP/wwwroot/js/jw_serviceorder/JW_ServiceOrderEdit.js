@@ -256,6 +256,7 @@ function AutoFit() {
     fitInputWidth("Header_JISVOH_MS_Number", 20, 30);
     fitInputWidth("Header_JISVOH_JW_Customer_Name", 40, 50);
     fitInputWidth("Header_JISVOH_Currency_Number", 10, 10);
+    fitInputWidth("Header_JISVOH_Category", 20, 20);
     fitInputWidth("Header_JISVOH_PaymentTerms", 30, 40);
     fitInputWidth("Header_JISVOH_DeliveryTerms", 30, 40);
     fitInputWidth("Header_JISVOH_DeliveryMode", 30, 40);
@@ -734,6 +735,12 @@ function CreateServiceOrderModel() {
         JISVOH_Remarks:
             $("#Header_JISVOH_Remarks").val(),
 
+        JISVOH_Category:
+            $("#Header_JISVOH_Category").val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE",
+
+        JISVOH_MS_Number:
+            parseInt($("#Header_JISVOH_MS_Number").val()) || null,
+
         SVO_Id:
             parseInt($("#Header_SVO_Id").val()) || 0,
 
@@ -785,13 +792,15 @@ function CreateServiceOrderModel() {
 
             JISVOI_Amount:
                 parseFloat(removeComma(row.find(".JISVOI_Amount").val())) || 0,
-
             JISVOI_DeliveryDate:
                 row.find(".JISVOI_DeliveryDate").val()
                     ? new Date(
                         row.find(".JISVOI_DeliveryDate").val()
                     ).toISOString()
-                    : null
+                    : null,
+
+            JISVOI_Category:
+                $("#Header_JISVOH_Category").val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE"
         };
 
         items.push(item);
@@ -1499,6 +1508,9 @@ function BindHeader(header) {
     $("#Header_JISVOH_Currency_Number")
         .val(header.jisvoh_Currency_Number ?? header.JISVOH_Currency_Number);
 
+    $("#Header_JISVOH_MS_Number")
+        .val(header.jisvoh_MS_Number ?? header.JISVOH_MS_Number).trigger("change");
+
     $("#Header_JISVOH_PaymentTerms")
         .val(header.jisvoh_PaymentTerms ?? header.JISVOH_PaymentTerms);
 
@@ -1516,6 +1528,10 @@ function BindHeader(header) {
 
     $("#Header_JISVOH_Remarks")
         .val(header.jisvoh_Remarks ?? header.JISVOH_Remarks);
+
+    var loadedCategory = header.jisvoh_Category ?? header.JISVOH_Category ?? "DELIVERY NOTE";
+    $("#Header_JISVOH_Category")
+        .val(loadedCategory === "RECEIPT NOTE" ? "RN" : "DN");
 }
 
 function BindItems(items) {

@@ -37,6 +37,7 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIRNH_Currency_Number", DbType.Int64, DTO.JIRNH_Currency_Number);
             Db.AddInParameter(DbC, "@JIRNH_WH_Number", DbType.Int64, DTO.JIRNH_WH_Number);
             Db.AddInParameter(DbC, "@JIRNH_Remarks", DbType.String, DTO.JIRNH_Remarks);
+            Db.AddInParameter(DbC, "@JIRNH_Freight_Applicable", DbType.String, (object)DTO.JIRNH_Freight_Applicable ?? DBNull.Value);
 
             // =======================
             // 🔹 ITEM (JIRNI)
@@ -49,8 +50,15 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIRNI_ITM_Code", DbType.String, DTO.JIRNI_ITM_Code);
             Db.AddInParameter(DbC, "@JIRNI_UoM_Number", DbType.Int64, DTO.JIRNI_UoM_Number);
             Db.AddInParameter(DbC, "@JIRNI_Qty", DbType.Decimal, DTO.JIRNI_Qty);
+            Db.AddInParameter(DbC, "@JIRNI_Qty_Kg", DbType.Decimal, DTO.JIRNI_Qty_Kg);
             Db.AddInParameter(DbC, "@JIRNI_UnitPrice", DbType.Decimal, DTO.JIRNI_UnitPrice);
             Db.AddInParameter(DbC, "@JIRNI_Amount", DbType.Decimal, DTO.JIRNI_Amount);
+            // NEW: Freight logic
+            Db.AddInParameter(DbC, "@JIRNI_Freight_Applicable", DbType.String, (object)DTO.JIRNI_Freight_Applicable ?? DBNull.Value);
+            Db.AddInParameter(DbC, "@JIRNI_Freight_ServiceOrder_Number", DbType.String, (object)DTO.JIRNI_Freight_ServiceOrder_Number ?? DBNull.Value);
+            Db.AddInParameter(DbC, "@JIRNI_JISVOI_Number_FRT", DbType.Int64, DTO.JIRNI_JISVOI_Number_FRT);
+            Db.AddInParameter(DbC, "@JIRNI_FromWH", DbType.Int64, (object)DTO.JIRNI_FromWH ?? DBNull.Value);
+            Db.AddInParameter(DbC, "@JIRNI_ToWH", DbType.Int64, (object)DTO.JIRNI_ToWH ?? DBNull.Value);
 
             // =======================
             // 🔹 BATCH (JIRNI_BCH)
@@ -179,7 +187,29 @@ namespace ERP_DAO.JobInwardTransaction
             DS = Db.ExecuteDataSet(DbC);
             return DS;
         }
+        // Add after GetFreightServiceOrderDB method
+        public DataSet GetItemUnitConversionDB(long itemNumber, long fromUnit)
+        {
+            try
+            {
+                Database db = new SqlDatabase(DB.Connection());
 
+                DbCommand cmd = db.GetStoredProcCommand("Item_UnitConversion_Get");
+
+                db.AddInParameter(cmd, "@ItemNumber", DbType.Int64, itemNumber);
+                db.AddInParameter(cmd, "@FromUnit", DbType.Int64, fromUnit);
+
+                return db.ExecuteDataSet(cmd);
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("SQL Error : " + ex.Message + Environment.NewLine + "Procedure : Item_UnitConversion_Get", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Application Error : " + ex.Message, ex);
+            }
+        }
 
         public DataSet ReceiptNoteJSONDB(long JIRNH_Number)
         {
@@ -219,6 +249,11 @@ namespace ERP_DAO.JobInwardTransaction
             dtItems.Columns.Add("JIRNI_UnitPrice", typeof(decimal));
             dtItems.Columns.Add("JIRNI_Amount", typeof(decimal));
 
+            // NEW: Freight logic
+            dtItems.Columns.Add("JIRNI_Freight_Applicable", typeof(string));
+            dtItems.Columns.Add("JIRNI_Freight_ServiceOrder_Number", typeof(long));
+            dtItems.Columns.Add("JIRNI_JISVOI_Number_FRT", typeof(long));
+
             foreach (var item in RN_DTO.Items)
             {
                 dtItems.Rows.Add(
@@ -230,7 +265,10 @@ namespace ERP_DAO.JobInwardTransaction
                     item.UoM_Number,
                     item.Qty,
                     item.UnitPrice,
-                    item.Amount
+                    item.Amount,
+                    item.Freight_Applicable,
+                    item.Freight_ServiceOrder_Number,
+                    item.JISVOI_Number_FRT
                 );
             }
 
@@ -340,6 +378,70 @@ namespace ERP_DAO.JobInwardTransaction
                         throw;
                     }
                 }
+            }
+        }
+
+        // NEW: Freight logic
+        public DataSet GetFreightServiceOrderDB(
+            long customerId,
+            long? prsNumber = null,
+            long? itemNumber = null,
+            long? uomNumber = null)
+        {
+            try
+            {
+                Database db = new SqlDatabase(DB.Connection());
+
+                DbCommand cmd = db.GetStoredProcCommand("JI_ServiceOrder_GetByCustomer_SP");
+
+                db.AddInParameter(cmd, "@CustomerId", DbType.Int64, customerId);
+                db.AddInParameter(cmd, "@PRS_Number", DbType.Int64,
+                    prsNumber.HasValue ? (object)prsNumber.Value : DBNull.Value);
+
+                db.AddInParameter(cmd, "@Item_Number", DbType.Int64,
+                    itemNumber.HasValue ? (object)itemNumber.Value : DBNull.Value);
+
+                db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
+          uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+
+                db.AddInParameter(cmd, "@Category", DbType.String, "RECEIPT NOTE");
+
+                return db.ExecuteDataSet(cmd);
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("SQL Error : " + ex.Message + Environment.NewLine + "Procedure : JI_ServiceOrder_GetByCustomer_SP", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Application Error : " + ex.Message, ex);
+            }
+        }
+
+        public DataSet CheckDeliveredQtyExceededFreightDB(
+         long jisvohNumber,
+         long? prsNumber = null,
+         long? itemNumber = null,
+         long? uomNumber = null)
+        {
+            try
+            {
+                Database db = new SqlDatabase(DB.Connection());
+                // CHANGED: Receipt Note uses received qty (RN), not delivered qty (DN)
+                DbCommand cmd = db.GetStoredProcCommand("USP_CheckReceivedQtyExceeded_Freight");
+                db.AddInParameter(cmd, "@JISVOH_Number", DbType.Int64, jisvohNumber);
+                db.AddInParameter(cmd, "@PRS_Number", DbType.Int64, prsNumber.HasValue ? (object)prsNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@Item_Number", DbType.Int64, itemNumber.HasValue ? (object)itemNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@UoM_Number", DbType.Int64, uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+                return db.ExecuteDataSet(cmd);
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("SQL Error : " + ex.Message + Environment.NewLine + "Procedure : USP_CheckReceivedQtyExceeded_Freight", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Application Error : " + ex.Message, ex);
             }
         }
 

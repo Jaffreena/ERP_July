@@ -83,6 +83,8 @@ namespace ERP_DTO.JobInwardTransaction
 
         [Display(Name = "GST Amount")]
         public double JISVII_GST_Amount { get; set; }
+        [Display(Name = "SO Assign")]
+        public string JISVII_SO_Assign { get; set; }
     }
 
     public class JobworkInvoiceAddress_DTO
@@ -151,6 +153,8 @@ namespace ERP_DTO.JobInwardTransaction
 
         [Display(Name = "GST Amount")]
         public double JISVIG_GST_Amount { get; set; }
+        [Display(Name = "SO Assign")]
+        public string JISVII_SO_Assign { get; set; }
     }
     public class JobworkInvoiceCreate_DTO
     {

@@ -1102,9 +1102,26 @@ namespace ERP.Controllers
                         Convert.ToDouble(item["JIDNI_Amount"]),
 
                     JIDNI_JW_InvoiceTracking =
-                        Convert.ToString(item["JIDNI_JW_InvoiceTracking"]) ,
+                        Convert.ToString(item["JIDNI_JW_InvoiceTracking"]),
                     JISVOH_Number =
-                        Convert.ToInt64(item["JISVOH_Number"])
+                        Convert.ToInt64(item["JISVOH_Number"]),
+
+                    // NEW: Freight logic — without these, Edit page's checkbox/dropdown
+                    // never bind since the DTO carries no saved value to render
+                    Freight_Applicable =
+                        item.Table.Columns.Contains("Freight_Applicable") && item["Freight_Applicable"] != DBNull.Value
+                            ? Convert.ToString(item["Freight_Applicable"])
+                            : "No",
+
+                    Freight_ServiceOrder_Number =
+                        item.Table.Columns.Contains("Freight_ServiceOrder_Number") && item["Freight_ServiceOrder_Number"] != DBNull.Value
+                            ? Convert.ToString(item["Freight_ServiceOrder_Number"])
+                            : "",
+
+                    JISVOI_Number_FRT =
+                        item.Table.Columns.Contains("JISVOI_Number_FRT") && item["JISVOI_Number_FRT"] != DBNull.Value
+                            ? Convert.ToInt64(item["JISVOI_Number_FRT"])
+                            : 0
                 });
             }
 
@@ -1586,18 +1603,21 @@ namespace ERP.Controllers
         }
         #endregion
         #region Get Service Order
+
+
         [HttpGet]
-        public JsonResult GetServiceOrder(long customerId, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)
+        public JsonResult GetServiceOrder(long customerId, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null, string category = "DELIVERY NOTE")
         {
             var dt = new DeliveryNote_DAO()
-                .GetServiceOrderDB(customerId, prsNumber, itemNumber, uomNumber)
+                .GetServiceOrderDB(customerId, prsNumber, itemNumber, uomNumber, category)
                 .Tables[0];
 
             return new JsonResult(
                 dt.AsEnumerable().Select(r => new
                 {
                     value = r["JISVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOH_Number"]),
-                    text = r["JISVOH_ServiceOrderNo"]?.ToString() ?? ""
+                    text = r["JISVOH_ServiceOrderNo"]?.ToString() ?? "",
+                    jisvoiNumber = r["JISVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOI_Number"])
                 }).ToList(),
                 new JsonSerializerOptions
                 {
@@ -1606,7 +1626,22 @@ namespace ERP.Controllers
                 });
         }
         #endregion
+        #region Check Delivered Qty Exceeded - Freight
+        [HttpGet]
+        public JsonResult CheckDeliveredQtyExceededFreight(long jisvohNumber, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)
+        {
+            var dt = new DeliveryNote_DAO()
+                .CheckDeliveredQtyExceededFreightDB(jisvohNumber, prsNumber, itemNumber, uomNumber)
+                .Tables[0];
 
+            return new JsonResult(dt.AsEnumerable().Select(r => new
+            {
+                deliveredQty = r["DeliveredQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["DeliveredQty"]),
+                jisvoiQty = r["JISVOI_Qty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["JISVOI_Qty"]),
+                isExceeded = r["IsExceeded"] != DBNull.Value && Convert.ToBoolean(r["IsExceeded"])
+            }).ToList());
+        }
+        #endregion
         #region Check Delivered Qty Exceeded
         [HttpGet]
         public JsonResult CheckDeliveredQtyExceeded(long jisvohNumber, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)

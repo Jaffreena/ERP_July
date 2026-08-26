@@ -134,6 +134,9 @@ namespace ERP_DAO.JobInwardTransaction
             cmd.Parameters.AddWithValue("@JISVOH_Tax", h.JISVOH_Tax ?? "");
             cmd.Parameters.AddWithValue("@JISVOH_TDC", h.JISVOH_TDC ?? "");
             cmd.Parameters.AddWithValue("@JISVOH_Remarks", h.JISVOH_Remarks ?? "");
+            cmd.Parameters.AddWithValue("@JISVOH_Category", h.JISVOH_Category ?? "DELIVERY NOTE");
+            cmd.Parameters.AddWithValue("@JISVOH_MS_Number", (object)h.JISVOH_MS_Number ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@JISVOH_Freight_Applicable", (object)h.JISVOH_Freight_Applicable ?? DBNull.Value);
 
             cmd.ExecuteNonQuery();
         }
@@ -161,6 +164,9 @@ namespace ERP_DAO.JobInwardTransaction
             cmd.Parameters.AddWithValue("@JISVOH_Tax", h.JISVOH_Tax ?? "");
             cmd.Parameters.AddWithValue("@JISVOH_TDC", h.JISVOH_TDC ?? "");
             cmd.Parameters.AddWithValue("@JISVOH_Remarks", h.JISVOH_Remarks ?? "");
+            cmd.Parameters.AddWithValue("@JISVOH_Category", h.JISVOH_Category ?? "DELIVERY NOTE");
+            cmd.Parameters.AddWithValue("@JISVOH_MS_Number", (object)h.JISVOH_MS_Number ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@JISVOH_Freight_Applicable", (object)h.JISVOH_Freight_Applicable ?? DBNull.Value);
 
             return Convert.ToInt64(cmd.ExecuteScalar());
         }
@@ -171,11 +177,15 @@ namespace ERP_DAO.JobInwardTransaction
             dt.Columns.Add("JISVOI_Number", typeof(long));
             dt.Columns.Add("JISVOI_PRS_Number", typeof(long));
             dt.Columns.Add("JISVOI_Item_Number", typeof(long));
+            dt.Columns.Add("JISVOI_WH_Number", typeof(long));
             dt.Columns.Add("JISVOI_UoM_Number", typeof(long));
             dt.Columns.Add("JISVOI_Qty", typeof(double));
             dt.Columns.Add("JISVOI_UnitPrice", typeof(double));
             dt.Columns.Add("JISVOI_Amount", typeof(double));
             dt.Columns.Add("JISVOI_DeliveryDate", typeof(DateTime));
+            dt.Columns.Add("JISVOI_Category", typeof(string));
+            dt.Columns.Add("JISVOI_FromWH", typeof(long));
+            dt.Columns.Add("JISVOI_ToWH", typeof(long));
 
             foreach (var item in items)
             {
@@ -187,11 +197,16 @@ namespace ERP_DAO.JobInwardTransaction
                 row["JISVOI_Number"] = item.JISVOI_Number > 0 ? item.JISVOI_Number : DBNull.Value;
                 row["JISVOI_PRS_Number"] = item.JISVOI_PRS_Number;
                 row["JISVOI_Item_Number"] = item.JISVOI_Item_Number;
+                row["JISVOI_WH_Number"] = item.JISVOI_WH_Number;
                 row["JISVOI_UoM_Number"] = item.JISVOI_UoM_Number;
                 row["JISVOI_Qty"] = item.JISVOI_Qty;
                 row["JISVOI_UnitPrice"] = item.JISVOI_UnitPrice;
                 row["JISVOI_Amount"] = item.JISVOI_Amount;
                 row["JISVOI_DeliveryDate"] = item.JISVOI_DeliveryDate.HasValue ? item.JISVOI_DeliveryDate.Value : DBNull.Value;
+
+                row["JISVOI_Category"] = item.JISVOI_Category ?? (object)DBNull.Value;
+                row["JISVOI_FromWH"] = item.JISVOI_FromWH.HasValue ? item.JISVOI_FromWH.Value : DBNull.Value;
+                row["JISVOI_ToWH"] = item.JISVOI_ToWH.HasValue ? item.JISVOI_ToWH.Value : DBNull.Value;
 
                 dt.Rows.Add(row);
             }
@@ -205,11 +220,15 @@ namespace ERP_DAO.JobInwardTransaction
 
             dt.Columns.Add("JISVOI_PRS_Number", typeof(long));
             dt.Columns.Add("JISVOI_Item_Number", typeof(long));
+            dt.Columns.Add("JISVOI_WH_Number", typeof(long));
             dt.Columns.Add("JISVOI_UoM_Number", typeof(long));
             dt.Columns.Add("JISVOI_Qty", typeof(double));
             dt.Columns.Add("JISVOI_UnitPrice", typeof(double));
             dt.Columns.Add("JISVOI_Amount", typeof(double));
             dt.Columns.Add("JISVOI_DeliveryDate", typeof(DateTime));
+            dt.Columns.Add("JISVOI_Category", typeof(string));
+            dt.Columns.Add("JISVOI_FromWH", typeof(long));
+            dt.Columns.Add("JISVOI_ToWH", typeof(long));
 
             foreach (var item in items)
             {
@@ -224,6 +243,9 @@ namespace ERP_DAO.JobInwardTransaction
                 row["JISVOI_Item_Number"] =
                     item.JISVOI_Item_Number;
 
+                row["JISVOI_WH_Number"] =
+                    item.JISVOI_WH_Number;
+
                 row["JISVOI_UoM_Number"] =
                     item.JISVOI_UoM_Number;
 
@@ -237,8 +259,21 @@ namespace ERP_DAO.JobInwardTransaction
                     item.JISVOI_Amount;
 
                 row["JISVOI_DeliveryDate"] =
-                    item.JISVOI_DeliveryDate.HasValue
-                        ? item.JISVOI_DeliveryDate.Value
+         item.JISVOI_DeliveryDate.HasValue
+             ? item.JISVOI_DeliveryDate.Value
+             : DBNull.Value;
+
+                row["JISVOI_Category"] =
+                    item.JISVOI_Category ?? (object)DBNull.Value;
+
+                row["JISVOI_FromWH"] =
+                    item.JISVOI_FromWH.HasValue
+                        ? item.JISVOI_FromWH.Value
+                        : DBNull.Value;
+
+                row["JISVOI_ToWH"] =
+                    item.JISVOI_ToWH.HasValue
+                        ? item.JISVOI_ToWH.Value
                         : DBNull.Value;
 
                 dt.Rows.Add(row);
@@ -246,7 +281,8 @@ namespace ERP_DAO.JobInwardTransaction
 
             return dt;
         }
-        private void ServiceOrderItemUpdate(long headerNumber, List<JI_ServiceOrderItem_DTO> items, SqlConnection con, SqlTransaction tr)
+        private void ServiceOrderItemUpdate(
+            long headerNumber, List<JI_ServiceOrderItem_DTO> items, SqlConnection con, SqlTransaction tr)
         {
             DataTable dt = CreateServiceOrderItemUpdateTable(items);
 
