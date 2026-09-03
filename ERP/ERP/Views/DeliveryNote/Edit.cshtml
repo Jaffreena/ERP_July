@@ -1322,9 +1322,9 @@
 
                                                                                         <input type="checkbox"
                                                                                                class="form-check-input JIDNI_JW_InvoiceTracking"
-                                                                                        @(Model.Items[i].JIDNI_JW_InvoiceTracking == "Yes" ? "checked" : "") />
+                                                                                        @(Model.Items[i].JIDNI_IsJW_InvoiceApplicable == "Yes" ? "checked" : "") />
 
-                                                                                        <input asp-for="Items[i].JIDNI_JW_InvoiceTracking"
+                                                                                        <input asp-for="Items[i].JIDNI_IsJW_InvoiceApplicable"
                                                                                                type="hidden"
                                                                                                class="JIDNI_JW_InvoiceTracking_Value" />
 
@@ -1335,19 +1335,19 @@
                                                                                     </td>
                                                                 <!-- SO Dropdown -->
                                                                 <td>
-                                                                    <select asp-for="Items[i].JISVOH_Number"
+                                                                    <select asp-for="Items[i].JIDNI_JIJWI_SVOH_Number"
                                                                             class="form-select JISVOH_Number"
                                                                             asp-items="@ViewBag.SON">
                                                                     </select>
                                                                     <!-- NEW: SO Item ID -->
-                                                                    <input type="hidden" asp-for="Items[i].JISVOI_Number" class="JISVOI_Number_Row" />
+                                                                    <input type="hidden" asp-for="Items[i].JIDNI_JIJWI_SVOI_Number" class="JISVOI_Number_Row" />
                                                                 </td>
                                                                 <!-- FREIGHT APPLICABLE -->
                                                                 <td class="text-center p-2">
                                                                     <input type="checkbox"
                                                                            class="form-check-input Freight_Applicable"
-                                                                    @(Model.Items[i].Freight_Applicable == "Yes" ? "checked" : "") />
-                                                                    <input asp-for="Items[i].Freight_Applicable"
+                                                                    @(Model.Items[i].JIDNI_IsFreightApplicable == "Yes" ? "checked" : "") />
+                                                                    <input asp-for="Items[i].JIDNI_IsFreightApplicable"
                                                                            type="hidden"
                                                                            class="Freight_Applicable_Value" />
                                                                 </td>
@@ -1355,10 +1355,10 @@
                                                                    <td>
         <select class="form-select Freight_ServiceOrder_Number"
                 name="Items[@i].Freight_ServiceOrder_Number"
-                data-saved-value="@Model.Items[i].Freight_ServiceOrder_Number">
+                data-saved-value="@Model.Items[i].JIDNI_JIJWI_SVOI_Number">
         </select>
         
-        <input type="hidden" asp-for="Items[i].JISVOI_Number_FRT" class="JISVOI_Number_FRT_Row" />
+        <input type="hidden" asp-for="Items[i].JIDNI_JIFRT_SVOI_Number" class="JISVOI_Number_FRT_Row" />
     </td>
                                                                                 </tr>
                                                                             }

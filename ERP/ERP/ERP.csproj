@@ -7,11 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\JWServiceOrder\**" />
+    <Content Remove="Views\JWServiceOrder\**" />
+    <EmbeddedResource Remove="Views\JWServiceOrder\**" />
+    <None Remove="Views\JWServiceOrder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="C:\Users\mrsof\.nuget\packages\select.htmltopdf.netcore\24.1.0\contentFiles\any\any\Select.Html.dep" />
     <Content Remove="Views\ReceiptNote\ReceiptCreate.cshtml" />
     <Content Remove="Views\ReceiptNote\ReceiptCreateBatchView.cshtml" />
     <Content Remove="Views\ReceiptNote\ReceiptCreateHeadView.cshtml" />
     <Content Remove="Views\ReceiptNote\ReceiptCreateItemView.cshtml" />
+    <Content Remove="Views\ReceiptNote\RNNumbering.cshtml" />
+    <Content Remove="Views\ReceiptNote\RNNumberingPrefix.cshtml" />
+    <Content Remove="Views\ReceiptNote\RNNumberingReset.cshtml" />
+    <Content Remove="Views\ReceiptNote\RNNumberingSuffix.cshtml" />
     <Content Remove="wwwroot\css\ukmj1vs1.epa~" />
   </ItemGroup>
 
@@ -113,6 +124,11 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\JobworkInward\ServiceOrder_JobWork\" />
+    <Folder Include="Views\JobworkInward\ServiceOrder_Freight\" />
   </ItemGroup>
 
 </Project>

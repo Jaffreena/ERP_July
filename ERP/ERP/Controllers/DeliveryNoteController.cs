@@ -254,7 +254,7 @@ namespace ERP.Controllers
             JIDNI_Qty = 5,
             JIDNI_UnitPrice = 100,
             JIDNI_Amount = 500,
-            JIDNI_JW_InvoiceTracking = "Y"
+            JIDNI_IsJW_InvoiceApplicable = "Y"
         },
 
         new DeliveryNoteItem_DTO
@@ -268,7 +268,7 @@ namespace ERP.Controllers
             JIDNI_Qty = 2,
             JIDNI_UnitPrice = 250,
             JIDNI_Amount = 500,
-            JIDNI_JW_InvoiceTracking = "N"
+            JIDNI_IsJW_InvoiceApplicable = "N"
         }
     };
 
@@ -314,7 +314,7 @@ namespace ERP.Controllers
             return View();
         }
         DNNumber_DTO PON_DTO = new DNNumber_DTO();
-        DNNumber_DAO PON_DAO = new DNNumber_DAO();
+        JIDN_Numbering_DAO PON_DAO = new JIDN_Numbering_DAO();
 
         void OnDeliveryNoteNumberGen(Int32 DNDate)
         {
@@ -324,7 +324,7 @@ namespace ERP.Controllers
             PON_DTO.CreatorCode = 1;
             PON_DTO.Id = 101;
 
-            DS1 = PON_DAO.DNNumberDB(PON_DTO);
+            DS1 = PON_DAO.JIDN_NumberingDB(PON_DTO);
 
             if (DS1.Tables[0].Rows.Count > 0)
             {
@@ -342,23 +342,23 @@ namespace ERP.Controllers
                         PON_DTO.CreatorCode = 1;
                         PON_DTO.Id = 103;
 
-                        PON_DAO.DNNumberDB(PON_DTO);
+                        PON_DAO.JIDN_NumberingDB(PON_DTO);
                     }
                     else if (DS1.Tables[2].Rows.Count > 0)
                     {
                         // New range -> insert fresh, using Setup dates directly (no Frequency calculation)
-                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["DNR_Date"].ToString());
-                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["DNR_EndDate"].ToString());
-                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["DNR_StartingNumber"].ToString());
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIDN_NR_Date"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIDN_NR_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIDN_NR_StartingNumber"].ToString());
 
-                        PON_DTO.DNN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["DNR_Number"].ToString());
+                        PON_DTO.DNN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIDN_NR_Number"].ToString());
                         PON_DTO.DNN_StartingNumber = Convert.ToString(Start);
                         PON_DTO.DNN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
                         PON_DTO.DNN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
                         PON_DTO.CreatorCode = 1;
                         PON_DTO.Id = 102;
 
-                        PON_DAO.DNNumberDB(PON_DTO);
+                        PON_DAO.JIDN_NumberingDB(PON_DTO);
                     }
                     // else: இந்த Date-க்கு ஒரு Reset range-கூட setup பண்ணல -> insert நடக்காது
                 }
@@ -1101,24 +1101,24 @@ namespace ERP.Controllers
                     JIDNI_Amount =
                         Convert.ToDouble(item["JIDNI_Amount"]),
 
-                    JIDNI_JW_InvoiceTracking =
-                        Convert.ToString(item["JIDNI_JW_InvoiceTracking"]),
-                    JISVOH_Number =
-                        Convert.ToInt64(item["JISVOH_Number"]),
+                    JIDNI_IsJW_InvoiceApplicable =
+                        Convert.ToString(item["JIDNI_IsJW_InvoiceApplicable"]),
+                    JIDNI_JIJWI_SVOH_Number =
+                        Convert.ToInt64(item["JIDNI_JIJWI_SVOH_Number"]),
 
                     // NEW: Freight logic — without these, Edit page's checkbox/dropdown
                     // never bind since the DTO carries no saved value to render
-                    Freight_Applicable =
+                    JIDNI_IsFreightApplicable =
                         item.Table.Columns.Contains("Freight_Applicable") && item["Freight_Applicable"] != DBNull.Value
                             ? Convert.ToString(item["Freight_Applicable"])
                             : "No",
 
-                    Freight_ServiceOrder_Number =
+                    JIDNI_JIFRT_SVOI_Number  =
                         item.Table.Columns.Contains("Freight_ServiceOrder_Number") && item["Freight_ServiceOrder_Number"] != DBNull.Value
-                            ? Convert.ToString(item["Freight_ServiceOrder_Number"])
-                            : "",
+                            ? Convert.ToInt64(item["Freight_ServiceOrder_Number"])
+                            : 0,
 
-                    JISVOI_Number_FRT =
+                    JIDNI_JIJWI_SVOI_Number =
                         item.Table.Columns.Contains("JISVOI_Number_FRT") && item["JISVOI_Number_FRT"] != DBNull.Value
                             ? Convert.ToInt64(item["JISVOI_Number_FRT"])
                             : 0
@@ -1141,7 +1141,7 @@ namespace ERP.Controllers
             dao.InsertEditBatchToTempDB(Root_JIDNI_Number);
        
             ViewBag.Collapse = true;
-            var x = dto.Items[0].JISVOH_Number;
+            var x = dto.Items[0].JIDNI_JIJWI_SVOH_Number;
             return View("Edit", dto);
         }
         #endregion
@@ -1659,6 +1659,52 @@ namespace ERP.Controllers
         }
         #endregion
 
+        #region new freight
+        // NEW: Freight logic (FromWH/ToWH based, JIFRT tables) — DN version
+        [HttpGet]
+        [Route("deliverynote/transactions/deliverynote/get-freight-service-order")]
+        public JsonResult GetFreightServiceOrder(long customerId, long? uomNumber = null, long? fromWHNumber = null, long? toWHNumber = null)
+        {
+            DeliveryNote_DAO dao = new DeliveryNote_DAO();
+
+            var dt = dao
+                .GetFreightServiceOrderDB(customerId, uomNumber, fromWHNumber, toWHNumber)
+                .Tables[0];
+
+            return new JsonResult(
+                dt.AsEnumerable().Select(r => new
+                {
+                    value = r["JIFRT_SVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JIFRT_SVOH_Number"]),
+                    text = r["JIFRT_SVOH_ServiceOrderNo"]?.ToString() ?? "",
+                    jisvoiNumber = r["JIFRT_SVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JIFRT_SVOI_Number"])
+                }).ToList(),
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                });
+        }
+
+        [HttpGet]
+        [Route("deliverynote/transactions/deliverynote/check-delivered-qty-exceeded-freight-new")]
+        public JsonResult CheckDeliveredQtyExceededFreightNew(long jisvohNumber, long? uomNumber = null, long? fromWHNumber = null, long? toWHNumber = null)
+        {
+            DeliveryNote_DAO dao = new DeliveryNote_DAO();
+
+            var dt = dao
+                .CheckDeliveredQtyExceededFreightDB_New(jisvohNumber, uomNumber, fromWHNumber, toWHNumber)
+                .Tables[0];
+
+            var result = dt.AsEnumerable().Select(r => new
+            {
+                deliveredQty = r["DeliveredQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["DeliveredQty"]),
+                jisvoiQty = r["JIFRT_SVOI_Qty"] == DBNull.Value ? 0 : Convert.ToDouble(r["JIFRT_SVOI_Qty"]),
+                isExceeded = r["IsExceeded"] != DBNull.Value && Convert.ToBoolean(r["IsExceeded"])
+            }).ToList();
+
+            return new JsonResult(result);
+        }
+        #endregion
         #region Address
         [Route("jobinward/transactions/delivery-note/address")]
         public IActionResult DeliveryNoteAddressID(string? JIDNHNumber, string ADTPNumber)

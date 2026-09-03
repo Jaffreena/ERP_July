@@ -1,0 +1,229 @@
+@model List<ERP_DTO.JobInwardTransaction.JIFRT_SVO_NumberReset_DTO>
+
+<div class="col table-fixed h-100">
+    <div class="w-100 table-responsive table-body table-body-f">
+        <table class="table table-one table-striped table-bordered table-hover align-middle w-100">
+            <thead>
+                <tr class="table-info text-center">
+                    <th class="datetype">Start Date</th>
+                    <th class="datetype">End Date</th>
+                    <th style="width:110px;">Start Number</th>
+                    <th style="width:110px;">Number Of Digits</th>
+                    <th>Prefil Zero</th>
+                    <th>Frequency</th>
+                    <th class="table-width-sm"></th>
+                </tr>
+            </thead>
+            <tbody id="ResetTableBody">
+                <tr id="ResetTempRow" style="display: none;">
+                    <td>
+                        <input id="JIFRT_SVO_NRS_StartDate" class="form-control JIFRT_SVO_NRS_StartDate datepicker text-center" autocomplete="off" />
+                    </td>
+                    <td>
+                        <input id="JIFRT_SVO_NRS_EndDate" class="form-control JIFRT_SVO_NRS_EndDate datepicker text-center" autocomplete="off" />
+                    </td>
+                    <td style="width:110px;">
+                        <input id="JIFRT_SVO_NRS_StartingNumber" class="form-control JIFRT_SVO_NRS_StartingNumber text-center" autocomplete="off" />
+                    </td>
+                    <td style="width:110px;">
+                        <input id="JIFRT_SVO_NRS_NumberofDigits" class="form-control JIFRT_SVO_NRS_NumberofDigits text-center" autocomplete="off" />
+                    </td>
+                    <td>
+                        <select id="JIFRT_SVO_NRS_PrefilZero" class="form-select JIFRT_SVO_NRS_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
+                    </td>
+                    <td>
+                        <select id="JIFRT_SVO_NRS_Frequency" class="form-select JIFRT_SVO_NRS_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
+                    </td>
+                    <td class="text-center">
+                        <input type="hidden" name="JIFRT_SVO_NRS_IsDeleted" class="JIFRT_SVO_NRS_IsDeleted" value="false" />
+                        <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model != null)
+                {
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="ResetNewRow">
+                            <td>
+                                <input id="JIFRT_SVO_NRS_StartDate" name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_StartDate" class="form-control JIFRT_SVO_NRS_StartDate datepicker text-center" autocomplete="off" value="@Model[i].JIFRT_SVO_NRS_StartDate" />
+                            </td>
+                            <td>
+                                <input id="JIFRT_SVO_NRS_EndDate" name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_EndDate" class="form-control JIFRT_SVO_NRS_EndDate datepicker text-center" autocomplete="off" value="@Model[i].JIFRT_SVO_NRS_EndDate" />
+                            </td>
+                            <td style="width:110px;">
+                                <input id="JIFRT_SVO_NRS_StartingNumber" name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_StartingNumber" class="form-control JIFRT_SVO_NRS_StartingNumber text-center" autocomplete="off" value="@Model[i].JIFRT_SVO_NRS_StartingNumber" />
+                            </td>
+                            <td style="width:110px;">
+                                <input id="JIFRT_SVO_NRS_NumberofDigits" name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_NumberofDigits" class="form-control JIFRT_SVO_NRS_NumberofDigits text-center" autocomplete="off" value="@Model[i].JIFRT_SVO_NRS_NumberofDigits" />
+                            </td>
+                            <td>
+                                <select id="JIFRT_SVO_NRS_PrefilZero" name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_PrefilZero" class="form-select JIFRT_SVO_NRS_PrefilZero text-center">
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Prefil)
+                                    {
+                                        if (item.Value == Model[i].JIFRT_SVO_NRS_PrefilZero)
+                                        {
+                                            <option value="@item.Value" selected>@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <select id="JIFRT_SVO_NRS_Frequency" name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_Frequency" class="form-select JIFRT_SVO_NRS_Frequency text-center">
+                                    <option value="1" selected="@(Model[i].JIFRT_SVO_NRS_Frequency == "1")">Monthly</option>
+                                    <option value="2" selected="@(Model[i].JIFRT_SVO_NRS_Frequency == "2")">Yearly</option>
+                                </select>
+                            </td>
+                            <td class="text-center">
+                                @if (@Model[i].JIFRT_SVO_NRS_Number != 0)
+                                {
+                                    <input name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_Number" type="hidden" class="JIFRT_SVO_NRS_Number" value="@Model[i].JIFRT_SVO_NRS_Number" />
+                                }
+                                <input type="hidden" name="JIFRT_SVO_NumberReset[@i].JIFRT_SVO_NRS_IsDeleted" value="false" class="JIFRT_SVO_NRS_IsDeleted" />
+                                <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row table-footer align-items-center">
+    <div class="col">
+        <a id="ResetNewRowButton" class="btn btn-primary">Add Row</a>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        function ResetInitializeFlatpickrs() {
+            $(".datepicker").flatpickr({
+                dateFormat: "d-M-Y",
+                altInput: false,
+            });
+        }
+
+        var rowCount = @(Model != null ? Model.Count : 0);
+        var isAddingRow = false;
+
+        function ResetaddRow() {
+            var NewRow = $("#ResetTempRow").clone().removeAttr("style").removeAttr("id").addClass("ResetNewRow");
+            NewRow.find("input.JIFRT_SVO_NRS_StartDate").attr("name", "JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_StartDate").val();
+            NewRow.find("input.JIFRT_SVO_NRS_EndDate").attr("name", "JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_EndDate").val();
+            NewRow.find("input.JIFRT_SVO_NRS_StartingNumber").attr("name", "JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_StartingNumber");
+            NewRow.find("input.JIFRT_SVO_NRS_NumberofDigits").attr("name", "JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_NumberofDigits");
+            NewRow.find("select.JIFRT_SVO_NRS_PrefilZero").attr("name", "JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_PrefilZero");
+            NewRow.find("select.JIFRT_SVO_NRS_Frequency").attr("name", "JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_Frequency");
+            NewRow.find("input.JIFRT_SVO_NRS_IsDeleted").attr("name", "JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_IsDeleted");
+
+            NewRow.find("input[name='JIFRT_SVO_NumberReset[" + rowCount + "].JIFRT_SVO_NRS_IsDeleted']").val(false);
+
+            $("#ResetTableBody").append(NewRow);
+            rowCount++;
+            NewRow.data("isValid", false);
+            isAddingRow = false;
+
+            ResetInitializeFlatpickrs();
+        }
+
+        if ($("tr.ResetNewRow").length == 0) {
+            ResetaddRow();
+        }
+
+        $(document).on('click', '.ResetRowRemove', function () {
+            $(this).closest('tr').find("input[name*='JIFRT_SVO_NRS_IsDeleted']").val(true);
+            $(this).closest('tr').hide();
+        });
+
+
+    $("#ResetNewRowButton").click(function () {
+                var lastRow = $("tr.ResetNewRow").last();
+                if (ResetCheckAllFieldsValid(lastRow)) {
+                    ResetaddRow();
+                }
+                else {
+                    var startingNumberInvalid = false;
+                    var numberOfDigitsInvalid = false;
+                    var otherInvalid = false;
+                    var firstInvalidField = null;
+
+                    lastRow.find("select, input, input[type='text']").each(function () {
+                        if (!ResetValidateField($(this))) {
+                            if (firstInvalidField == null) {
+                                firstInvalidField = $(this);
+                            }
+                            if ($(this).hasClass("JIFRT_SVO_NRS_StartingNumber")) {
+                                startingNumberInvalid = true;
+                            } else if ($(this).hasClass("JIFRT_SVO_NRS_NumberofDigits")) {
+                                numberOfDigitsInvalid = true;
+                            } else {
+                                otherInvalid = true;
+                            }
+                        }
+                    });
+
+                    if (firstInvalidField != null) {
+                        var message;
+                        if (startingNumberInvalid && numberOfDigitsInvalid) {
+                            message = "Start Number must be greater than 0, and Number Of Digits must be a single digit between 3 and 9.";
+                        } else if (startingNumberInvalid) {
+                            message = "Start Number must be greater than 0. Negative numbers, 0, or blank are not allowed.";
+                        } else if (numberOfDigitsInvalid) {
+                            message = "Number Of Digits must be a single digit between 3 and 9.";
+                        } else {
+                            message = "Please complete all fields !";
+                        }
+                        alert(message);
+                        firstInvalidField.focus();
+                    }
+                }
+            });
+        function ResetCheckAllFieldsValid(currentRow) {
+            var allFieldsValid = true;
+            $("tr.ResetNewRow:visible").each(function () {
+                $(this).find("select, input, input[type='text']").each(function () {
+                    if (!ResetValidateField($(this))) {
+                        allFieldsValid = false;
+                        return false;
+                    }
+                });
+                if (!allFieldsValid) return false;
+            });
+            return allFieldsValid;
+        }
+    function ResetValidateField(currentInput) {
+             var inputValue = currentInput.val();
+
+             if (inputValue === null || $.trim(inputValue) === "") {
+                 return false;
+             }
+
+             if (currentInput.hasClass("JIFRT_SVO_NRS_StartingNumber")) {
+                 var numValue = parseInt(inputValue, 10);
+                 if (isNaN(numValue) || numValue <= 0) {
+                     return false;
+                 }
+             }
+
+             if (currentInput.hasClass("JIFRT_SVO_NRS_NumberofDigits")) {
+                 if (!/^[3-9]$/.test($.trim(inputValue))) {
+                     return false;
+                 }
+             }
+
+             return true;
+         }
+        ResetInitializeFlatpickrs();
+    });
+</script>

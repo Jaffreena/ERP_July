@@ -5,9 +5,9 @@
 
 
 <style>
+
   
 
-     
     /* Equal spacing for all form rows */
     .row.align-items-center {
         padding: 2px 0;
@@ -69,7 +69,6 @@
         font-size: 13px !important;
         font-family: Arial, sans-serif;
         font-weight: 400;
-        
         resize: vertical; /* or both */
         overflow: auto;
     }
@@ -81,7 +80,7 @@
 
     
     /* Receipt Note Date */
-    #RN_Date + input {
+    #JIRNH_RN_Date + input {
         width: 15ch !important;
         max-width: 15ch !important;
         padding-right: 30px !important;
@@ -100,7 +99,7 @@
 
     
     /* Customer DC Date */
-    #JW_CustomerDC_Date + input {
+    #JIRNH_JW_CustomerDC_Date + input {
         width: 15ch !important;
         max-width: 15ch !important;
         padding-right: 30px !important;
@@ -115,21 +114,12 @@
     
 
     #JWC_Name {
-       
         padding-right: 24px; /* Space for the triangle */
 
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 8px center;
     }
-    
-
-  
-
-    
-    
-
-  
 </style>
 
 
@@ -144,16 +134,15 @@
     }
 </style> *@
 <style>
-.match-row td{
-    color:blue !important;
-    font-weight:600;
-    
-}
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
 
-.current-row td{
-    background:#dbeafe !important;
-}
-    </style>
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
 <style>
     .batchPopup thead th {
         position: sticky !important;
@@ -233,16 +222,16 @@
                     <div class="tab-content tab-body">
                         <div class="tab-pane fade show active border border-top-0 h-100 p-2" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
                         
-  <!--------------------------------------------batch--------------------------------------------->
+                            <!--------------------------------------------batch--------------------------------------------->
                             <div class="w-100 table-responsive">
                                 <table class="table table-bordered table-hover align-middle table-grid mb-0" id="BatchTable">
                                     <thead>
                                         <tr class="table-info">
-                                            <th class="datetype RNI_BCH_Date text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Date)</th>
-                                            <th class="RNI_BCH_No">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_No)</th>
-                                            <th class="table-width-xl RNI_BCH_Qty">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Qty)</th>
-                                            <th class="table-width-xl RNI_BCH_UnitPrice">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_UnitPrice)</th>
-                                            <th class="table-width-3xl RNI_BCH_Value">@Html.DisplayNameFor(M => M.ItemBatch.First().RNI_BCH_Value)</th>
+                                            <th class="datetype JIRNI_BCH_BatchDate text-center">@Html.DisplayNameFor(M => M.ItemBatch.First().JIRNI_BCH_BatchDate)</th>
+                                            <th class="JIRNI_BCH_Number">@Html.DisplayNameFor(M => M.ItemBatch.First().JIRNI_BCH_Number)</th>
+                                            <th class="table-width-xl JIRNI_BCH_BatchQty">@Html.DisplayNameFor(M => M.ItemBatch.First().JIRNI_BCH_BatchQty)</th>
+                                            <th class="table-width-xl JIRNI_BCH_BatchUnitPrice">@Html.DisplayNameFor(M => M.ItemBatch.First().JIRNI_BCH_BatchUnitPrice)</th>
+                                            <th class="table-width-3xl JIRNI_BCH_BatchValue">@Html.DisplayNameFor(M => M.ItemBatch.First().JIRNI_BCH_BatchValue)</th>
                                             <th class="action align-middle">Action</th>
                                         </tr>
                                     </thead>
@@ -252,19 +241,19 @@
                                                 <input id="RNI_BCH_Item_Number" class="RNI_BCH_Item_Number" type="hidden" />
                                                 <input id="RNI_BCH_Item_Index" class="RNI_BCH_Item_Index" type="hidden" />
                                                 <input id="RNI_BCH_Item_WH" class="RNI_BCH_Item_WH" type="hidden" />
-                                                <input id="RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date" autocomplete="off" />
+                                                <input id="JIRNI_BCH_BatchDate" class="form-control Key datepicker JIRNI_BCH_BatchDate" autocomplete="off" />
                                             </td>
                                             <td>
-                                                <input id="RNI_BCH_No" class="form-control RNI_BCH_No" autocomplete="off" />
+                                                <input id="JIRNI_BCH_Number" class="form-control JIRNI_BCH_Number" autocomplete="off" />
                                             </td>
                                             <td class="table-width-xl">
-                                                <input id="RNI_BCH_Qty" class="form-control RNI_BCH_Qty decimal" value="0" autocomplete="off" />
+                                                <input id="JIRNI_BCH_BatchQty" class="form-control JIRNI_BCH_BatchQty decimal" value="0" autocomplete="off" />
                                             </td>
                                             <td class="table-width-xl">
-                                                <input id="RNI_BCH_UnitPrice" value="0" class="form-control RNI_BCH_UnitPrice decimal"  autocomplete="off" />
+                                                <input id="JIRNI_BCH_BatchUnitPrice" value="0" class="form-control JIRNI_BCH_BatchUnitPrice decimal" autocomplete="off" />
                                             </td>
                                             <td class="table-width-xl">
-                                                <input id="RNI_BCH_Value" class="form-control RNI_BCH_Value decimal" readonly autocomplete="off" />
+                                                <input id="JIRNI_BCH_BatchValue" class="form-control JIRNI_BCH_BatchValue decimal" readonly autocomplete="off" />
                                             </td>
                                             <td class="action text-center align-middle">
                                                 <input id="RNI_BCH_IsDeleted" type="hidden" name="RNI_BCH_IsDeleted" class="RNI_BCH_IsDeleted" value="false" />
@@ -284,24 +273,24 @@
 
                                                         <input id="RNI_BCH_Item_Number" name="ItemBatch[@i].RNI_BCH_Item_Number" class="RNI_BCH_Item_Number" type="hidden" value="@Model.ItemBatch[i].JIRNI_BCH_JIRNI_Number" />
                                                         <input id="RNI_BCH_Item_WH" name="ItemBatch[@i].RNI_BCH_Item_WH" class="RNI_BCH_Item_WH" type="hidden" value="@Model.ItemBatch[i].WH_Number" />
-                                                        <input id="RNI_BCH_Date" name="ItemBatch[@i].RNI_BCH_Date" class="form-control Key datepicker RNI_BCH_Date" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Date" />
+                                                        <input id="JIRNI_BCH_BatchDate" name="ItemBatch[@i].JIRNI_BCH_BatchDate" class="form-control Key datepicker JIRNI_BCH_BatchDate" autocomplete="off" value="@Model.ItemBatch[i].JIRNI_BCH_BatchDate" />
                                                     </td>
                                                     <td>
-                                                        <input id="RNI_BCH_No" name="ItemBatch[@i].RNI_BCH_No" class="form-control RNI_BCH_No" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_No" />
+                                                        <input id="JIRNI_BCH_Number" name="ItemBatch[@i].JIRNI_BCH_Number" class="form-control JIRNI_BCH_Number" autocomplete="off" value="@Model.ItemBatch[i].JIRNI_BCH_Number" />
                                                     </td>
                                                     <td class="table-width-xl">
-                                                        <input id="RNI_BCH_Qty" name="ItemBatch[@i].RNI_BCH_Qty" class="form-control RNI_BCH_Qty" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Qty" />
+                                                        <input id="JIRNI_BCH_BatchQty" name="ItemBatch[@i].JIRNI_BCH_BatchQty" class="form-control JIRNI_BCH_BatchQty" autocomplete="off" value="@Model.ItemBatch[i].JIRNI_BCH_BatchQty" />
                                                     </td>
                                                     <td class="table-width-xl">
-                                                        <input id="RNI_BCH_UnitPrice" name="ItemBatch[@i].RNI_BCH_UnitPrice" readonly class="form-control RNI_BCH_UnitPrice decimal" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_UnitPrice" />
+                                                        <input id="JIRNI_BCH_BatchUnitPrice" name="ItemBatch[@i].JIRNI_BCH_BatchUnitPrice" readonly class="form-control JIRNI_BCH_BatchUnitPrice decimal" autocomplete="off" value="@Model.ItemBatch[i].JIRNI_BCH_BatchUnitPrice" />
                                                     </td>
                                                     <td class="table-width-xl">
-                                                        <input id="RNI_BCH_Value" name="ItemBatch[@i].RNI_BCH_Value" readonly class="form-control RNI_BCH_Value decimal" autocomplete="off" value="@Model.ItemBatch[i].RNI_BCH_Value" />
+                                                        <input id="JIRNI_BCH_BatchValue" name="ItemBatch[@i].JIRNI_BCH_BatchValue" readonly class="form-control JIRNI_BCH_BatchValue decimal" autocomplete="off" value="@Model.ItemBatch[i].JIRNI_BCH_BatchValue" />
                                                     </td>
                                                     <td class="action text-center align-middle">
-                                                        @if (@Model.ItemBatch[i].RNI_BCH_No != 0)
+                                                        @if (@Model.ItemBatch[i].JIRNI_BCH_Number != 0)
                                                         {
-                                                            <input name="ItemBatch[@i].RNI_BCH_No" type="hidden" class="Number" value="@Model.ItemBatch[i].RNI_BCH_No" />
+                                                            <input name="ItemBatch[@i].JIRNI_BCH_Number" type="hidden" class="Number" value="@Model.ItemBatch[i].JIRNI_BCH_Number" />
                                                         }
                                                         <input type="hidden" id="RNI_BCH_IsDeleted" name="ItemBatch[@i].RNI_BCH_IsDeleted" class="RNI_BCH_IsDeleted" value="@Model.ItemBatch[i].RNI_BCH_IsDeleted" />
                                                         <a class="IBatRowRemove text-danger p-0 icon-link shadow-none">
@@ -330,7 +319,7 @@
                                 </table>
                             </div>
 
-<!--------------------------------------------batch--------------------------------------------->
+                            <!--------------------------------------------batch--------------------------------------------->
                         </div>
                         <!-- Other WH -->
                         <div class="tab-pane fade p-2 border border-top-0"
@@ -504,7 +493,7 @@
 <div class="row panel-body gx-2  position-relative">
     <div class="col-12 panel-card-fixed h-100">
         <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
-              <!-- HEADER -->
+            <!-- HEADER -->
             
             <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
                 <div class="card-body pb-0" style="margin-top: -10px !important;">
@@ -539,43 +528,43 @@
                             <div class="row">
                                 <div class="col-12 col-md-3 col-lg-3">
                                     <div class="row align-items-center gx-2">
-                                        <label asp-for="RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="RN_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
+                                            <input asp-for="JIRNH_RN_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                         </div>
                                     </div>
                                     <div class="row align-items-center gx-2">
-                                        <label asp-for="RN_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_RN_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="RN_Date" class="form-control Key datepicker" style="width:20ch !important;" autocomplete="off" />
+                                            <input asp-for="JIRNH_RN_Date" class="form-control Key datepicker" style="width:20ch !important;" autocomplete="off" />
                                         </div>
                                     </div>
                                     <div class="row align-items-center gx-2 ">
-                                        <label asp-for="JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="JW_CustomerDC_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
+                                            <input asp-for="JIRNH_JW_CustomerDC_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                         </div>
                                     </div>
                                     <div class="row align-items-center gx-2">
-                                        <label asp-for="JW_CustomerDC_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_JW_CustomerDC_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="JW_CustomerDC_Date" class="form-control Key datepicker" style="width:20ch !important;" autocomplete="off" />
+                                            <input asp-for="JIRNH_JW_CustomerDC_Date" class="form-control Key datepicker" style="width:20ch !important;" autocomplete="off" />
                                         </div>
                                     </div>
                                     <div class="row align-items-center gx-2">
-                                        <label asp-for="MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <select asp-for="MS_Number" class="form-select MS_Number" 
-                                           asp-items="@ViewBag.MaterialSegregation"></select>
+                                            <select asp-for="JIRNH_MS_Number" class="form-select JIRNH_MS_Number"
+                                                    asp-items="@ViewBag.MaterialSegregation"></select>
                                         </div>
                                     </div>
           
                                 </div>
                                 <div class="col-12 col-md-3 col-lg-4">
                                     <div class="row align-items-center gx-2">
-                                        <label asp-for="JWC_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_JWC_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                         <div class="col-sm-7 col-lg-5">
-                                             <input asp-for="JWC_Number" type="hidden" />
+                                            <input asp-for="JIRNH_JWC_Number" type="hidden" />
 
                                             <input asp-for="JWC_Name"
                                                    class="form-control"
@@ -586,9 +575,9 @@
                                     </div>
 
                                     <div class="row align-items-center gx-2">
-                                        <label asp-for="Currency_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_Currency_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                         <div class="col-sm-7 col-lg-5">
-                                            <input asp-for="Currency_Number" class="form-control" type="hidden" />
+                                            <input asp-for="JIRNH_Currency_Number" class="form-control" type="hidden" />
                                             <input asp-for="Currency_Name"
                                                    class="form-control Key KeyDup"
                                                    autocomplete="off"
@@ -596,9 +585,9 @@
                                         </div>
                                     </div>
                                     <div class="row align-items-center gx-2">
-                                        <label asp-for="WH_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_WH_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                         <div class="col-sm-7 col-lg-5">
-                                            <select asp-for="WH_Number"
+                                            <select asp-for="JIRNH_WH_Number"
                                                     class="form-select"
                                                     asp-items="@ViewBag.Warehouse"></select>
 
@@ -620,20 +609,19 @@
 
                                 
                                 </div>
+
                                 
-                                
-                                    <div class="col-12 col-md-3 col-lg-3">
+                                <div class="col-12 col-md-3 col-lg-3">
                                     <div class="row align-items-start  gx-2">
-                                        <label asp-for="Remarks" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
+                                        <label asp-for="JIRNH_Remarks" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                             <textarea asp-for="Remarks" maxlength="250"
+                                            <textarea asp-for="JIRNH_Remarks" maxlength="250"
                                                       class="form-control Key KeyDup"
-                                                   
                                                       autocomplete="off"></textarea>
                                         </div>
                                     </div>
+
                                     
-                                
                                 </div>
                             </div>
                         </div>
@@ -660,7 +648,6 @@
                 </div>
             </div>
             <!-- HEADER -->
-             
             <!-- BODY has ITEM -->
             <div class="card rounded-0 bg-transparent shadow-none" id="CardBody">
                 <div class="card-body h-100">
@@ -686,9 +673,9 @@
                             <div class="tab-content tab-body tab-body-h-o">
                                 <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" tabindex="0">
                                     <div class="row h-100">
-                                     <!-------------------------item-------------------------------------------------------------------->
+                                        <!-------------------------item-------------------------------------------------------------------->
                                         <div class="col table-fixed h-100">
-                                            <div class="w-12 table-responsive table-body table-body-f"   style="height:528px;">
+                                            <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
 
                                                 <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="ItemTable">
 
@@ -699,13 +686,13 @@
                                                                 <input type="checkbox" id="IndexAllCheckItem" class="form-check-input border-white">
                                                             </th>
 
-                                                            <th class="PRS_Number">
-                                                                @Html.DisplayNameFor(m => m.Items.First().PRS_Number)
+                                                            <th class="JIRNI_PRS_Number">
+                                                                @Html.DisplayNameFor(m => m.Items.First().JIRNI_PRS_Number)
                                                             </th>
 
                                                             <th class="Item_Code">
                                                              
-                                                                @Html.DisplayNameFor(m => m.Items.First().Item_Number)
+                                                                @Html.DisplayNameFor(m => m.Items.First().JIRNI_Item_Number)
                                                             </th>
 
                                                             <th class="Description">
@@ -736,28 +723,28 @@
                                                                 @Html.DisplayNameFor(m => m.Items.First().ItemGroup)
                                                             </th>
 
-                                                            <th class="WH_Number">
-                                                                @Html.DisplayNameFor(m => m.Items.First().WH_Number)
+                                                            <th class="JIRNI_WH_Number">
+                                                                @Html.DisplayNameFor(m => m.Items.First().JIRNI_WH_Number)
                                                             </th>
 
-                                                            <th class="UoM_Number">
-                                                                @Html.DisplayNameFor(m => m.Items.First().UoM_Number)
+                                                            <th class="JIRNI_UoM_Number">
+                                                                @Html.DisplayNameFor(m => m.Items.First().JIRNI_UoM_Number)
                                                             </th>
 
-                                                            <th class="Qty">
-                                                                @Html.DisplayNameFor(m => m.Items.First().Qty)
+                                                            <th class="JIRNI_Qty">
+                                                                @Html.DisplayNameFor(m => m.Items.First().JIRNI_Qty)
                                                             </th>
 
-                                                            <th class="Qty_Kg">
-                                                                Qty (Kg)
+                                                            <th class="JIRNI_Qty_Kgs">
+                                                                Qty (Kgs)
                                                             </th>
 
-                                                            <th class="UnitPrice">
-                                                                @Html.DisplayNameFor(m => m.Items.First().UnitPrice)
+                                                            <th class="JIRNI_UnitPrice">
+                                                                @Html.DisplayNameFor(m => m.Items.First().JIRNI_UnitPrice)
                                                             </th>
 
-                                                            <th class="Amount">
-                                                                @Html.DisplayNameFor(m => m.Items.First().Amount)
+                                                            <th class="JIRNI_Amount">
+                                                                @Html.DisplayNameFor(m => m.Items.First().JIRNI_Amount)
                                                             </th>
 
                                                             <th class="table-width-md text-center FreightApplicableHeader">
@@ -770,7 +757,7 @@
                                                                 To WH
                                                             </th>
                                                             <th class="FreightSOHeader">
-                                                                Freight SO No.
+                                                                Freight SO #.
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -782,12 +769,12 @@
                                                         <tr id="TempRow" style="display:none;">
                                                             <td><input type="checkbox" class="CheckItem form-check-input"> </td>
                                                             <td>
-                                                                <select class="form-select PRS_Number" asp-items="@ViewBag.PRS"></select>
+                                                                <select class="form-select JIRNI_PRS_Number" asp-items="@ViewBag.PRS"></select>
                                                             </td>
-                                                       
 
+                                                       
                                                             <td>
-                                                                <input id="Item_Number" class="Item_Number" type="hidden" />
+                                                                <input id="JIRNI_Item_Number" class="JIRNI_Item_Number" type="hidden" />
                                                                 <input id="Item_Index" class="Item_Index" type="hidden" />
                                                                 <input class="form-control Item_Code" oninput="OnInput(this)" />
                                                             </td>
@@ -804,54 +791,54 @@
                                                             <td><input class="form-control ItemGroup" readonly /></td>
 
                                                             <td>
-                                                                <select class="form-select WH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                <select class="form-select JIRNI_WH_Number" asp-items="@ViewBag.Warehouse"></select>
                                                             </td>
 
                                                             <td class="text-center">
-                                                                <select class="form-select UoM_Number" asp-items="@ViewBag.UoM"></select>
+                                                                <select class="form-select JIRNI_UoM_Number" asp-items="@ViewBag.UoM"></select>
                                                             </td>
 
                                                             <td>
-                                                                <input class="form-control Qty text-center" />
+                                                                <input class="form-control JIRNI_Qty text-center" />
                                                             </td>
 
                                                             <td>
-                                                                <input class="form-control Qty_Kg text-center" readonly />
+                                                                <input class="form-control JIRNI_Qty_Kgs text-center" readonly />
                                                                 <input type="hidden" class="FromQty" />
                                                                 <input type="hidden" class="ToQty" />
                                                             </td>
 
                                                             <td>
-                                                                <input class="form-control UnitPrice text-end" />
+                                                                <input class="form-control JIRNI_UnitPrice text-end" />
                                                             </td>
 
                                                             <td>
-                                                                <input class="form-control Amount text-end" readonly />
+                                                                <input class="form-control JIRNI_Amount text-end" readonly />
                                                                 <input type="hidden" class="IsDeleted" value="0" />
                                                             </td>
 
                                                             <!-- FREIGHT APPLICABLE -->
                                                             <td class="text-center p-2 FreightApplicableCell">
-                                                                <input type="checkbox" class="form-check-input Freight_Applicable" />
+                                                                <input type="checkbox" class="form-check-input JIRNI_IsFreightApplicable" />
                                                             </td>
 
                                                             <!-- FROM WH -->
                                                             <td class="FromWHCell">
-                                                                <select class="form-select FromWH" asp-items="@ViewBag.Warehouse">
+                                                                <select class="form-select JIRNI_FromWH" asp-items="@ViewBag.Warehouse">
                                                                     <option value=""></option>
                                                                 </select>
                                                             </td>
 
                                                             <!-- TO WH -->
                                                             <td class="ToWHCell">
-                                                                <select class="form-select ToWH" asp-items="@ViewBag.Warehouse">
+                                                                <select class="form-select JIRNI_ToWH" asp-items="@ViewBag.Warehouse">
                                                                     <option value=""></option>
                                                                 </select>
                                                             </td>
 
                                                             <!-- FREIGHT NO -->
                                                             <td class="FreightSOCell">
-                                                                <select class="form-select Freight_ServiceOrder_Number">
+                                                                <select class="form-select JIRNI_JIFRT_SVOH_Number">
                                                                     <option value="0"></option>
                                                                 </select>
                                                                 <input type="hidden" class="JISVOI_Number_FRT_Row" value="0" />
@@ -859,7 +846,6 @@
                                                         </tr>
 
                                                         <!-- 🔹 EXISTING DATA -->
-
                                                         <!-- 🔹 EXISTING DATA -->
                                                         @if (Model != null)
                                                         {
@@ -872,9 +858,9 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].PRS_Number"
-                                                                               class="form-control PRS_Number"
-                                                                               value="@Model.Items[i].PRS_Number"
+                                                                        <input name="Items[@i].JIRNI_PRS_Number"
+                                                                               class="form-control JIRNI_PRS_Number"
+                                                                               value="@Model.Items[i].JIRNI_PRS_Number"
                                                                                oninput="OnInputProcess(this)"
                                                                                onfocus="OnFocusProcess(this)" autocomplete="off" />
 
@@ -882,9 +868,9 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].Item_Number"
-                                                                               class="form-control Item_Number"
-                                                                               value="@Model.Items[i].Item_Number"
+                                                                        <input name="Items[@i].JIRNI_Item_Number"
+                                                                               class="form-control JIRNI_Item_Number"
+                                                                               value="@Model.Items[i].JIRNI_Item_Number"
                                                                                oninput="OnInput(this)" />
                                                                         
                                                                     </td>
@@ -932,11 +918,11 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <select name="Items[@i].WH_Number" class="form-select WH_Number">
+                                                                        <select name="Items[@i].JIRNI_WH_Number" class="form-select JIRNI_WH_Number">
                                                                             @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                                                             {
                                                                                 <option value="@w.Value"
-                                                                                        selected="@(w.Value == Model.Items[i]?.WH_Number)">
+                                                                                        selected="@(w.Value == Model.Items[i]?.JIRNI_WH_Number)">
                                                                                     @w.Text
                                                                                 </option>
                                                                             }
@@ -944,11 +930,11 @@
                                                                     </td>
 
                                                                     <td class="text-center">
-                                                                        <select name="Items[@i].UoM_Number" class="form-select UoM_Number">
+                                                                        <select name="Items[@i].JIRNI_UoM_Number" class="form-select JIRNI_UoM_Number">
                                                                             @foreach (var u in (ViewBag.UoM as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                                                             {
                                                                                 <option value="@u.Value"
-                                                                                        selected="@(u.Value == Model.Items[i]?.UoM_Number)">
+                                                                                        selected="@(u.Value == Model.Items[i]?.JIRNI_UoM_Number)">
                                                                                     @u.Text
                                                                                 </option>
                                                                             }
@@ -956,29 +942,29 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].Qty"
-                                                                               class="form-control Qty text-center"
-                                                                               value="@Model.Items[i].Qty" />
+                                                                        <input name="Items[@i].JIRNI_Qty"
+                                                                               class="form-control JIRNI_Qty text-center"
+                                                                               value="@Model.Items[i].JIRNI_Qty" />
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].Qty_Kg"
-                                                                               class="form-control Qty_Kg text-center"
-                                                                               value="@Model.Items[i].Qty_Kg" readonly />
+                                                                        <input name="Items[@i].JIRNI_Qty_Kgs"
+                                                                               class="form-control JIRNI_Qty_Kgs text-center"
+                                                                               value="@Model.Items[i].JIRNI_Qty_Kgs" readonly />
                                                                         <input type="hidden" class="FromQty" />
                                                                         <input type="hidden" class="ToQty" />
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].UnitPrice"
-                                                                               class="form-control UnitPrice text-end"
-                                                                               value="@Model.Items[i].UnitPrice" />
+                                                                        <input name="Items[@i].JIRNI_UnitPrice"
+                                                                               class="form-control JIRNI_UnitPrice text-end"
+                                                                               value="@Model.Items[i].JIRNI_UnitPrice" />
                                                                     </td>
 
                                                                     <td>
-                                                                        <input name="Items[@i].Amount"
-                                                                               class="form-control Amount text-end"
-                                                                               value="@Model.Items[i].Amount" readonly />
+                                                                        <input name="Items[@i].JIRNI_Amount"
+                                                                               class="form-control JIRNI_Amount text-end"
+                                                                               value="@Model.Items[i].JIRNI_Amount" readonly />
 
                                                                         <input type="hidden"
                                                                                name="Items[@i].IsDeleted"
@@ -989,20 +975,20 @@
                                                                     <!-- FREIGHT APPLICABLE -->
                                                                     <td class="text-center p-2 FreightApplicableCell">
                                                                         <input type="checkbox"
-                                                                               name="Items[@i].Freight_Applicable"
-                                                                               class="form-check-input Freight_Applicable"
+                                                                               name="Items[@i].JIRNI_IsFreightApplicable"
+                                                                               class="form-check-input JIRNI_IsFreightApplicable"
                                                                                value="Yes"
-                                                                               checked="@(Model.Items[i].Freight_Applicable == "Yes")" />
+                                                                               checked="@(Model.Items[i].JIRNI_IsFreightApplicable == "Yes")" />
                                                                     </td>
 
                                                                     <!-- FROM WH -->
                                                                     <td class="FromWHCell">
-                                                                        <select name="Items[@i].FromWH" class="form-select FromWH">
+                                                                        <select name="Items[@i].JIRNI_FromWH" class="form-select JIRNI_FromWH">
                                                                             <option value=""></option>
                                                                             @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                                                             {
                                                                                 <option value="@w.Value"
-                                                                                        selected="@(w.Value == Model.Items[i].FromWH)">
+                                                                                        selected="@(w.Value == Model.Items[i].JIRNI_FromWH)">
                                                                                     @w.Text
                                                                                 </option>
                                                                             }
@@ -1011,12 +997,12 @@
 
                                                                     <!-- TO WH -->
                                                                     <td class="ToWHCell">
-                                                                        <select name="Items[@i].ToWH" class="form-select ToWH">
+                                                                        <select name="Items[@i].JIRNI_ToWH" class="form-select JIRNI_ToWH">
                                                                             <option value=""></option>
                                                                             @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                                                             {
                                                                                 <option value="@w.Value"
-                                                                                        selected="@(w.Value == Model.Items[i].ToWH)">
+                                                                                        selected="@(w.Value == Model.Items[i].JIRNI_ToWH)">
                                                                                     @w.Text
                                                                                 </option>
                                                                             }
@@ -1025,17 +1011,17 @@
 
                                                                     <!-- FREIGHT NO -->
                                                                     <td class="FreightSOCell">
-                                                                        <select name="Items[@i].Freight_ServiceOrder_Number"
-                                                                                class="form-select Freight_ServiceOrder_Number">
+                                                                        <select name="Items[@i].JIRNI_JIFRT_SVOH_Number"
+                                                                                class="form-select JIRNI_JIFRT_SVOH_Number">
                                                                             <option value="0"></option>
-                                                                            @if (!string.IsNullOrEmpty(Model.Items[i].Freight_ServiceOrder_Number) && Model.Items[i].Freight_ServiceOrder_Number != "0")
+                                                                            @if (!string.IsNullOrEmpty(Model.Items[i].JIRNI_JIFRT_SVOH_Number) && Model.Items[i].JIRNI_JIFRT_SVOH_Number != "0")
                                                                             {
-                                                                                <option value="@Model.Items[i].Freight_ServiceOrder_Number" selected>
-                                                                                    @Model.Items[i].Freight_ServiceOrder_Number
+                                                                                <option value="@Model.Items[i].JIRNI_JIFRT_SVOH_Number" selected>
+                                                                                    @Model.Items[i].JIRNI_JIFRT_SVOH_Number
                                                                                 </option>
                                                                             }
                                                                         </select>
-                                                                        <input type="hidden" class="JISVOI_Number_FRT_Row" value="@Model.Items[i].JISVOI_Number_FRT" />
+                                                                        <input type="hidden" class="JISVOI_Number_FRT_Row" value="@Model.Items[i].JIRNI_JIFRT_SVOI_Number" />
                                                                     </td>
 
                                                                 </tr>
@@ -1055,7 +1041,10 @@
                                                                 <input id="TotalAmount" style="text-align:right" class="form-control text-end" readonly />
                                                             </td>
                                                             <td></td>
-                                                           
+                                                            <td class="FreightApplicableFooterCell"></td>
+                                                            <td class="FromWHFooterCell"></td>
+                                                            <td class="ToWHFooterCell"></td>
+                                                            <td class="FreightSOFooterCell"></td>
                                                         </tr>
                                                     </tfoot>
 
@@ -1066,7 +1055,7 @@
                                          
                                         </div>
 
-                                     <!-------------------item----------------------------------------------------------->
+                                        <!-------------------item----------------------------------------------------------->
                                     </div>
                                 </div>
                             </div>
@@ -1084,7 +1073,7 @@
             <!-- BODY has ITEM -->
         </div>
     </div>
-    <div id="RightPane" >
+    <div id="RightPane">
         <div class="p-2">
             <div class="buyer-search-results"></div>
         </div>
@@ -1104,7 +1093,7 @@
     <script src="~/js/code/ItemGrid.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
-   <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote_batch.js" asp-append-version="true"></script>

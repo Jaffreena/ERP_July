@@ -41,12 +41,12 @@ namespace ERP_DAO.JobInwardTransaction
 
             DbCommand cmd = db.GetStoredProcCommand("JI_DeliveryNote_View_SP");
 
-            
+
             db.AddInParameter(cmd,
                               "@JIDNH_Number",
                               DbType.Int64,
                               JIDNH_Number);
- 
+
             return db.ExecuteDataSet(cmd);
         }
 
@@ -55,16 +55,16 @@ namespace ERP_DAO.JobInwardTransaction
             Database db = new SqlDatabase(DB.Connection());
             DbCommand cmd = db.GetStoredProcCommand("JI_Conversion_SP");
 
-         //   int DN_Id = 10; // INSERT MODE
+            //   int DN_Id = 10; // INSERT MODE
 
             // 🔹 Mode
             db.AddInParameter(cmd, "@DN_Id", DbType.Int32, DN_DTO.Header.DN_Id);
 
-          //  DN_DTO.Header.JIDNH_DN_Date = DateTime.Now;
+            //  DN_DTO.Header.JIDNH_DN_Date = DateTime.Now;
             db.AddInParameter(cmd, "@JIDNH_DN_Date", DbType.Date, DN_DTO.Header.JIDNH_DN_Date);
             db.AddInParameter(cmd, "@JIDNI_Item_Code", DbType.String, DN_DTO.Header.JIDNI_Item_Code);
             db.AddInParameter(cmd, "@DN_CUS_Number", DbType.Int32, DN_DTO.Header.DN_CUS_Number);
-        
+
 
 
             return db.ExecuteDataSet(cmd);
@@ -80,8 +80,8 @@ namespace ERP_DAO.JobInwardTransaction
             // 🔹 Mode
             db.AddInParameter(cmd, "@DN_Id", DbType.Int32, DN_DTO.DN_Id);
 
-           // DN_DTO.JIDNH_DN_Date = DateTime.Now;
-           // db.AddInParameter(cmd, "@JIDNH_DN_Date", DbType.Date, DN_DTO.JIDNH_DN_Date);
+            // DN_DTO.JIDNH_DN_Date = DateTime.Now;
+            // db.AddInParameter(cmd, "@JIDNH_DN_Date", DbType.Date, DN_DTO.JIDNH_DN_Date);
 
 
 
@@ -261,12 +261,12 @@ namespace ERP_DAO.JobInwardTransaction
                     item.JIDNI_UoM_Number,
                     item.JIDNI_Qty,
                     item.JIDNI_UnitPrice,
-                    item.JIDNI_Amount,
-                    item.JIDNI_JW_InvoiceTracking,
+                    item.JIDNI_Amount
+                    //item.JIDNI_JW_InvoiceTracking,
 
-                    // NEW
-                    item.JISVOH_Number,
-                    item.JISVOI_Number
+                    //// NEW
+                    //item.JISVOH_Number,
+                    //item.JISVOI_Number
                 );
             }
 
@@ -334,7 +334,7 @@ namespace ERP_DAO.JobInwardTransaction
                             cmd.Parameters.AddWithValue("@JICNVH_WC_Number", h.JIDNH_WC_Number);
                             cmd.Parameters.AddWithValue("@JICNVH_Operator", h.JIDNH_Operator_Number);
                             cmd.Parameters.AddWithValue("@JICNVH_PRS_Number", h.JIDNH_PRS_Number);
-                            cmd.Parameters.AddWithValue("@JICNVH_MS_Number", h.JIDNH_MS_Number); 
+                            cmd.Parameters.AddWithValue("@JICNVH_MS_Number", h.JIDNH_MS_Number);
 
                             DN_Number = Convert.ToInt64(cmd.ExecuteScalar());
                         }
@@ -349,8 +349,8 @@ namespace ERP_DAO.JobInwardTransaction
                         foreach (var item in DN_DTO.Items)
                         {
                             long insertedItemNumber = 0;
-                         
-                            
+
+
 
                             using (SqlCommand cmd = new SqlCommand(@"
          INSERT INTO JI_ConversionConsumption
@@ -373,12 +373,12 @@ namespace ERP_DAO.JobInwardTransaction
              @JICNVC_ConsQty 
          )", con, tr))
                             {
-                                cmd.Parameters.AddWithValue("@JICNVC_JICNVH_Number", DN_Number);                              
+                                cmd.Parameters.AddWithValue("@JICNVC_JICNVH_Number", DN_Number);
                                 cmd.Parameters.AddWithValue("@JICNVC_Item_Number", item.JIDNI_Item_Number);
                                 cmd.Parameters.AddWithValue("@JICNVC_WH_Number", item.JIDNI_WH_Number);
                                 cmd.Parameters.AddWithValue("@JICNVC_UoM_Number", item.JIDNI_UoM_Number);
                                 cmd.Parameters.AddWithValue("@JICNVC_ConsQty", item.JIDNI_Qty);
-                              
+
 
                                 insertedItemNumber =
                                     Convert.ToInt64(cmd.ExecuteScalar());
@@ -467,7 +467,7 @@ namespace ERP_DAO.JobInwardTransaction
                                     cmd.Parameters.AddWithValue("@JICNVC_BCH_BatchQty", useQty);
                                     cmd.Parameters.AddWithValue("@JICNVC_BCH_BatchUnitPrice", batch.JIDNI_BCH_BatchUnitPrice);
                                     cmd.Parameters.AddWithValue("@JICNVC_BCH_BatchValue", batch.JIDNI_BCH_BatchValue);
-                                     
+
                                     cmd.Parameters.AddWithValue("@RefBatchNumber", batch.JIDNI_BCH_Number);
                                     batchNumber =
                                         Convert.ToInt64(cmd.ExecuteScalar());
@@ -627,11 +627,11 @@ namespace ERP_DAO.JobInwardTransaction
             foreach (var item in items)
             {
                 dt.Rows.Add(
-                    Convert.ToInt64(item.Item_Number),
-                    Convert.ToInt64(item.WH_Number),
-                    Convert.ToInt64(item.UoM_Number),
+                    Convert.ToInt64(item.JIRNI_Item_Number),          // RENAMED: was item.Item_Number
+                    Convert.ToInt64(item.JIRNI_WH_Number),             // RENAMED: was item.WH_Number
+                    Convert.ToInt64(item.JIRNI_UoM_Number),            // RENAMED: was item.UoM_Number
                     "1",
-                    Convert.ToDecimal(item.Qty)
+                    Convert.ToDecimal(item.JIRNI_Qty)                  // RENAMED: was item.Qty
                 );
             }
 
@@ -643,7 +643,7 @@ namespace ERP_DAO.JobInwardTransaction
             DataTable dt = new DataTable();
 
             dt.Columns.Add("JICNVP_BCH_JICNVP_Number", typeof(long));
-    
+
             dt.Columns.Add("JICNVP_BCH_WH_Number", typeof(long));
             dt.Columns.Add("JICNVP_BCH_BatchDate", typeof(DateTime));
             dt.Columns.Add("JICNVP_BCH_BatchNo", typeof(string));
@@ -661,14 +661,14 @@ namespace ERP_DAO.JobInwardTransaction
             {
                 dt.Rows.Add(
                     batch.RNI_BCH_Item_Index + 1,
-                    
-                    Convert.ToInt64(batch.RNI_BCH_WH_Number),
-                    Convert.ToDateTime(batch.RNI_BCH_Date),
-                    batch.RNI_BCH_Number,
+
+                    Convert.ToInt64(batch.JIRNI_BCH_WH_Number),
+                    Convert.ToDateTime(batch.JIRNI_BCH_BatchDate),      // RENAMED: was batch.RNI_BCH_Date
+                    batch.JIRNI_BCH_BatchNo,                            // RENAMED: was batch.RNI_BCH_Number
                     "1",
-                    Convert.ToDecimal(batch.RNI_BCH_Qty),
-                    Convert.ToDecimal(batch.RNI_BCH_UnitPrice),
-                    Convert.ToDecimal(batch.RNI_BCH_Value)
+                    Convert.ToDecimal(batch.JIRNI_BCH_BatchQty),        // RENAMED: was batch.RNI_BCH_Qty
+                    Convert.ToDecimal(batch.JIRNI_BCH_BatchUnitPrice),  // RENAMED: was batch.RNI_BCH_UnitPrice
+                    Convert.ToDecimal(batch.JIRNI_BCH_BatchValue)       // RENAMED: was batch.RNI_BCH_Value
                 );
             }
 
@@ -690,10 +690,10 @@ namespace ERP_DAO.JobInwardTransaction
             foreach (var item in items)
             {
                 dt.Rows.Add(
-                    Convert.ToInt64(item.Item_Number),
-                    Convert.ToInt64(item.WH_Number),
-                    Convert.ToInt64(item.UoM_Number),
-                    Convert.ToDecimal(item.Qty)
+                    Convert.ToInt64(item.JIRNI_Item_Number),          // RENAMED: was item.Item_Number
+                    Convert.ToInt64(item.JIRNI_WH_Number),             // RENAMED: was item.WH_Number
+                    Convert.ToInt64(item.JIRNI_UoM_Number),            // RENAMED: was item.UoM_Number
+                    Convert.ToDecimal(item.JIRNI_Qty)                  // RENAMED: was item.Qty
                 );
             }
 
@@ -723,12 +723,12 @@ namespace ERP_DAO.JobInwardTransaction
                 dt.Rows.Add(
                     batch.RNI_BCH_Item_Index + 1,
                     batchNo++,
-                    Convert.ToInt64(batch.RNI_BCH_WH_Number),
-                    Convert.ToDateTime(batch.RNI_BCH_Date),
-                    batch.RNI_BCH_Number,
-                    Convert.ToDecimal(batch.RNI_BCH_Qty),
-                    Convert.ToDecimal(batch.RNI_BCH_UnitPrice),
-                    Convert.ToDecimal(batch.RNI_BCH_Value)
+                    Convert.ToInt64(batch.JIRNI_BCH_WH_Number),
+                    Convert.ToDateTime(batch.JIRNI_BCH_BatchDate),      // RENAMED: was batch.RNI_BCH_Date
+                    batch.JIRNI_BCH_BatchNo,                            // RENAMED: was batch.RNI_BCH_Number
+                    Convert.ToDecimal(batch.JIRNI_BCH_BatchQty),        // RENAMED: was batch.RNI_BCH_Qty
+                    Convert.ToDecimal(batch.JIRNI_BCH_BatchUnitPrice),  // RENAMED: was batch.RNI_BCH_UnitPrice
+                    Convert.ToDecimal(batch.JIRNI_BCH_BatchValue)       // RENAMED: was batch.RNI_BCH_Value
                 );
             }
 
@@ -806,7 +806,7 @@ namespace ERP_DAO.JobInwardTransaction
                     i.JIDNI_Qty,
                     i.JIDNI_UnitPrice,
                     i.JIDNI_Amount,
-                    i.JIDNI_JW_InvoiceTracking
+                    i.JIDNI_IsJW_InvoiceApplicable
                 );
             }
 
@@ -926,7 +926,7 @@ namespace ERP_DAO.JobInwardTransaction
 
                 db.AddInParameter(cmd, "@LineItem_Number", DbType.Int64, lineItemNumber);
 
-           
+
 
                 return db.ExecuteDataSet(cmd);
             }
@@ -986,7 +986,7 @@ namespace ERP_DAO.JobInwardTransaction
             }
         }
 
-        public DataSet GetBatchDetailsEditDB_ItemChanged(long fromWarehouse, long lineItemNumber, long JIDNI_Number, int ItemGridIndex,long JIDNH_Number)
+        public DataSet GetBatchDetailsEditDB_ItemChanged(long fromWarehouse, long lineItemNumber, long JIDNI_Number, int ItemGridIndex, long JIDNH_Number)
         {
             try
             {
@@ -996,14 +996,14 @@ namespace ERP_DAO.JobInwardTransaction
 
                 //    DbCommand cmd = db.GetStoredProcCommand("JI_DeliveryNote_GetBatchDetails_Edit_SP_ItemChange");
                 DbCommand cmd = db.GetStoredProcCommand("SP_GetBatchStock");
-                
+
                 db.AddInParameter(cmd, "@Warehouse_Number", DbType.Int64, fromWarehouse);
 
                 db.AddInParameter(cmd, "@Item_Number", DbType.Int64, lineItemNumber);
 
                 db.AddInParameter(cmd, "@DBCH_Index", DbType.Int64, ItemGridIndex);
-            //    db.AddInParameter(cmd, "@Header_Number", DbType.Int64, JIDNH_Number);
-                
+                //    db.AddInParameter(cmd, "@Header_Number", DbType.Int64, JIDNH_Number);
+
 
                 return db.ExecuteDataSet(cmd);
             }
@@ -1025,7 +1025,7 @@ namespace ERP_DAO.JobInwardTransaction
             }
         }
 
-        public DataSet GetBatchDetailsEditDB(long fromWarehouse, long lineItemNumber,long JIDNI_Number,int ItemGridIndex)
+        public DataSet GetBatchDetailsEditDB(long fromWarehouse, long lineItemNumber, long JIDNI_Number, int ItemGridIndex)
         {
             try
             {
@@ -1061,7 +1061,7 @@ namespace ERP_DAO.JobInwardTransaction
         }
 
 
-        public DataSet GetBatchDetailsDB(long fromWarehouse, long lineItemNumber,int ItemGridIndex)
+        public DataSet GetBatchDetailsDB(long fromWarehouse, long lineItemNumber, int ItemGridIndex)
         {
             try
             {
@@ -1142,7 +1142,7 @@ namespace ERP_DAO.JobInwardTransaction
                 return ds;
             }
         }
-        public DataSet OutCommonBatchSaveDB (OutCommonBatch_DTO dto)
+        public DataSet OutCommonBatchSaveDB(OutCommonBatch_DTO dto)
         {
             Database db = new SqlDatabase(DB.Connection());
 
@@ -1295,7 +1295,7 @@ FROM
                 ", con, tr))
                         {
                             delCmd.Parameters.AddWithValue("@DBCH_Index", first.DBCH_Index);
-                          
+
 
                             delCmd.ExecuteNonQuery();
                         }
@@ -1362,12 +1362,12 @@ FROM
 
                                 cmd.ExecuteNonQuery();
                             }
-                        }  
+                        }
 
                         tr.Commit();
                     }
                     catch
-                    { 
+                    {
                         tr.Rollback();
                         throw;
                     }
@@ -1437,7 +1437,7 @@ FROM
         }
 
 
-        public void TempDeliveryBatchEditChangeItemDBRow(long DBCH_Item_Number, long warehouse,long JINDI_Number,long JINDH_Number,int DBCH_Index)
+        public void TempDeliveryBatchEditChangeItemDBRow(long DBCH_Item_Number, long warehouse, long JINDI_Number, long JINDH_Number, int DBCH_Index)
         {
             using (SqlConnection con = new SqlConnection(DB.Connection()))
             {
@@ -1497,7 +1497,7 @@ WHERE
                 using (SqlTransaction tr = con.BeginTransaction())
                 {
                     try
-                    { 
+                    {
 
                         // =========================
                         // 3. DELETE INDEX GROUP
@@ -1642,12 +1642,12 @@ INNER JOIN BatchTotal B
                 }
             }
         }
-      
+
         public DataTable GetBatchStockDetails(
        long Item_Number,
        long Warehouse,
        long Header_Number,
-       long LineItem_Number,int ItemGridIndex)
+       long LineItem_Number, int ItemGridIndex)
         {
             DataTable dt = new DataTable();
             UpdateTempBatchReservedQty();
@@ -1748,7 +1748,7 @@ WHERE I.Item_Number =@Item_Number
                     cmd.Parameters.AddWithValue("@Header_Number", Header_Number);
                     cmd.Parameters.AddWithValue("@LineItem_Number", LineItem_Number);
                     cmd.Parameters.AddWithValue("@ItemGridIndex", ItemGridIndex);
-                    
+
                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                     {
                         da.Fill(dt);
@@ -1950,7 +1950,7 @@ WHERE I.Item_Number =@Item_Number
             Database db = new SqlDatabase(DB.Connection());
             DbCommand cmd = db.GetStoredProcCommand("SP_JI_Conversion_FullSingleQuery");
 
-         
+
 
             return db.ExecuteDataSet(cmd);
         }

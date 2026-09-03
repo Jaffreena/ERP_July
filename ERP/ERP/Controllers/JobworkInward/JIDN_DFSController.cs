@@ -6,7 +6,7 @@ using System.Data;
 
 namespace ERP.Controllers.JobworkInward
 {
-    public class DFSDeliveryNoteController : Controller
+    public class JIDN_DFSController : Controller
     {
         Help Help = new Help();
         DataSet DS = new DataSet();
@@ -35,32 +35,32 @@ namespace ERP.Controllers.JobworkInward
                 SH_DTO = System.Text.Json.JsonSerializer.Deserialize<DeliveryNoteHeader_DTO>(SHto);
             }
             GetDevliverNoteData();
-            DFS_JI_DeliveryNoteDAO dao = new DFS_JI_DeliveryNoteDAO();
+            JIDN_DFS_DAO dao = new JIDN_DFS_DAO();
             DataSet ds = dao.JI_DeliveryNoteGet();
 
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 DataRow row = ds.Tables[0].Rows[0];
 
-                SH_DTO.JIDNH_Number = Convert.ToInt64(row["DFS_JIDNH_Number"]);
-                SH_DTO.JIDNH_MS_Number = Convert.ToInt64(row["DFS_JIDNH_MS_Number"]);
-                SH_DTO.JIDNH_JW_Customer_Number = Convert.ToInt64(row["DFS_JIDNH_JW_Customer_Number"]);
+                SH_DTO.JIDNH_Number = Convert.ToInt64(row["JIDN_DFS_Number"]);
+                SH_DTO.JIDNH_MS_Number = Convert.ToInt64(row["JIDN_DFS_MS_Number"]);
+                SH_DTO.JIDNH_JW_Customer_Number = Convert.ToInt64(row["JIDN_DFS_JW_Customer_Number"]);
                 SH_DTO.JIDNH_JW_Customer_Name = Convert.ToString(row["CUS_Name"]);
 
-                SH_DTO.JIDNH_Currency_Number = Convert.ToInt64(row["DFS_JIDNH_Currency_Number"]);
+                SH_DTO.JIDNH_Currency_Number = Convert.ToInt64(row["JIDN_DFS_Currency_Number"]);
                 SH_DTO.JIDNH_CurrencyCode = Convert.ToString(row["Currency_Name"]);
-                SH_DTO.JIDNH_WH_Number = Convert.ToInt64(row["DFS_JIDNH_WH_Number"]);
-                SH_DTO.JIDNH_PaymentTerms = Convert.ToString(row["DFS_JIDNH_PaymentTerms"]);
-                SH_DTO.JIDNH_DeliveryTerms = Convert.ToString(row["DFS_JIDNH_DeliveryTerms"]);
-                SH_DTO.JIDNH_DeliveryMode = Convert.ToString(row["DFS_JIDNH_DeliveryMode"]);
-                SH_DTO.JIDNH_DespatchDocumentNo = Convert.ToString(row["DFS_JIDNH_DespatchDocument"]);
-                SH_DTO.JIDNH_DespatchedThrough = Convert.ToString(row["DFS_JIDNH_DespatchedThrough"]);
-                SH_DTO.JIDNH_Remarks = Convert.ToString(row["DFS_JIDNH_Remarks"]);
+                SH_DTO.JIDNH_WH_Number = Convert.ToInt64(row["JIDN_DFS_WH_Number"]);
+                SH_DTO.JIDNH_PaymentTerms = Convert.ToString(row["JIDN_DFS_PaymentTerms"]);
+                SH_DTO.JIDNH_DeliveryTerms = Convert.ToString(row["JIDN_DFS_DeliveryTerms"]);
+                SH_DTO.JIDNH_DeliveryMode = Convert.ToString(row["JIDN_DFS_DeliveryMode"]);
+                SH_DTO.JIDNH_DespatchDocumentNo = Convert.ToString(row["JIDN_DFS_DespatchDocument"]);
+                SH_DTO.JIDNH_DespatchedThrough = Convert.ToString(row["JIDN_DFS_DespatchedThrough"]);
+                SH_DTO.JIDNH_Remarks = Convert.ToString(row["JIDN_DFS_Remarks"]);
             }
 
             ViewBag.Collapse = true;
 
-            return View(SH_DTO);
+            return View("~/Views/JobworkInward/DeliveryNote/DeliveryNoteDefaultSetting.cshtml", SH_DTO);
         }
 
         [HttpPost]
@@ -72,7 +72,7 @@ namespace ERP.Controllers.JobworkInward
                 DeliveryNoteHeader_DTO S_DTO = dto.Header;
 
                 DeliveryNote_DTO SI_DTO = new DeliveryNote_DTO();
-                DFS_JI_DeliveryNoteDAO SI_DAO = new DFS_JI_DeliveryNoteDAO();
+                JIDN_DFS_DAO SI_DAO = new JIDN_DFS_DAO();
 
                 SI_DTO.JIDNH_MS_Number = S_DTO.JIDNH_MS_Number;
                 SI_DTO.JIDNH_JW_Customer_Number = S_DTO.JIDNH_JW_Customer_Number;
@@ -103,7 +103,7 @@ namespace ERP.Controllers.JobworkInward
         [Route("jobinward/transactions/delivery-note/get")]
         public IActionResult GetDeliveryNote()
         {
-            DFS_JI_DeliveryNoteDAO dao = new DFS_JI_DeliveryNoteDAO();
+            JIDN_DFS_DAO dao = new JIDN_DFS_DAO();
 
             DataSet ds = dao.JI_DeliveryNoteGet();
 
@@ -116,19 +116,19 @@ namespace ERP.Controllers.JobworkInward
                     success = true,
                     data = new
                     {
-                        dfS_JIDNH_Number = row["DFS_JIDNH_Number"],
-                        dfS_JIDNH_MS_Number = row["DFS_JIDNH_MS_Number"],
-                        dfS_JIDNH_JW_Customer_Number = row["DFS_JIDNH_JW_Customer_Number"],
+                        jidN_DFS_Number = row["JIDN_DFS_Number"],
+                        jidN_DFS_MS_Number = row["JIDN_DFS_MS_Number"],
+                        jidN_DFS_JW_Customer_Number = row["JIDN_DFS_JW_Customer_Number"],
                         cuS_Name = row["CUS_Name"],
-                        dfS_JIDNH_Currency_Number = row["DFS_JIDNH_Currency_Number"],
+                        jidN_DFS_Currency_Number = row["JIDN_DFS_Currency_Number"],
                         currency_Name = row["Currency_Name"],
-                        dfS_JIDNH_WH_Number = row["DFS_JIDNH_WH_Number"],
-                        dfS_JIDNH_PaymentTerms = row["DFS_JIDNH_PaymentTerms"],
-                        dfS_JIDNH_DeliveryTerms = row["DFS_JIDNH_DeliveryTerms"],
-                        dfS_JIDNH_DeliveryMode = row["DFS_JIDNH_DeliveryMode"],
-                        dfS_JIDNH_DespatchDocument = row["DFS_JIDNH_DespatchDocument"],
-                        dfS_JIDNH_DespatchedThrough = row["DFS_JIDNH_DespatchedThrough"],
-                        dfS_JIDNH_Remarks = row["DFS_JIDNH_Remarks"]
+                        jidN_DFS_WH_Number = row["JIDN_DFS_WH_Number"],
+                        jidN_DFS_PaymentTerms = row["JIDN_DFS_PaymentTerms"],
+                        jidN_DFS_DeliveryTerms = row["JIDN_DFS_DeliveryTerms"],
+                        jidN_DFS_DeliveryMode = row["JIDN_DFS_DeliveryMode"],
+                        jidN_DFS_DespatchDocument = row["JIDN_DFS_DespatchDocument"],
+                        jidN_DFS_DespatchedThrough = row["JIDN_DFS_DespatchedThrough"],
+                        jidN_DFS_Remarks = row["JIDN_DFS_Remarks"]
                     }
                 });
             }

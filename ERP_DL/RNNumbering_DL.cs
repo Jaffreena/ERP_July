@@ -9,55 +9,56 @@ using System.Threading.Tasks;
 
 namespace ERP_DL
 {
-    public class RNNumbering_DL
+
+    public class JIRN_Numbering_DL
     {
-        public List<RNNumberReset_DTO> PORList(DataTable Dt)
+        public List<JIRN_NumberReset_DTO> PORList(DataTable Dt)
         {
-            List<RNNumberReset_DTO> PORList = new List<RNNumberReset_DTO>();
+            List<JIRN_NumberReset_DTO> PORList = new List<JIRN_NumberReset_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PORList.Add(
-                    new RNNumberReset_DTO
+                    new JIRN_NumberReset_DTO
                     {
-                        RNR_Number = Convert.ToInt64(dr["RNR_Number"]),
-                        RNR_Date = Convert.ToString(dr["RNR_Date"]),
-                        RNR_EndDate = Convert.ToString(dr["RNR_EndDate"]),
-                        RNR_StartingNumber = Convert.ToString(dr["RNR_StartingNumber"]),
-                        RNR_NumberofDigits = Convert.ToString(dr["RNR_NumberofDigits"]),
-                        RNR_PrefilZero = Convert.ToString(dr["RNR_PrefilZero"]),
-                        RNR_Frequency = Convert.ToString(dr["RNR_Frequency"])
+                        JIRN_NRS_Number = Convert.ToInt64(dr["JIRN_NRS_Number"]),
+                        JIRN_NRS_StartDate = Convert.ToString(dr["JIRN_NRS_StartDate"]),
+                        JIRN_NRS_EndDate = Convert.ToString(dr["JIRN_NRS_EndDate"]),
+                        JIRN_NRS_StartingNumber = Convert.ToString(dr["JIRN_NRS_StartingNumber"]),
+                        JIRN_NRS_NumberofDigits = Convert.ToString(dr["JIRN_NRS_NumberofDigits"]),
+                        JIRN_NRS_PrefilZero = Convert.ToString(dr["JIRN_NRS_PrefilZero"]),
+                        JIRN_NRS_Frequency = Convert.ToString(dr["JIRN_NRS_Frequency"])
                     });
             }
             return PORList;
         }
-        public List<RNNumberPrefix_DTO> POPList(DataTable Dt)
+        public List<JIRN_NumberPrefix_DTO> POPList(DataTable Dt)
         {
-            List<RNNumberPrefix_DTO> PORList = new List<RNNumberPrefix_DTO>();
+            List<JIRN_NumberPrefix_DTO> PORList = new List<JIRN_NumberPrefix_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PORList.Add(
-                    new RNNumberPrefix_DTO
+                    new JIRN_NumberPrefix_DTO
                     {
-                        RNP_Number = Convert.ToInt64(dr["RNP_Number"]),
-                        RNP_Date = Convert.ToString(dr["RNP_Date"]),
-                        RNP_EndDate = Convert.ToString(dr["RNP_EndDate"]),
-                        RNP_Particulars = Convert.ToString(dr["RNP_Particulars"])
+                        JIRN_PFX_Number = Convert.ToInt64(dr["JIRN_PFX_Number"]),
+                        JIRN_PFX_StartDate = Convert.ToString(dr["JIRN_PFX_StartDate"]),
+                        JIRN_PFX_EndDate = Convert.ToString(dr["JIRN_PFX_EndDate"]),
+                        JIRN_PFX_Particulars = Convert.ToString(dr["JIRN_PFX_Particulars"])
                     });
             }
             return PORList;
         }
-        public List<RNNumberSuffix_DTO> POSList(DataTable Dt)
+        public List<JIRN_NumberSuffix_DTO> POSList(DataTable Dt)
         {
-            List<RNNumberSuffix_DTO> PORList = new List<RNNumberSuffix_DTO>();
+            List<JIRN_NumberSuffix_DTO> PORList = new List<JIRN_NumberSuffix_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PORList.Add(
-                    new RNNumberSuffix_DTO  
+                    new JIRN_NumberSuffix_DTO
                     {
-                        RNS_Number = Convert.ToInt64(dr["RNS_Number"]),
-                        RNS_Date = Convert.ToString(dr["RNS_Date"]),
-                        RNS_EndDate = Convert.ToString(dr["RNS_EndDate"]),
-                        RNS_Particulars = Convert.ToString(dr["RNS_Particulars"])
+                        JIRN_SFX_Number = Convert.ToInt64(dr["JIRN_SFX_Number"]),
+                        JIRN_SFX_StartDate = Convert.ToString(dr["JIRN_SFX_StartDate"]),
+                        JIRN_SFX_EndDate = Convert.ToString(dr["JIRN_SFX_EndDate"]),
+                        JIRN_SFX_Particulars = Convert.ToString(dr["JIRN_SFX_Particulars"])
                     });
             }
             return PORList;
@@ -66,53 +67,53 @@ namespace ERP_DL
 
 
 
-        public List<RNNumberReset_DTO> PIRList(DataTable Dt)
+        public List<JIRN_NumberReset_DTO> PIRList(DataTable Dt)
         {
-            List<RNNumberReset_DTO> PIRList = new List<RNNumberReset_DTO>();
+            List<JIRN_NumberReset_DTO> PIRList = new List<JIRN_NumberReset_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PIRList.Add(
-                    new RNNumberReset_DTO
+                    new JIRN_NumberReset_DTO
                     {
-                        RNR_Number = Convert.ToInt64(dr["RNR_Number"]),
-                        RNR_Date = Convert.ToString(dr["RNR_Date"]),
-                        RNR_EndDate = Convert.ToString(dr["RNR_EndDate"]),
-                        RNR_StartingNumber = Convert.ToString(dr["RNR_StartingNumber"]),
-                        RNR_NumberofDigits = Convert.ToString(dr["RNR_NumberofDigits"]),
-                        RNR_PrefilZero = Convert.ToString(dr["RNR_PrefilZero"]),
-                        RNR_Frequency = Convert.ToString(dr["RNR_Frequency"])
+                        JIRN_NRS_Number = Convert.ToInt64(dr["JIRN_NRS_Number"]),
+                        JIRN_NRS_StartDate = Convert.ToString(dr["JIRN_NRS_StartDate"]),
+                        JIRN_NRS_EndDate = Convert.ToString(dr["JIRN_NRS_EndDate"]),
+                        JIRN_NRS_StartingNumber = Convert.ToString(dr["JIRN_NRS_StartingNumber"]),
+                        JIRN_NRS_NumberofDigits = Convert.ToString(dr["JIRN_NRS_NumberofDigits"]),
+                        JIRN_NRS_PrefilZero = Convert.ToString(dr["JIRN_NRS_PrefilZero"]),
+                        JIRN_NRS_Frequency = Convert.ToString(dr["JIRN_NRS_Frequency"])
                     });
             }
             return PIRList;
         }
-        public List<RNNumberPrefix_DTO> PIPList(DataTable Dt)
+        public List<JIRN_NumberPrefix_DTO> PIPList(DataTable Dt)
         {
-            List<RNNumberPrefix_DTO> PIRList = new List<RNNumberPrefix_DTO>();
+            List<JIRN_NumberPrefix_DTO> PIRList = new List<JIRN_NumberPrefix_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PIRList.Add(
-                    new RNNumberPrefix_DTO
+                    new JIRN_NumberPrefix_DTO
                     {
-                        RNP_Number = Convert.ToInt64(dr["RNP_Number"]),
-                        RNP_Date = Convert.ToString(dr["RNP_Date"]),
-                        RNP_EndDate = Convert.ToString(dr["RNP_EndDate"]),
-                        RNP_Particulars = Convert.ToString(dr["RNP_Particulars"])
+                        JIRN_PFX_Number = Convert.ToInt64(dr["JIRN_PFX_Number"]),
+                        JIRN_PFX_StartDate = Convert.ToString(dr["JIRN_PFX_StartDate"]),
+                        JIRN_PFX_EndDate = Convert.ToString(dr["JIRN_PFX_EndDate"]),
+                        JIRN_PFX_Particulars = Convert.ToString(dr["JIRN_PFX_Particulars"])
                     });
             }
             return PIRList;
         }
-        public List<RNNumberSuffix_DTO> PISList(DataTable Dt)
+        public List<JIRN_NumberSuffix_DTO> PISList(DataTable Dt)
         {
-            List<RNNumberSuffix_DTO> PIRList = new List<RNNumberSuffix_DTO>();
+            List<JIRN_NumberSuffix_DTO> PIRList = new List<JIRN_NumberSuffix_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PIRList.Add(
-                    new RNNumberSuffix_DTO
+                    new JIRN_NumberSuffix_DTO
                     {
-                        RNS_Number = Convert.ToInt64(dr["RNS_Number"]),
-                        RNS_Date = Convert.ToString(dr["RNS_Date"]),
-                        RNS_EndDate = Convert.ToString(dr["RNS_EndDate"]),
-                        RNS_Particulars  = Convert.ToString(dr["RNS_Particulars"])
+                        JIRN_SFX_Number = Convert.ToInt64(dr["JIRN_SFX_Number"]),
+                        JIRN_SFX_StartDate = Convert.ToString(dr["JIRN_SFX_StartDate"]),
+                        JIRN_SFX_EndDate = Convert.ToString(dr["JIRN_SFX_EndDate"]),
+                        JIRN_SFX_Particulars = Convert.ToString(dr["JIRN_SFX_Particulars"])
                     });
             }
             return PIRList;
@@ -121,307 +122,437 @@ namespace ERP_DL
 
 
 
-        public List<RNNumberReset_DTO> PRRList(DataTable Dt)
+        public List<JIRN_NumberReset_DTO> PRRList(DataTable Dt)
         {
-            List<RNNumberReset_DTO> PRRList = new List<RNNumberReset_DTO>();
+            List<JIRN_NumberReset_DTO> PRRList = new List<JIRN_NumberReset_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PRRList.Add(
-                    new RNNumberReset_DTO
+                    new JIRN_NumberReset_DTO
                     {
-                        RNR_Number = Convert.ToInt64(dr["RNR_Number"]),
-                        RNR_Date = Convert.ToString(dr["RNR_Date"]),
-                        RNR_EndDate = Convert.ToString(dr["RNR_EndDate"]),
-                        RNR_StartingNumber = Convert.ToString(dr["RNR_StartingNumber"]),
-                        RNR_NumberofDigits = Convert.ToString(dr["RNR_NumberofDigits"]),
-                        RNR_PrefilZero = Convert.ToString(dr["RNR_PrefilZero"]),
-                        RNR_Frequency = Convert.ToString(dr["RNR_Frequency"])
+                        JIRN_NRS_Number = Convert.ToInt64(dr["JIRN_NRS_Number"]),
+                        JIRN_NRS_StartDate = Convert.ToString(dr["JIRN_NRS_StartDate"]),
+                        JIRN_NRS_EndDate = Convert.ToString(dr["JIRN_NRS_EndDate"]),
+                        JIRN_NRS_StartingNumber = Convert.ToString(dr["JIRN_NRS_StartingNumber"]),
+                        JIRN_NRS_NumberofDigits = Convert.ToString(dr["JIRN_NRS_NumberofDigits"]),
+                        JIRN_NRS_PrefilZero = Convert.ToString(dr["JIRN_NRS_PrefilZero"]),
+                        JIRN_NRS_Frequency = Convert.ToString(dr["JIRN_NRS_Frequency"])
                     });
             }
             return PRRList;
         }
-        public List<RNNumberPrefix_DTO> PRPList(DataTable Dt)
+        public List<JIRN_NumberPrefix_DTO> PRPList(DataTable Dt)
         {
-            List<RNNumberPrefix_DTO> PRRList = new List<RNNumberPrefix_DTO>();
+            List<JIRN_NumberPrefix_DTO> PRRList = new List<JIRN_NumberPrefix_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PRRList.Add(
-                    new RNNumberPrefix_DTO  
+                    new JIRN_NumberPrefix_DTO
                     {
-                        RNP_Number = Convert.ToInt64(dr["RNP_Number"]),
-                        RNP_Date = Convert.ToString(dr["RNP_Date"]),
-                        RNP_EndDate = Convert.ToString(dr["RNP_EndDate"]),
-                        RNP_Particulars = Convert.ToString(dr["RNP_Particulars"])
+                        JIRN_PFX_Number = Convert.ToInt64(dr["JIRN_PFX_Number"]),
+                        JIRN_PFX_StartDate = Convert.ToString(dr["JIRN_PFX_StartDate"]),
+                        JIRN_PFX_EndDate = Convert.ToString(dr["JIRN_PFX_EndDate"]),
+                        JIRN_PFX_Particulars = Convert.ToString(dr["JIRN_PFX_Particulars"])
                     });
             }
             return PRRList;
         }
-        public List<RNNumberSuffix_DTO> PRSList(DataTable Dt)
+        public List<JIRN_NumberSuffix_DTO> PRSList(DataTable Dt)
         {
-            List<RNNumberSuffix_DTO> PRRList = new List<RNNumberSuffix_DTO>();
+            List<JIRN_NumberSuffix_DTO> PRRList = new List<JIRN_NumberSuffix_DTO>();
             foreach (DataRow dr in Dt.Rows)
             {
                 PRRList.Add(
-                    new RNNumberSuffix_DTO
+                    new JIRN_NumberSuffix_DTO
                     {
-                        RNS_Number = Convert.ToInt64(dr["RNS_Number"]),
-                        RNS_Date = Convert.ToString(dr["RNS_Date"]),
-                        RNS_EndDate = Convert.ToString(dr["RNS_EndDate"]),
-                        RNS_Particulars = Convert.ToString(dr["RNS_Particulars"])
+                        JIRN_SFX_Number = Convert.ToInt64(dr["JIRN_SFX_Number"]),
+                        JIRN_SFX_StartDate = Convert.ToString(dr["JIRN_SFX_StartDate"]),
+                        JIRN_SFX_EndDate = Convert.ToString(dr["JIRN_SFX_EndDate"]),
+                        JIRN_SFX_Particulars = Convert.ToString(dr["JIRN_SFX_Particulars"])
                     });
             }
             return PRRList;
         }
 
     }
-
-    public class DNNumbering_DL
+    public class JIDN_Numbering_DL
     {
-        public List<DNNumberReset_DTO> DORList(DataTable Dt)
+        public List<JIDN_NumberReset_DTO> JIDN_NRList(DataTable Dt)
         {
-            List<DNNumberReset_DTO> DORList = new List<DNNumberReset_DTO>();
+            List<JIDN_NumberReset_DTO> JIDN_NRList = new List<JIDN_NumberReset_DTO>();
 
             foreach (DataRow dr in Dt.Rows)
             {
-                DORList.Add(
-                    new DNNumberReset_DTO
+                JIDN_NRList.Add(
+                    new JIDN_NumberReset_DTO
                     {
-                        DNR_Number = Convert.ToInt64(dr["DNR_Number"]),
-                        DNR_Date = Convert.ToString(dr["DNR_Date"]),
-                        DNR_EndDate = Convert.ToString(dr["DNR_EndDate"]),
-                        DNR_StartingNumber = Convert.ToString(dr["DNR_StartingNumber"]),
-                        DNR_NumberofDigits = Convert.ToString(dr["DNR_NumberofDigits"]),
-                        DNR_PrefilZero = Convert.ToString(dr["DNR_PrefilZero"]),
-                        DNR_Frequency = Convert.ToString(dr["DNR_Frequency"])
-                    });
+                        JIDN_NR_Number = Convert.ToInt64(dr["JIDN_NR_Number"]),
+                        JIDN_NR_Date = Convert.ToString(dr["JIDN_NR_Date"]),
+                        JIDN_NR_EndDate = Convert.ToString(dr["JIDN_NR_EndDate"]),
+                        JIDN_NR_StartingNumber = Convert.ToString(dr["JIDN_NR_StartingNumber"]),
+                        JIDN_NR_NumberofDigits = Convert.ToString(dr["JIDN_NR_NumberofDigits"]),
+                        JIDN_NR_PrefilZero = Convert.ToString(dr["JIDN_NR_PrefilZero"]),
+                        JIDN_NR_Frequency = Convert.ToString(dr["JIDN_NR_Frequency"])
+                    }
+                );
             }
 
-            return DORList;
+            return JIDN_NRList;
         }
 
-        public List<DNNumberPrefix_DTO> DOPList(DataTable Dt)
+        public List<JIDN_NumberPrefix_DTO> JIDN_PrefixList(DataTable Dt)
         {
-            List<DNNumberPrefix_DTO> DOPList = new List<DNNumberPrefix_DTO>();
+            List<JIDN_NumberPrefix_DTO> JIDN_PrefixList = new List<JIDN_NumberPrefix_DTO>();
 
             foreach (DataRow dr in Dt.Rows)
             {
-                DOPList.Add(
-                    new DNNumberPrefix_DTO
+                JIDN_PrefixList.Add(
+                    new JIDN_NumberPrefix_DTO
                     {
-                        DNP_Number = Convert.ToInt64(dr["DNP_Number"]),
-                        DNP_Date = Convert.ToString(dr["DNP_Date"]),
-                        DNP_EndDate = Convert.ToString(dr["DNP_EndDate"]),
-                        DNP_Particulars = Convert.ToString(dr["DNP_Particulars"])
-                    });
+                        JIDN_Prefix_Number = Convert.ToInt64(dr["JIDN_Prefix_Number"]),
+                        JIDN_Prefix_Date = Convert.ToString(dr["JIDN_Prefix_Date"]),
+                        JIDN_Prefix_EndDate = Convert.ToString(dr["JIDN_Prefix_EndDate"]),
+                        JIDN_Prefix_Particulars = Convert.ToString(dr["JIDN_Prefix_Particulars"])
+                    }
+                );
             }
 
-            return DOPList;
+            return JIDN_PrefixList;
         }
 
-        public List<DNNumberSuffix_DTO> DOSList(DataTable Dt)
+        public List<JIDN_NumberSuffix_DTO> JIDN_SuffixList(DataTable Dt)
         {
-            List<DNNumberSuffix_DTO> DOSList = new List<DNNumberSuffix_DTO>();
+            List<JIDN_NumberSuffix_DTO> JIDN_SuffixList = new List<JIDN_NumberSuffix_DTO>();
 
             foreach (DataRow dr in Dt.Rows)
             {
-                DOSList.Add(
-                    new DNNumberSuffix_DTO
+                JIDN_SuffixList.Add(
+                    new JIDN_NumberSuffix_DTO
                     {
-                        DNS_Number = Convert.ToInt64(dr["DNS_Number"]),
-                        DNS_Date = Convert.ToString(dr["DNS_Date"]),
-                        DNS_EndDate = Convert.ToString(dr["DNS_EndDate"]),
-                        DNS_Particulars = Convert.ToString(dr["DNS_Particulars"])
-                    });
+                        JIDN_Suffix_Number = Convert.ToInt64(dr["JIDN_Suffix_Number"]),
+                        JIDN_Suffix_Date = Convert.ToString(dr["JIDN_Suffix_Date"]),
+                        JIDN_Suffix_EndDate = Convert.ToString(dr["JIDN_Suffix_EndDate"]),
+                        JIDN_Suffix_Particulars = Convert.ToString(dr["JIDN_Suffix_Particulars"])
+                    }
+                );
             }
 
-            return DOSList;
+            return JIDN_SuffixList;
         }
     }
     public class JINumbering_DL
     {
-        public List<JINumberReset_DTO> JORList(DataTable Dt)
-        {
-            List<JINumberReset_DTO> JORList = new List<JINumberReset_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JINumberReset_DTO> JORList(DataTable Dt)
             {
-                JORList.Add(
-                    new JINumberReset_DTO
-                    {
-                        JIR_Number = Convert.ToInt64(dr["JIR_Number"]),
-                        JIR_Date = Convert.ToString(dr["JIR_Date"]),
-                        JIR_EndDate = Convert.ToString(dr["JIR_EndDate"]),
-                        JIR_StartingNumber = Convert.ToString(dr["JIR_StartingNumber"]),
-                        JIR_NumberofDigits = Convert.ToString(dr["JIR_NumberofDigits"]),
-                        JIR_PrefilZero = Convert.ToString(dr["JIR_PrefilZero"]),
-                        JIR_Frequency = Convert.ToString(dr["JIR_Frequency"])
-                    });
+                List<JINumberReset_DTO> JORList = new List<JINumberReset_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JORList.Add(
+                        new JINumberReset_DTO
+                        {
+                            JIR_Number = Convert.ToInt64(dr["JIR_Number"]),
+                            JIR_Date = Convert.ToString(dr["JIR_Date"]),
+                            JIR_EndDate = Convert.ToString(dr["JIR_EndDate"]),
+                            JIR_StartingNumber = Convert.ToString(dr["JIR_StartingNumber"]),
+                            JIR_NumberofDigits = Convert.ToString(dr["JIR_NumberofDigits"]),
+                            JIR_PrefilZero = Convert.ToString(dr["JIR_PrefilZero"]),
+                            JIR_Frequency = Convert.ToString(dr["JIR_Frequency"])
+                        });
+                }
+
+                return JORList;
             }
 
-            return JORList;
-        }
-
-        public List<JINumberPrefix_DTO> JOPList(DataTable Dt)
-        {
-            List<JINumberPrefix_DTO> JOPList = new List<JINumberPrefix_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JINumberPrefix_DTO> JOPList(DataTable Dt)
             {
-                JOPList.Add(
-                    new JINumberPrefix_DTO
-                    {
-                        JIP_Number = Convert.ToInt64(dr["JIP_Number"]),
-                        JIP_Date = Convert.ToString(dr["JIP_Date"]),
-                        JIP_EndDate = Convert.ToString(dr["JIP_EndDate"]),
-                        JIP_Particulars = Convert.ToString(dr["JIP_Particulars"])
-                    });
+                List<JINumberPrefix_DTO> JOPList = new List<JINumberPrefix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JOPList.Add(
+                        new JINumberPrefix_DTO
+                        {
+                            JIP_Number = Convert.ToInt64(dr["JIP_Number"]),
+                            JIP_Date = Convert.ToString(dr["JIP_Date"]),
+                            JIP_EndDate = Convert.ToString(dr["JIP_EndDate"]),
+                            JIP_Particulars = Convert.ToString(dr["JIP_Particulars"])
+                        });
+                }
+
+                return JOPList;
             }
 
-            return JOPList;
+            public List<JINumberSuffix_DTO> JOSList(DataTable Dt)
+            {
+                List<JINumberSuffix_DTO> JOSList = new List<JINumberSuffix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JOSList.Add(
+                        new JINumberSuffix_DTO
+                        {
+                            JIS_Number = Convert.ToInt64(dr["JIS_Number"]),
+                            JIS_Date = Convert.ToString(dr["JIS_Date"]),
+                            JIS_EndDate = Convert.ToString(dr["JIS_EndDate"]),
+                            JIS_Particulars = Convert.ToString(dr["JIS_Particulars"])
+                        });
+                }
+
+                return JOSList;
+            }
         }
 
-        public List<JINumberSuffix_DTO> JOSList(DataTable Dt)
+        public class JSONumbering_DL
         {
-            List<JINumberSuffix_DTO> JOSList = new List<JINumberSuffix_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JSONumberReset_DTO> JSORList(DataTable Dt)
             {
-                JOSList.Add(
-                    new JINumberSuffix_DTO
-                    {
-                        JIS_Number = Convert.ToInt64(dr["JIS_Number"]),
-                        JIS_Date = Convert.ToString(dr["JIS_Date"]),
-                        JIS_EndDate = Convert.ToString(dr["JIS_EndDate"]),
-                        JIS_Particulars = Convert.ToString(dr["JIS_Particulars"])
-                    });
+                List<JSONumberReset_DTO> JSORList = new List<JSONumberReset_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JSORList.Add(
+                        new JSONumberReset_DTO
+                        {
+                            JSOR_Number = Convert.ToInt64(dr["JSOR_Number"]),
+                            JSOR_Date = Convert.ToString(dr["JSOR_Date"]),
+                            JSOR_EndDate = Convert.ToString(dr["JSOR_EndDate"]),
+                            JSOR_StartingNumber = Convert.ToString(dr["JSOR_StartingNumber"]),
+                            JSOR_NumberofDigits = Convert.ToString(dr["JSOR_NumberofDigits"]),
+                            JSOR_PrefilZero = Convert.ToString(dr["JSOR_PrefilZero"]),
+                            JSOR_Frequency = Convert.ToString(dr["JSOR_Frequency"])
+                        });
+                }
+
+                return JSORList;
             }
 
-            return JOSList;
-        }
-    }
-    public class JSONumbering_DL
-    {
-        public List<JSONumberReset_DTO> JSORList(DataTable Dt)
-        {
-            List<JSONumberReset_DTO> JSORList = new List<JSONumberReset_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JSONumberPrefix_DTO> JSOPList(DataTable Dt)
             {
-                JSORList.Add(
-                    new JSONumberReset_DTO
-                    {
-                        JSOR_Number = Convert.ToInt64(dr["JSOR_Number"]),
-                        JSOR_Date = Convert.ToString(dr["JSOR_Date"]),
-                        JSOR_EndDate = Convert.ToString(dr["JSOR_EndDate"]),
-                        JSOR_StartingNumber = Convert.ToString(dr["JSOR_StartingNumber"]),
-                        JSOR_NumberofDigits = Convert.ToString(dr["JSOR_NumberofDigits"]),
-                        JSOR_PrefilZero = Convert.ToString(dr["JSOR_PrefilZero"]),
-                        JSOR_Frequency = Convert.ToString(dr["JSOR_Frequency"])
-                    });
+                List<JSONumberPrefix_DTO> JSOPList = new List<JSONumberPrefix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JSOPList.Add(
+                        new JSONumberPrefix_DTO
+                        {
+                            JSOP_Number = Convert.ToInt64(dr["JSOP_Number"]),
+                            JSOP_Date = Convert.ToString(dr["JSOP_Date"]),
+                            JSOP_EndDate = Convert.ToString(dr["JSOP_EndDate"]),
+                            JSOP_Particulars = Convert.ToString(dr["JSOP_Particulars"])
+                        });
+                }
+
+                return JSOPList;
             }
 
-            return JSORList;
+            public List<JSONumberSuffix_DTO> JSOSList(DataTable Dt)
+            {
+                List<JSONumberSuffix_DTO> JSOSList = new List<JSONumberSuffix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JSOSList.Add(
+                        new JSONumberSuffix_DTO
+                        {
+                            JSOS_Number = Convert.ToInt64(dr["JSOS_Number"]),
+                            JSOS_Date = Convert.ToString(dr["JSOS_Date"]),
+                            JSOS_EndDate = Convert.ToString(dr["JSOS_EndDate"]),
+                            JSOS_Particulars = Convert.ToString(dr["JSOS_Particulars"])
+                        });
+                }
+
+                return JSOSList;
+            }
         }
 
-        public List<JSONumberPrefix_DTO> JSOPList(DataTable Dt)
+        public class JI_CONVNumbering_DL
         {
-            List<JSONumberPrefix_DTO> JSOPList = new List<JSONumberPrefix_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JI_CONVNumberReset_DTO> JICRList(DataTable Dt)
             {
-                JSOPList.Add(
-                    new JSONumberPrefix_DTO
-                    {
-                        JSOP_Number = Convert.ToInt64(dr["JSOP_Number"]),
-                        JSOP_Date = Convert.ToString(dr["JSOP_Date"]),
-                        JSOP_EndDate = Convert.ToString(dr["JSOP_EndDate"]),
-                        JSOP_Particulars = Convert.ToString(dr["JSOP_Particulars"])
-                    });
+                List<JI_CONVNumberReset_DTO> JICRList = new List<JI_CONVNumberReset_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JICRList.Add(
+                        new JI_CONVNumberReset_DTO
+                        {
+                            JICR_Number = Convert.ToInt64(dr["JICR_Number"]),
+                            JICR_Date = Convert.ToString(dr["JICR_Date"]),
+                            JICR_EndDate = Convert.ToString(dr["JICR_EndDate"]),
+                            JICR_StartingNumber = Convert.ToString(dr["JICR_StartingNumber"]),
+                            JICR_NumberofDigits = Convert.ToString(dr["JICR_NumberofDigits"]),
+                            JICR_PrefilZero = Convert.ToString(dr["JICR_PrefilZero"]),
+                            JICR_Frequency = Convert.ToString(dr["JICR_Frequency"])
+                        });
+                }
+
+                return JICRList;
             }
 
-            return JSOPList;
-        }
-
-        public List<JSONumberSuffix_DTO> JSOSList(DataTable Dt)
-        {
-            List<JSONumberSuffix_DTO> JSOSList = new List<JSONumberSuffix_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JI_CONVNumberPrefix_DTO> JICPList(DataTable Dt)
             {
-                JSOSList.Add(
-                    new JSONumberSuffix_DTO
-                    {
-                        JSOS_Number = Convert.ToInt64(dr["JSOS_Number"]),
-                        JSOS_Date = Convert.ToString(dr["JSOS_Date"]),
-                        JSOS_EndDate = Convert.ToString(dr["JSOS_EndDate"]),
-                        JSOS_Particulars = Convert.ToString(dr["JSOS_Particulars"])
-                    });
+                List<JI_CONVNumberPrefix_DTO> JICPList = new List<JI_CONVNumberPrefix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JICPList.Add(
+                        new JI_CONVNumberPrefix_DTO
+                        {
+                            JICP_Number = Convert.ToInt64(dr["JICP_Number"]),
+                            JICP_Date = Convert.ToString(dr["JICP_Date"]),
+                            JICP_EndDate = Convert.ToString(dr["JICP_EndDate"]),
+                            JICP_Particulars = Convert.ToString(dr["JICP_Particulars"])
+                        });
+                }
+
+                return JICPList;
             }
 
-            return JSOSList;
-        }
-    }
-    public class JI_CONVNumbering_DL
-    {
-        public List<JI_CONVNumberReset_DTO> JICRList(DataTable Dt)
-        {
-            List<JI_CONVNumberReset_DTO> JICRList = new List<JI_CONVNumberReset_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JI_CONVNumberSuffix_DTO> JICSList(DataTable Dt)
             {
-                JICRList.Add(
-                    new JI_CONVNumberReset_DTO
-                    {
-                        JICR_Number = Convert.ToInt64(dr["JICR_Number"]),
-                        JICR_Date = Convert.ToString(dr["JICR_Date"]),
-                        JICR_EndDate = Convert.ToString(dr["JICR_EndDate"]),
-                        JICR_StartingNumber = Convert.ToString(dr["JICR_StartingNumber"]),
-                        JICR_NumberofDigits = Convert.ToString(dr["JICR_NumberofDigits"]),
-                        JICR_PrefilZero = Convert.ToString(dr["JICR_PrefilZero"]),
-                        JICR_Frequency = Convert.ToString(dr["JICR_Frequency"])
-                    });
+                List<JI_CONVNumberSuffix_DTO> JICSList = new List<JI_CONVNumberSuffix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JICSList.Add(
+                        new JI_CONVNumberSuffix_DTO
+                        {
+                            JICS_Number = Convert.ToInt64(dr["JICS_Number"]),
+                            JICS_Date = Convert.ToString(dr["JICS_Date"]),
+                            JICS_EndDate = Convert.ToString(dr["JICS_EndDate"]),
+                            JICS_Particulars = Convert.ToString(dr["JICS_Particulars"])
+                        });
+                }
+
+                return JICSList;
+            }
+        }
+        public class JIJWI_SVO_Numbering_DL
+        {
+            public List<JIJWI_SVO_NumberReset_DTO> JIJWI_SVO_NRSList(DataTable Dt)
+            {
+                List<JIJWI_SVO_NumberReset_DTO> JIJWI_SVO_NRSList = new List<JIJWI_SVO_NumberReset_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JIJWI_SVO_NRSList.Add(
+                        new JIJWI_SVO_NumberReset_DTO
+                        {
+                            JIJWI_SVO_NRS_Number = Convert.ToInt64(dr["JIJWI_SVO_NRS_Number"]),
+                            JIJWI_SVO_NRS_StartDate = Convert.ToString(dr["JIJWI_SVO_NRS_StartDate"]),
+                            JIJWI_SVO_NRS_EndDate = Convert.ToString(dr["JIJWI_SVO_NRS_EndDate"]),
+                            JIJWI_SVO_NRS_StartingNumber = Convert.ToString(dr["JIJWI_SVO_NRS_StartingNumber"]),
+                            JIJWI_SVO_NRS_NumberofDigits = Convert.ToString(dr["JIJWI_SVO_NRS_NumberofDigits"]),
+                            JIJWI_SVO_NRS_PrefilZero = Convert.ToString(dr["JIJWI_SVO_NRS_PrefilZero"]),
+                            JIJWI_SVO_NRS_Frequency = Convert.ToString(dr["JIJWI_SVO_NRS_Frequency"])
+                        });
+                }
+
+                return JIJWI_SVO_NRSList;
             }
 
-            return JICRList;
-        }
-
-        public List<JI_CONVNumberPrefix_DTO> JICPList(DataTable Dt)
-        {
-            List<JI_CONVNumberPrefix_DTO> JICPList = new List<JI_CONVNumberPrefix_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JIJWI_SVO_NumberPrefix_DTO> JIJWI_SVO_PFXList(DataTable Dt)
             {
-                JICPList.Add(
-                    new JI_CONVNumberPrefix_DTO
-                    {
-                        JICP_Number = Convert.ToInt64(dr["JICP_Number"]),
-                        JICP_Date = Convert.ToString(dr["JICP_Date"]),
-                        JICP_EndDate = Convert.ToString(dr["JICP_EndDate"]),
-                        JICP_Particulars = Convert.ToString(dr["JICP_Particulars"])
-                    });
+                List<JIJWI_SVO_NumberPrefix_DTO> JIJWI_SVO_PFXList = new List<JIJWI_SVO_NumberPrefix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JIJWI_SVO_PFXList.Add(
+                        new JIJWI_SVO_NumberPrefix_DTO
+                        {
+                            JIJWI_SVO_PFX_Number = Convert.ToInt64(dr["JIJWI_SVO_PFX_Number"]),
+                            JIJWI_SVO_PFX_StartDate = Convert.ToString(dr["JIJWI_SVO_PFX_StartDate"]),
+                            JIJWI_SVO_PFX_EndDate = Convert.ToString(dr["JIJWI_SVO_PFX_EndDate"]),
+                            JIJWI_SVO_PFX_Particulars = Convert.ToString(dr["JIJWI_SVO_PFX_Particulars"])
+                        });
+                }
+
+                return JIJWI_SVO_PFXList;
             }
 
-            return JICPList;
+            public List<JIJWI_SVO_NumberSuffix_DTO> JIJWI_SVO_SFXList(DataTable Dt)
+            {
+                List<JIJWI_SVO_NumberSuffix_DTO> JIJWI_SVO_SFXList = new List<JIJWI_SVO_NumberSuffix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JIJWI_SVO_SFXList.Add(
+                        new JIJWI_SVO_NumberSuffix_DTO
+                        {
+                            JIJWI_SVO_SFX_Number = Convert.ToInt64(dr["JIJWI_SVO_SFX_Number"]),
+                            JIJWI_SVO_SFX_StartDate = Convert.ToString(dr["JIJWI_SVO_SFX_StartDate"]),
+                            JIJWI_SVO_SFX_EndDate = Convert.ToString(dr["JIJWI_SVO_SFX_EndDate"]),
+                            JIJWI_SVO_SFX_Particulars = Convert.ToString(dr["JIJWI_SVO_SFX_Particulars"])
+                        });
+                }
+
+                return JIJWI_SVO_SFXList;
+            }
         }
 
-        public List<JI_CONVNumberSuffix_DTO> JICSList(DataTable Dt)
+        public class JIFRT_SVO_Numbering_DL
         {
-            List<JI_CONVNumberSuffix_DTO> JICSList = new List<JI_CONVNumberSuffix_DTO>();
-
-            foreach (DataRow dr in Dt.Rows)
+            public List<JIFRT_SVO_NumberReset_DTO> JIFRT_SVO_NRSList(DataTable Dt)
             {
-                JICSList.Add(
-                    new JI_CONVNumberSuffix_DTO
-                    {
-                        JICS_Number = Convert.ToInt64(dr["JICS_Number"]),
-                        JICS_Date = Convert.ToString(dr["JICS_Date"]),
-                        JICS_EndDate = Convert.ToString(dr["JICS_EndDate"]),
-                        JICS_Particulars = Convert.ToString(dr["JICS_Particulars"])
-                    });
+                List<JIFRT_SVO_NumberReset_DTO> JIFRT_SVO_NRSList = new List<JIFRT_SVO_NumberReset_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JIFRT_SVO_NRSList.Add(
+                        new JIFRT_SVO_NumberReset_DTO
+                        {
+                            JIFRT_SVO_NRS_Number = Convert.ToInt64(dr["JIFRT_SVO_NRS_Number"]),
+                            JIFRT_SVO_NRS_StartDate = Convert.ToString(dr["JIFRT_SVO_NRS_StartDate"]),
+                            JIFRT_SVO_NRS_EndDate = Convert.ToString(dr["JIFRT_SVO_NRS_EndDate"]),
+                            JIFRT_SVO_NRS_StartingNumber = Convert.ToString(dr["JIFRT_SVO_NRS_StartingNumber"]),
+                            JIFRT_SVO_NRS_NumberofDigits = Convert.ToString(dr["JIFRT_SVO_NRS_NumberofDigits"]),
+                            JIFRT_SVO_NRS_PrefilZero = Convert.ToString(dr["JIFRT_SVO_NRS_PrefilZero"]),
+                            JIFRT_SVO_NRS_Frequency = Convert.ToString(dr["JIFRT_SVO_NRS_Frequency"])
+                        });
+                }
+
+                return JIFRT_SVO_NRSList;
             }
 
-            return JICSList;
-        }
-    }
+            public List<JIFRT_SVO_NumberPrefix_DTO> JIFRT_SVO_PFXList(DataTable Dt)
+            {
+                List<JIFRT_SVO_NumberPrefix_DTO> JIFRT_SVO_PFXList = new List<JIFRT_SVO_NumberPrefix_DTO>();
 
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JIFRT_SVO_PFXList.Add(
+                        new JIFRT_SVO_NumberPrefix_DTO
+                        {
+                            JIFRT_SVO_PFX_Number = Convert.ToInt64(dr["JIFRT_SVO_PFX_Number"]),
+                            JIFRT_SVO_PFX_StartDate = Convert.ToString(dr["JIFRT_SVO_PFX_StartDate"]),
+                            JIFRT_SVO_PFX_EndDate = Convert.ToString(dr["JIFRT_SVO_PFX_EndDate"]),
+                            JIFRT_SVO_PFX_Particulars = Convert.ToString(dr["JIFRT_SVO_PFX_Particulars"])
+                        });
+                }
+
+                return JIFRT_SVO_PFXList;
+            }
+
+            public List<JIFRT_SVO_NumberSuffix_DTO> JIFRT_SVO_SFXList(DataTable Dt)
+            {
+                List<JIFRT_SVO_NumberSuffix_DTO> JIFRT_SVO_SFXList = new List<JIFRT_SVO_NumberSuffix_DTO>();
+
+                foreach (DataRow dr in Dt.Rows)
+                {
+                    JIFRT_SVO_SFXList.Add(
+                        new JIFRT_SVO_NumberSuffix_DTO
+                        {
+                            JIFRT_SVO_SFX_Number = Convert.ToInt64(dr["JIFRT_SVO_SFX_Number"]),
+                            JIFRT_SVO_SFX_StartDate = Convert.ToString(dr["JIFRT_SVO_SFX_StartDate"]),
+                            JIFRT_SVO_SFX_EndDate = Convert.ToString(dr["JIFRT_SVO_SFX_EndDate"]),
+                            JIFRT_SVO_SFX_Particulars = Convert.ToString(dr["JIFRT_SVO_SFX_Particulars"])
+                        });
+                }
+
+                return JIFRT_SVO_SFXList;
+            }
+        }
+
+    
 }

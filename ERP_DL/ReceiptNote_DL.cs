@@ -112,9 +112,9 @@ namespace ERP_DL
                         RN_Number = Convert.ToInt64(dr["JIRNH_Number"]),
                         RN_No = Convert.ToString(dr["JIRNH_RN_No"]),
                         RN_Date = Convert.ToString(dr["JIRNH_RN_Date"]),
-                       RN_Process = Convert.ToString(dr["RN_Process"]),
+                        RN_Process = Convert.ToString(dr["RN_Process"]),
                         RN_JWC_WH_Name = Convert.ToString(dr["RN_JWC_WH_Name"]),
-                    //    SI_ExportOrder = Convert.ToString(dr["SIH_ExportOrder"]) == "1" ? "Yes" : "No",
+                        //    SI_ExportOrder = Convert.ToString(dr["SIH_ExportOrder"]) == "1" ? "Yes" : "No",
                         RN_ITM_Category = Convert.ToString(dr["RN_ITM_Category"]),
                         RN_ITM_GroupInfo = Convert.ToString(dr["RN_ITM_GroupInfo"]),
                         RN_JWC_Name = Convert.ToString(dr["RN_JWC_Name"]),
@@ -135,7 +135,7 @@ namespace ERP_DL
                         RN_TotalAmount = Convert.ToString(dr["JIRNI_Amount"]),
                         RN_JW_CustomerDC_No = Convert.ToString(dr["RN_JW_CustomerDC_No"]),
                         RN_JW_CustomerDC_Date = Convert.ToString(dr["RN_JW_CustomerDC_Date"]),
-                     //   SI_TotalAmount = Convert.ToString(dr["JIRNI_Amount"]),
+                        //   SI_TotalAmount = Convert.ToString(dr["JIRNI_Amount"]),
                         //SI_ExchangeRate = Convert.ToString(dr["SIH_ExchangeRate"]),
                         //SI_HeadGST_Amount = Convert.ToString(dr["SIH_GST_Amount"]),
                         //SI_ItemGST_Amount = Convert.ToString(dr["SII_GST_Amount"]),
@@ -375,38 +375,39 @@ namespace ERP_DL
                     {
                         JIRNH_Number = Convert.ToInt64(dr["JIRNH_Number"]),
 
-                        RN_No = Convert.ToString(dr["JIRNH_RN_No"]),
+                        JIRNH_RN_No = Convert.ToString(dr["JIRNH_RN_No"]),                                              // RENAMED: was RN_No
 
-                        RN_Date = dr["JIRNH_RN_Date"] != DBNull.Value
+                        JIRNH_RN_Date = dr["JIRNH_RN_Date"] != DBNull.Value                                            // RENAMED: was RN_Date
                                     ? Convert.ToDateTime(dr["JIRNH_RN_Date"]).ToString("yyyy-MM-dd")
                                     : "",
 
-                        JW_CustomerDC_No = Convert.ToString(dr["JIRNH_JW_CustomerDC_No"]),
+                        JIRNH_JW_CustomerDC_No = Convert.ToString(dr["JIRNH_JW_CustomerDC_No"]),                        // RENAMED: was JW_CustomerDC_No
 
-                        JW_CustomerDC_Date = dr["JIRNH_JW_CustomerDC_Date"] != DBNull.Value
+                        JIRNH_JW_CustomerDC_Date = dr["JIRNH_JW_CustomerDC_Date"] != DBNull.Value                       // RENAMED: was JW_CustomerDC_Date
                                                 ? Convert.ToDateTime(dr["JIRNH_JW_CustomerDC_Date"]).ToString("yyyy-MM-dd")
                                                 : "",
 
-                        MS_Number = Convert.ToString(dr["JIRNH_MS_Number"]),
+                        JIRNH_MS_Number = Convert.ToString(dr["JIRNH_MS_Number"]),                                      // RENAMED: was MS_Number
 
-                        JWC_Number = Convert.ToString(dr["JIRNH_JWC_Number"]),
+                        JIRNH_JWC_Number = Convert.ToString(dr["JIRNH_JWC_Number"]),                                    // RENAMED: was JWC_Number
 
                         JWC_Name = Convert.ToString(dr["CUS_Name"]),
 
-                        Currency_Number = Convert.ToString(dr["JIRNH_Currency_Number"]),
+                        JIRNH_Currency_Number = Convert.ToString(dr["JIRNH_Currency_Number"]),                          // RENAMED: was Currency_Number
 
                         Currency_Name = Convert.ToString(dr["CurrencyCode"]),
 
-                        WH_Number = Convert.ToString(dr["JIRNH_WH_Number"]),
+                        JIRNH_WH_Number = Convert.ToString(dr["JIRNH_WH_Number"]),                                      // RENAMED: was WH_Number
 
-                        Remarks = Convert.ToString(dr["JIRNH_Remarks"])
- 
-                       
+                        JIRNH_Remarks = Convert.ToString(dr["JIRNH_Remarks"])                                           // RENAMED: was Remarks
+
+
                     });
             }
 
             return RNList;
         }
+
         public List<ReceiptNoteBatch_DTO> ReceiptNoteBatchList(DataTable Dt)
         {
             List<ReceiptNoteBatch_DTO> BatchList = new List<ReceiptNoteBatch_DTO>();
@@ -416,31 +417,31 @@ namespace ERP_DL
                 BatchList.Add(
                     new ReceiptNoteBatch_DTO
                     {
-                        RNI_BCH_No = Convert.ToInt64(dr["JIRNI_BCH_Number"]),
+                        JIRNI_BCH_Number = Convert.ToInt64(dr["JIRNI_BCH_Number"]),                                      // RENAMED: was RNI_BCH_No
 
                         JIRNI_BCH_JIRNH_Number = Convert.ToInt64(dr["JIRNI_BCH_JIRNH_Number"]),
 
                         JIRNI_BCH_JIRNI_Number = Convert.ToInt64(dr["JIRNI_BCH_JIRNI_Number"]),
 
-                      //  RNI_BCH_WH_Name = Convert.ToString(dr["RNI_BCH_WH_Name"]),
+                        //  RNI_BCH_WH_Name = Convert.ToString(dr["RNI_BCH_WH_Name"]),
 
-                     //   WH_Number = Convert.ToString(dr["WH_Number"]),
+                        //   WH_Number = Convert.ToString(dr["WH_Number"]),
 
-                        RNI_BCH_Date = Convert.ToString(dr["JIRNI_BCH_BatchDate"]),
+                        JIRNI_BCH_BatchDate = Convert.ToString(dr["JIRNI_BCH_BatchDate"]),                              // RENAMED: was RNI_BCH_Date
 
-                        RNI_BCH_WH_Number = Convert.ToString(dr["JIRNI_BCH_WH_Number"]),
+                        JIRNI_BCH_WH_Number = Convert.ToString(dr["JIRNI_BCH_WH_Number"]),
 
-                        RNI_BCH_Qty = Convert.ToDecimal(dr["JIRNI_BCH_BatchQty"]),
+                        JIRNI_BCH_BatchQty = Convert.ToDecimal(dr["JIRNI_BCH_BatchQty"]),                               // RENAMED: was RNI_BCH_Qty
 
-                        RNI_BCH_UnitPrice = Convert.ToDecimal(dr["JIRNI_BCH_BatchUnitPrice"]),
+                        JIRNI_BCH_BatchUnitPrice = Convert.ToDecimal(dr["JIRNI_BCH_BatchUnitPrice"]),                   // RENAMED: was RNI_BCH_UnitPrice
 
-                        RNI_BCH_Value = Convert.ToDecimal(dr["JIRNI_BCH_BatchValue"]),
-                        RNI_BCH_Number = Convert.ToString(dr["JIRNI_BCH_BatchNo"]),
-                       
+                        JIRNI_BCH_BatchValue = Convert.ToDecimal(dr["JIRNI_BCH_BatchValue"]),                           // RENAMED: was RNI_BCH_Value
+                        JIRNI_BCH_BatchNo = Convert.ToString(dr["JIRNI_BCH_BatchNo"]),                                  // RENAMED: was RNI_BCH_Number
+
 
                         //  RNI_BCH_IsDeleted = Convert.ToString(dr["RNI_BCH_IsDeleted"]),
 
-                         RNI_BCH_Item_Number = Convert.ToString(dr["JIRNI_BCH_JIRNI_Number"])
+                        RNI_BCH_Item_Number = Convert.ToString(dr["JIRNI_BCH_JIRNI_Number"])
                     });
             }
 
@@ -460,12 +461,12 @@ namespace ERP_DL
 
                         JIRNI_JIRNH_Number = Convert.ToInt64(dr["JIRNI_JIRNH_Number"]),
 
-                        PRS_Number = Convert.ToString(dr["JIRNI_Number"]),
+                        JIRNI_PRS_Number = Convert.ToString(dr["JIRNI_Number"]),                                        // RENAMED: was PRS_Number
 
-                        Item_Number = Convert.ToString(dr["JIRNI_Item_Number"]),
+                        JIRNI_Item_Number = Convert.ToString(dr["JIRNI_Item_Number"]),                                 // RENAMED: was Item_Number
 
                         PRS_Name = Convert.ToString(dr["PRS_ProcessName"]),
-                        
+
                         //Description = Convert.ToString(dr["Description"]),
 
                         //OuterDia = Convert.ToString(dr["OuterDia"]),
@@ -484,13 +485,13 @@ namespace ERP_DL
 
                         //UoM_Number = Convert.ToString(dr["UoM_Number"]),
 
-                        Qty = Convert.ToString(dr["JIRNI_Qty"]),
+                        JIRNI_Qty = Convert.ToString(dr["JIRNI_Qty"]),                                                 // RENAMED: was Qty
 
-                        UnitPrice = Convert.ToString(dr["JIRNI_UnitPrice"]),
+                        JIRNI_UnitPrice = Convert.ToString(dr["JIRNI_UnitPrice"]),                                     // RENAMED: was UnitPrice
 
-                        Amount = Convert.ToString(dr["JIRNI_Amount"])
+                        JIRNI_Amount = Convert.ToString(dr["JIRNI_Amount"])                                            // RENAMED: was Amount
 
-                      
+
                     });
             }
 

@@ -37,7 +37,7 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIRNH_Currency_Number", DbType.Int64, DTO.JIRNH_Currency_Number);
             Db.AddInParameter(DbC, "@JIRNH_WH_Number", DbType.Int64, DTO.JIRNH_WH_Number);
             Db.AddInParameter(DbC, "@JIRNH_Remarks", DbType.String, DTO.JIRNH_Remarks);
-            Db.AddInParameter(DbC, "@JIRNH_Freight_Applicable", DbType.String, (object)DTO.JIRNH_Freight_Applicable ?? DBNull.Value);
+            Db.AddInParameter(DbC, "@JIRNH_IsFreightApplicable", DbType.String, (object)DTO.JIRNH_IsFreightApplicable ?? DBNull.Value);      // RENAMED: was @JIRNH_Freight_Applicable / DTO.JIRNH_Freight_Applicable
 
             // =======================
             // 🔹 ITEM (JIRNI)
@@ -50,13 +50,13 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIRNI_ITM_Code", DbType.String, DTO.JIRNI_ITM_Code);
             Db.AddInParameter(DbC, "@JIRNI_UoM_Number", DbType.Int64, DTO.JIRNI_UoM_Number);
             Db.AddInParameter(DbC, "@JIRNI_Qty", DbType.Decimal, DTO.JIRNI_Qty);
-            Db.AddInParameter(DbC, "@JIRNI_Qty_Kg", DbType.Decimal, DTO.JIRNI_Qty_Kg);
+            Db.AddInParameter(DbC, "@JIRNI_Qty_Kgs", DbType.Decimal, DTO.JIRNI_Qty_Kgs);      // RENAMED: was @JIRNI_Qty_Kg / DTO.JIRNI_Qty_Kg
             Db.AddInParameter(DbC, "@JIRNI_UnitPrice", DbType.Decimal, DTO.JIRNI_UnitPrice);
             Db.AddInParameter(DbC, "@JIRNI_Amount", DbType.Decimal, DTO.JIRNI_Amount);
             // NEW: Freight logic
-            Db.AddInParameter(DbC, "@JIRNI_Freight_Applicable", DbType.String, (object)DTO.JIRNI_Freight_Applicable ?? DBNull.Value);
-            Db.AddInParameter(DbC, "@JIRNI_Freight_ServiceOrder_Number", DbType.String, (object)DTO.JIRNI_Freight_ServiceOrder_Number ?? DBNull.Value);
-            Db.AddInParameter(DbC, "@JIRNI_JISVOI_Number_FRT", DbType.Int64, DTO.JIRNI_JISVOI_Number_FRT);
+            Db.AddInParameter(DbC, "@JIRNI_IsFreightApplicable", DbType.String, (object)DTO.JIRNI_IsFreightApplicable ?? DBNull.Value);          // RENAMED: was @JIRNI_Freight_Applicable
+            Db.AddInParameter(DbC, "@JIRNI_JIFRT_SVOH_Number", DbType.String, (object)DTO.JIRNI_JIFRT_SVOH_Number ?? DBNull.Value);              // RENAMED: was @JIRNI_Freight_ServiceOrder_Number
+            Db.AddInParameter(DbC, "@JIRNI_JIFRT_SVOI_Number", DbType.Int64, DTO.JIRNI_JIFRT_SVOI_Number);                                       // RENAMED: was @JIRNI_JISVOI_Number_FRT
             Db.AddInParameter(DbC, "@JIRNI_FromWH", DbType.Int64, (object)DTO.JIRNI_FromWH ?? DBNull.Value);
             Db.AddInParameter(DbC, "@JIRNI_ToWH", DbType.Int64, (object)DTO.JIRNI_ToWH ?? DBNull.Value);
 
@@ -88,7 +88,7 @@ namespace ERP_DAO.JobInwardTransaction
             catch (Exception ex)
             {
                 WriteLog(DTO, ex); // Log DTO + exception
-                
+
             }
             return DS;
         }
@@ -157,7 +157,7 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIRNI_WH_Number", DbType.Int64, DTO.JIRNI_WH_Number);
             Db.AddInParameter(DbC, "@JIRNI_ITM_Code", DbType.String, DTO.JIRNI_ITM_Code);
             Db.AddInParameter(DbC, "@JIRNI_UoM_Number", DbType.Int64, DTO.JIRNI_UoM_Number);
-            Db.AddInParameter(DbC, "@JIRNI_Qty", DbType.Decimal, DTO.JIRNI_OriginalQty);           
+            Db.AddInParameter(DbC, "@JIRNI_Qty", DbType.Decimal, DTO.JIRNI_OriginalQty);
             Db.AddInParameter(DbC, "@JIRNI_AmendedQty", DbType.Decimal, DTO.JIRNI_AmendedQty);
             Db.AddInParameter(DbC, "@JIRNI_UnitPrice", DbType.Decimal, DTO.JIRNI_UnitPrice);
             Db.AddInParameter(DbC, "@JIRNI_Amount", DbType.Decimal, DTO.JIRNI_Amount);
@@ -169,7 +169,7 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIRNI_BCH_WH_Number", DbType.Int64, DTO.JIRNI_BCH_WH_Number);
             Db.AddInParameter(DbC, "@JIRNI_BCH_BatchDate", DbType.Date, DTO.JIRNI_BCH_BatchDate);
             Db.AddInParameter(DbC, "@JIRNI_BCH_BatchNo", DbType.String, DTO.JIRNI_BCH_BatchNo);
-          
+
             Db.AddInParameter(DbC, "@JIRNI_BCH_AmendedQty", DbType.Decimal, DTO.JIRNI_BCH_BatchAmendedQty);
             Db.AddInParameter(DbC, "@JIRNI_BCH_BatchUnitPrice", DbType.Decimal, DTO.JIRNI_BCH_BatchUnitPrice);
             Db.AddInParameter(DbC, "@JIRNI_BCH_BatchValue", DbType.Decimal, DTO.JIRNI_BCH_BatchValue);
@@ -259,16 +259,16 @@ namespace ERP_DAO.JobInwardTransaction
                 dtItems.Rows.Add(
                     item.Item_Index,
                     item.JIRNI_Number,
-                    item.PRS_Number,
-                    item.Item_Number,
-                    item.WH_Number,
-                    item.UoM_Number,
-                    item.Qty,
-                    item.UnitPrice,
-                    item.Amount,
-                    item.Freight_Applicable,
-                    item.Freight_ServiceOrder_Number,
-                    item.JISVOI_Number_FRT
+                    item.JIRNI_PRS_Number,                  // RENAMED: was item.PRS_Number
+                    item.JIRNI_Item_Number,                 // RENAMED: was item.Item_Number
+                    item.JIRNI_WH_Number,                   // RENAMED: was item.WH_Number
+                    item.JIRNI_UoM_Number,                  // RENAMED: was item.UoM_Number
+                    item.JIRNI_Qty,                         // RENAMED: was item.Qty
+                    item.JIRNI_UnitPrice,                   // RENAMED: was item.UnitPrice
+                    item.JIRNI_Amount,                      // RENAMED: was item.Amount
+                    item.JIRNI_IsFreightApplicable,         // RENAMED: was item.Freight_Applicable
+                    item.JIRNI_JIFRT_SVOH_Number,           // RENAMED: was item.Freight_ServiceOrder_Number
+                    item.JIRNI_JIFRT_SVOI_Number            // RENAMED: was item.JISVOI_Number_FRT
                 );
             }
 
@@ -291,14 +291,14 @@ namespace ERP_DAO.JobInwardTransaction
             {
                 dtBatches.Rows.Add(
                     batch.RNI_BCH_Item_Index,
-                    batch.RNI_BCH_No,
+                    batch.JIRNI_BCH_Number,                 // RENAMED: was batch.RNI_BCH_No
                     batch.JIRNI_Number,
-                    batch.RNI_BCH_WH_Number,
-                    batch.RNI_BCH_Date,
-                    batch.RNI_BCH_Number,
-                    batch.RNI_BCH_Qty,
-                    batch.RNI_BCH_UnitPrice,
-                    batch.RNI_BCH_Value
+                    batch.JIRNI_BCH_WH_Number,
+                    batch.JIRNI_BCH_BatchDate,               // RENAMED: was batch.RNI_BCH_Date
+                    batch.JIRNI_BCH_BatchNo,                 // RENAMED: was batch.RNI_BCH_Number
+                    batch.JIRNI_BCH_BatchQty,                // RENAMED: was batch.RNI_BCH_Qty
+                    batch.JIRNI_BCH_BatchUnitPrice,          // RENAMED: was batch.RNI_BCH_UnitPrice
+                    batch.JIRNI_BCH_BatchValue                // RENAMED: was batch.RNI_BCH_Value
                 );
             }
 
@@ -333,22 +333,22 @@ namespace ERP_DAO.JobInwardTransaction
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@JIRNH_Number", RN_DTO.Header.JIRNH_Number);
-                cmd.Parameters.AddWithValue("@JIRNH_RN_No", RN_DTO.Header.RN_No);
-                cmd.Parameters.AddWithValue("@JIRNH_RN_Date", RN_DTO.Header.RN_Date);
+                cmd.Parameters.AddWithValue("@JIRNH_RN_No", RN_DTO.Header.JIRNH_RN_No);                        // RENAMED: was Header.RN_No
+                cmd.Parameters.AddWithValue("@JIRNH_RN_Date", RN_DTO.Header.JIRNH_RN_Date);                    // RENAMED: was Header.RN_Date
 
                 cmd.Parameters.AddWithValue("@JIRNH_JW_CustomerDC_No",
-                    RN_DTO.Header.JW_CustomerDC_No ?? (object)DBNull.Value);
+                    RN_DTO.Header.JIRNH_JW_CustomerDC_No ?? (object)DBNull.Value);                             // RENAMED: was Header.JW_CustomerDC_No
 
                 cmd.Parameters.AddWithValue("@JIRNH_JW_CustomerDC_Date",
-                    RN_DTO.Header.JW_CustomerDC_Date);
+                    RN_DTO.Header.JIRNH_JW_CustomerDC_Date);                                                   // RENAMED: was Header.JW_CustomerDC_Date
 
-                cmd.Parameters.AddWithValue("@JIRNH_MS_Number", RN_DTO.Header.MS_Number);
-                cmd.Parameters.AddWithValue("@JIRNH_JWC_Number", RN_DTO.Header.JWC_Number);
-                cmd.Parameters.AddWithValue("@JIRNH_Currency_Number", RN_DTO.Header.Currency_Number);
-                cmd.Parameters.AddWithValue("@JIRNH_WH_Number", RN_DTO.Header.WH_Number);
+                cmd.Parameters.AddWithValue("@JIRNH_MS_Number", RN_DTO.Header.JIRNH_MS_Number);                // RENAMED: was Header.MS_Number
+                cmd.Parameters.AddWithValue("@JIRNH_JWC_Number", RN_DTO.Header.JIRNH_JWC_Number);              // RENAMED: was Header.JWC_Number
+                cmd.Parameters.AddWithValue("@JIRNH_Currency_Number", RN_DTO.Header.JIRNH_Currency_Number);    // RENAMED: was Header.Currency_Number
+                cmd.Parameters.AddWithValue("@JIRNH_WH_Number", RN_DTO.Header.JIRNH_WH_Number);                // RENAMED: was Header.WH_Number
 
                 cmd.Parameters.AddWithValue("@JIRNH_Remarks",
-                    RN_DTO.Header.Remarks ?? (object)DBNull.Value);
+                    RN_DTO.Header.JIRNH_Remarks ?? (object)DBNull.Value);                                      // RENAMED: was Header.Remarks
 
                 cmd.Parameters.AddWithValue("@UserCode", 0);
 
@@ -383,26 +383,23 @@ namespace ERP_DAO.JobInwardTransaction
 
         // NEW: Freight logic
         public DataSet GetFreightServiceOrderDB(
-            long customerId,
-            long? prsNumber = null,
-            long? itemNumber = null,
-            long? uomNumber = null)
+     long customerId,
+     long? fromWHNumber = null,
+     long? toWHNumber = null)
         {
             try
             {
                 Database db = new SqlDatabase(DB.Connection());
 
-                DbCommand cmd = db.GetStoredProcCommand("JI_ServiceOrder_GetByCustomer_SP");
+                DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrder_GetByCustomer_SP");
 
                 db.AddInParameter(cmd, "@CustomerId", DbType.Int64, customerId);
-                db.AddInParameter(cmd, "@PRS_Number", DbType.Int64,
-                    prsNumber.HasValue ? (object)prsNumber.Value : DBNull.Value);
 
-                db.AddInParameter(cmd, "@Item_Number", DbType.Int64,
-                    itemNumber.HasValue ? (object)itemNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64,
+                      fromWHNumber.HasValue ? (object)fromWHNumber.Value : DBNull.Value);
 
-                db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
-          uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64,
+                    toWHNumber.HasValue ? (object)toWHNumber.Value : DBNull.Value);
 
                 db.AddInParameter(cmd, "@Category", DbType.String, "RECEIPT NOTE");
 
@@ -410,7 +407,7 @@ namespace ERP_DAO.JobInwardTransaction
             }
             catch (SqlException ex)
             {
-                throw new Exception("SQL Error : " + ex.Message + Environment.NewLine + "Procedure : JI_ServiceOrder_GetByCustomer_SP", ex);
+                throw new Exception("SQL Error : " + ex.Message + Environment.NewLine + "Procedure : JIFRT_ServiceOrder_GetByCustomer_SP", ex);
             }
             catch (Exception ex)
             {
@@ -418,21 +415,18 @@ namespace ERP_DAO.JobInwardTransaction
             }
         }
 
-        public DataSet CheckDeliveredQtyExceededFreightDB(
-         long jisvohNumber,
-         long? prsNumber = null,
-         long? itemNumber = null,
-         long? uomNumber = null)
+        public DataSet CheckReceivedQtyExceededFreightDB(
+long jisvohNumber,
+long? fromWHNumber = null,
+long? toWHNumber = null)
         {
             try
             {
                 Database db = new SqlDatabase(DB.Connection());
-                // CHANGED: Receipt Note uses received qty (RN), not delivered qty (DN)
                 DbCommand cmd = db.GetStoredProcCommand("USP_CheckReceivedQtyExceeded_Freight");
-                db.AddInParameter(cmd, "@JISVOH_Number", DbType.Int64, jisvohNumber);
-                db.AddInParameter(cmd, "@PRS_Number", DbType.Int64, prsNumber.HasValue ? (object)prsNumber.Value : DBNull.Value);
-                db.AddInParameter(cmd, "@Item_Number", DbType.Int64, itemNumber.HasValue ? (object)itemNumber.Value : DBNull.Value);
-                db.AddInParameter(cmd, "@UoM_Number", DbType.Int64, uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@JIFRT_SVOH_Number", DbType.Int64, jisvohNumber);
+                db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64, fromWHNumber.HasValue ? (object)fromWHNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64, toWHNumber.HasValue ? (object)toWHNumber.Value : DBNull.Value);
                 return db.ExecuteDataSet(cmd);
             }
             catch (SqlException ex)

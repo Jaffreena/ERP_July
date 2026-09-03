@@ -821,6 +821,21 @@ namespace ERP_DAO.JobInwardTransaction
 
         #endregion
 
+        #region Source: Freight Service Order dropdown
+
+        public DataSet GetFreightServiceOrderDB(long customerId, string category)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrder_ForDropdown_SP");
+
+            db.AddInParameter(cmd, "@CustomerId", DbType.Int64, customerId);
+            db.AddInParameter(cmd, "@Category", DbType.String, category);
+
+            return db.ExecuteDataSet(cmd);
+        }
+
+        #endregion
+
         #region Tax Cluster (reused, not Freight-specific)
 
         public DataSet Get_Freight_Invoice_Taxcluster(long JWC_Number, DateTime CheckDate)

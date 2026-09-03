@@ -3,13 +3,19 @@
 @{
     ViewData["Title"] = "Delivery Note";
 }
- 
 
+ 
 <!-----search logic highlight---->
 
 <style>
+    #ItemTable {
+        table-layout: auto !important;
+    }
+
+    #ItemTable {
+        border-right: none !important;
+    }
   
-   
     .match-row td {
         color: blue !important;
         font-weight: 600;
@@ -236,9 +242,9 @@
                                     <!-- 🔥 TEMPLATE ROW (USED FOR CLONE ONLY) -->
                                     <tr id="AddTempRow" style="display:none">
                                         <td>
-                                            <select class="form-select JIDNA_ADTP_Number"      asp-items="@ViewBag.AddressType"></select>
+                                            <select class="form-select JIDNA_ADTP_Number" asp-items="@ViewBag.AddressType"></select>
                                         </td>
-                                        <td>                                            
+                                        <td>
                                             <select class="form-select JIDNA_Address_ID" asp-items="@ViewBag.AddressID"></select>
                                          
                                         </td>
@@ -467,7 +473,7 @@
 
                                         <td class="table-width-xl">
 
-                                            <input type="number" autocomplete="off"
+                                            <input type="text" autocomplete="off"
                                                    class="form-control text-end JIDNI_BCH_QtyInvoice">
 
                                         </td>
@@ -691,8 +697,8 @@
                         </div>
 
                     </div>
+
                
-                
                 </div>
             </div>
 
@@ -887,6 +893,14 @@
                                         </div>
 
                                     </div>
+                                    <div class="row align-items-center gx-2 mb-0 ps-0">
+                                        <label class="col-md-6 col-form-label ps-0">Freight Applicable</label>
+                                        <div class="col-md-6">
+                                            <input type="checkbox"
+                                                   id="Header_Freight_Applicable"
+                                                   class="form-check-input" />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-12 col-md-3">
                                     <div class="row align-items-start gx-2 mb-0" style="padding-right:200px;">
@@ -894,8 +908,7 @@
                                         <div class="col-sm-7 col-lg-5">
                                             <textarea asp-for="Header.JIDNH_Remarks"
                                                       class="form-control"
-                                                      maxlength="250"
-                                                     ></textarea>
+                                                      maxlength="250"></textarea>
                                         </div>
                                     </div>
                                  
@@ -980,8 +993,7 @@
                                         <div class="col table-fixed h-100">
                                             <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
 
-                                                <table class="table table-one table-striped table-bordered table-hover align-middle w-100"
-                                                       id="ItemTable">
+                                                <table class="table table-one table-striped table-bordered table-hover align-middle" id="ItemTable">
 
                                                     <thead>
 
@@ -1044,6 +1056,10 @@
                                                             </th>
 
                                                             <th class="table-width-xl text-end">
+                                                                Qty (Kgs)
+                                                            </th>
+
+                                                            <th class="table-width-xl text-end">
                                                                 Unit Price
                                                             </th>
 
@@ -1057,10 +1073,16 @@
                                                             <th>
                                                                 JWI SO No.
                                                             </th>
-                                                            <th class="table-width-md text-center">
+                                                            <th class="table-width-md text-center FreightApplicableHeader">
                                                                 Freight Applicable
                                                             </th>
-                                                            <th>
+                                                            <th class="FromWHHeader">
+                                                                From WH
+                                                            </th>
+                                                            <th class="ToWHHeader">
+                                                                To WH
+                                                            </th>
+                                                            <th class="FreightSOHeader">
                                                                 Freight SO No.
                                                             </th>
                                                         </tr>
@@ -1114,7 +1136,7 @@
 
                                                             <!-- DESCRIPTION -->
                                                             <td>
-                                                                <textarea id="JIDNI_Item_Description" class="form-control JIDNI_Item_Description"   readonly></textarea>
+                                                                <textarea id="JIDNI_Item_Description" class="form-control JIDNI_Item_Description" readonly></textarea>
 
                                                                     
                                                             </td>
@@ -1199,6 +1221,17 @@
                                                                 <input id="JIDNI_Qty"
                                                                        class="form-control JIDNI_Qty text-end"
                                                                        autocomplete="off" />
+                                                                <input type="hidden" class="FromQty" />
+                                                                <input type="hidden" class="ToQty" />
+
+                                                            </td>
+
+                                                            <!-- QTY KGS -->
+                                                            <td class="table-width-xl">
+
+                                                                <input id="JIDNI_Qty_Kgs"
+                                                                       class="form-control JIDNI_Qty_Kgs text-end"
+                                                                       autocomplete="off" readonly />
 
                                                             </td>
 
@@ -1224,8 +1257,8 @@
                                                             <td class="text-center p-2">
 
                                                                 <input type="checkbox"
-                                                                       id="JIDNI_JW_InvoiceTracking"
-                                                                       class="form-check-input JIDNI_JW_InvoiceTracking" />
+                                                                       id="JIDNI_IsJW_InvoiceApplicable"
+                                                                       class="form-check-input JIDNI_IsJW_InvoiceApplicable" />
 
                                                                 <input type="hidden"
                                                                        class="JIDNI_IsDeleted"
@@ -1234,29 +1267,45 @@
                                                             </td>
                                                             <!-- so dropdown -->
                                                             <td>
-                                                                <select id="JISVOH_Number"
-                                                                        class="form-select JISVOH_Number"
+                                                                <select id="JIDNI_JIJWI_SVOH_Number"
+                                                                        class="form-select JIDNI_JIJWI_SVOH_Number"
                                                                         asp-items="@ViewBag.SON">
                                                                 </select>
                                                                 <!-- NEW: SO Item ID, needed by qty formula -->
-                                                                <input type="hidden" class="JISVOI_Number_Row" value="0" />
+                                                                <input type="hidden" class="JIDNI_JIJWI_SVOI_Number_Row" value="0" />
                                                             </td>
                                                             <!-- FREIGHT APPLICABLE -->
-                                                            <td class="text-center p-2">
+                                                            <td class="text-center p-2 FreightApplicableCell">
                                                                 <input type="checkbox"
-                                                                       id="Freight_Applicable"
-                                                                       class="form-check-input Freight_Applicable" />
+                                                                       id="JIDNI_IsFreightApplicable"
+                                                                       class="form-check-input JIDNI_IsFreightApplicable" />
                                                                 <input type="hidden"
-                                                                       class="Freight_Applicable_Value" />
+                                                                       class="JIDNI_IsFreightApplicable_Value" />
+                                                            </td>
+                                                            <!-- FROM WH -->
+                                                            <td class="FromWHCell">
+                                                                <select id="JIDNI_FromWH"
+                                                                        class="form-select JIDNI_FromWH"
+                                                                        asp-items="@ViewBag.Warehouse">
+                                                                    <option value=""></option>
+                                                                </select>
+                                                            </td>
+                                                            <!-- TO WH -->
+                                                            <td class="ToWHCell">
+                                                                <select id="JIDNI_ToWH"
+                                                                        class="form-select JIDNI_ToWH"
+                                                                        asp-items="@ViewBag.Warehouse">
+                                                                    <option value=""></option>
+                                                                </select>
                                                             </td>
                                                             <!-- FREIGHT NO -->
-                                                            <td>
-                                                                <select id="Freight_ServiceOrder_Number"
-                                                                        class="form-select Freight_ServiceOrder_Number">
+                                                            <td class="FreightSOCell">
+                                                                <select id="JIDNI_JIFRT_SVOH_Number"
+                                                                        class="form-select JIDNI_JIFRT_SVOH_Number">
                                                                     <option value="0"></option>
                                                                 </select>
                                                                 <!-- NEW: Freight SO Item ID, needed by qty formula -->
-                                                                <input type="hidden" class="JISVOI_Number_FRT_Row" value="0" />
+                                                                <input type="hidden" class="JIDNI_JIFRT_SVOI_Number_Row" value="0" />
                                                             </td>
                                                         </tr>
 
@@ -1305,7 +1354,6 @@
 
                                                                 <textarea name="Items[0].JIDNI_Item_Description"
                                                                           class="form-control JIDNI_Item_Description"
-                                                                      
                                                                           readonly></textarea>
 
                                                                         
@@ -1391,6 +1439,16 @@
 
                                                                 <input name="Items[0].JIDNI_Qty" autocomplete="off"
                                                                        class="form-control JIDNI_Qty text-end" />
+                                                                <input type="hidden" class="FromQty" />
+                                                                <input type="hidden" class="ToQty" />
+
+                                                            </td>
+
+                                                            <!-- QTY KGS -->
+                                                            <td class="table-width-xl">
+
+                                                                <input name="Items[0].JIDNI_Qty_Kgs" autocomplete="off"
+                                                                       class="form-control JIDNI_Qty_Kgs text-end" readonly />
 
                                                             </td>
 
@@ -1415,40 +1473,56 @@
                                                             <td class="text-center p-2">
 
                                                                 <input type="checkbox"
-                                                                       name="Items[0].JIDNI_JW_InvoiceTracking"
-                                                                       class="form-check-input JIDNI_JW_InvoiceTracking" />
+                                                                       name="Items[0].JIDNI_IsJW_InvoiceApplicable"
+                                                                       class="form-check-input JIDNI_IsJW_InvoiceApplicable" />
                                                               
-                                                                       <input type="hidden"
+                                                                <input type="hidden"
                                                                        name="Items[0].JIDNI_IsDeleted"
                                                                        class="JIDNI_IsDeleted"
                                                                        value="false" />
 
                                                             </td>
                                                             <td>
-                                                                <select name="Items[0].JISVOH_Number"
-                                                                        class="form-select JISVOH_Number"
+                                                                <select name="Items[0].JIDNI_JIJWI_SVOH_Number"
+                                                                        class="form-select JIDNI_JIJWI_SVOH_Number"
                                                                         asp-items="@ViewBag.SON">
                                                                 </select>
                                                                 <!-- NEW: SO Item ID, needed by qty formula -->
-                                                                <input type="hidden" name="Items[0].JISVOI_Number" class="JISVOI_Number_Row" value="0" />
+                                                                <input type="hidden" name="Items[0].JIDNI_JIJWI_SVOI_Number" class="JIDNI_JIJWI_SVOI_Number_Row" value="0" />
                                                             </td>
                                                             <!-- FREIGHT APPLICABLE -->
-                                                            <td class="text-center p-2">
+                                                            <td class="text-center p-2 FreightApplicableCell">
                                                                 <input type="checkbox"
-                                                                       name="Items[0].Freight_Applicable"
-                                                                       class="form-check-input Freight_Applicable" />
+                                                                       name="Items[0].JIDNI_IsFreightApplicable"
+                                                                       class="form-check-input JIDNI_IsFreightApplicable" />
                                                                 <input type="hidden"
-                                                                       class="Freight_Applicable_Value"
+                                                                       class="JIDNI_IsFreightApplicable_Value"
                                                                        value="false" />
                                                             </td>
+                                                            <!-- FROM WH -->
+                                                            <td class="FromWHCell">
+                                                                <select name="Items[0].JIDNI_FromWH"
+                                                                        class="form-select JIDNI_FromWH"
+                                                                        asp-items="@ViewBag.Warehouse">
+                                                                    <option value=""></option>
+                                                                </select>
+                                                            </td>
+                                                            <!-- TO WH -->
+                                                            <td class="ToWHCell">
+                                                                <select name="Items[0].JIDNI_ToWH"
+                                                                        class="form-select JIDNI_ToWH"
+                                                                        asp-items="@ViewBag.Warehouse">
+                                                                    <option value=""></option>
+                                                                </select>
+                                                            </td>
                                                             <!-- FREIGHT NO -->
-                                                            <td>
-                                                                <select name="Items[0].Freight_ServiceOrder_Number"
-                                                                        class="form-select Freight_ServiceOrder_Number">
+                                                            <td class="FreightSOCell">
+                                                                <select name="Items[0].JIDNI_JIFRT_SVOH_Number"
+                                                                        class="form-select JIDNI_JIFRT_SVOH_Number">
                                                                     <option value="0"></option>
                                                                 </select>
                                                                 <!-- NEW: Freight SO Item ID, needed by qty formula -->
-                                                                <input type="hidden" name="Items[0].JISVOI_Number_FRT" class="JISVOI_Number_FRT_Row" value="0" />
+                                                                <input type="hidden" name="Items[0].JIDNI_JIFRT_SVOI_Number" class="JIDNI_JIFRT_SVOI_Number_Row" value="0" />
                                                             </td>
                                                         </tr>
 
@@ -1458,8 +1532,7 @@
 
                                                         <tr class="table-info">
 
-                                                            <td colspan="12"
-                                                                class="text-end py-2">
+                                                            <td colspan="12" class="text-end py-2" style="width: 40px !important; min-width: 40px !important; max-width: 40px !important; text-align: center !important;">
 
                                                                 <span class="float-end pe-3">
 
@@ -1471,9 +1544,7 @@
 
                                                             <td>
 
-                                                                <input id="TotalQty"
-                                                                       class="form-control text-center"
-                                                                       readonly />
+                                                                <input id="TotalQty" class="form-control text-center" readonly="">
 
                                                             </td>
 
@@ -1481,25 +1552,29 @@
                                                             </td>
 
                                                             <td>
-
-                                                                <input id="TotalAmount"
-                                                                       class="form-control text-end"
-                                                                       readonly />
-
                                                             </td>
 
                                                             <td>
+
+                                                                <input id="TotalAmount" class="form-control text-end" readonly="">
+
                                                             </td>
+
                                                             <td>
                                                             </td>
                                                             <td>
                                                             </td>
-                                                            <td>
+                                                            <td class="FreightApplicableFooterCell" style="display: none;">
+                                                            </td>
+                                                            <td class="FromWHFooterCell" style="display: none;">
+                                                            </td>
+                                                            <td class="ToWHFooterCell" style="display: none;">
+                                                            </td>
+                                                            <td class="FreightSOFooterCell" style="display: none;">
                                                             </td>
                                                         </tr>
 
                                                     </tfoot>
-
                                                 </table>
                                             </div>
 

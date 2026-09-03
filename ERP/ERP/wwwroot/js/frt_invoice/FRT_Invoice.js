@@ -2041,9 +2041,6 @@ function LoadServiceOrderDropdown(dropdown) {
     let row = $(dropdown).closest("tr");
 
     let customerId = $("#Header_FRTIH_JW_Customer_Number").val();
-    let prsNumber = 40008;
-    let itemNumber = row.find(".FRTII_Item_Number").val();
-    let uomNumber = row.find(".FRTII_UoM_Number").val();
 
     // NEW: pass the row's own source category (falls back to the
     // row's data-source attribute; the Category dropdown alone isn't
@@ -2051,17 +2048,11 @@ function LoadServiceOrderDropdown(dropdown) {
     // header dropdown is later switched)
     let category = row.attr("data-source") === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE";
 
-    console.log(row.find(".FRTII_PRS_Number").length);
-    console.log(row.find(".FRTII_Item_Number").length);
-    console.log(row.find(".FRTII_UoM_Number").length);
     $.ajax({
-        url: "/DeliveryNote/GetServiceOrder",
+        url: "/FreightInvoice/GetFreightServiceOrder",
         type: "GET",
         data: {
             customerId: customerId,
-            prsNumber: prsNumber,
-            itemNumber: itemNumber,
-            uomNumber: uomNumber,
             category: category
         },
         success: function (response) {

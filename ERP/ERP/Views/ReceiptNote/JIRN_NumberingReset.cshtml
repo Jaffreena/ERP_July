@@ -1,4 +1,4 @@
-﻿@model List<ERP_DTO.JobInwardTransaction.DNNumberReset_DTO>
+﻿@model List<ERP_DTO.JobInwardTransaction.JIRN_NumberReset_DTO>
 
 <div class="col table-fixed h-100">
     <div class="w-100 table-responsive table-body table-body-f">
@@ -17,25 +17,25 @@
             <tbody id="ResetTableBody">
                 <tr id="ResetTempRow" style="display: none;">
                     <td>
-                        <input id="DNR_Date" class="form-control DNR_Date datepicker text-center" autocomplete="off" />
+                        <input id="JIRN_NRS_StartDate" class="form-control JIRN_NRS_StartDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="DNR_EndDate" class="form-control DNR_EndDate datepicker text-center" autocomplete="off" />
+                        <input id="JIRN_NRS_EndDate" class="form-control JIRN_NRS_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td style="width:110px;">
-                        <input id="DNR_StartingNumber" class="form-control DNR_StartingNumber text-center" autocomplete="off" />
+                        <input id="JIRN_NRS_StartingNumber" class="form-control JIRN_NRS_StartingNumber text-center" autocomplete="off" />
                     </td>
                     <td style="width:110px;">
-                        <input id="DNR_NumberofDigits" class="form-control DNR_NumberofDigits text-center" autocomplete="off" />
+                        <input id="JIRN_NRS_NumberofDigits" class="form-control JIRN_NRS_NumberofDigits text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <select id="DNR_PrefilZero" class="form-select DNR_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
+                        <select id="JIRN_NRS_PrefilZero" class="form-select JIRN_NRS_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
                     </td>
                     <td>
-                        <select id="DNR_Frequency" class="form-select DNR_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
+                        <select id="JIRN_NRS_Frequency" class="form-select JIRN_NRS_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
                     </td>
                     <td class="text-center">
-                        <input type="hidden" name="DNR_IsDeleted" class="DNR_IsDeleted" value="false" />
+                        <input type="hidden" name="JIRN_NRS_IsDeleted" class="JIRN_NRS_IsDeleted" value="false" />
                         <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -49,22 +49,22 @@
                     {
                         <tr class="ResetNewRow">
                             <td>
-                                <input id="DNR_Date" name="DNNumberReset[@i].DNR_Date" class="form-control DNR_Date datepicker text-center" autocomplete="off" value="@Model[i].DNR_Date" />
+                                <input id="JIRN_NRS_StartDate" name="JIRN_NumberReset[@i].JIRN_NRS_StartDate" class="form-control JIRN_NRS_StartDate datepicker text-center" autocomplete="off" value="@Model[i].JIRN_NRS_StartDate" />
                             </td>
                             <td>
-                                <input id="DNR_EndDate" name="DNNumberReset[@i].DNR_EndDate" class="form-control DNR_EndDate datepicker text-center" autocomplete="off" value="@Model[i].DNR_EndDate" />
+                                <input id="JIRN_NRS_EndDate" name="JIRN_NumberReset[@i].JIRN_NRS_EndDate" class="form-control JIRN_NRS_EndDate datepicker text-center" autocomplete="off" value="@Model[i].JIRN_NRS_EndDate" />
                             </td>
                             <td style="width:110px;">
-                                <input id="DNR_StartingNumber" name="DNNumberReset[@i].DNR_StartingNumber" class="form-control DNR_StartingNumber text-center" autocomplete="off" value="@Model[i].DNR_StartingNumber" />
+                                <input id="JIRN_NRS_StartingNumber" name="JIRN_NumberReset[@i].JIRN_NRS_StartingNumber" class="form-control JIRN_NRS_StartingNumber text-center" autocomplete="off" value="@Model[i].JIRN_NRS_StartingNumber" />
                             </td>
                             <td style="width:110px;">
-                                <input id="DNR_NumberofDigits" name="DNNumberReset[@i].DNR_NumberofDigits" class="form-control DNR_NumberofDigits text-center" autocomplete="off" value="@Model[i].DNR_NumberofDigits" />
+                                <input id="JIRN_NRS_NumberofDigits" name="JIRN_NumberReset[@i].JIRN_NRS_NumberofDigits" class="form-control JIRN_NRS_NumberofDigits text-center" autocomplete="off" value="@Model[i].JIRN_NRS_NumberofDigits" />
                             </td>
                             <td>
-                                <select id="DNR_PrefilZero" name="DNNumberReset[@i].DNR_PrefilZero" class="form-select DNR_PrefilZero text-center">
+                                <select id="JIRN_NRS_PrefilZero" name="JIRN_NumberReset[@i].JIRN_NRS_PrefilZero" class="form-select JIRN_NRS_PrefilZero text-center">
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Prefil)
                                     {
-                                        if (item.Value == Model[i].DNR_PrefilZero)
+                                        if (item.Value == Model[i].JIRN_NRS_PrefilZero)
                                         {
                                             <option value="@item.Value" selected>@item.Text</option>
                                         }
@@ -76,17 +76,17 @@
                                 </select>
                             </td>
                             <td>
-                                <select id="DNR_Frequency" name="DNNumberReset[@i].DNR_Frequency" class="form-select DNR_Frequency text-center">
-                                    <option value="1" selected="@(Model[i].DNR_Frequency == "1")">Monthly</option>
-                                    <option value="2" selected="@(Model[i].DNR_Frequency == "2")">Yearly</option>
+                                <select id="JIRN_NRS_Frequency" name="JIRN_NumberReset[@i].JIRN_NRS_Frequency" class="form-select JIRN_NRS_Frequency text-center">
+                                    <option value="1" selected="@(Model[i].JIRN_NRS_Frequency == "1")">Monthly</option>
+                                    <option value="2" selected="@(Model[i].JIRN_NRS_Frequency == "2")">Yearly</option>
                                 </select>
                             </td>
                             <td class="text-center">
-                                @if (@Model[i].DNR_Number != 0)
+                                @if (@Model[i].JIRN_NRS_Number != 0)
                                 {
-                                    <input name="DNNumberReset[@i].DNR_Number" type="hidden" class="DNR_Number" value="@Model[i].DNR_Number" />
+                                    <input name="JIRN_NumberReset[@i].JIRN_NRS_Number" type="hidden" class="JIRN_NRS_Number" value="@Model[i].JIRN_NRS_Number" />
                                 }
-                                <input type="hidden" name="DNNumberReset[@i].DNR_IsDeleted" value="false" class="DNR_IsDeleted" />
+                                <input type="hidden" name="JIRN_NumberReset[@i].JIRN_NRS_IsDeleted" value="false" class="JIRN_NRS_IsDeleted" />
                                 <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -119,15 +119,15 @@
 
         function ResetaddRow() {
             var NewRow = $("#ResetTempRow").clone().removeAttr("style").removeAttr("id").addClass("ResetNewRow");
-            NewRow.find("input.DNR_Date").attr("name", "DNNumberReset[" + rowCount + "].DNR_Date").val();
-            NewRow.find("input.DNR_EndDate").attr("name", "DNNumberReset[" + rowCount + "].DNR_EndDate").val();
-            NewRow.find("input.DNR_StartingNumber").attr("name", "DNNumberReset[" + rowCount + "].DNR_StartingNumber");
-            NewRow.find("input.DNR_NumberofDigits").attr("name", "DNNumberReset[" + rowCount + "].DNR_NumberofDigits");
-            NewRow.find("select.DNR_PrefilZero").attr("name", "DNNumberReset[" + rowCount + "].DNR_PrefilZero");
-            NewRow.find("select.DNR_Frequency").attr("name", "DNNumberReset[" + rowCount + "].DNR_Frequency");
-            NewRow.find("input.DNR_IsDeleted").attr("name", "DNNumberReset[" + rowCount + "].DNR_IsDeleted");
+            NewRow.find("input.JIRN_NRS_StartDate").attr("name", "JIRN_NumberReset[" + rowCount + "].JIRN_NRS_StartDate").val();
+            NewRow.find("input.JIRN_NRS_EndDate").attr("name", "JIRN_NumberReset[" + rowCount + "].JIRN_NRS_EndDate").val();
+            NewRow.find("input.JIRN_NRS_StartingNumber").attr("name", "JIRN_NumberReset[" + rowCount + "].JIRN_NRS_StartingNumber");
+            NewRow.find("input.JIRN_NRS_NumberofDigits").attr("name", "JIRN_NumberReset[" + rowCount + "].JIRN_NRS_NumberofDigits");
+            NewRow.find("select.JIRN_NRS_PrefilZero").attr("name", "JIRN_NumberReset[" + rowCount + "].JIRN_NRS_PrefilZero");
+            NewRow.find("select.JIRN_NRS_Frequency").attr("name", "JIRN_NumberReset[" + rowCount + "].JIRN_NRS_Frequency");
+            NewRow.find("input.JIRN_NRS_IsDeleted").attr("name", "JIRN_NumberReset[" + rowCount + "].JIRN_NRS_IsDeleted");
 
-            NewRow.find("input[name='DNNumberReset[" + rowCount + "].DNR_IsDeleted']").val(false);
+            NewRow.find("input[name='JIRN_NumberReset[" + rowCount + "].JIRN_NRS_IsDeleted']").val(false);
 
             $("#ResetTableBody").append(NewRow);
             rowCount++;
@@ -142,13 +142,13 @@
         }
 
         $(document).on('click', '.ResetRowRemove', function () {
-            $(this).closest('tr').find("input[name*='DNR_IsDeleted']").val(true);
+            $(this).closest('tr').find("input[name*='JIRN_NRS_IsDeleted']").val(true);
             $(this).closest('tr').hide();
         });
 
 
 
-      $("#ResetNewRowButton").click(function () {
+     $("#ResetNewRowButton").click(function () {
             var lastRow = $("tr.ResetNewRow").last();
             if (ResetCheckAllFieldsValid(lastRow)) {
                 ResetaddRow();
@@ -164,9 +164,9 @@
                         if (firstInvalidField == null) {
                             firstInvalidField = $(this);
                         }
-                        if ($(this).hasClass("DNR_StartingNumber")) {
+                        if ($(this).hasClass("JIRN_NRS_StartingNumber")) {
                             startingNumberInvalid = true;
-                        } else if ($(this).hasClass("DNR_NumberofDigits")) {
+                        } else if ($(this).hasClass("JIRN_NRS_NumberofDigits")) {
                             numberOfDigitsInvalid = true;
                         } else {
                             otherInvalid = true;
@@ -203,21 +203,21 @@
             });
             return allFieldsValid;
         }
-        function ResetValidateField(currentInput) {
+    function ResetValidateField(currentInput) {
             var inputValue = currentInput.val();
 
             if (inputValue === null || $.trim(inputValue) === "") {
                 return false;
             }
 
-            if (currentInput.hasClass("DNR_StartingNumber")) {
+     if (currentInput.hasClass("JIRN_NRS_StartingNumber")) {
                 var numValue = parseInt(inputValue, 10);
                 if (isNaN(numValue) || numValue <= 0) {
                     return false;
                 }
             }
 
-            if (currentInput.hasClass("DNR_NumberofDigits")) {
+            if (currentInput.hasClass("JIRN_NRS_NumberofDigits")) {
                 if (!/^[3-9]$/.test($.trim(inputValue))) {
                     return false;
                 }

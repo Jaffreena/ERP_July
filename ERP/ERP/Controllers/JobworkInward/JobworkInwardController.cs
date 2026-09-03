@@ -2,7 +2,7 @@
 
 namespace ERP.Controllers.JobworkInward
 {
-    public class JobworkInwardController : Controller
+    public class JobworkInwardMainController : Controller
     {
         public IActionResult Index()
         {

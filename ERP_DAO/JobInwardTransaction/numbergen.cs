@@ -202,4 +202,78 @@ namespace ERP_DAO.JobInwardTransaction
         }
  
     }
+
+    public class JIJWI_SVO_NextNumber_DAO
+    {
+        DBConnect DB = new DBConnect();
+
+        public JIJWI_SVO_NextNumber_DTO JIJWI_SVO_NextNumberDB(JIJWI_SVO_NextNumber_DTO DTO)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JIJWI_SVO_GetNextNumber_SP");
+            db.AddInParameter(cmd, "@Id", DbType.Int32, DTO.Id);
+
+            switch (DTO.Id)
+            {
+                case 101:
+                    db.AddInParameter(cmd, "@JIJWI_SVO_Date", DbType.Date, DTO.JIJWI_SVO_Date);
+                    db.AddOutParameter(cmd, "@NextNumber", DbType.Int32, 4);
+                    db.AddOutParameter(cmd, "@Prefix", DbType.String, 30);
+                    db.AddOutParameter(cmd, "@Suffix", DbType.String, 30);
+                    db.AddOutParameter(cmd, "@NumberOfDigits", DbType.Int32, 4);
+                    db.AddOutParameter(cmd, "@PrefilZero", DbType.Boolean, 1);
+                    db.ExecuteNonQuery(cmd);
+
+                    DTO.NextNumber = Convert.ToInt32(db.GetParameterValue(cmd, "@NextNumber"));
+                    DTO.Prefix = Convert.ToString(db.GetParameterValue(cmd, "@Prefix"));
+                    DTO.Suffix = Convert.ToString(db.GetParameterValue(cmd, "@Suffix"));
+                    DTO.NumberOfDigits = Convert.ToInt32(db.GetParameterValue(cmd, "@NumberOfDigits"));
+                    DTO.PrefilZero = Convert.ToBoolean(db.GetParameterValue(cmd, "@PrefilZero"));
+
+                    string seqStr = DTO.NextNumber.ToString();
+                    if (DTO.PrefilZero)
+                        seqStr = seqStr.PadLeft(DTO.NumberOfDigits, '0');
+                    DTO.FinalNumber = DTO.Prefix + seqStr + DTO.Suffix;
+                    break;
+            }
+            return DTO;
+        }
+    }
+
+    public class JIFRT_SVO_NextNumber_DAO
+    {
+        DBConnect DB = new DBConnect();
+
+        public JIFRT_SVO_NextNumber_DTO JIFRT_SVO_NextNumberDB(JIFRT_SVO_NextNumber_DTO DTO)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JIFRT_SVO_GetNextNumber_SP");
+            db.AddInParameter(cmd, "@Id", DbType.Int32, DTO.Id);
+
+            switch (DTO.Id)
+            {
+                case 101:
+                    db.AddInParameter(cmd, "@JIFRT_SVO_Date", DbType.Date, DTO.JIFRT_SVO_Date);
+                    db.AddOutParameter(cmd, "@NextNumber", DbType.Int32, 4);
+                    db.AddOutParameter(cmd, "@Prefix", DbType.String, 30);
+                    db.AddOutParameter(cmd, "@Suffix", DbType.String, 30);
+                    db.AddOutParameter(cmd, "@NumberOfDigits", DbType.Int32, 4);
+                    db.AddOutParameter(cmd, "@PrefilZero", DbType.Boolean, 1);
+                    db.ExecuteNonQuery(cmd);
+
+                    DTO.NextNumber = Convert.ToInt32(db.GetParameterValue(cmd, "@NextNumber"));
+                    DTO.Prefix = Convert.ToString(db.GetParameterValue(cmd, "@Prefix"));
+                    DTO.Suffix = Convert.ToString(db.GetParameterValue(cmd, "@Suffix"));
+                    DTO.NumberOfDigits = Convert.ToInt32(db.GetParameterValue(cmd, "@NumberOfDigits"));
+                    DTO.PrefilZero = Convert.ToBoolean(db.GetParameterValue(cmd, "@PrefilZero"));
+
+                    string seqStr = DTO.NextNumber.ToString();
+                    if (DTO.PrefilZero)
+                        seqStr = seqStr.PadLeft(DTO.NumberOfDigits, '0');
+                    DTO.FinalNumber = DTO.Prefix + seqStr + DTO.Suffix;
+                    break;
+            }
+            return DTO;
+        }
+    }
 }

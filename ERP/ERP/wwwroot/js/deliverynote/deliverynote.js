@@ -218,14 +218,18 @@ const ItemTableFields = [
     { cls: ".JIDNI_Qty", min: 10, max: 20, align: "center" },  // Qty
     { cls: ".JIDNI_UnitPrice", min: 10, max: 20, align: "right" },   // Unit Price
     { cls: ".JIDNI_Amount", min: 13, max: 25, align: "right" },   // Amount
-    
+
     // Not present in the specification, so left unchanged
-    { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" },
-    { cls: ".Freight_ServiceOrder_Number", min: 10, max: 25, align: "left" }
-   
+    { cls: ".JIDNI_JIJWI_SVOH_Number", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNI_FromWH", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNI_ToWH", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNI_JIFRT_SVOH_Number", min: 10, max: 25, align: "left" }
+
+
+
 ];
 let isMouseSelectingBuyer = false;
- 
+
 var addressIndex = 0;
 //#region batch grid alignment
 function GetTableWidth(container = "#DeliveryNoteBatchList") {
@@ -265,7 +269,7 @@ function GetTableWidth(container = "#DeliveryNoteBatchList") {
     return totalWidth;
 }
 
- 
+
 function ApplyOtherBatchFieldWidths(container = "#DeliveryNoteOtherBatchList") {
 
     const fields = [
@@ -399,7 +403,7 @@ function getTextWidth(text, element) {
     ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
 
     return Math.ceil(ctx.measureText(text).width);
-} 
+}
 function ApplyHeaderAlignment(container = "#ItemTable") {
 
     const fields = [
@@ -422,10 +426,11 @@ function ApplyHeaderAlignment(container = "#ItemTable") {
         { cls: ".JIDNI_UnitPrice", align: "right" },
         { cls: ".JIDNI_Amount", align: "right" },
 
-      
-        { cls: ".JISVOH_Number", align: "left" },
-        
-        { cls: ".Freight_ServiceOrder_Number", align: "left" }
+        { cls: ".JIDNI_JIJWI_SVOH_Number", align: "left" },
+        { cls: ".JIDNI_FromWH", align: "left" },
+        { cls: ".JIDNI_ToWH", align: "left" },
+
+        { cls: ".JIDNI_JIFRT_SVOH_Number", align: "left" }
     ];
 
     fields.forEach(f => {
@@ -527,36 +532,36 @@ function LoadDefaultFormSetting() {
             if (response && response.success && response.data) {
                 var data = response.data;
 
-                if (data.dfS_JIDNH_MS_Number) {
-                    $('#Header_JIDNH_MS_Number').val(data.dfS_JIDNH_MS_Number).trigger('change');
+                if (data.jidN_DFS_MS_Number) {
+                    $('#Header_JIDNH_MS_Number').val(data.jidN_DFS_MS_Number).trigger('change');
                 }
-                if (data.dfS_JIDNH_JW_Customer_Number) {
-                    $('#Header_JIDNH_JW_Customer_Number').val(data.dfS_JIDNH_JW_Customer_Number);
+                if (data.jidN_DFS_JW_Customer_Number) {
+                    $('#Header_JIDNH_JW_Customer_Number').val(data.jidN_DFS_JW_Customer_Number);
                     $('#Header_JIDNH_JW_Customer_Name').val(data.cuS_Name);
                 }
-                if (data.dfS_JIDNH_Currency_Number) {
-                    $('#Header_JIDNH_Currency_Number').val(data.dfS_JIDNH_Currency_Number).trigger('change');
+                if (data.jidN_DFS_Currency_Number) {
+                    $('#Header_JIDNH_Currency_Number').val(data.jidN_DFS_Currency_Number).trigger('change');
                 }
-                if (data.dfS_JIDNH_WH_Number) {
-                    $('#Header_JIDNH_WH_Number').val(data.dfS_JIDNH_WH_Number).trigger('change');
+                if (data.jidN_DFS_WH_Number) {
+                    $('#Header_JIDNH_WH_Number').val(data.jidN_DFS_WH_Number).trigger('change');
                 }
-                if (data.dfS_JIDNH_PaymentTerms) {
-                    $('#Header_JIDNH_PaymentTerms').val(data.dfS_JIDNH_PaymentTerms);
+                if (data.jidN_DFS_PaymentTerms) {
+                    $('#Header_JIDNH_PaymentTerms').val(data.jidN_DFS_PaymentTerms);
                 }
-                if (data.dfS_JIDNH_DeliveryTerms) {
-                    $('#Header_JIDNH_DeliveryTerms').val(data.dfS_JIDNH_DeliveryTerms);
+                if (data.jidN_DFS_DeliveryTerms) {
+                    $('#Header_JIDNH_DeliveryTerms').val(data.jidN_DFS_DeliveryTerms);
                 }
-                if (data.dfS_JIDNH_DeliveryMode) {
-                    $('#Header_JIDNH_DeliveryMode').val(data.dfS_JIDNH_DeliveryMode);
+                if (data.jidN_DFS_DeliveryMode) {
+                    $('#Header_JIDNH_DeliveryMode').val(data.jidN_DFS_DeliveryMode);
                 }
-                if (data.dfS_JIDNH_DespatchedThrough) {
-                    $('#Header_JIDNH_DespatchedThrough').val(data.dfS_JIDNH_DespatchedThrough);
+                if (data.jidN_DFS_DespatchedThrough) {
+                    $('#Header_JIDNH_DespatchedThrough').val(data.jidN_DFS_DespatchedThrough);
                 }
-                if (data.dfS_JIDNH_Remarks) {
-                    $('#Header_JIDNH_Remarks').val(data.dfS_JIDNH_Remarks);
+                if (data.jidN_DFS_Remarks) {
+                    $('#Header_JIDNH_Remarks').val(data.jidN_DFS_Remarks);
                 }
-                if (data.dfS_JIDNH_DespatchDocument) {
-                    $('#Header_JIDNH_DespatchDocumentNo').val(data.dfS_JIDNH_DespatchDocument);
+                if (data.jidN_DFS_DespatchDocument) {
+                    $('#Header_JIDNH_DespatchDocumentNo').val(data.jidN_DFS_DespatchDocument);
                 }
             }
         },
@@ -574,14 +579,61 @@ $(document).ready(function () {
             let row = $(this);
 
             if (
-                row.find(".JIDNI_JW_InvoiceTracking").is(":checked") ||
-                row.find(".Freight_Applicable").is(":checked")
+                row.find(".JIDNI_IsJW_InvoiceApplicable").is(":checked") ||
+                row.find(".JIDNI_IsFreightApplicable").is(":checked")
             ) {
                 row.find(".JIDNI_UoM_Number").trigger("change");
             }
         });
     });
- 
+
+    // NEW: Qty to Kg conversion (same pattern as Receipt Note)
+    $(document).on("input", ".JIDNI_Qty", function () {
+        let row = $(this).closest("tr");
+        CalculateQtyKgDN(row);
+    });
+
+    $(document).on("change", ".JIDNI_UoM_Number", function () {
+        let row = $(this).closest("tr");
+        let itemNumber = row.find(".JIDNI_Item_Number").val();
+        let fromUnit = $(this).val();
+
+        if (!itemNumber || !fromUnit) return;
+
+        $.ajax({
+            url: '/receiptnote/transactions/receiptnote/get-item-unit-conversion',
+            type: 'GET',
+            data: { itemNumber: itemNumber, fromUnit: fromUnit },
+            success: function (res) {
+                row.find(".FromQty").val(res.fromQty);
+                row.find(".ToQty").val(res.toQty);
+                CalculateQtyKgDN(row);
+            }
+        });
+    });
+
+    // NEW: Header Freight Applicable toggle (show/hide item-grid freight columns)
+    function ToggleFreightColumns_DN() {
+        let isFreight = $("#Header_Freight_Applicable").is(":checked");
+
+        let freightCols = ".FreightApplicableHeader, .FreightApplicableCell, .FreightApplicableFooterCell, " +
+            ".FromWHHeader, .FromWHCell, .FromWHFooterCell, " +
+            ".ToWHHeader, .ToWHCell, .ToWHFooterCell, " +
+            ".FreightSOHeader, .FreightSOCell, .FreightSOFooterCell";
+
+        if (isFreight) {
+            $(freightCols).show();
+        } else {
+            $(freightCols).hide();
+        }
+    }
+
+    $(document).on("change", "#Header_Freight_Applicable", function () {
+        ToggleFreightColumns_DN();
+    });
+
+    ToggleFreightColumns_DN();
+
     LoadDefaultFormSetting();
 
     //#region Header_JIDNH_JW_Customer_Name
@@ -641,7 +693,7 @@ $(document).ready(function () {
         }, 200);
     });
 
-  
+
     $(document).on(
         "input change blur",
         "#DeliveryNoteOtherBatchList input, #DeliveryNoteOtherBatchList textarea, #DeliveryNoteOtherBatchList select",
@@ -660,7 +712,7 @@ $(document).ready(function () {
     $(document).on("change", "#ItemTable select", function () {
         ResizeColumn(this);
     });
-    
+
     //#endregion
 
     AutoFit();
@@ -689,7 +741,7 @@ $(document).ready(function () {
         });
 
     //#endregion
- 
+
     //#region Unit Price Format
 
     //#region comma format on focusout
@@ -714,10 +766,10 @@ $(document).ready(function () {
             input.select();
         }, 10);
     });
-   
+
     //#endregion
 
-    
+
 
     //#region Initialize Flatpickr
     InitializeGstFlatpickrs();
@@ -734,7 +786,7 @@ $(document).ready(function () {
 
     DateBind();
 
-   
+
     //#endregion Initialize Flatpickr
 
     //#region onkeypress qty and unit
@@ -803,7 +855,7 @@ $(document).ready(function () {
 
         // 1. Validate last row before adding new row
         let isValid = true;
-     
+
 
         $("#ItemTable tbody tr.NewRow:last").find("input, select").each(function () {
 
@@ -848,7 +900,7 @@ $(document).ready(function () {
         });
 
         if (!isValid) {
-           
+
             alert("Please fill required fields before adding new row.");
             return;
         }
@@ -927,17 +979,17 @@ $(document).ready(function () {
             searchTable: "#tblsearch"
         });
 
-     
+
 
 
     });
     //#endregion add row item grid
 
 
-  
+
 
     //#region jwc address
-  
+
 
     $("#AddressButton").click(function () {
 
@@ -979,7 +1031,7 @@ $(document).ready(function () {
     });
     //#endregion CLICK ADDRESS BUTTON
 
- 
+
 
     //#region CHANGE ADDRESS TYPE
     function isDuplicateAddress(type, currentRow) {
@@ -1025,7 +1077,7 @@ $(document).ready(function () {
             dataType: "json",
             success: function (data) {
                 var AddressID = data.buyerAddressId;
-             
+
                 var AddressDefault = data.buyerAddress;
 
                 var $AddressDropdown = currentRow.find('.JIDNA_Address_ID');
@@ -1048,7 +1100,7 @@ $(document).ready(function () {
                 // set default + fill fields
                 if (AddressDefault != null) {
                     $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
-                   // ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
+                    // ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
 
                     ADDAddress.text(AddressDefault.buY_ADD_Address);
                     ADDCity.val(AddressDefault.buY_ADD_City);
@@ -1094,7 +1146,7 @@ $(document).ready(function () {
 
     //#endregion CHANGE ADDRESS TYPE
 
-  
+
 
     //#region Save Function
     $("#btnSave").on("click", function (e) {
@@ -1109,7 +1161,7 @@ $(document).ready(function () {
             e.preventDefault();
             return false;
 
-           
+
 
             // continue save
         }
@@ -1137,7 +1189,7 @@ $(document).ready(function () {
                             location.reload();
                         });
                         showAlert('Record Inserted');
-                     //  window.location.href = response.redirectUrl;
+                        //  window.location.href = response.redirectUrl;
                         console.log(JSON.stringify(model));
                     }
 
@@ -1153,7 +1205,7 @@ $(document).ready(function () {
 
         }
 
-    }); 
+    });
     function GetBatchMismatchRowIds() {
         return batchMismatchData
             .map(x => x.rowId)
@@ -1320,8 +1372,8 @@ $(document).ready(function () {
             }
 
             let item = {
-                JISVOH_Number:
-                    parseInt(row.find(".JISVOH_Number").val()) || 0,
+                JIDNI_JIJWI_SVOH_Number:
+                    parseInt(row.find(".JIDNI_JIJWI_SVOH_Number").val()) || 0,
 
                 JIDNI_JIDNH_Number:
                     parseInt(row.find(".JIDNI_JIDNH_Number").val()) || 0,
@@ -1344,31 +1396,40 @@ $(document).ready(function () {
                 JIDNI_Qty:
                     parseFloat((row.find(".JIDNI_Qty").val() || "0").replace(/,/g, "")) || 0,
 
+                JIDNI_Qty_Kgs:
+                    parseFloat((row.find(".JIDNI_Qty_Kgs").val() || "0").replace(/,/g, "")) || 0,
+
                 JIDNI_UnitPrice:
                     parseFloat((row.find(".JIDNI_UnitPrice").val() || "0").replace(/,/g, "")) || 0,
 
                 JIDNI_Amount:
                     parseFloat((row.find(".JIDNI_Amount").val() || "0").replace(/,/g, "")) || 0,
 
-                JIDNI_JW_InvoiceTracking:
-                    row.find(".JIDNI_JW_InvoiceTracking").is(":checked")
+                JIDNI_IsJW_InvoiceApplicable:
+                    row.find(".JIDNI_IsJW_InvoiceApplicable").is(":checked")
                         ? "Yes"
                         : "No",
-                Freight_Applicable:
-                    row.find(".Freight_Applicable").is(":checked")
+                JIDNI_IsFreightApplicable:
+                    row.find(".JIDNI_IsFreightApplicable").is(":checked")
                         ? "Yes"
                         : "No",
 
-                Freight_ServiceOrder_Number:
-                    row.find(".Freight_ServiceOrder_Number").val() || "",
+                JIDNI_JIFRT_SVOH_Number:
+                    row.find(".JIDNI_JIFRT_SVOH_Number").val() || "",
+
+                JIDNI_FromWH:
+                    row.find(".JIDNI_FromWH").val() || "",
+
+                JIDNI_ToWH:
+                    row.find(".JIDNI_ToWH").val() || "",
 
                 // NEW: SO Item IDs — needed by USP_CheckDeliveredQtyExceeded_Freight's
                 // DN-side calculation
-                JISVOI_Number:
-                    parseInt(row.find(".JISVOI_Number_Row").val()) || 0,
+                JIDNI_JIJWI_SVOI_Number:
+                    parseInt(row.find(".JIDNI_JIJWI_SVOI_Number_Row").val()) || 0,
 
-                JISVOI_Number_FRT:
-                    parseInt(row.find(".JISVOI_Number_FRT_Row").val()) || 0
+                JIDNI_JIFRT_SVOI_Number:
+                    parseInt(row.find(".JIDNI_JIFRT_SVOI_Number_Row").val()) || 0
             };
             items.push(item);
 
@@ -1440,12 +1501,12 @@ $(document).ready(function () {
             Items: items,
             deliveryNoteBatches: CreateDeliveryNoteBatchModel(),
             Addresses: addresses
-          
+
         };
         console.log(deliveryNoteModel)
 
         return deliveryNoteModel;
-       
+
     }
 
     //#endregion Save Function
@@ -1484,11 +1545,11 @@ $(document).ready(function () {
             let ItemGridindex =
                 currentRow.index(
                     "#ItemTable tbody tr.NewRow:visible"
-                )+1;
+                ) + 1;
 
 
 
-           
+
 
             $.ajax({
 
@@ -1509,10 +1570,10 @@ $(document).ready(function () {
                     console.log(xhr.responseText);
                 }
             });
-       
+
         });
-      
-      
+
+
 
     });
     //#endregion remove checked rows
@@ -1520,12 +1581,12 @@ $(document).ready(function () {
 
     $(document).on(
         "change",
-        ".JIDNI_JW_InvoiceTracking, .JIDNI_PRS_Number, .JIDNI_Item_Code, .JIDNI_UoM_Number",
+        ".JIDNI_IsJW_InvoiceApplicable, .JIDNI_PRS_Number, .JIDNI_Item_Code, .JIDNI_UoM_Number",
         function () {
 
             let row = $(this).closest("tr");
 
-            if (row.find(".JIDNI_JW_InvoiceTracking").is(":checked")) {
+            if (row.find(".JIDNI_IsJW_InvoiceApplicable").is(":checked")) {
 
                 BindServiceOrder(
                     $("#Header_JIDNH_JW_Customer_Number").val(),
@@ -1535,7 +1596,7 @@ $(document).ready(function () {
                 );
 
             } else {
-                row.find(".JISVOH_Number").html('<option value="0"></option>');
+                row.find(".JIDNI_JIJWI_SVOH_Number").html('<option value="0"></option>');
             }
         }
     );
@@ -1544,21 +1605,22 @@ $(document).ready(function () {
 
     $(document).on(
         "change",
-        ".Freight_Applicable, .JIDNI_Item_Code, .JIDNI_UoM_Number",
+        ".JIDNI_IsFreightApplicable, .JIDNI_UoM_Number, .JIDNI_FromWH, .JIDNI_ToWH",
         function () {
 
             let row = $(this).closest("tr");
 
-            if (row.find(".Freight_Applicable").is(":checked")) {
+            if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
 
                 BindFreightServiceOrder(
                     $("#Header_JIDNH_JW_Customer_Number").val(),
-                    row.find(".JIDNI_Item_Number").val(),
-                    row.find(".JIDNI_UoM_Number").val()
+                    row.find(".JIDNI_UoM_Number").val(),
+                    row.find(".JIDNI_FromWH").val(),
+                    row.find(".JIDNI_ToWH").val()
                 );
 
             } else {
-                row.find(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+                row.find(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
             }
         }
     );
@@ -1590,7 +1652,7 @@ function GetDeliveryNoteNumber() {
         data: { DNDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-                alert("Please set numbering for this date range.");
+               // alert("Please set numbering for this date range.");
                 $("#Header_JIDNH_DN_No").val("");
                 DateBind();
 
@@ -1639,7 +1701,7 @@ function DeleteItemRowTempTable(inputElement) {
         data: { index: ItemGridindex },
 
         success: function (response) {
-          
+
             calculateTotal();
         },
 
@@ -1653,7 +1715,7 @@ function DeleteItemRowTempTable(inputElement) {
 
 
 //#endregion
- 
+
 function addAddressRow() {
 
     let i = addressIndex;
@@ -2001,30 +2063,31 @@ function SearchBuyer(inputElement) {
 
 // Hide search when clicking outside
 
- //#endregion customer Search Functions
+//#endregion customer Search Functions
 
- // No's Service Order dropdown
-$(document).on("change", ".Freight_ServiceOrder_Number", function () {
+// No's Service Order dropdown
+$(document).on("change", ".JIDNI_JIFRT_SVOH_Number", function () {
 
     let row = $(this).closest("tr");
     let freightSO = $(this).val();
 
-    // NEW: capture SO item id for JISVOI_Number_FRT (needed for the
+    // NEW: capture SO item id for JIDNI_JIFRT_SVOI_Number (needed for the
     // qty-exceeded calc, same as GetOtherRowsQtyForSO/DB linkage)
     let selectedJisvoi = $(this).find("option:selected").attr("data-jisvoi") || 0;
-    row.find(".JISVOI_Number_FRT_Row").val(selectedJisvoi);
+    row.find(".JIDNI_JIFRT_SVOI_Number_Row").val(selectedJisvoi);
 
     if (!freightSO || freightSO === "0") return;
 
-    let itemNumber = row.find(".JIDNI_Item_Number").val();
     let uomNumber = row.find(".JIDNI_UoM_Number").val();
+    let fromWHNumber = row.find(".JIDNI_FromWH").val();
+    let toWHNumber = row.find(".JIDNI_ToWH").val();
     let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
 
-    $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+    $.get("/deliverynote/transactions/deliverynote/check-delivered-qty-exceeded-freight-new", {
         jisvohNumber: freightSO,
-        prsNumber: FREIGHT_PRS_NUMBER,
-        itemNumber,
-        uomNumber
+        uomNumber,
+        fromWHNumber,
+        toWHNumber
     }, function (res) {
 
         if (!res || res.length === 0) return;
@@ -2045,7 +2108,7 @@ $(document).on("change", ".Freight_ServiceOrder_Number", function () {
                 row.find(".JIDNI_Qty")
                     .focus()
                     .select();
-                row.find(".Freight_ServiceOrder_Number").val("0");
+                row.find(".JIDNI_JIFRT_SVOH_Number").val("0");
             }, 300);
         }
     });
@@ -2055,7 +2118,7 @@ $(document).on("change", ".Freight_ServiceOrder_Number", function () {
 $(document).on("focusout", ".JIDNI_Qty", function () {
 
     let row = $(this).closest("tr");
-    let jisvohNumber = row.find(".JISVOH_Number").val();
+    let jisvohNumber = row.find(".JIDNI_JIJWI_SVOH_Number").val();
     if (!jisvohNumber) return;
     let prsNumber = row.find(".JIDNI_PRS_Number").val();
     let itemNumber = row.find(".JIDNI_Item_Number").val();
@@ -2085,7 +2148,7 @@ $(document).on("focusout", ".JIDNI_Qty", function () {
                 row.find(".JIDNI_Qty")
                     .focus()
                     .select();
-                row.find(".JISVOH_Number").val("0");
+                row.find(".JIDNI_JIJWI_SVOH_Number").val("0");
             }, 300);
         }
     });
@@ -2095,18 +2158,19 @@ $(document).on("focusout", ".JIDNI_Qty", function () {
 $(document).on("focusout", ".JIDNI_Qty", function () {
 
     let row = $(this).closest("tr");
-    let freightSO = row.find(".Freight_ServiceOrder_Number").val();
+    let freightSO = row.find(".JIDNI_JIFRT_SVOH_Number").val();
     if (!freightSO || freightSO === "0") return;
 
-    let itemNumber = row.find(".JIDNI_Item_Number").val();
     let uomNumber = row.find(".JIDNI_UoM_Number").val();
+    let fromWHNumber = row.find(".JIDNI_FromWH").val();
+    let toWHNumber = row.find(".JIDNI_ToWH").val();
     let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
 
-    $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+    $.get("/deliverynote/transactions/deliverynote/check-delivered-qty-exceeded-freight-new", {
         jisvohNumber: freightSO,
-        prsNumber: FREIGHT_PRS_NUMBER,
-        itemNumber,
-        uomNumber
+        uomNumber,
+        fromWHNumber,
+        toWHNumber
     }, function (res) {
         if (!res || res.length === 0) return;
         let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
@@ -2121,17 +2185,17 @@ $(document).on("focusout", ".JIDNI_Qty", function () {
                 row.find(".JIDNI_Qty")
                     .focus()
                     .select();
-                row.find(".Freight_ServiceOrder_Number").val("0");
+                row.find(".JIDNI_JIFRT_SVOH_Number").val("0");
             }, 300);
         }
     });
 });
 
-$(document).on("change", ".JISVOH_Number", function () {
+$(document).on("change", ".JIDNI_JIJWI_SVOH_Number", function () {
 
     let row = $(this).closest("tr");
     let jisvohNumber = $(this).val();
-    row.find(".JISVOH_Number").val(jisvohNumber)
+    row.find(".JIDNI_JIJWI_SVOH_Number").val(jisvohNumber)
 
     let prsNumber = row.find(".JIDNI_PRS_Number").val();
     let itemNumber = row.find(".JIDNI_Item_Number").val();
@@ -2165,13 +2229,13 @@ $(document).on("change", ".JISVOH_Number", function () {
                 row.find(".JIDNI_Qty")
                     .focus()
                     .select();
-                row.find(".JISVOH_Number").val("0");
+                row.find(".JIDNI_JIJWI_SVOH_Number").val("0");
             }, 300);
 
 
         } else if (jisvohNumber && jisvohNumber !== "0") {
             // NEW: valid selection, within limit — lock the dropdown
-            row.find(".JISVOH_Number").prop("disabled", true);
+            row.find(".JIDNI_JIJWI_SVOH_Number").prop("disabled", true);
         }
     });
 });
@@ -2190,8 +2254,8 @@ function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
 
         // CHANGED: also check the Freight SO field — a row's qty could
         // be booked against a Service Order via either dropdown.
-        let rowSO = row.find(".JISVOH_Number").val() || 0;
-        let rowFreightSO = row.find(".Freight_ServiceOrder_Number").val() || 0;
+        let rowSO = row.find(".JIDNI_JIJWI_SVOH_Number").val() || 0;
+        let rowFreightSO = row.find(".JIDNI_JIFRT_SVOH_Number").val() || 0;
 
         if (rowSO == jisvohNumber || rowFreightSO == jisvohNumber) {
             total += parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
@@ -2201,33 +2265,33 @@ function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
     return total;
 }
 function BindServiceOrder(customerId, prsNumber = null, itemNumber = null, uomNumber = null) {
-    $(".JISVOH_Number").html('<option value="0"></option>');
+    $(".JIDNI_JIJWI_SVOH_Number").html('<option value="0"></option>');
     if (!customerId) return;
 
     $.get("/DeliveryNote/GetServiceOrder",
         { customerId, prsNumber, itemNumber, uomNumber },
         data => $.each(data, (_, item) => {
             // NEW: skip entries with no real value/text — server
-            
+
             if (!item.value || item.value === "" || item.value === "0") return;
 
-            $(".JISVOH_Number").append(`<option value="${item.value}">${item.text}</option>`)
+            $(".JIDNI_JIJWI_SVOH_Number").append(`<option value="${item.value}">${item.text}</option>`)
         })
     );
 }
 
-function BindFreightServiceOrder(customerId, itemNumber = null, uomNumber = null) {
-    $(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+function BindFreightServiceOrder(customerId, uomNumber = null, fromWHNumber = null, toWHNumber = null) {
+    $(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
     if (!customerId) return;
 
-    $.get("/DeliveryNote/GetServiceOrder",
-        { customerId, prsNumber: FREIGHT_PRS_NUMBER, itemNumber, uomNumber },
+    $.get("/deliverynote/transactions/deliverynote/get-freight-service-order",
+        { customerId, uomNumber, fromWHNumber, toWHNumber },
         data => $.each(data, (_, item) => {
             // NEW: skip entries with no real value/text — server
 
             if (!item.value || item.value === "" || item.value === "0") return;
 
-            $(".Freight_ServiceOrder_Number").append(
+            $(".JIDNI_JIFRT_SVOH_Number").append(
                 `<option value="${item.value}" data-jisvoi="${item.jisvoiNumber || 0}">${item.text}</option>`
             )
         })
@@ -2235,6 +2299,22 @@ function BindFreightServiceOrder(customerId, itemNumber = null, uomNumber = null
 }
 
 //#region Calculate Total
+function CalculateQtyKgDN(row) {
+    let qty = parseFloat((row.find(".JIDNI_Qty").val() || "0").replace(/,/g, "")) || 0;
+    let uomText = row.find(".JIDNI_UoM_Number option:selected").text().trim().toUpperCase();
+
+    let qtyKg;
+    if (uomText === "KGS") {
+        qtyKg = qty * 1;
+    } else {
+        let fromQty = parseFloat(row.find(".FromQty").val()) || 0;
+        let toQty = parseFloat(row.find(".ToQty").val()) || 0;
+        qtyKg = fromQty > 0 ? (qty * (toQty / fromQty)) : 0;
+    }
+
+    row.find(".JIDNI_Qty_Kgs").val(qtyKg === 0 ? "" : qtyKg.toFixed(2));
+}
+
 function calculateTotal() {
 
     let totalQty = 0;
@@ -2504,7 +2584,7 @@ function searchItemJIDNI(inputElement) {
 
 
 //#region COMMON FUNCTIONS
- 
+
 function DecimalIndianRupees(value) {
     if (value === "" || isNaN(value)) {
         return "0.00";
@@ -2580,22 +2660,22 @@ function validateHeaderById() {
 
     // 1. DN No
     if ($("#Header_JIDNH_DN_No").val().trim() === "") {
-        showAlert('Delivery Note No. is required','#Header_JIDNH_DN_No');
-        
+        showAlert('Delivery Note No. is required', '#Header_JIDNH_DN_No');
+
         return false;
     }
 
     // 2. DN Date
     if ($("#Header_JIDNH_DN_Date").val().trim() === "") {
-        showAlert('DN Date is required','#Header_JIDNH_DN_Date');
-        
+        showAlert('DN Date is required', '#Header_JIDNH_DN_Date');
+
         return false;
     }
 
     // 3. Material Segregation
     if ($("#Header_JIDNH_MS_Number").val() === "" || $("#Header_JIDNH_MS_Number").val() === "0") {
-        showAlert('Material Segregation is required','#Header_JIDNH_MS_Number');
-        
+        showAlert('Material Segregation is required', '#Header_JIDNH_MS_Number');
+
         return false;
     }
 
@@ -2603,64 +2683,64 @@ function validateHeaderById() {
     if ($("#Header_JIDNH_JW_Customer_Number").val().trim() === "" ||
         $("#Header_JIDNH_JW_Customer_Name").val().trim() === "") {
 
-        showAlert('JW Customer is required','#Header_JIDNH_JW_Customer_Name');
-       
+        showAlert('JW Customer is required', '#Header_JIDNH_JW_Customer_Name');
+
         return false;
     }
 
     // 5. Currency
     if ($("#Header_JIDNH_Currency_Number").val() === "" || $("#Header_JIDNH_Currency_Number").val() === "0") {
-        showAlert('Currency is required','#Header_JIDNH_Currency_Number');
-       
+        showAlert('Currency is required', '#Header_JIDNH_Currency_Number');
+
         return false;
     }
 
     // 6. Warehouse
     if ($("#Header_JIDNH_WH_Number").val() === "" || $("#Header_JIDNH_WH_Number").val() === "0") {
-        showAlert('Warehouse is required','#Header_JIDNH_WH_Number');
-     
+        showAlert('Warehouse is required', '#Header_JIDNH_WH_Number');
+
         return false;
     }
 
     //// 7. Payment Terms
     //if ($("#Header_JIDNH_PaymentTerms").val().trim() === "") {
     //    showAlert('Payment Terms is required','#Header_JIDNH_PaymentTerms');
-        
+
     //    return false;
     //}
 
     //// 8. Delivery Terms
     //if ($("#Header_JIDNH_DeliveryTerms").val().trim() === "") {
     //    showAlert('Delivery Terms is required','#Header_JIDNH_DeliveryTerms');
-      
+
     //    return false;
     //}
 
     //// 9. Delivery Mode
     //if ($("#Header_JIDNH_DeliveryMode").val().trim() === "") {
     //    showAlert('Delivery Mode is required','#Header_JIDNH_DeliveryMode');
-        
+
     //    return false;
     //}
 
     //// 10. Despatch Document No
     //if ($("#Header_JIDNH_DespatchDocumentNo").val().trim() === "") {
     //    showAlert('Despatch Document No is required','#Header_JIDNH_DespatchDocumentNo');
-       
+
     //    return false;
     //}
 
     //// 11. Despatched Through
     //if ($("#Header_JIDNH_DespatchedThrough").val().trim() === "") {
     //    showAlert('Despatched Through is required','#Header_JIDNH_DespatchedThrough');
-      
+
     //    return false;
     //}
 
     //// 12. Remarks
     //if ($("#Header_JIDNH_Remarks").val().trim() === "") {
     //    showAlert('Remarks is required','#Header_JIDNH_Remarks');
-     
+
     //    return false;
     //}
     // =========================
@@ -2681,7 +2761,7 @@ function validateHeaderById() {
 //#endregion
 
 //#region VALIDATE ITEM GRID,batchgrid
- 
+
 function validateItemGrid() {
 
     let hasValidRow = false;
@@ -2729,7 +2809,7 @@ function validateItemGrid() {
         // validate Item Code
         if (!itemCode || itemCode.trim() === "") {
             showAlert('Item Code is required', row.find(".JIDNI_Item_Code"));
-         
+
             isValid = false;
             return false;
         }
@@ -2737,7 +2817,7 @@ function validateItemGrid() {
         // validate Qty
         if (!qty || qty.trim() === "" || qty.trim() === "0") {
             showAlert('Qty is required', row.find(".JIDNI_Qty"));
-         
+
             isValid = false;
             return false;
         }
@@ -2745,9 +2825,28 @@ function validateItemGrid() {
         // validate Unit Price
         if (!unitPrice || unitPrice.trim() === "" || unitPrice.trim() === "0") {
             showAlert('Unit Price is required', row.find(".JIDNI_UnitPrice"));
-          
+
             isValid = false;
             return false;
+        }
+
+        // NEW: validate From WH / To WH when Freight Applicable is checked
+        if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
+
+            let fromWH = row.find(".JIDNI_FromWH").val();
+            let toWH = row.find(".JIDNI_ToWH").val();
+
+            if (!fromWH || fromWH === "0") {
+                showAlert("From WH is required.", row.find(".JIDNI_FromWH"));
+                isValid = false;
+                return false;
+            }
+
+            if (!toWH || toWH === "0") {
+                showAlert("To WH is required.", row.find(".JIDNI_ToWH"));
+                isValid = false;
+                return false;
+            }
         }
 
     });
@@ -2882,7 +2981,7 @@ function ClearAll() {
 }
 //#endregion
 
- 
+
 
 function ResizeAddressPopup(tableSelector = "#AddressTable", modalSelector = "#BuyerAddress") {
 
@@ -2933,15 +3032,15 @@ function LoadJWCAddress() {
             });
             setTimeout(function () {
                 ResizeAddressColumns();
-               
+
                 $("#BuyerAddress").one("shown.bs.modal", function () {
                     ResizeAddressPopup();
                 });
 
                 $("#BuyerAddress").modal("show");
             }, 500);
-        
-          
+
+
         }
     });
 }

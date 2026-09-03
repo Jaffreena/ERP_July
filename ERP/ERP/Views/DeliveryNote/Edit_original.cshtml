@@ -1254,9 +1254,9 @@
 
                                                     <input type="checkbox"
                                                            class="form-check-input JIDNI_JW_InvoiceTracking"
-                                                    @(Model.Items[i].JIDNI_JW_InvoiceTracking == "Yes" ? "checked" : "") />
+                                                    @(Model.Items[i].JIDNI_IsJW_InvoiceApplicable == "Yes" ? "checked" : "") />
 
-                                                    <input asp-for="Items[i].JIDNI_JW_InvoiceTracking"
+                                                    <input asp-for="Items[i].JIDNI_IsJW_InvoiceApplicable"
                                                            type="hidden"
                                                            class="JIDNI_JW_InvoiceTracking_Value" />
 

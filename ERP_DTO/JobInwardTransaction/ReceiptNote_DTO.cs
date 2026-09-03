@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
- 
+
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,64 +23,64 @@ namespace ERP_DTO.JobInwardTransaction
     public class ReceiptNoteBatch_DTO
     {
         [Display(Name = "Batch Number")]
-        public Int64 RNI_BCH_No { get; set; }
+        public Int64 JIRNI_BCH_Number { get; set; }                 // RENAMED: was RNI_BCH_No
 
-        public string? RNI_BCH_Num { get; set; }
+        public string? RNI_BCH_Num { get; set; }                    // NOT renamed - no matching column
 
 
-        public Int64 RNI_BCH_RNI_Number { get; set; }
+        public Int64 RNI_BCH_RNI_Number { get; set; }               // NOT renamed - no matching column
 
 
 
         public Int64 JIRNI_BCH_JIRNH_Number { get; set; }
         public Int64 JIRNI_BCH_JIRNI_Number { get; set; }
-        public string? RNI_BCH_WH_Name { get; set; }
+        public string? RNI_BCH_WH_Name { get; set; }                // NOT renamed - joined display field, no matching column
 
         [Display(Name = "Warehouse")]
         //  [Required(ErrorMessage = "Warehouse is Required")]
-        public string? WH_Number { get; set; }
+        public string? WH_Number { get; set; }                      // NOT renamed - no matching column
 
         [Display(Name = "Batch Date")]
         [Required(ErrorMessage = "Batch Date is Required")]
-        public string? RNI_BCH_Date { get; set; }
+        public string? JIRNI_BCH_BatchDate { get; set; }            // RENAMED: was RNI_BCH_Date
 
         [Display(Name = "Batch Ware house Number")]
         //   [Required(ErrorMessage = "Batch Number is Required")]
-        public string? RNI_BCH_WH_Number { get; set; }
+        public string? JIRNI_BCH_WH_Number { get; set; }            // already matched column - no rename needed
 
         [Display(Name = "Qty")]
         //  [Required(ErrorMessage = "Qty is Required")]
-        public decimal? RNI_BCH_Qty { get; set; }
+        public decimal? JIRNI_BCH_BatchQty { get; set; }            // RENAMED: was RNI_BCH_Qty
         public decimal? RNI_BCH_OriginalQty { get; set; }
         public decimal? RNI_BCH_UsedQty { get; set; }
         public decimal? RNI_BCH_AmendQty { get; set; }
 
         [Display(Name = "Unit Price")]
         [Required(ErrorMessage = "Unit Price is Required")]
-        public decimal? RNI_BCH_UnitPrice { get; set; }
+        public decimal? JIRNI_BCH_BatchUnitPrice { get; set; }      // RENAMED: was RNI_BCH_UnitPrice
 
         [Display(Name = "Batch Value")]
         // [Required(ErrorMessage = "Batch Value is Required")]
-        public decimal? RNI_BCH_Value { get; set; }
+        public decimal? JIRNI_BCH_BatchValue { get; set; }          // RENAMED: was RNI_BCH_Value
 
         public string? RNI_BCH_IsDeleted { get; set; }
         public string? RNI_BCH_Item_Number { get; set; }
         public Int64 RNI_BCH_Item_Index { get; set; }
 
-        public string? RNI_BCH_Number { get; set; }
+        public string? JIRNI_BCH_BatchNo { get; set; }              // RENAMED: was RNI_BCH_Number
         public long? JIRNI_Number { get; set; }
 
         public void Reset()
         {
-            this.RNI_BCH_No = 0;
+            this.JIRNI_BCH_Number = 0;                   // RENAMED: was RNI_BCH_No
             this.JIRNI_BCH_JIRNH_Number = 0;
             this.JIRNI_BCH_JIRNI_Number = 0;
             this.WH_Number = "";
-            this.RNI_BCH_Date = "";
-            this.RNI_BCH_WH_Number = "";
-            this.RNI_BCH_Qty = 0.0m;
-            this.RNI_BCH_UnitPrice = 0.0m;
-            this.RNI_BCH_Value = 0.0m;
+            this.JIRNI_BCH_BatchDate = "";                // RENAMED: was RNI_BCH_Date
+            this.JIRNI_BCH_WH_Number = "";                // already matched column
+            this.JIRNI_BCH_BatchQty = 0.0m;               // RENAMED: was RNI_BCH_Qty
+            this.JIRNI_BCH_BatchUnitPrice = 0.0m;         // RENAMED: was RNI_BCH_UnitPrice
+            this.JIRNI_BCH_BatchValue = 0.0m;             // RENAMED: was RNI_BCH_Value
             this.RNI_BCH_IsDeleted = "false";
             this.RNI_BCH_Item_Number = "";
         }
@@ -93,14 +93,14 @@ namespace ERP_DTO.JobInwardTransaction
 
         [Display(Name = "Process")]
         [Required(ErrorMessage = "Process is Required")]
-        public string? PRS_Number { get; set; }
+        public string? JIRNI_PRS_Number { get; set; }               // RENAMED: was PRS_Number
 
-        public string? PRS_Name { get; set; }
+        public string? PRS_Name { get; set; }                       // NOT renamed - no matching column
 
         [Display(Name = "Item Code")]
         //[Required(ErrorMessage = "Item Code is Required")]
-        public string? Item_Number { get; set; }
-        public string? Item_Code { get; set; }
+        public string? JIRNI_Item_Number { get; set; }              // RENAMED: was Item_Number
+        public string? Item_Code { get; set; }                      // NOT renamed - no matching column
 
         public string? RNI_Index { get; set; }
         public string? RNI_MS_Number { get; set; }
@@ -146,43 +146,43 @@ namespace ERP_DTO.JobInwardTransaction
 
         [Display(Name = "Warehouse")]
         [Required(ErrorMessage = "Warehouse is Required")]
-        public string? WH_Number { get; set; }
+        public string? JIRNI_WH_Number { get; set; }                // RENAMED: was WH_Number
 
         [Display(Name = "UoM")]
         [Required(ErrorMessage = "UoM is Required")]
-        public string? UoM_Number { get; set; }
+        public string? JIRNI_UoM_Number { get; set; }               // RENAMED: was UoM_Number
 
         [Display(Name = "Qty")]
         [Required(ErrorMessage = "Qty is Required")]
-        public string? Qty { get; set; }
-        public string? Qty_Kg { get; set; }
+        public string? JIRNI_Qty { get; set; }                      // RENAMED: was Qty
+        public string? JIRNI_Qty_Kgs { get; set; }                  // RENAMED: was Qty_Kg
         public string? AmendQty { get; set; }
         public string? OriginalQty { get; set; }
         public string? UsedQty { get; set; }
 
         [Display(Name = "Unit Price")]
         [Required(ErrorMessage = "Unit Price is Required")]
-        public string? UnitPrice { get; set; }
+        public string? JIRNI_UnitPrice { get; set; }                // RENAMED: was UnitPrice
 
         [Display(Name = "Amount")]
         [Required(ErrorMessage = "Amount is Required")]
-        public string? Amount { get; set; }
+        public string? JIRNI_Amount { get; set; }                   // RENAMED: was Amount
 
         public string? IsDeleted { get; set; }
 
         // NEW: Freight logic
-        public string? Freight_Applicable { get; set; }
-        public string? Freight_ServiceOrder_Number { get; set; }
-        public string? JISVOI_Number_FRT { get; set; }
-        public string? FromWH { get; set; }
-        public string? ToWH { get; set; }
+        public string? JIRNI_IsFreightApplicable { get; set; }      // RENAMED: was Freight_Applicable
+        public string? JIRNI_JIFRT_SVOH_Number { get; set; }        // RENAMED: was Freight_ServiceOrder_Number
+        public string? JIRNI_JIFRT_SVOI_Number { get; set; }        // RENAMED: was JISVOI_Number_FRT
+        public string? JIRNI_FromWH { get; set; }                   // RENAMED: was FromWH
+        public string? JIRNI_ToWH { get; set; }                     // RENAMED: was ToWH
 
         public void Reset()
         {
             this.JIRNI_Number = 0;
             this.JIRNI_JIRNH_Number = 0;
-            this.PRS_Number = "";
-            this.Item_Number = "";
+            this.JIRNI_PRS_Number = "";                  // RENAMED: was PRS_Number
+            this.JIRNI_Item_Number = "";                 // RENAMED: was Item_Number
             this.Description = "";
             this.OuterDia = "";
             this.Thickness = "";
@@ -190,67 +190,68 @@ namespace ERP_DTO.JobInwardTransaction
             this.Width = "";
             this.MaterialGrade = "";
             this.ItemGroup = "";
-            this.WH_Number = "";
-            this.UoM_Number = "";
-            this.Qty = "";
-            this.Qty_Kg = "";
-            this.UnitPrice = "";
-            this.Amount = "";
+            this.JIRNI_WH_Number = "";                   // RENAMED: was WH_Number
+            this.JIRNI_UoM_Number = "";                  // RENAMED: was UoM_Number
+            this.JIRNI_Qty = "";                         // RENAMED: was Qty
+            this.JIRNI_Qty_Kgs = "";                     // RENAMED: was Qty_Kg
+            this.JIRNI_UnitPrice = "";                   // RENAMED: was UnitPrice
+            this.JIRNI_Amount = "";                      // RENAMED: was Amount
             this.IsDeleted = "";
-            this.Freight_Applicable = "";
-            this.Freight_ServiceOrder_Number = "";
-            this.JISVOI_Number_FRT = "";
-            this.FromWH = "";
-            this.ToWH = "";
+            this.JIRNI_IsFreightApplicable = "";         // RENAMED: was Freight_Applicable
+            this.JIRNI_JIFRT_SVOH_Number = "";           // RENAMED: was Freight_ServiceOrder_Number
+            this.JIRNI_JIFRT_SVOI_Number = "";           // RENAMED: was JISVOI_Number_FRT
+            this.JIRNI_FromWH = "";                      // RENAMED: was FromWH
+            this.JIRNI_ToWH = "";                        // RENAMED: was ToWH
         }
     }
+
     public class ReceiptNoteHead_DTO
     {
         public Int64 JIRNH_Number { get; set; }
 
         [Display(Name = "Receipt Note No")]
         [Required(ErrorMessage = "Receipt Note No is Required")]
-        public string? RN_No { get; set; }
+        public string? JIRNH_RN_No { get; set; }                    // RENAMED: was RN_No
 
         [Display(Name = "Date")]
         [Required(ErrorMessage = "Date is Required")]
-        public string? RN_Date { get; set; }
+        public string? JIRNH_RN_Date { get; set; }                  // RENAMED: was RN_Date
 
         [Display(Name = "JW Customer DC No")]
         [Required(ErrorMessage = "Customer DC No is Required")]
-        public string? JW_CustomerDC_No { get; set; }
+        public string? JIRNH_JW_CustomerDC_No { get; set; }         // RENAMED: was JW_CustomerDC_No
 
         [Display(Name = "Customer DC Date")]
         [Required(ErrorMessage = "Customer DC Date is Required")]
-        public string? JW_CustomerDC_Date { get; set; }
+        public string? JIRNH_JW_CustomerDC_Date { get; set; }       // RENAMED: was JW_CustomerDC_Date
 
         [Display(Name = "Material Segregation")]
         [Required(ErrorMessage = "Material Segregation is Required")]
-        public string? MS_Number { get; set; }
+        public string? JIRNH_MS_Number { get; set; }                // RENAMED: was MS_Number
 
         [Display(Name = "JW Customer")]
         [Required(ErrorMessage = "Customer is Required")]
-        public string? JWC_Number { get; set; }
+        public string? JIRNH_JWC_Number { get; set; }               // RENAMED: was JWC_Number
 
         [Display(Name = "JW Customer")]
         //[Required(ErrorMessage = "Customer is Required")]
-        public string? JWC_Name { get; set; }
+        public string? JWC_Name { get; set; }                       // NOT renamed - joined display field, no matching column
 
         [Display(Name = "Currency")]
         [Required(ErrorMessage = "Currency is Required")]
-        public string? Currency_Number { get; set; }
+        public string? JIRNH_Currency_Number { get; set; }          // RENAMED: was Currency_Number
 
-        public string? Currency_Name { get; set; }
+        public string? Currency_Name { get; set; }                  // NOT renamed - joined display field, no matching column
 
         [Display(Name = "Warehouse")]
         [Required(ErrorMessage = "Warehouse is Required")]
-        public string? WH_Number { get; set; }
+        public string? JIRNH_WH_Number { get; set; }                // RENAMED: was WH_Number
 
         [Display(Name = "Freight Applicable")]
-        public string? Freight_Applicable { get; set; }
+        public string? JIRNH_IsFreightApplicable { get; set; }      // RENAMED: was Freight_Applicable
 
         [Display(Name = "Remarks")]
-        public string? Remarks { get; set; }
+        public string? JIRNH_Remarks { get; set; }                  // RENAMED: was Remarks
 
         // Child Lists
         public List<ReceiptNoteItem_DTO>? Items { get; set; } = new();
@@ -261,16 +262,16 @@ namespace ERP_DTO.JobInwardTransaction
         public void Reset()
         {
             this.JIRNH_Number = 0;
-            this.RN_No = null;
-            this.RN_Date = "";
-            this.JW_CustomerDC_No = "";
-            this.JW_CustomerDC_Date = "";
-            this.MS_Number = null;
-            this.JWC_Number = null;
-            this.Currency_Number = null;
-            this.WH_Number = null;
-            this.Freight_Applicable = null;
-            this.Remarks = "";
+            this.JIRNH_RN_No = null;                    // RENAMED: was RN_No
+            this.JIRNH_RN_Date = "";                     // RENAMED: was RN_Date
+            this.JIRNH_JW_CustomerDC_No = "";            // RENAMED: was JW_CustomerDC_No
+            this.JIRNH_JW_CustomerDC_Date = "";          // RENAMED: was JW_CustomerDC_Date
+            this.JIRNH_MS_Number = null;                 // RENAMED: was MS_Number
+            this.JIRNH_JWC_Number = null;                // RENAMED: was JWC_Number
+            this.JIRNH_Currency_Number = null;           // RENAMED: was Currency_Number
+            this.JIRNH_WH_Number = null;                 // RENAMED: was WH_Number
+            this.JIRNH_IsFreightApplicable = null;       // RENAMED: was Freight_Applicable
+            this.JIRNH_Remarks = "";                     // RENAMED: was Remarks
             this.Mode_ID = 0;
             this.Items = null;
             this.ItemBatch = null;
@@ -278,8 +279,8 @@ namespace ERP_DTO.JobInwardTransaction
             this.ItemBatch = new List<ReceiptNoteBatch_DTO>();
         }
     }
-    
-    
+
+
     #endregion
 
 
@@ -480,7 +481,7 @@ namespace ERP_DTO.JobInwardTransaction
             this.RNI_BCH_Item_Number = "";
         }
     }
-  
+
     public class ReceiptNoteItemEdit_DTO
     {
         public Int64 JIRNI_Number { get; set; }
@@ -548,7 +549,7 @@ namespace ERP_DTO.JobInwardTransaction
         public string? UoM_Number { get; set; }
 
         [Display(Name = "Original Qty")]
-     //   [Required(ErrorMessage = "Qty is Required")]
+        //   [Required(ErrorMessage = "Qty is Required")]
         public string? OriginalQty { get; set; }
 
         public string? UsedQty { get; set; }
@@ -587,7 +588,7 @@ namespace ERP_DTO.JobInwardTransaction
             this.IsDeleted = "";
         }
     }
-  
+
     public class ReceiptNoteHeadEdit_DTO
     {
         public Int64 JIRNH_Number { get; set; }
@@ -680,7 +681,7 @@ namespace ERP_DTO.JobInwardTransaction
         public Int64 JIRNH_Currency_Number { get; set; }
         public Int64 JIRNH_WH_Number { get; set; }
         public String? JIRNH_Remarks { get; set; }
-        public String? JIRNH_Freight_Applicable { get; set; }
+        public String? JIRNH_IsFreightApplicable { get; set; }      // RENAMED: was JIRNH_Freight_Applicable
 
         //public int RNH_Date { get; set; } // For Numbering Purpose Only (Important ❗)
 
@@ -705,13 +706,13 @@ namespace ERP_DTO.JobInwardTransaction
         public String? JIRNI_ITM_Code { get; set; }
         public Int64 JIRNI_UoM_Number { get; set; }
         public Double JIRNI_Qty { get; set; }
-        public Double JIRNI_Qty_Kg { get; set; }
+        public Double JIRNI_Qty_Kgs { get; set; }      // RENAMED: was JIRNI_Qty_Kg
         public Double JIRNI_UnitPrice { get; set; }
         public Double JIRNI_Amount { get; set; }
         // NEW: Freight logic
-        public String? JIRNI_Freight_Applicable { get; set; }
-        public String? JIRNI_Freight_ServiceOrder_Number { get; set; }
-        public Int64 JIRNI_JISVOI_Number_FRT { get; set; }
+        public String? JIRNI_IsFreightApplicable { get; set; }      // RENAMED: was JIRNI_Freight_Applicable
+        public String? JIRNI_JIFRT_SVOH_Number { get; set; }        // RENAMED: was JIRNI_Freight_ServiceOrder_Number
+        public Int64 JIRNI_JIFRT_SVOI_Number { get; set; }          // RENAMED: was JIRNI_JISVOI_Number_FRT
         public Int64? JIRNI_FromWH { get; set; }
         public Int64? JIRNI_ToWH { get; set; }
         // =======================
@@ -770,11 +771,11 @@ namespace ERP_DTO.JobInwardTransaction
             JIRNI_Qty = 0;
             JIRNI_UnitPrice = 0;
             JIRNI_Amount = 0;
-        JIRNI_Freight_Applicable = "";
-        JIRNI_Freight_ServiceOrder_Number = "";
-        JIRNI_JISVOI_Number_FRT = 0;
-        // Batch
-        JIRNI_BCH_JIRNH_Number = 0;
+            JIRNI_IsFreightApplicable = "";               // RENAMED: was JIRNI_Freight_Applicable
+            JIRNI_JIFRT_SVOH_Number = "";                 // RENAMED: was JIRNI_Freight_ServiceOrder_Number
+            JIRNI_JIFRT_SVOI_Number = 0;                  // RENAMED: was JIRNI_JISVOI_Number_FRT
+                                                          // Batch
+            JIRNI_BCH_JIRNH_Number = 0;
             JIRNI_BCH_JIRNI_Number = 0;
             JIRNI_BCH_Number = 0;
             JIRNI_BCH_WH_Number = 0;
@@ -814,7 +815,7 @@ namespace ERP_DTO.JobInwardTransaction
 
         public String? RN_ITM_Category { get; set; }
 
-        
+
         public String? RN_ITM_Code { get; set; }
         public String? RN_ITM_Description { get; set; }
 
@@ -853,7 +854,7 @@ namespace ERP_DTO.JobInwardTransaction
 
         public String? RN_Remarks { get; set; }
 
-        public String? RN_Process{ get; set; }
+        public String? RN_Process { get; set; }
 
         public string? RN_JWC_WH_Name { get; set; }
         public string? RN_ITM_GroupInfo { get; set; }

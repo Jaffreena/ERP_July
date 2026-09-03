@@ -283,9 +283,10 @@ namespace ERP_DAO.JobInwardTransaction
                 // the client — same pattern as DeliveryNoteCreateDB. Freight-
                 // applicable rows carry their SO header in Freight_ServiceOrder_Number,
                 // not JISVOH_Number.
-                long resolvedJISVOH_Number = item.JISVOH_Number ?? 0;
+                long resolvedJISVOH_Number = item.JIDNI_JIFRT_SVOH_Number ?? 0;
                 if (resolvedJISVOH_Number == 0 &&
-                    long.TryParse(item.Freight_ServiceOrder_Number, out long freightSO))
+                   // long.TryParse(item.JIDNI_JIFRT_SVOI_Number, out long freightSO))
+                    long.TryParse("0", out long freightSO))
                 {
                     resolvedJISVOH_Number = freightSO;
                 }
@@ -310,7 +311,7 @@ namespace ERP_DAO.JobInwardTransaction
                         resolvedJISVOI_Number = Convert.ToInt64(result);
                 }
 
-                bool isFreightRow = item.Freight_Applicable == "Yes";
+                bool isFreightRow = item.JIDNI_IsJW_InvoiceApplicable == "Yes";
 
                 dt.Rows.Add(
                     DN_DTO.Header.JIDNH_Number,
@@ -322,13 +323,13 @@ namespace ERP_DAO.JobInwardTransaction
                     item.JIDNI_Qty,
                     item.JIDNI_UnitPrice,
                     item.JIDNI_Amount,
-                    item.JIDNI_JW_InvoiceTracking,
+                  //  item.JIDNI_JW_InvoiceTracking,
                     isFreightRow ? 0 : resolvedJISVOH_Number,
                     isFreightRow ? 0 : resolvedJISVOI_Number,
                     isFreightRow ? resolvedJISVOH_Number : 0,
-                    isFreightRow ? resolvedJISVOI_Number : 0,
-                    (object?)item.Freight_Applicable ?? DBNull.Value,
-                    (object?)item.Freight_ServiceOrder_Number ?? DBNull.Value
+                    isFreightRow ? resolvedJISVOI_Number : 0
+                 //   (object?)item.Freight_Applicable ?? DBNull.Value,
+                  //  (object?)item.Freight_ServiceOrder_Number ?? DBNull.Value
                 );
             }
 
@@ -426,16 +427,15 @@ namespace ERP_DAO.JobInwardTransaction
                         {
                             long insertedItemNumber = 0;
                             long JISVOI_Number = 0;
-                            bool isFreightRow = item.Freight_Applicable == "Yes";
-                            bool isJWIRow = item.JIDNI_JW_InvoiceTracking == "Yes";
+                            bool isFreightRow = item.JIDNI_IsFreightApplicable == "Yes";
+                            bool isJWIRow = item.JIDNI_IsJW_InvoiceApplicable == "Yes";
                             // CHANGED: Freight-applicable rows carry their SO header in
-                            // Freight_ServiceOrder_Number, not JISVOH_Number (stays 0 for
+                            // JIDNI_JIFRT_SVOH_Number, not JIDNI_JIJWI_SVOH_Number (stays 0 for
                             // these rows) — fall back to it so the lookup actually matches
-                            long resolvedJISVOH_Number = item.JISVOH_Number ?? 0;
-                            if (resolvedJISVOH_Number == 0 &&
-                                long.TryParse(item.Freight_ServiceOrder_Number, out long freightSO))
+                            long resolvedJISVOH_Number = item.JIDNI_JIJWI_SVOH_Number ?? 0;
+                            if (resolvedJISVOH_Number == 0)
                             {
-                                resolvedJISVOH_Number = freightSO;
+                                resolvedJISVOH_Number = item.JIDNI_JIFRT_SVOH_Number ?? 0;
                             }
                             // Get JISVOI_Number from Service Order Item
                             using (SqlCommand getCmd = new SqlCommand(@"
@@ -457,12 +457,11 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                             }
 
                             // NEW: keep JWI and Freight resolution in separate columns
-                            // NEW: keep JWI and Freight resolution in separate columns
                             long JISVOH_Number_FRT = 0;
                             long JISVOI_Number_FRT = 0;
-                            if (isFreightRow && long.TryParse(item.Freight_ServiceOrder_Number, out long freightSOForItem))
+                            if (isFreightRow && (item.JIDNI_JIFRT_SVOH_Number ?? 0) != 0)
                             {
-                                JISVOH_Number_FRT = freightSOForItem;
+                                JISVOH_Number_FRT = item.JIDNI_JIFRT_SVOH_Number.Value;
                                 using (SqlCommand getFrtCmd = new SqlCommand(@"
         SELECT TOP 1 JISVOI_Number
         FROM JI_ServiceOrderItem
@@ -475,7 +474,7 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                                     getFrtCmd.Parameters.AddWithValue("@PRS_Number", 40008L); // Freight PRS_Number fixed, goods PRS_Number இல்ல
                                     getFrtCmd.Parameters.AddWithValue("@Item_Number", item.JIDNI_Item_Number);
                                     getFrtCmd.Parameters.AddWithValue("@UoM_Number", item.JIDNI_UoM_Number);
-                                    getFrtCmd.Parameters.AddWithValue("@JISVOH_Number", freightSOForItem);
+                                    getFrtCmd.Parameters.AddWithValue("@JISVOH_Number", JISVOH_Number_FRT);
                                     object frtResult = getFrtCmd.ExecuteScalar();
                                     if (frtResult != null && frtResult != DBNull.Value)
                                         JISVOI_Number_FRT = Convert.ToInt64(frtResult);
@@ -491,15 +490,17 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
             JIDNI_WH_Number,
             JIDNI_UoM_Number,
             JIDNI_Qty,
+            JIDNI_Qty_Kgs,
             JIDNI_UnitPrice,
             JIDNI_Amount,
-            JIDNI_JW_InvoiceTracking,
-            JISVOH_Number,
-            JISVOI_Number,
-            JISVOH_Number_FRT,                -- NEW
-            JISVOI_Number_FRT,                -- NEW
-            Freight_Applicable,
-            Freight_ServiceOrder_Number
+            JIDNI_IsJW_InvoiceApplicable,
+            JIDNI_JIJWI_SVOH_Number,
+            JIDNI_JIJWI_SVOI_Number,
+                     JIDNI_JIFRT_SVOH_Number,
+            JIDNI_JIFRT_SVOI_Number,
+            JIDNI_IsFreightApplicable,
+            JIDNI_FromWH,
+            JIDNI_ToWH
         )
         OUTPUT INSERTED.JIDNI_Number
         VALUES
@@ -510,15 +511,17 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
             @JIDNI_WH_Number,
             @JIDNI_UoM_Number,
             @JIDNI_Qty,
+            @JIDNI_Qty_Kgs,
             @JIDNI_UnitPrice,
             @JIDNI_Amount,
-            @JIDNI_JW_InvoiceTracking,
-            @JISVOH_Number,
-            @JISVOI_Number,
-            @JISVOH_Number_FRT,               -- NEW
-            @JISVOI_Number_FRT,               -- NEW
-            @Freight_Applicable,
-            @Freight_ServiceOrder_Number
+            @JIDNI_IsJW_InvoiceApplicable,
+            @JIDNI_JIJWI_SVOH_Number,
+            @JIDNI_JIJWI_SVOI_Number,
+            @JIDNI_JIFRT_SVOH_Number,
+            @JIDNI_JIFRT_SVOI_Number,
+            @JIDNI_IsFreightApplicable,
+            @JIDNI_FromWH,
+            @JIDNI_ToWH
         )", con, tr))
                             {
                                 cmd.Parameters.AddWithValue("@JIDNI_JIDNH_Number", DN_Number);
@@ -527,15 +530,17 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                                 cmd.Parameters.AddWithValue("@JIDNI_WH_Number", item.JIDNI_WH_Number);
                                 cmd.Parameters.AddWithValue("@JIDNI_UoM_Number", item.JIDNI_UoM_Number);
                                 cmd.Parameters.AddWithValue("@JIDNI_Qty", item.JIDNI_Qty);
+                                cmd.Parameters.AddWithValue("@JIDNI_Qty_Kgs", item.JIDNI_Qty_Kgs);
                                 cmd.Parameters.AddWithValue("@JIDNI_UnitPrice", item.JIDNI_UnitPrice);
+                                cmd.Parameters.AddWithValue("@JIDNI_FromWH", item.JIDNI_FromWH.HasValue ? (object)item.JIDNI_FromWH.Value : DBNull.Value);
+                                cmd.Parameters.AddWithValue("@JIDNI_ToWH", item.JIDNI_ToWH.HasValue ? (object)item.JIDNI_ToWH.Value : DBNull.Value);
                                 cmd.Parameters.AddWithValue("@JIDNI_Amount", item.JIDNI_Amount);
-                                cmd.Parameters.AddWithValue("@JIDNI_JW_InvoiceTracking", item.JIDNI_JW_InvoiceTracking);
-                                cmd.Parameters.AddWithValue("@JISVOH_Number", isJWIRow ? resolvedJISVOH_Number : 0);
-                                cmd.Parameters.AddWithValue("@JISVOI_Number", isJWIRow ? JISVOI_Number : 0);
-                                cmd.Parameters.AddWithValue("@JISVOH_Number_FRT", JISVOH_Number_FRT);
-                                cmd.Parameters.AddWithValue("@JISVOI_Number_FRT", JISVOI_Number_FRT);
-                                cmd.Parameters.AddWithValue("@Freight_Applicable", item.Freight_Applicable ?? (object)DBNull.Value);
-                                cmd.Parameters.AddWithValue("@Freight_ServiceOrder_Number", item.Freight_ServiceOrder_Number ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@JIDNI_IsJW_InvoiceApplicable", item.JIDNI_IsJW_InvoiceApplicable);
+                                cmd.Parameters.AddWithValue("@JIDNI_JIJWI_SVOH_Number", isJWIRow ? resolvedJISVOH_Number : 0);
+                                cmd.Parameters.AddWithValue("@JIDNI_JIJWI_SVOI_Number", isJWIRow ? JISVOI_Number : 0);
+                                cmd.Parameters.AddWithValue("@JIDNI_JIFRT_SVOH_Number", JISVOH_Number_FRT);
+                                cmd.Parameters.AddWithValue("@JIDNI_JIFRT_SVOI_Number", JISVOI_Number_FRT);
+                                cmd.Parameters.AddWithValue("@JIDNI_IsFreightApplicable", item.JIDNI_IsFreightApplicable ?? (object)DBNull.Value);
                                 insertedItemNumber =
                                     Convert.ToInt64(cmd.ExecuteScalar());
                             }
@@ -597,7 +602,7 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                                 JIDNI_BCH_BatchQty,
                                 JIDNI_BCH_BatchUnitPrice,
                                 JIDNI_BCH_BatchValue,
-                                RefBatch_Number
+                                JIDNI_BCH_Ref_Batch
                             )
 
                             OUTPUT INSERTED.JIDNI_BCH_Number
@@ -623,7 +628,7 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                                     cmd.Parameters.AddWithValue("@Qty", useQty);
                                     cmd.Parameters.AddWithValue("@UnitPrice", batch.JIDNI_BCH_BatchUnitPrice);
                                     cmd.Parameters.AddWithValue("@BatchValue", batch.JIDNI_BCH_BatchValue);
-                                     
+
                                     cmd.Parameters.AddWithValue("@RefBatchNumber", batch.JIDNI_BCH_Number);
                                     batchNumber =
                                         Convert.ToInt64(cmd.ExecuteScalar());
@@ -636,19 +641,23 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                                 using (SqlCommand cmd = new SqlCommand(@"
                             INSERT INTO OUT_COMMON_BATCH
                             (
-                                TransType,
-                                Header_Number,
-                                LineItem_Number,
-                                LineBatch_Number,
-                                Warehouse,
-                                BatchDate,
-                                BatchNo,
-                                ItemStatus,
-                                BatchQty,
-                                BatchUnitPrice,
-                                BatchValue,
-                                RefBatch_Number,
-                                Item_Number
+                                OCB_TransType,
+                                OCB_Header_Number,
+                                OCB_LineItem_Number,
+                                OCB_LineBatch_Number,
+                                OCB_Warehouse_Number,
+                                OCB_BatchDate,
+                                OCB_BatchNo,
+                                OCB_ItemStatus,
+                                OCB_BatchQty,
+                                OCB_BatchUnitPrice,
+                                OCB_BatchValue,
+                                OCB_RefBatch_Number,
+                                OCB_Item_Number,
+                                OCB_CreatorCode,
+                                OCB_CreatorDate,
+                                OCB_EditorCode,
+                                OCB_EditorDate
 
                             )
 
@@ -666,7 +675,11 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                                 @BatchUnitPrice,
                                 @BatchValue,
                                 @RefBatchNumber,
-                                @Item_Number
+                                @Item_Number,
+                                0,
+                                GETDATE(),
+                                0,
+                                GETDATE()
                             )", con, tr))
                                 {
                                     cmd.Parameters.AddWithValue("@TransType", "Delivery Note");
@@ -707,7 +720,11 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                             JIDNA_State,
                             JIDNA_Country,
                             JIDNA_PIN,
-                            JIDNA_GSTIN
+                            JIDNA_GSTIN,
+                            JIDNA_CreatorCode,
+                            JIDNA_CreatorDate,
+                            JIDNA_EditorCode,
+                            JIDNA_EditorDate
                         )
 
                         VALUES
@@ -720,7 +737,11 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                             @State,
                             @Country,
                             @PIN,
-                            @GSTIN
+                            @GSTIN,
+                            0,
+                            GETDATE(),
+                            0,
+                            GETDATE()
                         )", con, tr))
                             {
                                 cmd.Parameters.AddWithValue("@JIDNH", DN_Number);
@@ -835,8 +856,8 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
                     i.JIDNI_UoM_Number,
                     i.JIDNI_Qty,
                     i.JIDNI_UnitPrice,
-                    i.JIDNI_Amount,
-                    i.JIDNI_JW_InvoiceTracking
+                    i.JIDNI_Amount
+                  //  i.JIDNI_JW_InvoiceTracking
                 );
             }
 
@@ -1176,7 +1197,7 @@ AND JISVOI_JISVOH_Number = @JISVOH_Number
         {
             Database db = new SqlDatabase(DB.Connection());
 
-            DbCommand cmd = db.GetStoredProcCommand("SP_OUT_COMMON_BATCH_INSERT");
+            DbCommand cmd = db.GetStoredProcCommand("JI_DeliveryNote_SP_OUT_COMMON_BATCH_INSERT");
 
             db.AddInParameter(cmd, "@TransType", DbType.String, dto.TransType);
             db.AddInParameter(cmd, "@Header_Number", DbType.Int64, dto.Header_Number);
@@ -1685,19 +1706,19 @@ INNER JOIN BatchTotal B
             {
                 using (SqlCommand cmd = new SqlCommand(@"
         
-      SELECT distinct
-    I.LineBatch_Number,
-    I.BatchNo,
-    I.BatchDate,
-    I.Item_Number,
-    I.FromWarehouse,
+        SELECT distinct
+    I.ICB_LineBatch_Number AS LineBatch_Number,
+    I.ICB_BatchNo AS BatchNo,
+    I.ICB_BatchDate AS BatchDate,
+    I.ICB_Item_Number AS Item_Number,
+    I.ICB_Warehouse_Number AS FromWarehouse,
 
-    ISNULL(I.BatchQty,0) AS BatchQty,
+    ISNULL(I.ICB_BatchQty,0) AS BatchQty,
 
     -- Delivered Qty from current draft
     ISNULL(temp.DBCH_Qty,0) AS DeliveredQty,
 
-    ISNULL(I.BatchQty,0) AS QtyReceived,
+    ISNULL(I.ICB_BatchQty,0) AS QtyReceived,
 
    ISNULL(T.TotalDeliveredQty,0) AS QtyUsedTillNow,
 
@@ -1705,13 +1726,13 @@ INNER JOIN BatchTotal B
    ISNULL(R.ReservedQty,0) AS ReservedQty,
 
     -- Final Available Qty
-    ISNULL(I.BatchQty,0) - ISNULL(T.TotalDeliveredQty,0) AS AvailableQty,
+    ISNULL(I.ICB_BatchQty,0) - ISNULL(T.TotalDeliveredQty,0) AS AvailableQty,
     --    - ISNULL(R.ReservedQty,0)
     --    + ISNULL(D.DeliveredQty,0) AS AvailableQty,
 
     ISNULL(D.BatchUnitPrice,0) AS BatchUnitPrice,
     ISNULL(D.BatchValue,0) AS BatchValue,
-    ISNULL(D.RefBatch_Number,0) AS RefBatch_Number,
+    ISNULL(D.JIDNI_BCH_Ref_Batch,0) AS RefBatch_Number,
 
     W.WarehouseCode
 
@@ -1721,18 +1742,18 @@ FROM IN_COMMON_BATCH I
 LEFT JOIN
 (
     SELECT
-        RefBatch_Number,
-        SUM(BatchQty) AS TotalDeliveredQty
+        OCB_RefBatch_Number AS RefBatch_Number,
+        SUM(OCB_BatchQty) AS TotalDeliveredQty
     FROM OUT_COMMON_BATCH
-    GROUP BY RefBatch_Number
+    GROUP BY OCB_RefBatch_Number
 ) T
-    ON T.RefBatch_Number = I.LineBatch_Number
+    ON T.RefBatch_Number = I.ICB_LineBatch_Number
 
 ---- Current delivery draft
 LEFT JOIN
 (
     SELECT
-        RefBatch_Number,
+        JIDNI_BCH_Ref_Batch,
         JIDNI_BCH_WH_Number AS Warehouse,
         SUM(JIDNI_BCH_BatchQty) AS DeliveredQty,
         SUM(JIDNI_BCH_BatchUnitPrice) AS BatchUnitPrice,
@@ -1741,10 +1762,10 @@ LEFT JOIN
   -- WHERE JIDNI_BCH_JIDNH_Number =@Header_Number
     --  AND JIDNI_BCH_JIDNI_Number =@LineItem_Number
     GROUP BY
-        RefBatch_Number,
+        JIDNI_BCH_Ref_Batch,
         JIDNI_BCH_WH_Number
 ) D
-    ON D.RefBatch_Number = I.LineBatch_Number
+    ON D.JIDNI_BCH_Ref_Batch = I.ICB_LineBatch_Number
 
 -- Reserved Qty from Temp Table
 LEFT JOIN
@@ -1759,7 +1780,7 @@ LEFT JOIN
         RefBatch_Number,
         DBCH_Index
 ) R
-    ON R.RefBatch_Number = I.LineBatch_Number
+    ON R.RefBatch_Number = I.ICB_LineBatch_Number
    AND R.DBCH_Index = @ItemGridIndex
 
 LEFT JOIN Warehouse W
@@ -1767,9 +1788,9 @@ LEFT JOIN Warehouse W
 left join (
 
     select DBCH_Qty,refbatch_number  from Temp_DeliveryNoteBatch where DBCH_Index=@ItemGridIndex
-    )temp on temp.refbatch_number=I.LineBatch_Number
-WHERE I.Item_Number =@Item_Number
-  AND I.FromWarehouse = @Warehouse;
+    )temp on temp.refbatch_number=I.ICB_LineBatch_Number
+WHERE I.ICB_Item_Number =@Item_Number
+  AND I.ICB_Warehouse_Number = @Warehouse;
         
         ", con))
                 {
@@ -2003,6 +2024,73 @@ WHERE I.Item_Number =@Item_Number
 
             return db.ExecuteDataSet(cmd);
         }
+
+
+        // NEW: Freight logic (FromWH/ToWH based, JIFRT tables) — DN version
+        public DataSet GetFreightServiceOrderDB(
+            long customerId,
+            long? uomNumber = null,
+            long? fromWHNumber = null,
+            long? toWHNumber = null)
+        {
+            try
+            {
+                Database db = new SqlDatabase(DB.Connection());
+
+                DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrder_GetByCustomer_DN_SP");
+
+                db.AddInParameter(cmd, "@CustomerId", DbType.Int64, customerId);
+
+                db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
+                    uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+
+                db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64,
+                    fromWHNumber.HasValue ? (object)fromWHNumber.Value : DBNull.Value);
+
+                db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64,
+                    toWHNumber.HasValue ? (object)toWHNumber.Value : DBNull.Value);
+
+                return db.ExecuteDataSet(cmd);
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("SQL Error : " + ex.Message + Environment.NewLine + "Procedure : JIFRT_ServiceOrder_GetByCustomer_DN_SP", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Application Error : " + ex.Message, ex);
+            }
+        }
+
+        public DataSet CheckDeliveredQtyExceededFreightDB_New(
+            long jisvohNumber,
+            long? uomNumber = null,
+            long? fromWHNumber = null,
+            long? toWHNumber = null)
+        {
+            try
+            {
+                Database db = new SqlDatabase(DB.Connection());
+                DbCommand cmd = db.GetStoredProcCommand("USP_CheckDeliveredQtyExceeded_Freight_DN_SP");
+                db.AddInParameter(cmd, "@JIFRT_SVOH_Number", DbType.Int64, jisvohNumber);
+                db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
+                    uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64,
+                    fromWHNumber.HasValue ? (object)fromWHNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64,
+                    toWHNumber.HasValue ? (object)toWHNumber.Value : DBNull.Value);
+                return db.ExecuteDataSet(cmd);
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("SQL Error : " + ex.Message + Environment.NewLine + "Procedure : USP_CheckDeliveredQtyExceeded_Freight_DN_SP", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Application Error : " + ex.Message, ex);
+            }
+        }
+
 
     }
 

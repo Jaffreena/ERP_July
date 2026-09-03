@@ -1,4 +1,4 @@
-﻿@model List<ERP_DTO.JobInwardTransaction.DNNumberPrefix_DTO>
+@model List<ERP_DTO.JobInwardTransaction.JIJWI_SVO_NumberPrefix_DTO>
 
 <div class="col table-fixed h-100">
     <div class="w-100 table-responsive table-body table-body-f">
@@ -14,16 +14,16 @@
             <tbody id="PreTableBody">
                 <tr id="PreTempRow" style="display: none;">
                     <td>
-                        <input id="DNP_Date" class="form-control DNP_Date datepicker text-center" autocomplete="off" />
+                        <input id="JIJWI_SVO_PFX_StartDate" class="form-control JIJWI_SVO_PFX_StartDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="DNP_EndDate" class="form-control DNP_EndDate datepicker text-center" autocomplete="off" />
+                        <input id="JIJWI_SVO_PFX_EndDate" class="form-control JIJWI_SVO_PFX_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="DNP_Particulars" class="form-control DNP_Particulars" autocomplete="off" />
+                        <input id="JIJWI_SVO_PFX_Particulars" class="form-control JIJWI_SVO_PFX_Particulars" autocomplete="off" />
                     </td>
                     <td class="text-center">
-                        <input type="hidden" name="DNP_IsDeleted" class="DNP_IsDeleted" value="false" />
+                        <input type="hidden" name="JIJWI_SVO_PFX_IsDeleted" class="JIJWI_SVO_PFX_IsDeleted" value="false" />
                         <a class="PreRowRemove btn btn-sm btn-danger p-1 icon-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -37,20 +37,20 @@
                     {
                         <tr class="PreNewRow">
                             <td>
-                                <input id="DNP_Date" name="DNNumberPrefix[@i].DNP_Date" class="form-control DNP_Date text-center datepicker" autocomplete="off" value="@Model[i].DNP_Date" />
+                                <input id="JIJWI_SVO_PFX_StartDate" name="JIJWI_SVO_NumberPrefix[@i].JIJWI_SVO_PFX_StartDate" class="form-control JIJWI_SVO_PFX_StartDate text-center datepicker" autocomplete="off" value="@Model[i].JIJWI_SVO_PFX_StartDate" />
                             </td>
                                 <td>
-                                <input id="DNP_EndDate" name="DNNumberPrefix[@i].DNP_EndDate" class="form-control DNP_EndDate text-center datepicker" autocomplete="off" value="@Model[i].DNP_EndDate" />
+                                <input id="JIJWI_SVO_PFX_EndDate" name="JIJWI_SVO_NumberPrefix[@i].JIJWI_SVO_PFX_EndDate" class="form-control JIJWI_SVO_PFX_EndDate text-center datepicker" autocomplete="off" value="@Model[i].JIJWI_SVO_PFX_EndDate" />
                             </td>
                             <td>
-                                <input id="DNP_Particulars" name="DNNumberPrefix[@i].DNP_Particulars" class="form-control DNP_Particulars" autocomplete="off" value="@Model[i].DNP_Particulars" />
+                                <input id="JIJWI_SVO_PFX_Particulars" name="JIJWI_SVO_NumberPrefix[@i].JIJWI_SVO_PFX_Particulars" class="form-control JIJWI_SVO_PFX_Particulars" autocomplete="off" value="@Model[i].JIJWI_SVO_PFX_Particulars" />
                             </td>
                             <td class="text-center">
-                                @if (@Model[i].DNP_Number != 0)
+                                @if (@Model[i].JIJWI_SVO_PFX_Number != 0)
                                 {
-                                    <input name="DNNumberPrefix[@i].DNP_Number" type="hidden" class="DNP_Number" value="@Model[i].DNP_Number" />
+                                    <input name="JIJWI_SVO_NumberPrefix[@i].JIJWI_SVO_PFX_Number" type="hidden" class="JIJWI_SVO_PFX_Number" value="@Model[i].JIJWI_SVO_PFX_Number" />
                                 }
-                                <input type="hidden" name="DNNumberPrefix[@i].DNP_IsDeleted" value="false" class="DNP_IsDeleted" />
+                                <input type="hidden" name="JIJWI_SVO_NumberPrefix[@i].JIJWI_SVO_PFX_IsDeleted" value="false" class="JIJWI_SVO_PFX_IsDeleted" />
                                 <a class="PreRowRemove btn btn-sm btn-danger p-1 icon-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -83,12 +83,12 @@
 
         function PreaddRow() {
             var NewRow = $("#PreTempRow").clone().removeAttr("style").removeAttr("id").addClass("PreNewRow");
-            NewRow.find("input.DNP_Date").attr("name", "DNNumberPrefix[" + rowCount + "].DNP_Date").val();
-               NewRow.find("input.DNP_EndDate").attr("name", "DNNumberPrefix[" + rowCount + "].DNP_EndDate").val();
-            NewRow.find("input.DNP_Particulars").attr("name", "DNNumberPrefix[" + rowCount + "].DNP_Particulars");
-            NewRow.find("input.DNP_IsDeleted").attr("name", "DNNumberPrefix[" + rowCount + "].DNP_IsDeleted");
+          NewRow.find("input.JIJWI_SVO_PFX_StartDate").attr("name", "JIJWI_SVO_NumberPrefix[" + rowCount + "].JIJWI_SVO_PFX_StartDate").val();
+               NewRow.find("input.JIJWI_SVO_PFX_EndDate").attr("name", "JIJWI_SVO_NumberPrefix[" + rowCount + "].JIJWI_SVO_PFX_EndDate").val();
+            NewRow.find("input.JIJWI_SVO_PFX_Particulars").attr("name", "JIJWI_SVO_NumberPrefix[" + rowCount + "].JIJWI_SVO_PFX_Particulars");
+            NewRow.find("input.JIJWI_SVO_PFX_IsDeleted").attr("name", "JIJWI_SVO_NumberPrefix[" + rowCount + "].JIJWI_SVO_PFX_IsDeleted");
 
-            NewRow.find("input[name='DNNumberPrefix[" + rowCount + "].DNP_IsDeleted']").val(false);
+            NewRow.find("input[name='JIJWI_SVO_NumberPrefix[" + rowCount + "].JIJWI_SVO_PFX_IsDeleted']").val(false);
 
             $("#PreTableBody").append(NewRow);
             rowCount++;
@@ -103,7 +103,7 @@
         }
 
         $(document).on('click', '.PreRowRemove', function () {
-            $(this).closest('tr').find("input[name*='DNP_IsDeleted']").val(true);
+            $(this).closest('tr').find("input[name*='JIJWI_SVO_PFX_IsDeleted']").val(true);
             $(this).closest('tr').hide();
         });
 
@@ -141,23 +141,23 @@
             });
             return allFieldsValid;
         }
-       function PreValidateField(currentInput) {
-            if (currentInput.hasClass("DNP_Particulars")) {
-                return true;
-            }
+    function PreValidateField(currentInput) {
+             if (currentInput.hasClass("JIJWI_SVO_PFX_Particulars")) {
+                 return true;
+             }
 
-            var valid = 1;
-            var inputValue = currentInput.val();
-            if (inputValue === "") {
-                valid = 0;
-            }
-            if (valid == 0) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
+             var valid = 1;
+             var inputValue = currentInput.val();
+             if (inputValue === "") {
+                 valid = 0;
+             }
+             if (valid == 0) {
+                 return false;
+             }
+             else {
+                 return true;
+             }
+         }
         PrefixInitializeFlatpickrs();
     });
 </script>

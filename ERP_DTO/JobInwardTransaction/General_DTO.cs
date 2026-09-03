@@ -51,6 +51,43 @@ namespace ERP_DTO.JobInwardTransaction
         public int Result_Number { get; set; }
         public string Result_Message { get; set; }
     }
+    public class FreightServiceOrder_DTO
+    {
+        public long JIFRT_SVOH_Number { get; set; }
+        public string JIFRT_SVOH_ServiceOrderNo { get; set; }
+        public long JIFRT_SVOH_JW_Customer_Number { get; set; }
+        public string JIFRT_SVOH_JW_Customer_Name { get; set; }
+        public long JIFRT_SVOH_Currency_Number { get; set; }
+        public long? JIFRT_SVOH_MS_Number { get; set; }
+        public string JIFRT_SVOH_PaymentTerms { get; set; }
+        public string JIFRT_SVOH_DeliveryTerms { get; set; }
+        public string JIFRT_SVOH_DeliveryMode { get; set; }
+        public string JIFRT_SVOH_Tax { get; set; }
+        public string JIFRT_SVOH_TDC { get; set; }
+        public string JIFRT_SVOH_Remarks { get; set; }
+
+        public int Result_Number { get; set; }
+        public string Result_Message { get; set; }
+    }
+
+    public class JobworkInvoiceServiceOrder_DTO
+    {
+        public long JIJWI_SVOH_Number { get; set; }
+        public string JIJWI_SVOH_ServiceOrderNo { get; set; }
+        public long JIJWI_SVOH_JW_Customer_Number { get; set; }
+        public string JIJWI_SVOH_JW_Customer_Name { get; set; }
+        public long JIJWI_SVOH_Currency_Number { get; set; }
+        public long? JIJWI_SVOH_MS_Number { get; set; }
+        public string JIJWI_SVOH_PaymentTerms { get; set; }
+        public string JIJWI_SVOH_DeliveryTerms { get; set; }
+        public string JIJWI_SVOH_DeliveryMode { get; set; }
+        public string JIJWI_SVOH_Tax { get; set; }
+        public string JIJWI_SVOH_TDC { get; set; }
+        public string JIJWI_SVOH_Remarks { get; set; }
+
+        public int Result_Number { get; set; }
+        public string Result_Message { get; set; }
+    }
     public class Conversion_DTO
     {
         public long JICNVH_Number { get; set; }

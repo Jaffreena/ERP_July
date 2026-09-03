@@ -191,4 +191,187 @@ namespace ERP_DTO.JobInwardTransaction
 
         public string JISVOI_Category { get; set; }
     }
+
+    #region new
+    public class JIJWI_ServiceOrderHead_DTO
+    {
+        public long JIJWI_SVOH_Number { get; set; }
+        public string JIJWI_SVOH_RegNo { get; set; }
+        public DateTime JIJWI_SVOH_RegDate { get; set; }
+        public string JIJWI_SVOH_ServiceOrderNo { get; set; }
+        public DateTime JIJWI_SVOH_ServiceOrderDate { get; set; }
+        public long? JIJWI_SVOH_MS_Number { get; set; }
+        public long JIJWI_SVOH_JW_Customer_Number { get; set; }
+        public long JIJWI_SVOH_Currency_Number { get; set; }
+        public string JIJWI_SVOH_PaymentTerms { get; set; }
+        public string JIJWI_SVOH_DeliveryTerms { get; set; }
+        public string JIJWI_SVOH_DeliveryMode { get; set; }
+        public string JIJWI_SVOH_Tax { get; set; }
+        public string JIJWI_SVOH_TDC { get; set; }
+        public string JIJWI_SVOH_Remarks { get; set; }
+    }
+    public class JIJWI_ServiceOrderItem_DTO
+    {
+        public long JIJWI_SVOI_Number { get; set; }
+        public bool JIJWI_SVOI_IsDeleted { get; set; }
+        public long JIJWI_SVOI_PRS_Number { get; set; }
+        public long JIJWI_SVOI_Item_Number { get; set; }
+        public long? JIJWI_SVOI_WH_Number { get; set; }
+        public long JIJWI_SVOI_UoM_Number { get; set; }
+        public double JIJWI_SVOI_Qty { get; set; }
+        public double JIJWI_SVOI_UnitPrice { get; set; }
+        public double JIJWI_SVOI_Amount { get; set; }
+        public DateTime? JIJWI_SVOI_DeliveryDate { get; set; }
+        public string JIJWI_SVOI_Category { get; set; }
+    }
+    public class JIJWI_ServiceOrder_DTO
+    {
+        public JIJWI_ServiceOrderHead_DTO Header { get; set; }
+        public List<JIJWI_ServiceOrderItem_DTO> Items { get; set; }
+    }
+    public class JIFRT_ServiceOrderHead_DTO
+    {
+        public long JIFRT_SVOH_Number { get; set; }
+        public string JIFRT_SVOH_RegNo { get; set; }
+        public DateTime JIFRT_SVOH_RegDate { get; set; }
+        public string JIFRT_SVOH_ServiceOrderNo { get; set; }
+        public DateTime JIFRT_SVOH_ServiceOrderDate { get; set; }
+        public string JIFRT_SVOH_Category { get; set; }
+        public long JIFRT_SVOH_JW_Customer_Number { get; set; }
+        public long JIFRT_SVOH_Currency_Number { get; set; }
+        public string JIFRT_SVOH_PaymentTerms { get; set; }
+        public string JIFRT_SVOH_DeliveryTerms { get; set; }
+        public string JIFRT_SVOH_DeliveryMode { get; set; }
+        public string JIFRT_SVOH_Tax { get; set; }
+        public string JIFRT_SVOH_TDC { get; set; }
+        public string JIFRT_SVOH_Remarks { get; set; }
+    }
+    public class JIFRT_ServiceOrderItem_DTO
+    {
+        public long JIFRT_SVOI_Number { get; set; }
+        public bool JIFRT_SVOI_IsDeleted { get; set; }
+        public string JIFRT_SVOI_Category { get; set; }
+        public long JIFRT_SVOI_PRS_Number { get; set; }
+        public long? JIFRT_SVOI_FromWH_Number { get; set; }
+        public long? JIFRT_SVOI_ToWH_Number { get; set; }
+        public long JIFRT_SVOI_UoM_Number { get; set; }
+        public double JIFRT_SVOI_Qty { get; set; }
+        public double JIFRT_SVOI_Rate { get; set; }
+        public double JIFRT_SVOI_Amount { get; set; }
+    }
+    public class JIFRT_ServiceOrder_DTO
+    {
+        public JIFRT_ServiceOrderHead_DTO Header { get; set; }
+        public List<JIFRT_ServiceOrderItem_DTO> Items { get; set; }
+    }
+    public class ServiceOrderCreatePage_DTO
+    {
+        public string ServiceType { get; set; }   // "JWI" or "FREIGHT"
+        public JIJWI_ServiceOrderHead_DTO JWIHeader { get; set; }
+        public List<JIJWI_ServiceOrderItem_DTO> JWIItems { get; set; }
+        public JIFRT_ServiceOrderHead_DTO FreightHeader { get; set; }
+        public List<JIFRT_ServiceOrderItem_DTO> FreightItems { get; set; }
+    }
+    #endregion
+
+    #region register
+    public class JIJWIServiceOrderSummary_DTO
+    {
+        public long JIJWI_SVOH_Number { get; set; }
+        public int SO_Id { get; set; }
+        public int SO_CreatorCode { get; set; }
+        public string? JIJWI_SVOH_RegNo { get; set; }
+        public DateTime JIJWI_SVOH_RegDate { get; set; }
+        public string? JIJWI_SVOH_ServiceOrderNo { get; set; }
+        public DateTime JIJWI_SVOH_ServiceOrderDate { get; set; }
+        public long JIJWI_SVOH_JW_Customer_Number { get; set; }
+        public long CUS_JCG_Number { get; set; }
+        public string? JCG_JW_CustomerGroup { get; set; }
+        public string? JCC_JW_CustomerCategory { get; set; }
+        public string? CUS_Name { get; set; }
+        public string? CurrencyCode { get; set; }
+        public string? PRS_ProcessName { get; set; }
+        public int NoOfLineItems { get; set; }
+        public string Qty { get; set; }
+        public double Amount { get; set; }
+    }
+
+    public class JIJWIServiceOrderDetailed_DTO
+    {
+        public long JIJWI_SVOH_Number { get; set; }
+        public int SO_Id { get; set; }
+        public int SO_CreatorCode { get; set; }
+        public string? JIJWI_SVOH_RegNo { get; set; }
+        public DateTime JIJWI_SVOH_RegDate { get; set; }
+        public string? JIJWI_SVOH_ServiceOrderNo { get; set; }
+        public DateTime JIJWI_SVOH_ServiceOrderDate { get; set; }
+        public long JIJWI_SVOH_JW_Customer_Number { get; set; }
+        public long CUS_JCG_Number { get; set; }
+        public string? JCG_JW_CustomerGroup { get; set; }
+        public string? JCC_JW_CustomerCategory { get; set; }
+        public string? CUS_Name { get; set; }
+        public string? CurrencyCode { get; set; }
+        public long JIJWI_SVOI_PRS_Number { get; set; }
+        public long JIJWI_SVOI_Item_Number { get; set; }
+        public string? PRS_ProcessName { get; set; }
+        public string? ItemGroup { get; set; }
+        public string? ItemCode { get; set; }
+        public string? ItemDescription { get; set; }
+        public string? OuterDia { get; set; }
+        public string? Thickness { get; set; }
+        public string? ItemLength { get; set; }
+        public string? ITM_Width { get; set; }
+        public string? MaterialGrade { get; set; }
+        public string? UOM { get; set; }
+        public string Qty { get; set; }
+        public double UnitPrice { get; set; }
+        public double Amount { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+    }
+
+    public class JIFRTServiceOrderSummary_DTO
+    {
+        public long JIFRT_SVOH_Number { get; set; }
+        public int SO_Id { get; set; }
+        public int SO_CreatorCode { get; set; }
+        public string? JIFRT_SVOH_RegNo { get; set; }
+        public DateTime JIFRT_SVOH_RegDate { get; set; }
+        public string? JIFRT_SVOH_ServiceOrderNo { get; set; }
+        public DateTime JIFRT_SVOH_ServiceOrderDate { get; set; }
+        public long JIFRT_SVOH_JW_Customer_Number { get; set; }
+        public long CUS_JCG_Number { get; set; }
+        public string? JCG_JW_CustomerGroup { get; set; }
+        public string? JCC_JW_CustomerCategory { get; set; }
+        public string? CUS_Name { get; set; }
+        public string? CurrencyCode { get; set; }
+        public int NoOfLineItems { get; set; }
+        public string Qty { get; set; }
+        public double Amount { get; set; }
+    }
+
+    public class JIFRTServiceOrderDetailed_DTO
+    {
+        public long JIFRT_SVOH_Number { get; set; }
+        public int SO_Id { get; set; }
+        public int SO_CreatorCode { get; set; }
+        public string? JIFRT_SVOH_RegNo { get; set; }
+        public DateTime JIFRT_SVOH_RegDate { get; set; }
+        public string? JIFRT_SVOH_ServiceOrderNo { get; set; }
+        public DateTime JIFRT_SVOH_ServiceOrderDate { get; set; }
+        public long JIFRT_SVOH_JW_Customer_Number { get; set; }
+        public long CUS_JCG_Number { get; set; }
+        public string? JCG_JW_CustomerGroup { get; set; }
+        public string? JCC_JW_CustomerCategory { get; set; }
+        public string? CUS_Name { get; set; }
+        public string? CurrencyCode { get; set; }
+        public long JIFRT_SVOI_PRS_Number { get; set; }
+        public string? FromWH { get; set; }
+        public string? ToWH { get; set; }
+        public string? UOM { get; set; }
+        public string Qty { get; set; }
+        public double Rate { get; set; }
+        public double Amount { get; set; }
+    }
+    #endregion
+
 }

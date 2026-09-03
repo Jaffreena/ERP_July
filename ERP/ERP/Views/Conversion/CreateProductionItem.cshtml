@@ -12,8 +12,8 @@
                         <input type="checkbox" id="IndexAllCheckItem" class="form-check-input border-white">
                     </th>
 
-                    <th>@Html.DisplayNameFor(m => m.First().PRS_Number)</th>
-                    <th>@Html.DisplayNameFor(m => m.First().Item_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_PRS_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_Item_Number)</th>
                     <th>@Html.DisplayNameFor(m => m.First().Description)</th>
 
                     <th class="text-end">@Html.DisplayNameFor(m => m.First().OuterDia)</th>
@@ -24,12 +24,12 @@
                     <th>@Html.DisplayNameFor(m => m.First().MaterialGrade)</th>
                     <th>@Html.DisplayNameFor(m => m.First().ItemGroup)</th>
 
-                    <th>@Html.DisplayNameFor(m => m.First().WH_Number)</th>
-                    <th>@Html.DisplayNameFor(m => m.First().UoM_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_WH_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_UoM_Number)</th>
 
-                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Qty)</th>
-                    <th class="text-end">@Html.DisplayNameFor(m => m.First().UnitPrice)</th>
-                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Amount)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().JIRNI_Qty)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().JIRNI_UnitPrice)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().JIRNI_Amount)</th>
                 </tr>
             </thead>
 
@@ -41,13 +41,13 @@
                     <td><input type="checkbox" class="CheckItem form-check-input"> </td>
 
                     <td>
-                        <input id="PRS_Number" class="PRS_Number" type="hidden" />
+                        <input id="JIRNI_PRS_Number" class="JIRNI_PRS_Number" type="hidden" />
                         <input class="form-control PRS_Name" autocomplete="off" oninput="OnInputProcess(this)" id="prsnum" onfocus="OnFocusProcess(this)" />
                         <div class="search-results card" style="display:none"></div>
                     </td>
 
                     <td>
-                        <input id="Item_Number" class="Item_Number" type="hidden" />
+                        <input id="JIRNI_Item_Number" class="JIRNI_Item_Number" type="hidden" />
                         <input id="Item_Index" class="Item_Index" type="hidden" />
                         <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
                         <div class="search-results card" style="display:none"></div>
@@ -64,23 +64,23 @@
                     <td><input class="form-control ItemGroup" readonly /></td>
 
                     <td>
-                        <select class="form-select WH_Number" asp-items="@ViewBag.Warehouse"></select>
+                        <select class="form-select JIRNI_WH_Number" asp-items="@ViewBag.Warehouse"></select>
                     </td>
 
                     <td>
-                        <select class="form-select UoM_Number" asp-items="@ViewBag.UoM"></select>
+                        <select class="form-select JIRNI_UoM_Number" asp-items="@ViewBag.UoM"></select>
                     </td>
 
                     <td>
-                        <input class="form-control Qty text-end" />
+                        <input class="form-control JIRNI_Qty text-end" />
                     </td>
 
                     <td>
-                        <input class="form-control UnitPrice text-end" />
+                        <input class="form-control JIRNI_UnitPrice text-end" />
                     </td>
 
                     <td>
-                        <input class="form-control Amount text-end" readonly />
+                        <input class="form-control JIRNI_Amount text-end" readonly />
                         <input type="hidden" class="IsDeleted" value="0" />
                     </td>
                 </tr>
@@ -97,9 +97,9 @@
                             </td>
 
                             <td>
-                                <input name="Items[@i].PRS_Number"
-                                       class="form-control PRS_Number"
-                                       value="@Model[i].PRS_Number"
+                                <input name="Items[@i].JIRNI_PRS_Number"
+                                       class="form-control JIRNI_PRS_Number"
+                                       value="@Model[i].JIRNI_PRS_Number"
                                        oninput="OnInputProcess(this)"
                                        onfocus="OnFocusProcess(this)" autocomplete="off" />
 
@@ -107,9 +107,9 @@
                             </td>
 
                             <td>
-                                <input name="Items[@i].Item_Number"
-                                       class="form-control Item_Number"
-                                       value="@Model[i].Item_Number"
+                                <input name="Items[@i].JIRNI_Item_Number"
+                                       class="form-control JIRNI_Item_Number"
+                                       value="@Model[i].JIRNI_Item_Number"
                                        oninput="OnInput(this)" onfocus="OnFocus(this)" />
                                 <div class="search-results card" style="display:none"></div>
                             </td>
@@ -157,11 +157,11 @@
                             </td>
 
                             <td>
-                                <select name="Items[@i].WH_Number" class="form-select WH_Number">
+                                <select name="Items[@i].JIRNI_WH_Number" class="form-select JIRNI_WH_Number">
                                     @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                     {
                                         <option value="@w.Value"
-                                                selected="@(w.Value == Model[i]?.WH_Number)">
+                                                selected="@(w.Value == Model[i]?.JIRNI_WH_Number)">
                                             @w.Text
                                         </option>
                                     }
@@ -169,11 +169,11 @@
                             </td>
 
                             <td>
-                                <select name="Items[@i].UoM_Number" class="form-select UoM_Number">
+                                <select name="Items[@i].JIRNI_UoM_Number" class="form-select JIRNI_UoM_Number">
                                     @foreach (var u in (ViewBag.UoM as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                     {
                                         <option value="@u.Value"
-                                                selected="@(u.Value == Model[i]?.UoM_Number)">
+                                                selected="@(u.Value == Model[i]?.JIRNI_UoM_Number)">
                                             @u.Text
                                         </option>
                                     }
@@ -181,21 +181,21 @@
                             </td>
 
                             <td>
-                                <input name="Items[@i].Qty"
-                                       class="form-control Qty text-end"
-                                       value="@Model[i].Qty" />
+                                <input name="Items[@i].JIRNI_Qty"
+                                       class="form-control JIRNI_Qty text-end"
+                                       value="@Model[i].JIRNI_Qty" />
                             </td>
 
                             <td>
-                                <input name="Items[@i].UnitPrice"
-                                       class="form-control UnitPrice text-end"
-                                       value="@Model[i].UnitPrice" />
+                                <input name="Items[@i].JIRNI_UnitPrice"
+                                       class="form-control JIRNI_UnitPrice text-end"
+                                       value="@Model[i].JIRNI_UnitPrice" />
                             </td>
 
                             <td>
-                                <input name="Items[@i].Amount"
-                                       class="form-control Amount text-end"
-                                       value="@Model[i].Amount" readonly />
+                                <input name="Items[@i].JIRNI_Amount"
+                                       class="form-control JIRNI_Amount text-end"
+                                       value="@Model[i].JIRNI_Amount" readonly />
 
                                 <input type="hidden"
                                        name="Items[@i].IsDeleted"

@@ -29,7 +29,7 @@
 
         let input = $(this);
         let rows = $("#RightPane .buyer-search-results tbody tr");
-// Enter, no record selected (empty textbox, full unfiltered
+        // Enter, no record selected (empty textbox, full unfiltered
         // list) -> auto-select first record + close popup, same as
         // Tab does via Focus Out point 3.
         if (e.key === "Enter" &&
@@ -50,10 +50,10 @@
                 SelectBuyer(
                     firstCust,
                     "#JWC_Name",
-                    "#JWC_Number",
+                    "#JIRNH_JWC_Number",
                     "#Currency_Name",
-                    "#Currency_Number",
-                    "#WH_Number",
+                    "#JIRNH_Currency_Number",
+                    "#JIRNH_WH_Number",
                     "#RightPane",
                     ".buyer-search-results"
                 );
@@ -98,10 +98,10 @@
                 SelectBuyer(
                     firstCust,
                     "#JWC_Name",
-                    "#JWC_Number",
+                    "#JIRNH_JWC_Number",
                     "#Currency_Name",
-                    "#Currency_Number",
-                    "#WH_Number",
+                    "#JIRNH_Currency_Number",
+                    "#JIRNH_WH_Number",
                     "#RightPane",
                     ".buyer-search-results"
                 );
@@ -171,7 +171,7 @@
 
         let row = $(this).closest("tr");
         let rows = $("#RightPane_Item .search-results tbody tr");
-     
+
         if (e.key === "Enter" &&
             $.trim($(this).val()) === "" && rows.length > 0 &&
             !rows.filter(".current-row, .match-row").length) {
@@ -195,7 +195,7 @@
             "#RightPane_Item",
             ".search-results",
             "#ItemMessage",
-            "#MS_Number"
+            "#JIRNH_MS_Number"
         );
     });
     //#endregion
@@ -242,7 +242,7 @@
 //#region  field width
 const FREIGHT_PRS_NUMBER = 40008;
 const ItemTableFields = [
-    { cls: ".PRS_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
+    { cls: ".JIRNI_PRS_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
     { cls: ".Item_Code", min: 12, max: 15, align: "left" },
     { cls: ".Description", min: 40, max: 40, align: "left" },
     { cls: ".OuterDia", min: 8, max: 8, align: "center" },
@@ -251,27 +251,27 @@ const ItemTableFields = [
     { cls: ".Width", min: 8, max: 8, align: "center" },
     { cls: ".MaterialGrade", min: 10, max: 25, align: "left" },
     { cls: ".ItemGroup", min: 10, max: 30, align: "left" },
-    { cls: ".WH_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
-    { cls: ".UoM_Number", min: 10, max: 15, align: "center", extraPadding: 8 },
-    { cls: ".Qty", min: 10, max: 20, align: "center", extraPadding: 8 },
-    { cls: ".Qty_Kg", min: 10, max: 20, align: "center", extraPadding: 8 },
-    { cls: ".UnitPrice", min: 11, max: 20, align: "right", extraPadding: 8 },
-    { cls: ".Amount", min: 13, max: 25, align: "right", extraPadding: 8 },
+    { cls: ".JIRNI_WH_Number", min: 10, max: 25, align: "left", extraPadding: 8 },
+    { cls: ".JIRNI_UoM_Number", min: 10, max: 15, align: "center", extraPadding: 8 },
+    { cls: ".JIRNI_Qty", min: 10, max: 20, align: "center", extraPadding: 8 },
+    { cls: ".JIRNI_Qty_Kgs", min: 10, max: 20, align: "center", extraPadding: 8 },
+    { cls: ".JIRNI_UnitPrice", min: 11, max: 20, align: "right", extraPadding: 8 },
+    { cls: ".JIRNI_Amount", min: 13, max: 25, align: "right", extraPadding: 8 },
 
     // NEW: Freight logic
-   
-    { cls: ".FromWH", min: 10, max: 25, align: "left" },
-    { cls: ".ToWH", min: 10, max: 25, align: "left" },
-    { cls: ".Freight_ServiceOrder_Number", min: 10, max: 25, align: "left" }
+
+    { cls: ".JIRNI_FromWH", min: 10, max: 25, align: "left" },
+    { cls: ".JIRNI_ToWH", min: 10, max: 25, align: "left" },
+    { cls: ".JIRNI_JIFRT_SVOH_Number", min: 10, max: 25, align: "left" }
 ];
 
 //#endregion
 
 let isMouseSelectingBuyer = false;
- 
+
 
 //#region show right panes
- 
+
 
 //#endregion
 //#region COMMON FUNCTIONS
@@ -307,7 +307,7 @@ function QtyDecimalRupees(value, decimalPlaces) {
 //#region Auto Add Row on Last Row
 
 
-$(document).on("focusout", ".Qty, .UnitPrice", function () {
+$(document).on("focusout", ".JIRNI_Qty, .JIRNI_UnitPrice", function () {
 
     let $row = $(this).closest("tr");
 
@@ -315,8 +315,8 @@ $(document).on("focusout", ".Qty, .UnitPrice", function () {
         return;
     }
 
-    let qty = parseFloat($row.find(".Qty").attr("data-value")) || 0;
-    let price = parseFloat($row.find(".UnitPrice").attr("data-value")) || 0;
+    let qty = parseFloat($row.find(".JIRNI_Qty").attr("data-value")) || 0;
+    let price = parseFloat($row.find(".JIRNI_UnitPrice").attr("data-value")) || 0;
 
     if (qty > 0 || price > 0) {
         autoAddRow_F($row);
@@ -384,15 +384,15 @@ function ResizeBatchPopup(tableSelector = "#BatchTable", modalSelector = "#IBatc
 function ApplyBatchFieldWidths(container = "#BatchTable") {
 
     const fields = [
-        { cls: ".RNI_BCH_Date", min: 10, max: 10, align: "center" },
-        { cls: ".RNI_BCH_No", min: 20, max: 50, align: "left" },
-        { cls: ".RNI_BCH_Qty", min: 10, max: 20, align: "center" },
-        { cls: ".RNI_BCH_UnitPrice", min: 11, max: 20, align: "right" },
-        { cls: ".RNI_BCH_Value", min: 13, max: 25, align: "right" }
+        { cls: ".JIRNI_BCH_BatchDate", min: 12, max: 12, align: "center" },
+        { cls: ".JIRNI_BCH_Number", min: 20, max: 50, align: "left" },
+        { cls: ".JIRNI_BCH_BatchQty", min: 10, max: 20, align: "center" },
+        { cls: ".JIRNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
+        { cls: ".JIRNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
     ];
     const $container = $(container);
 
-   
+
 
     fields.forEach(f => {
 
@@ -438,7 +438,7 @@ function ApplyBatchFieldWidths(container = "#BatchTable") {
         requiredWidth = Math.min(requiredWidth, maxWidth);
 
         // Extra space so the last digit is not clipped
-        if (f.cls === ".RNI_BCH_UnitPrice"  || f.cls === ".RNI_BCH_Value") {
+        if (f.cls === ".JIRNI_BCH_BatchUnitPrice" || f.cls === ".JIRNI_BCH_BatchValue") {
             requiredWidth = Math.min(requiredWidth + 8, maxWidth);
         }
 
@@ -472,7 +472,7 @@ function ApplyBatchFieldWidths(container = "#BatchTable") {
             }
         });
     });
-   
+
     ResizeBatchPopup(container, "#IBatch");
 }
 
@@ -488,8 +488,8 @@ function ResizeColumns() {
 }
 function OpenItemCodeSearch(inputElement) {
 
-    if ($.trim($("#MS_Number").val()) === "" || $("#MS_Number").val() === "0") {
-        $("#MS_Number").prop("selectedIndex", 1);
+    if ($.trim($("#JIRNH_MS_Number").val()) === "" || $("#JIRNH_MS_Number").val() === "0") {
+        $("#JIRNH_MS_Number").prop("selectedIndex", 1);
     }
 
     $("#RightPane").hide();
@@ -512,24 +512,24 @@ function LoadDefaultFormSetting() {
                 var data = response.data;
 
                 if (data.dfS_JIRNH_JW_CustomerDC_No) {
-                    $('#JW_CustomerDC_No').val(data.dfS_JIRNH_JW_CustomerDC_No);
+                    $('#JIRNH_JW_CustomerDC_No').val(data.dfS_JIRNH_JW_CustomerDC_No);
                 }
                 if (data.dfS_JIRNH_MS_Number) {
-                    $('#MS_Number').val(data.dfS_JIRNH_MS_Number).trigger('change');
+                    $('#JIRNH_MS_Number').val(data.dfS_JIRNH_MS_Number).trigger('change');
                 }
                 if (data.dfS_JIRNH_JWC_Number) {
-                    $('#JWC_Number').val(data.dfS_JIRNH_JWC_Number);
+                    $('#JIRNH_JWC_Number').val(data.dfS_JIRNH_JWC_Number);
                     $('#JWC_Name').val(data.cuS_Name);
                 }
                 if (data.dfS_JIRNH_Currency_Number) {
-                    $('#Currency_Number').val(data.dfS_JIRNH_Currency_Number);
+                    $('#JIRNH_Currency_Number').val(data.dfS_JIRNH_Currency_Number);
                     $('#Currency_Name').val(data.currency_Name);
                 }
                 if (data.dfS_JIRNH_WH_Number) {
-                    $('#WH_Number').val(data.dfS_JIRNH_WH_Number).trigger('change');
+                    $('#JIRNH_WH_Number').val(data.dfS_JIRNH_WH_Number).trigger('change');
                 }
                 if (data.dfS_JIRNH_Remarks) {
-                    $('#Remarks').val(data.dfS_JIRNH_Remarks);
+                    $('#JIRNH_Remarks').val(data.dfS_JIRNH_Remarks);
                 }
             }
         },
@@ -564,7 +564,7 @@ $(document).ready(function () {
     $(document).on("mousedown", ".Item_Code", function (e) {
         OpenItemCodeSearch(this);
     });
-   
+
     // Item_Code – Text change: moved to <script> block
 
     // Item_Code – Focus Out: moved to <script> block
@@ -595,7 +595,7 @@ $(document).ready(function () {
         // Make clicked row the current row
         $(this).addClass("current-row");
     });
-  
+
     $(document).on("input", "#ItemTable input", function () {
         ResizeColumns();
     });
@@ -605,14 +605,14 @@ $(document).ready(function () {
     });
 
     // NEW: Qty to Kg conversion
-    $(document).on("input", ".Qty", function () {
+    $(document).on("input", ".JIRNI_Qty", function () {
         let row = $(this).closest("tr");
         CalculateQtyKg(row);
     });
 
-    $(document).on("change", ".UoM_Number", function () {
+    $(document).on("change", ".JIRNI_UoM_Number", function () {
         let row = $(this).closest("tr");
-        let itemNumber = row.find(".Item_Number").val();
+        let itemNumber = row.find(".JIRNI_Item_Number").val();
         let fromUnit = $(this).val();
 
         if (!itemNumber || !fromUnit) return;
@@ -633,10 +633,15 @@ $(document).ready(function () {
     function ToggleFreightColumns_RN() {
         let isFreight = $("#Header_Freight_Applicable").is(":checked");
 
+        let freightCols = ".FreightApplicableHeader, .FreightApplicableCell, .FreightApplicableFooterCell, " +
+            ".FromWHHeader, .FromWHCell, .FromWHFooterCell, " +
+            ".ToWHHeader, .ToWHCell, .ToWHFooterCell, " +
+            ".FreightSOHeader, .FreightSOCell, .FreightSOFooterCell";
+
         if (isFreight) {
-            $(".FreightApplicableHeader, .FreightApplicableCell, .FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell, .FreightSOHeader, .FreightSOCell").show();
+            $(freightCols).show();
         } else {
-            $(".FreightApplicableHeader, .FreightApplicableCell, .FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell, .FreightSOHeader, .FreightSOCell").hide();
+            $(freightCols).hide();
         }
     }
 
@@ -646,40 +651,39 @@ $(document).ready(function () {
 
     ToggleFreightColumns_RN();
 
-    // NEW: Freight logic
     $(document).on(
         "change",
-        ".Freight_Applicable, .Item_Code, .UoM_Number",
+        ".JIRNI_IsFreightApplicable, .JIRNI_FromWH, .JIRNI_ToWH",
         function () {
 
             let row = $(this).closest("tr");
 
-            if (row.find(".Freight_Applicable").is(":checked")) {
+            if (row.find(".JIRNI_IsFreightApplicable").is(":checked")) {
 
                 BindFreightServiceOrder(
-                    $("#JWC_Number").val(),
-                    row.find(".Item_Number").val(),
-                    row.find(".UoM_Number").val()
+                    $("#JIRNH_JWC_Number").val(),
+                    row.find(".JIRNI_FromWH").val(),
+                    row.find(".JIRNI_ToWH").val()
                 );
 
             } else {
-                row.find(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+                row.find(".JIRNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
             }
         }
     );
-   
 
-    $(document).on("focusin", ".Amount", function () {
+
+    $(document).on("focusin", ".JIRNI_Amount", function () {
         ResizeColumns();
     });
     $(document).on("input change blur", "#BatchTable input, #BatchTable textarea, #BatchTable select", function () {
-  
+
         ApplyBatchFieldWidths("#BatchTable", function () {
-           
+
         });
     });
-    
-    $(document).on("focus", ".PRS_Number", function () {
+
+    $(document).on("focus", ".JIRNI_PRS_Number", function () {
         this.click();
     });
 
@@ -689,7 +693,7 @@ $(document).ready(function () {
         CloseIBatchModal();
     });
     //#region item code right pane search
-  
+
     //#endregion
     $("#RemoveItemRowButton").on("click", function () {
 
@@ -715,7 +719,7 @@ $(document).ready(function () {
         }
 
         checkedRows.remove();
-       
+
 
         calculateTotal_rn();
 
@@ -727,7 +731,7 @@ $(document).ready(function () {
     // Hide batch popup when clicking outside of it
 
 
-    $(document).on("focusout", ".UnitPrice", function () {
+    $(document).on("focusout", ".JIRNI_UnitPrice", function () {
 
         let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
 
@@ -736,7 +740,7 @@ $(document).ready(function () {
             .val(value === 0 ? "" : formatIndianCurrency(value));
     });
 
-    $(document).on("focusout", ".Qty", function () {
+    $(document).on("focusout", ".JIRNI_Qty", function () {
 
         let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
 
@@ -744,26 +748,26 @@ $(document).ready(function () {
             .attr("data-value", value)
             .val(value === 0 ? "" : formatIndianQty(value));
     });
-  
 
-   
+
+
     $("#AddRowButton").trigger("click");
-    $(document).on("keyup", ".Qty, .UnitPrice", function () {
+    $(document).on("keyup", ".JIRNI_Qty, .JIRNI_UnitPrice", function () {
 
         let row = $(this).closest("tr");
 
-        row.find(".Qty")
-            .attr("data-value", removeCommas(row.find(".Qty").val()));
+        row.find(".JIRNI_Qty")
+            .attr("data-value", removeCommas(row.find(".JIRNI_Qty").val()));
 
-        row.find(".UnitPrice")
-            .attr("data-value", removeCommas(row.find(".UnitPrice").val()));
+        row.find(".JIRNI_UnitPrice")
+            .attr("data-value", removeCommas(row.find(".JIRNI_UnitPrice").val()));
 
-        let qty = parseFloat(row.find(".Qty").attr("data-value")) || 0;
-        let unitPrice = parseFloat(row.find(".UnitPrice").attr("data-value")) || 0;
+        let qty = parseFloat(row.find(".JIRNI_Qty").attr("data-value")) || 0;
+        let unitPrice = parseFloat(row.find(".JIRNI_UnitPrice").attr("data-value")) || 0;
 
         let amount = qty * unitPrice;
 
-        row.find(".Amount")
+        row.find(".JIRNI_Amount")
             .val(amount === 0 ? "" : formatIndianCurrency(amount))
             .attr("data-value", amount);
 
@@ -791,8 +795,8 @@ $(document).ready(function () {
 
         var dto = GetReceiptNoteDTO();   // We'll create this function next
         console.log(dto);                     // Object
-        console.log('123------------------'+JSON.stringify(dto));
-    
+        console.log('123------------------' + JSON.stringify(dto));
+
         // JSON
         $.ajax({
             url: "/Receipt_Note/SaveReceiptNote",
@@ -800,16 +804,16 @@ $(document).ready(function () {
             contentType: "application/json",
             data: JSON.stringify(dto),
             success: function (res) {
-             
-                
-              
+
+
+
                 $('#ModelAlert').one('hidden.bs.modal', function () {
                     location.reload();
                 });
                 showAlert('Record Inserted');
-           
-                  //  window.location.href = res.redirectUrl;
-              
+
+                //  window.location.href = res.redirectUrl;
+
             },
             error: function (xhr) {
                 alert(xhr.responseText);
@@ -847,7 +851,7 @@ $(document).ready(function () {
         let row = $(textbox).closest("tr");
 
         row.find(".Item_Code").val($(textbox).data("oldItemCode") || "");
-        row.find(".Item_Number").val($(textbox).data("oldItemNumber") || "");
+        row.find(".JIRNI_Item_Number").val($(textbox).data("oldItemNumber") || "");
 
         $("#RightPane_Item").removeClass("show");
         $("#RightPane_Item .search-results").hide();
@@ -859,7 +863,7 @@ $(document).ready(function () {
     InitializeGstFlatpickrs();
 
     function InitializeGstFlatpickrs() {
-        $(".datepicker").flatpickr({
+        $(".datepicker").not("#IBatTempRow .datepicker").flatpickr({
             dateFormat: "d-M-Y",   // 30-Apr-2026
             altInput: true,        // shows formatted date
             altFormat: "d-M-Y",   // display format
@@ -867,7 +871,6 @@ $(document).ready(function () {
             defaultDate: new Date() // optional: today default
         });
     }
-
     DateBind();
     //#endregion Initialize Flatpickr
 
@@ -875,26 +878,26 @@ $(document).ready(function () {
     AutoFitHeader();
     //#region Header AutoFit - KeyUp
 
-    $(document).on("keyup change input", "#RN_No, #JW_CustomerDC_No, #MS_Number, #JWC_Name, #Currency_Name, #WH_Number, #Remarks", function () {
+    $(document).on("keyup change input", "#JIRNH_RN_No, #JIRNH_JW_CustomerDC_No, #JIRNH_MS_Number, #JWC_Name, #Currency_Name, #JIRNH_WH_Number, #JIRNH_Remarks", function () {
 
         const widths = {
-            RN_No: [20, 25],
-            JW_CustomerDC_No: [20, 25],
-            MS_Number: [20, 30],
+            JIRNH_RN_No: [20, 25],
+            JIRNH_JW_CustomerDC_No: [20, 25],
+            JIRNH_MS_Number: [20, 30],
             JWC_Name: [40, 50],
             Currency_Name: [10, 10],
-            WH_Number: [20, 25],
-            Remarks: [40, 40]
+            JIRNH_WH_Number: [20, 25],
+            JIRNH_Remarks: [40, 40]
         };
         const [min, max] = widths[this.id];
         fitInputWidth(this, min, max);
     });
 
     //#endregion
-    $(document).on("change", "#MS_Number, #WH_Number", function () {
+    $(document).on("change", "#JIRNH_MS_Number, #JIRNH_WH_Number", function () {
         fitInputWidth(this, 20, 20);
     });
-  
+
 });
 $(window).on("load", function () {
     setTimeout(function () {
@@ -906,18 +909,18 @@ $(window).on("load", function () {
             tableBody: "#TableBody",
             searchTable: "#tblsearch"
         });
-     
+
 
     }, 200);
 });
 function AutoFitHeader() {
-    fitInputWidth("RN_No", 20, 25);
-    fitInputWidth("JW_CustomerDC_No", 20, 25);
-    fitInputWidth("MS_Number", 20, 30);
+    fitInputWidth("JIRNH_RN_No", 20, 25);
+    fitInputWidth("JIRNH_JW_CustomerDC_No", 20, 25);
+    fitInputWidth("JIRNH_MS_Number", 20, 30);
     fitInputWidth("JWC_Name", 40, 50);
     fitInputWidth("Currency_Name", 10, 10);
-    fitInputWidth("WH_Number", 20, 25);
-    fitInputWidth("Remarks", 40, 40);
+    fitInputWidth("JIRNH_WH_Number", 20, 25);
+    fitInputWidth("JIRNH_Remarks", 40, 40);
 }
 function ValidateItemBatchMapping() {
 
@@ -929,8 +932,8 @@ function ValidateItemBatchMapping() {
         let rowId = i + 1;
 
         // Validate only if both Process and Item are selected
-        let process = row.find(".PRS_Number").val();
-        let itemNo = row.find(".Item_Number").val();
+        let process = row.find(".JIRNI_PRS_Number").val();
+        let itemNo = row.find(".JIRNI_Item_Number").val();
 
         if (!process || !itemNo)
             continue;
@@ -949,9 +952,9 @@ function ValidateItemBatchMapping() {
                 return false;
 
             return (
-                batch.RNI_BCH_Date &&
-                batch.RNI_BCH_No &&
-                (parseFloat(batch.RNI_BCH_Qty) || 0) > 0
+                batch.JIRNI_BCH_BatchDate &&
+                batch.JIRNI_BCH_Number &&
+                (parseFloat(batch.JIRNI_BCH_BatchQty) || 0) > 0
             );
         });
 
@@ -1027,23 +1030,23 @@ function GetHeader() {
 
     return {
 
-        RN_No: $("#RN_No").val(),
-        RN_Date: $("#RN_Date").val(),
+        JIRNH_RN_No: $("#JIRNH_RN_No").val(),
+        JIRNH_RN_Date: $("#JIRNH_RN_Date").val(),
 
-        JWC_Number: $("#JWC_Number").val(),
+        JIRNH_JWC_Number: $("#JIRNH_JWC_Number").val(),
 
-        Currency_Number: $("#Currency_Number").val(),
+        JIRNH_Currency_Number: $("#JIRNH_Currency_Number").val(),
 
-        JW_CustomerDC_No: $("#JW_CustomerDC_No").val(),
-        JW_CustomerDC_Date: $("#JW_CustomerDC_Date").val(),
+        JIRNH_JW_CustomerDC_No: $("#JIRNH_JW_CustomerDC_No").val(),
+        JIRNH_JW_CustomerDC_Date: $("#JIRNH_JW_CustomerDC_Date").val(),
 
-        MS_Number: $("#MS_Number").val(),
+        JIRNH_MS_Number: $("#JIRNH_MS_Number").val(),
 
-        Remarks: $("#Remarks").val(),
+        JIRNH_Remarks: $("#JIRNH_Remarks").val(),
 
-        WH_Number: $("#WH_Number").val(),
+        JIRNH_WH_Number: $("#JIRNH_WH_Number").val(),
 
-        Freight_Applicable: $("#Header_Freight_Applicable").is(":checked") ? "Yes" : "No"
+        JIRNH_IsFreightApplicable: $("#Header_Freight_Applicable").is(":checked") ? "Yes" : "No"
 
     };
 
@@ -1062,19 +1065,19 @@ function GetItemBatches() {
 
                 RNI_BCH_Item_Number: batch.RNI_BCH_Item_Number,
 
-                RNI_BCH_WH_Number: batch.RNI_BCH_WH_Number,
+                JIRNI_BCH_WH_Number: batch.JIRNI_BCH_WH_Number,
 
-                RNI_BCH_Date: batch.RNI_BCH_Date,
+                JIRNI_BCH_BatchDate: batch.JIRNI_BCH_BatchDate,
 
-                RNI_BCH_No: 0,
+                JIRNI_BCH_Number: 0,
 
-                RNI_BCH_Number: batch.RNI_BCH_No,
+                JIRNI_BCH_BatchNo: batch.JIRNI_BCH_Number,
 
-                RNI_BCH_Qty: batch.RNI_BCH_Qty || 0,
+                JIRNI_BCH_BatchQty: batch.JIRNI_BCH_BatchQty || 0,
 
-                RNI_BCH_UnitPrice: batch.RNI_BCH_UnitPrice || 0,
+                JIRNI_BCH_BatchUnitPrice: batch.JIRNI_BCH_BatchUnitPrice || 0,
 
-                RNI_BCH_Value: batch.RNI_BCH_Value || 0,
+                JIRNI_BCH_BatchValue: batch.JIRNI_BCH_BatchValue || 0,
 
                 RNI_BCH_IsDeleted: batch.RNI_BCH_IsDeleted || "false"
             });
@@ -1097,26 +1100,26 @@ function GetItems() {
         if (row.find(".IsDeleted").val() === "1")
             return;
 
-        let itemNumber = row.find(".Item_Number").val();
+        let itemNumber = row.find(".JIRNI_Item_Number").val();
 
         if (itemNumber && itemNumber.trim() !== "") {
             items.push({
-                Item_Number: itemNumber,
-                PRS_Number: row.find(".PRS_Number").val(),
-                WH_Number: row.find(".WH_Number").val(),
-                UoM_Number: row.find(".UoM_Number").val(),
-                Qty: String(row.find(".Qty").attr("data-value") || "0"),
-                Qty_Kg: String(row.find(".Qty_Kg").val() || "0"),
-                UnitPrice: String(row.find(".UnitPrice").attr("data-value") || "0"),
-                Amount: String(row.find(".Amount").attr("data-value") || "0"),
+                JIRNI_Item_Number: itemNumber,
+                JIRNI_PRS_Number: row.find(".JIRNI_PRS_Number").val(),
+                JIRNI_WH_Number: row.find(".JIRNI_WH_Number").val(),
+                JIRNI_UoM_Number: row.find(".JIRNI_UoM_Number").val(),
+                JIRNI_Qty: String(row.find(".JIRNI_Qty").attr("data-value") || "0"),
+                JIRNI_Qty_Kgs: String(row.find(".JIRNI_Qty_Kgs").val() || "0"),
+                JIRNI_UnitPrice: String(row.find(".JIRNI_UnitPrice").attr("data-value") || "0"),
+                JIRNI_Amount: String(row.find(".JIRNI_Amount").attr("data-value") || "0"),
                 IsDeleted: "0",
 
                 // NEW: Freight logic
-                Freight_Applicable: row.find(".Freight_Applicable").is(":checked") ? "Yes" : "No",
-                Freight_ServiceOrder_Number: row.find(".Freight_ServiceOrder_Number").val() || "",
-                JISVOI_Number_FRT: row.find(".JISVOI_Number_FRT_Row").val() || "0",
-                FromWH: row.find(".FromWH").val() || "",
-                ToWH: row.find(".ToWH").val() || ""
+                JIRNI_IsFreightApplicable: row.find(".JIRNI_IsFreightApplicable").is(":checked") ? "Yes" : "No",
+                JIRNI_JIFRT_SVOH_Number: row.find(".JIRNI_JIFRT_SVOH_Number").val() || "",
+                JIRNI_JIFRT_SVOI_Number: row.find(".JISVOI_Number_FRT_Row").val() || "0",
+                JIRNI_FromWH: row.find(".JIRNI_FromWH").val() || "",
+                JIRNI_ToWH: row.find(".JIRNI_ToWH").val() || ""
             });
         }
     });
@@ -1133,20 +1136,20 @@ function DateBind() {
 
     var formattedDate = day + "-" + months[today.getMonth()] + "-" + today.getFullYear();
 
-    var fp = document.getElementById("RN_Date")._flatpickr;
+    var fp = document.getElementById("JIRNH_RN_Date")._flatpickr;
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
 }
 
 // NEW: Freight logic
-function BindFreightServiceOrder(customerId, itemNumber = null, uomNumber = null) {
-    $(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+function BindFreightServiceOrder(customerId, fromWHNumber = null, toWHNumber = null) {
+    $(".JIRNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
     if (!customerId) return;
     $.get("/receiptnote/transactions/receiptnote/get-freight-service-order",
-        { customerId, prsNumber: FREIGHT_PRS_NUMBER, itemNumber, uomNumber },
+        { customerId, fromWHNumber, toWHNumber },
         data => $.each(data, (_, item) => {
             if (!item.value || item.value === "" || item.value === "0") return;
 
-            $(".Freight_ServiceOrder_Number").append(
+            $(".JIRNI_JIFRT_SVOH_Number").append(
                 `<option value="${item.value}" data-jisvoi="${item.jisvoiNumber || 0}">${item.text}</option>`
             )
         })
@@ -1163,10 +1166,10 @@ function GetOtherRowsQtyForFreightSO(freightSO, currentRow) {
         if (row.is(currentRow)) return;
         if (row.find(".IsDeleted").val() === "1") return;
 
-        let rowFreightSO = row.find(".Freight_ServiceOrder_Number").val() || 0;
+        let rowFreightSO = row.find(".JIRNI_JIFRT_SVOH_Number").val() || 0;
 
         if (rowFreightSO == freightSO) {
-            total += parseFloat(row.find(".Qty").attr("data-value") || removeCommas(row.find(".Qty").val())) || 0;
+            total += parseFloat(row.find(".JIRNI_Qty_Kgs").val()) || 0;
         }
     });
 
@@ -1176,43 +1179,41 @@ function GetOtherRowsQtyForFreightSO(freightSO, currentRow) {
 // NEW: Freight logic — Qty Allowed check against Freight SO
 function CheckFreightQtyExceeded(row) {
 
-    let freightSO = row.find(".Freight_ServiceOrder_Number").val();
+    let freightSO = row.find(".JIRNI_JIFRT_SVOH_Number").val();
     if (!freightSO || freightSO === "0") return;
 
-    let itemNumber = row.find(".Item_Number").val();
-    let uomNumber = row.find(".UoM_Number").val();
-    let originalQty = parseFloat(row.find(".Qty").attr("data-value") || removeCommas(row.find(".Qty").val())) || 0;
-
-    $.get("/receiptnote/transactions/receiptnote/check-delivered-qty-exceeded-freight", {
+    let fromWHNumber = row.find(".JIRNI_FromWH").val();
+    let toWHNumber = row.find(".JIRNI_ToWH").val();
+    let originalQty = parseFloat(row.find(".JIRNI_Qty_Kgs").val()) || 0;
+    $.get("/receiptnote/transactions/receiptnote/check-received-qty-exceeded-freight", {
         jisvohNumber: freightSO,
-        prsNumber: FREIGHT_PRS_NUMBER,
-        itemNumber,
-        uomNumber
+        fromWHNumber,
+        toWHNumber
     }, function (res) {
 
         if (!res || res.length === 0) return;
 
-        let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+        let receivedQty = parseFloat(res[0].receivedQty) || 0;
         let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
 
-        // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(Freight SO)
+        // FORMULA: RealReceivedQty = DB_ReceivedQty + OtherRowsQty(Freight SO)
         let otherRowsQty = GetOtherRowsQtyForFreightSO(freightSO, row);
-        let realDeliveredQty = deliveredQty + otherRowsQty;
+        let realReceivedQty = receivedQty + otherRowsQty;
 
-        // FORMULA: IsExceeded  <=>  (RealDeliveredQty + CurrentQty) > SVO_Qty
-        if ((realDeliveredQty + originalQty) > jisvoiQty) {
+        // FORMULA: IsExceeded  <=>  (RealReceivedQty + CurrentQty) > SVO_Qty
+        if ((realReceivedQty + originalQty) > jisvoiQty) {
 
-            // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
-            alert("Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty));
+            // FORMULA: AllowedQty = SVO_Qty − RealReceivedQty
+            alert("Freight Qty Allowed: " + (jisvoiQty - realReceivedQty));
             setTimeout(function () {
-                row.find(".Qty").focus().select();
-                row.find(".Freight_ServiceOrder_Number").val("0");
+                row.find(".JIRNI_Qty").focus().select();
+                row.find(".JIRNI_JIFRT_SVOH_Number").val("0");
             }, 300);
         }
     });
 }
 
-$(document).on("change", ".Freight_ServiceOrder_Number", function () {
+$(document).on("change", ".JIRNI_JIFRT_SVOH_Number", function () {
 
     let row = $(this).closest("tr");
     let selectedJisvoi = $(this).find("option:selected").attr("data-jisvoi") || 0;
@@ -1223,19 +1224,19 @@ $(document).on("change", ".Freight_ServiceOrder_Number", function () {
 });
 
 
-$(document).on("focusout", ".Qty", function () {
+$(document).on("focusout", ".JIRNI_Qty", function () {
     CheckFreightQtyExceeded($(this).closest("tr"));
 });
 
 //#region Receipt Note Number
 
 //#region Receipt Note Number
-$(document).on("change", "#RN_Date", function () {
+$(document).on("change", "#JIRNH_RN_Date", function () {
     GetReceiptNoteNumber();
 });
 function GetReceiptNoteNumber() {
 
-    let date = $("#RN_Date").val();
+    let date = $("#JIRNH_RN_Date").val();
 
     if (!date)
         return;
@@ -1246,14 +1247,14 @@ function GetReceiptNoteNumber() {
         data: { RNDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-                alert("Please set numbering for this date range.");
-                $("#RN_No").val("");
+              //  alert("Please set numbering for this date range.");
+                $("#JIRNH_RN_No").val("");
                 DateBind();
 
                 return;
             }
 
-            $("#RN_No").val(response);
+            $("#JIRNH_RN_No").val(response);
 
         },
         error: function () {
@@ -1266,49 +1267,49 @@ function GetReceiptNoteNumber() {
 function validateHeaderById_RN() {
 
     // 1. Receipt Note No
-    if ($("#RN_No").val().trim() === "") {
-        showAlert('Receipt Note No. is required', '#RN_No');
+    if ($("#JIRNH_RN_No").val().trim() === "") {
+        showAlert('Receipt Note No. is required', '#JIRNH_RN_No');
         return false;
     }
 
     // 2. Receipt Note Date
-    if ($("#RN_Date").val().trim() === "") {
-        showAlert('Receipt Note Date is required', '#RN_Date');
+    if ($("#JIRNH_RN_Date").val().trim() === "") {
+        showAlert('Receipt Note Date is required', '#JIRNH_RN_Date');
         return false;
     }
 
     // 3. Customer DC No
-    if ($("#JW_CustomerDC_No").val().trim() === "") {
-        showAlert('Customer DC No. is required', '#JW_CustomerDC_No');
+    if ($("#JIRNH_JW_CustomerDC_No").val().trim() === "") {
+        showAlert('Customer DC No. is required', '#JIRNH_JW_CustomerDC_No');
         return false;
     }
 
     // 4. Customer DC Date
-    if ($("#JW_CustomerDC_Date").val().trim() === "") {
-        showAlert('Customer DC Date is required', '#JW_CustomerDC_Date');
+    if ($("#JIRNH_JW_CustomerDC_Date").val().trim() === "") {
+        showAlert('Customer DC Date is required', '#JIRNH_JW_CustomerDC_Date');
         return false;
     }
 
     // 5. Material Segregation
-    if ($("#MS_Number").val() === "" || $("#MS_Number").val() === "0") {
-        showAlert('Material Segregation is required', '#MS_Number');
+    if ($("#JIRNH_MS_Number").val() === "" || $("#JIRNH_MS_Number").val() === "0") {
+        showAlert('Material Segregation is required', '#JIRNH_MS_Number');
         return false;
     }
 
     // 6. Job Work Customer
-    if ($("#JWC_Number").val() === "" || $("#JWC_Number").val() === "0") {
+    if ($("#JIRNH_JWC_Number").val() === "" || $("#JIRNH_JWC_Number").val() === "0") {
         showAlert('Job Work Customer is required', '#JWC_Name');
         return false;
     }
 
     // 7. Warehouse
-    if ($("#WH_Number").val() === "" || $("#WH_Number").val() === "0") {
-        showAlert('Warehouse is required', '#WH_Number');
+    if ($("#JIRNH_WH_Number").val() === "" || $("#JIRNH_WH_Number").val() === "0") {
+        showAlert('Warehouse is required', '#JIRNH_WH_Number');
         return false;
     }
-     
 
-   
+
+
     if (!validateItemGrid_RN()) {
         return false;
     }
@@ -1318,7 +1319,7 @@ function validateHeaderById_RN() {
     if (!ValidateItemBatches_RN()) {
         return false;
     }
-   
+
 
     return true;
 }
@@ -1335,11 +1336,11 @@ function validateItemGrid_RN() {
         if (row.attr("id") === "TempRow")
             return;
 
-        let prsNumber = row.find(".PRS_Number").val();
+        let prsNumber = row.find(".JIRNI_PRS_Number").val();
         let itemCode = row.find(".Item_Code").val();
-        let warehouse = row.find(".WH_Number").val();
-        let uom = row.find(".UoM_Number").val();
-        let qty = row.find(".Qty").val();
+        let warehouse = row.find(".JIRNI_WH_Number").val();
+        let uom = row.find(".JIRNI_UoM_Number").val();
+        let qty = row.find(".JIRNI_Qty").val();
 
         // Has user started entering this row?
         let isRowStarted =
@@ -1358,7 +1359,7 @@ function validateItemGrid_RN() {
         // Process
         if (!prsNumber || prsNumber.trim() === "") {
 
-            showAlert("Process is required.", row.find(".PRS_Number"));
+            showAlert("Process is required.", row.find(".JIRNI_PRS_Number"));
             isValid = false;
             return false;
         }
@@ -1374,7 +1375,7 @@ function validateItemGrid_RN() {
         // Warehouse
         if (!warehouse || warehouse === "0") {
 
-            showAlert("Warehouse is required.", row.find(".WH_Number"));
+            showAlert("Warehouse is required.", row.find(".JIRNI_WH_Number"));
             isValid = false;
             return false;
         }
@@ -1382,7 +1383,7 @@ function validateItemGrid_RN() {
         // UOM
         if (!uom || uom === "0") {
 
-            showAlert("UOM is required.", row.find(".UoM_Number"));
+            showAlert("UOM is required.", row.find(".JIRNI_UoM_Number"));
             isValid = false;
             return false;
         }
@@ -1390,27 +1391,27 @@ function validateItemGrid_RN() {
         // Qty
         if (!qty || qty.trim() === "" || parseFloat(qty) <= 0) {
 
-            showAlert("Qty is required.", row.find(".Qty"));
+            showAlert("Qty is required.", row.find(".JIRNI_Qty"));
             isValid = false;
             return false;
         }
 
         // NEW: Freight Applicable - From WH / To WH mandatory
-        if (row.find(".Freight_Applicable").is(":checked")) {
+        if (row.find(".JIRNI_IsFreightApplicable").is(":checked")) {
 
-            let fromWH = row.find(".FromWH").val();
-            let toWH = row.find(".ToWH").val();
+            let fromWH = row.find(".JIRNI_FromWH").val();
+            let toWH = row.find(".JIRNI_ToWH").val();
 
             if (!fromWH || fromWH.trim() === "" || fromWH === "0") {
 
-                showAlert("From WH is required.", row.find(".FromWH"));
+                showAlert("From WH is required.", row.find(".JIRNI_FromWH"));
                 isValid = false;
                 return false;
             }
 
             if (!toWH || toWH.trim() === "" || toWH === "0") {
 
-                showAlert("To WH is required.", row.find(".ToWH"));
+                showAlert("To WH is required.", row.find(".JIRNI_ToWH"));
                 isValid = false;
                 return false;
             }
@@ -1453,12 +1454,12 @@ function ValidateItemBatches_RN() {
             if (batch.RNI_BCH_IsDeleted === "true")
                 continue;
 
-            let qty = parseFloat(batch.RNI_BCH_Qty) || 0;
-            let unitPrice = parseFloat(batch.RNI_BCH_UnitPrice) || 0;
+            let qty = parseFloat(batch.JIRNI_BCH_BatchQty) || 0;
+            let unitPrice = parseFloat(batch.JIRNI_BCH_BatchUnitPrice) || 0;
 
             // Ignore completely empty row
-            if (!batch.RNI_BCH_Date &&
-                !batch.RNI_BCH_No &&
+            if (!batch.JIRNI_BCH_BatchDate &&
+                !batch.JIRNI_BCH_Number &&
                 qty === 0 &&
                 unitPrice === 0) {
 
@@ -1467,20 +1468,20 @@ function ValidateItemBatches_RN() {
             }
 
             // Qty entered without Batch Number
-            if (!batch.RNI_BCH_No && qty > 0) {
+            if (!batch.JIRNI_BCH_Number && qty > 0) {
 
                 showAlert("Please enter Batch Number.");
                 return false;
             }
 
             // Remove row if Batch Number is empty
-            if (!batch.RNI_BCH_No) {
+            if (!batch.JIRNI_BCH_Number) {
 
                 item.batchValues.splice(j, 1);
                 continue;
             }
 
-            if (!batch.RNI_BCH_Date) {
+            if (!batch.JIRNI_BCH_BatchDate) {
 
                 showAlert("Please enter Batch Date.");
                 return false;
@@ -1534,7 +1535,7 @@ function IBatNewRow() {
     var previousRow = $("#IBatTableBody tr.IBatNewRow:last");
 
     var unitPrice = previousRow.length
-        ? previousRow.find(".RNI_BCH_UnitPrice").val()
+        ? previousRow.find(".JIRNI_BCH_BatchUnitPrice").val()
         : "";
 
     var itemNumber = previousRow.length
@@ -1561,39 +1562,38 @@ function IBatNewRow() {
         .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_Item_WH")
         .val(warehouse);
 
-    row.find("input.RNI_BCH_Date")
-        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_Date");
+    row.find("input.JIRNI_BCH_BatchDate")
+        .attr("name", "ItemBatch[" + browCount + "].JIRNI_BCH_BatchDate");
 
-    row.find("input.RNI_BCH_No")
-        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_No");
+    row.find("input.JIRNI_BCH_Number")
+        .attr("name", "ItemBatch[" + browCount + "].JIRNI_BCH_Number");
 
-    row.find("input.RNI_BCH_Qty")
-        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_Qty");
+    row.find("input.JIRNI_BCH_BatchQty")
+        .attr("name", "ItemBatch[" + browCount + "].JIRNI_BCH_BatchQty");
 
-    row.find("input.RNI_BCH_UnitPrice")
-        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_UnitPrice")
+    row.find("input.JIRNI_BCH_BatchUnitPrice")
+        .attr("name", "ItemBatch[" + browCount + "].JIRNI_BCH_BatchUnitPrice")
         .val(unitPrice)
         .prop("readonly", true);
 
-    row.find("input.RNI_BCH_Value")
-        .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_Value");
+    row.find("input.JIRNI_BCH_BatchValue")
+        .attr("name", "ItemBatch[" + browCount + "].JIRNI_BCH_BatchValue");
 
     row.find("input.RNI_BCH_IsDeleted")
         .attr("name", "ItemBatch[" + browCount + "].RNI_BCH_IsDeleted")
         .val("false");
-
     $("#IBatTableBody").append(row);
 
     row.data("isValid", false);
 
-    row.find(".RNI_BCH_No").focus();
+    row.find(".JIRNI_BCH_Number").focus();
 
     return row;
 }
 
 function autoAddRow_F(currentRow) {
 
-    let qty = parseFloat(currentRow.find(".Qty").val()) || 0;
+    let qty = parseFloat(currentRow.find(".JIRNI_Qty").val()) || 0;
 
     let itemCode = currentRow.find(".Item_Code").val();
 
@@ -1617,7 +1617,7 @@ function autoAddRow_F(currentRow) {
 }
 //#endregion
 
-$(document).on("focusout", "#IBatTableBody .RNI_BCH_Qty", function () {
+$(document).on("focusout", "#IBatTableBody .JIRNI_BCH_BatchQty", function () {
 
     let currentRow = $(this).closest("tr");
 
@@ -1631,7 +1631,7 @@ $(document).on("focusout", "#IBatTableBody .RNI_BCH_Qty", function () {
     // If current row is the last row, add new batch row
     if (currentRow.is(lastRow)) {
 
-      //  IBatNewRow();
+        //  IBatNewRow();
     }
 
 });
@@ -1649,7 +1649,7 @@ $("#AddRowButton").on("click", function () {
 
         let el = $(this);
 
-   
+
 
         // Item Code
         if (el.hasClass("Item_Code")) {
@@ -1661,7 +1661,7 @@ $("#AddRowButton").on("click", function () {
         }
 
         // Qty
-        if (el.hasClass("Qty")) {
+        if (el.hasClass("JIRNI_Qty")) {
             if ($.trim(el.val()) === "" || parseFloat(el.val()) <= 0) {
                 isValid = false;
                 el.focus();
@@ -1670,7 +1670,7 @@ $("#AddRowButton").on("click", function () {
         }
 
         // Unit Price
-        if (el.hasClass("UnitPrice")) {
+        if (el.hasClass("JIRNI_UnitPrice")) {
             if ($.trim(el.val()) === "" || parseFloat(el.val()) <= 0) {
                 isValid = false;
                 el.focus();
@@ -1680,7 +1680,7 @@ $("#AddRowButton").on("click", function () {
 
     });
 
-   
+
 
     // Clone template row
     let $newRow = $("#TempRow").clone();
@@ -1710,7 +1710,7 @@ $("#AddRowButton").on("click", function () {
                 el.hasClass("Width") ||
                 el.hasClass("MaterialGrade") ||
                 el.hasClass("ItemGroup") ||
-                el.hasClass("Amount")
+                el.hasClass("JIRNI_Amount")
             ) {
                 el.val("");
             }
@@ -1744,7 +1744,7 @@ $("#AddRowButton").on("click", function () {
     // Recalculate footer
     calculateTotal_rn();
     SetTableHeight();
-   
+
 });
 
 //#endregion
@@ -1766,7 +1766,7 @@ function ClearAll() {
                 $(this).val("");
             }
         });
-    $("#ItemTable tbody tr.NewRow").remove(); 
+    $("#ItemTable tbody tr.NewRow").remove();
     $(".jwcustomer-search-results").hide().html("");
 
 }
@@ -1782,8 +1782,8 @@ function calculateTotal_rn() {
 
     $("#ItemTable tbody tr.NewRow:visible").each(function () {
 
-        let qty = parseFloat(($(this).find(".Qty").val() || "0").replace(/,/g, "")) || 0;
-        let amount = parseFloat(($(this).find(".Amount").val() || "0").replace(/,/g, "")) || 0;
+        let qty = parseFloat(($(this).find(".JIRNI_Qty").val() || "0").replace(/,/g, "")) || 0;
+        let amount = parseFloat(($(this).find(".JIRNI_Amount").val() || "0").replace(/,/g, "")) || 0;
 
         totalQty += qty;
         totalAmount += amount;
@@ -1796,13 +1796,19 @@ function calculateTotal_rn() {
 //#endregion Calculate Total
 
 function CalculateQtyKg(row) {
-    let qty = parseFloat((row.find(".Qty").val() || "0").replace(/,/g, "")) || 0;
-    let fromQty = parseFloat(row.find(".FromQty").val()) || 0;
-    let toQty = parseFloat(row.find(".ToQty").val()) || 0;
+    let qty = parseFloat((row.find(".JIRNI_Qty").val() || "0").replace(/,/g, "")) || 0;
+    let uomText = row.find(".JIRNI_UoM_Number option:selected").text().trim().toUpperCase();
 
-    let qtyKg = fromQty > 0 ? (qty * (toQty / fromQty)) : 0;
+    let qtyKg;
+    if (uomText === "KGS") {
+        qtyKg = qty * 1;
+    } else {
+        let fromQty = parseFloat(row.find(".FromQty").val()) || 0;
+        let toQty = parseFloat(row.find(".ToQty").val()) || 0;
+        qtyKg = fromQty > 0 ? (qty * (toQty / fromQty)) : 0;
+    }
 
-    row.find(".Qty_Kg").val(qtyKg === 0 ? "" : qtyKg.toFixed(2));
+    row.find(".JIRNI_Qty_Kgs").val(qtyKg === 0 ? "" : qtyKg.toFixed(2));
 }
 
 //#region item grid fetch item details
@@ -1814,11 +1820,11 @@ function OnFocus(inputElement) {
 
     $(inputElement).data("oldItemCode", $(inputElement).val());
     $(inputElement).data("oldItemNumber",
-        $(inputElement).closest("tr").find(".Item_Number").val());
+        $(inputElement).closest("tr").find(".JIRNI_Item_Number").val());
 
     OpenItemCodeSearch(inputElement);
 }
- 
+
 function searchItemJIDNI(inputElement) {
     if (itemSearchXHR) itemSearchXHR.abort()
     let itemCode = inputElement.value.trim();
@@ -1826,11 +1832,11 @@ function searchItemJIDNI(inputElement) {
 
     let resultsDiv = $("#RightPane_Item").find(".search-results");
 
-    let material = $("#MS_Number").val();
+    let material = $("#JIRNH_MS_Number").val();
 
     if (!material) return;
 
-   itemSearchXHR= $.ajax({
+    itemSearchXHR = $.ajax({
         url: '/jobinward/transactions/conversion/item',
         type: 'GET',
         data: {
@@ -1886,7 +1892,7 @@ function searchItemJIDNI(inputElement) {
                         $("#ItemMessage").hide().text("");
 
                         row.find(".Item_Code").val(item.itemCode);
-                        row.find(".Item_Number").val(item.itemNumber);
+                        row.find(".JIRNI_Item_Number").val(item.itemNumber);
 
                         $(inputElement).data("oldItemCode", item.itemCode);
                         $(inputElement).data("oldItemNumber", item.itemNumber);
@@ -1899,8 +1905,8 @@ function searchItemJIDNI(inputElement) {
                         row.find(".MaterialGrade").val(item.materialGrade);
                         row.find(".ItemGroup").val(item.itemGroup);
 
-                        row.find(".UoM_Number").val(item.uoM);
-                        row.find(".WH_Number").val(item.saleWarehouse);
+                        row.find(".JIRNI_UoM_Number").val(item.uoM);
+                        row.find(".JIRNI_WH_Number").val(item.saleWarehouse);
 
                         // NEW: Qty to Kg conversion - fetch FromQty/ToQty
                         $.ajax({
@@ -1914,8 +1920,8 @@ function searchItemJIDNI(inputElement) {
                             }
                         });
 
-                        let qtyInput = row.find(".Qty");
-                        let qtyUnitprice = row.find(".UnitPrice");
+                        let qtyInput = row.find(".JIRNI_Qty");
+                        let qtyUnitprice = row.find(".JIRNI_UnitPrice");
 
                         qtyInput.focus();
 
@@ -2024,13 +2030,13 @@ function searchItemJIDNI(inputElement) {
 
 
 //#region JW Customer Search Functions
- 
+
 function OnBuyerSelectCall(inputElement) {
-   
-    OnBuyerSelect(inputElement, "#RightPane",".buyer-search-results");
+
+    OnBuyerSelect(inputElement, "#RightPane", ".buyer-search-results");
 }
 function OnBuyerInput(inputElement) {
-     
+
     SearchBuyer(inputElement);
 }
 
@@ -2041,16 +2047,16 @@ function OnBuyerInput(inputElement) {
         return;
     }
     SearchBuyer(inputElement);
-     
+
 }
- 
+
 let buyerSearchXHR = null;
 
 function SearchBuyer(inputElement) {
 
     var buyer = inputElement.value;
     buyer = buyer.trim();
-    var rnDate = $("#RN_Date").val();
+    var rnDate = $("#JIRNH_RN_Date").val();
 
     var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
@@ -2077,7 +2083,7 @@ function SearchBuyer(inputElement) {
 
                 $("#RightPane").addClass("show");   // <-- Add this line
                 resultsDiv.show();
-                let selectedIndex = -1;  
+                let selectedIndex = -1;
                 var table = $(`
 <div class="card-body modal-content batchPopup p-0"
      style="z-index:999;">
@@ -2097,9 +2103,9 @@ function SearchBuyer(inputElement) {
 
                     var row = $("<tr></tr>").css("height", "24px");
                     row.data("customer", cust);
-                    row.append("<td>" + cust.cuS_Name + "</td>");                 
-                   
-                    table.find("tbody").append(row);              
+                    row.append("<td>" + cust.cuS_Name + "</td>");
+
+                    table.find("tbody").append(row);
 
                 });
                 // List box – click or Enter: select record → move to textbox
@@ -2114,10 +2120,10 @@ function SearchBuyer(inputElement) {
                     SelectBuyer(
                         clickedCust,
                         "#JWC_Name",
-                        "#JWC_Number",
+                        "#JIRNH_JWC_Number",
                         "#Currency_Name",
-                        "#Currency_Number",
-                        "#WH_Number",
+                        "#JIRNH_Currency_Number",
+                        "#JIRNH_WH_Number",
                         "#RightPane",
                         ".buyer-search-results"
                     );
@@ -2156,7 +2162,7 @@ function SearchBuyer(inputElement) {
         box-sizing:border-box;">
 </div>
 `);
-             
+
                 //#region search logic highlight
 
                 // Store all rows
@@ -2200,7 +2206,7 @@ function SearchBuyer(inputElement) {
                 }
 
                 //#endregion
-             
+
             } else {
                 resultsDiv.append(GetBuyerEmptyView());
                 $("#RightPane").addClass("show");

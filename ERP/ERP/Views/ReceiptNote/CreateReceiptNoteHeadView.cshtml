@@ -92,42 +92,42 @@
     <div class="row">
         <div class="col-12 col-md-3">
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                 <div class="col-md-6 col-lg-7">
-                    <input asp-for="RN_No" class="form-control Key KeyDup" autocomplete="off"   />
+                    <input asp-for="JIRNH_RN_No" class="form-control Key KeyDup" autocomplete="off" />
                 </div>
             </div>
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="RN_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_RN_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                 <div class="col-md-6 col-lg-7">
-                    <input asp-for="RN_Date" class="form-control Key datepicker" autocomplete="off" />
+                    <input asp-for="JIRNH_RN_Date" class="form-control Key datepicker" autocomplete="off" />
                 </div>
             </div>
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                 <div class="col-md-6 col-lg-7">
-                    <input asp-for="JW_CustomerDC_No" class="form-control Key KeyDup" autocomplete="off"   />
+                    <input asp-for="JIRNH_JW_CustomerDC_No" class="form-control Key KeyDup" autocomplete="off" />
                 </div>
             </div>
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="JW_CustomerDC_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_JW_CustomerDC_Date" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                 <div class="col-md-6 col-lg-7">
-                    <input asp-for="JW_CustomerDC_Date" class="form-control Key datepicker" autocomplete="off" />
+                    <input asp-for="JIRNH_JW_CustomerDC_Date" class="form-control Key datepicker" autocomplete="off" />
                 </div>
             </div>
           
         </div>
         <div class="col-12 col-md-3">
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                 <div class="col-md-6 col-lg-7">
-                    <select asp-for="MS_Number" class="form-select MS_Number" asp-items="@ViewBag.MaterialSegregation"></select>
+                    <select asp-for="JIRNH_MS_Number" class="form-select JIRNH_MS_Number" asp-items="@ViewBag.MaterialSegregation"></select>
                 </div>
             </div>
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="JWC_Number" class="col-sm-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_JWC_Number" class="col-sm-5 col-form-label ps-0"></label>
                 <div class="col-sm-7">
-                    <input asp-for="JWC_Number" class="form-control" type="hidden" />
+                    <input asp-for="JIRNH_JWC_Number" class="form-control" type="hidden" />
                   
                     <input asp-for="JWC_Name" class="form-control" autocomplete="off" oninput="OnBuyerInput(this)" onfocus="OnBuyerFocus(this)" />
                     <div class="buyer-search-results bg-primary card" style="display:none"></div>
@@ -136,30 +136,30 @@
         </div>
         <div class="col-12 col-md-3">
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="Currency_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
-                <input asp-for="Currency_Number" class="form-control" type="hidden" />
+                <label asp-for="JIRNH_Currency_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                <input asp-for="JIRNH_Currency_Number" class="form-control" type="hidden" />
                 <div class="col-md-6 col-lg-7">
                     <input asp-for="Currency_Name" class="form-control Key KeyDup" autocomplete="off" readonly />
                 </div>
             </div>
       
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="WH_Number" class="col-sm-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_WH_Number" class="col-sm-5 col-form-label ps-0"></label>
                 <div class="col-sm-7">
-                    <select asp-for="WH_Number" class="form-select" onchange="SearchGST()" asp-items="@ViewBag.Warehouse"></select>
+                    <select asp-for="JIRNH_WH_Number" class="form-select" onchange="SearchGST()" asp-items="@ViewBag.Warehouse"></select>
                     @{
                         if (Model != null)
                         {
-                            // <input asp-for="SIH_HIDE_TCT_Number" class="form-control" type="hidden" value="@Model.Currency_Number" />
+                            // <input asp-for="SIH_HIDE_TCT_Number" class="form-control" type="hidden" value="@Model.JIRNH_Currency_Number" />
                         }
                     }
                     <div class="cluster-results dropdown-results search-results bg-primary p-2" style="display:none"></div>
                 </div>
             </div>
             <div class="row align-items-center px-2 mb-1">
-                <label asp-for="Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                <label asp-for="JIRNH_Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                 <div class="col-md-6 col-lg-7">
-                    <input asp-for="Remarks" class="form-control Key KeyDup" autocomplete="off"  />
+                    <input asp-for="JIRNH_Remarks" class="form-control Key KeyDup" autocomplete="off" />
                 </div>
             </div>
         </div>
@@ -210,7 +210,7 @@
     }
     async function SearchBuyer(inputElement) {
         var Buyer = inputElement.value;
-        var SIHDate = $("#RN_Date").val();
+        var SIHDate = $("#JIRNH_RN_Date").val();
         var resultsDiv = $(inputElement).next('.buyer-search-results');
         // var isChecked = $("#SIH_ExportOrder").prop("checked");
         var Export;
@@ -239,17 +239,17 @@
 
                         row.on('click', function () {
                             $(inputElement).val(Buy.cuS_Name);
-                             // $("#JWC_Number").val(Buy.cuS_Number)
-                            $("#JWC_Number").val(Buy.cuS_Number)
+                             // $("#JIRNH_JWC_Number").val(Buy.cuS_Number)
+                            $("#JIRNH_JWC_Number").val(Buy.cuS_Number)
                            $("#JWC_Name").val(Buy.cuS_Name);
                                 $("#Currency_Name").val(Buy.cuS_CUR_Name)
-                            $("#Currency_Number").val(Buy.cuS_CUR_Number)
+                            $("#JIRNH_Currency_Number").val(Buy.cuS_CUR_Number)
                             $("#SIH_CUR_Number").val(Buy.cuS_CUR_Number)
                             $("#SIH_BUY_LOC_Number").val(Buy.cuS_LOC_Number)
                             $("#SIH_CUR_DecimalPlaces").val(Buy.cuS_CUR_DecimalPlaces)
                             $("#SIH_WHT_Number").val(Buy.cuS_WHT_Number)
                             
-                               $("#WH_Number").val(Buy.cuS_WH_Number)
+                               $("#JIRNH_WH_Number").val(Buy.cuS_WH_Number)
                             resultsDiv.hide();
 
                             // SearchClustor(Buy.buY_Number, Buy.buY_TCT_Number);
@@ -279,218 +279,218 @@
     }
 </script>
 <script>
-    function showAlert(message, focusSelector = null) {
-        $('#AlertMessage').html(message);
+       function showAlert(message, focusSelector = null) {
+           $('#AlertMessage').html(message);
 
-        const modal = new bootstrap.Modal(document.getElementById('ModelAlert'));
-        modal.show();
+           const modal = new bootstrap.Modal(document.getElementById('ModelAlert'));
+           modal.show();
 
-        $('#ModelAlert').off('hidden.bs.modal').on('hidden.bs.modal', function () {
-            if (focusSelector) {
-                setTimeout(() => $(focusSelector).focus(), 100);
-            }
-        });
-    } 
-
-
-       $("#MS_Number").change(function () {
-
-        // Check whether any visible row contains item
-        let hasItem = $("tr.NewRow").filter(function () {
-
-            let row = $(this);
-
-            let isDeleted = row.find(".IsDeleted").val() === "true";
-
-            let itemNumber = row.find(".Item_Number").val();
-
-            return !isDeleted &&
-                   itemNumber &&
-                   itemNumber.trim() !== "";
-
-        }).length > 0;
+           $('#ModelAlert').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+               if (focusSelector) {
+                   setTimeout(() => $(focusSelector).focus(), 100);
+               }
+           });
+       }
 
 
-        // No items → allow directly
-        if (!hasItem)
-            return;
+          $("#JIRNH_MS_Number").change(function () {
+
+           // Check whether any visible row contains item
+           let hasItem = $("tr.NewRow").filter(function () {
+
+               let row = $(this);
+
+               let isDeleted = row.find(".IsDeleted").val() === "true";
+
+               let itemNumber = row.find(".Item_Number").val();
+
+               return !isDeleted &&
+                      itemNumber &&
+                      itemNumber.trim() !== "";
+
+           }).length > 0;
 
 
-        // Confirmation
-        if (confirm("Changing this will clear all grid values. Continue?")) {
-
-            $("tr.NewRow").each(function () {
-
-                let row = $(this);
-
-                // Clear all inputs except delete flag
-                row.find("input")
-                   .not(".IsDeleted")
-                   .val("");
-
-                // Reset dropdowns
-                row.find("select")
-                   .prop("selectedIndex", 0);
-
-                // Reset delete flag
-                row.find(".IsDeleted")
-                   .val("false");
-
-            });
-
-        }
-        else {
-
-            // Restore previous value
-            $(this).val($(this).data("old"));
-
-        }
-
-    });
+           // No items → allow directly
+           if (!hasItem)
+               return;
 
 
-       $('form').submit(function (e) {
+           // Confirmation
+           if (confirm("Changing this will clear all grid values. Continue?")) {
 
-        // ================= HEADER VALIDATION =================
-        let validations = [
-            { field: '#RN_No', message: 'Receipt No required' },
-            { field: '#RN_Date', message: 'Receipt Date required' },
-            { field: '#JW_CustomerDC_No', message: 'Customer DC No required' },
-            { field: '#MS_Number', message: 'Select Material Segregation' },
-            { field: '#JWC_Name', message: 'Select JW Customer' },
-            { field: '#WH_Number', message: 'Select Warehouse' }
-        ];
+               $("tr.NewRow").each(function () {
 
-        for (let i = 0; i < validations.length; i++) {
+                   let row = $(this);
 
-            let item = validations[i];
+                   // Clear all inputs except delete flag
+                   row.find("input")
+                      .not(".IsDeleted")
+                      .val("");
 
-            if (!$(item.field).val()) {
-                showAlert(item.message, item.field);
-                e.preventDefault();
-                return false;
-            }
-        }
+                   // Reset dropdowns
+                   row.find("select")
+                      .prop("selectedIndex", 0);
 
-        // ================= GRID VALIDATION =================
-        let hasRow = false;
+                   // Reset delete flag
+                   row.find(".IsDeleted")
+                      .val("false");
 
-        $('#ItemTable tbody tr.NewRow').each(function () {
+               });
 
-            let row = $(this);
+           }
+           else {
 
-            // Skip deleted rows
-            if (row.find('.IsDeleted').val() == "1") {
-                return;
-            }
+               // Restore previous value
+               $(this).val($(this).data("old"));
 
-            let item = row.find('.Item_Number').val();
-            let wh = row.find('.WH_Number').val();
-            let uom = row.find('.UoM_Number').val();
-            let process = row.find('.PRS_Number').val();
+           }
 
-            let qty = parseFloat(removeCommas(row.find('.Qty').val())) || 0;
-            let price = parseFloat(removeCommas(row.find('.UnitPrice').val())) || 0;
+       });
 
-            // ===== Skip validation for empty row =====
-            let isEmptyRow =
-                !item &&
-                !wh &&
-                !uom &&
-                !process &&
-                qty <= 0 &&
-                price <= 0;
 
-            // Skip only if table has more than 1 row
-            if (isEmptyRow && $('#ItemTable tbody tr.NewRow').length > 1) {
-                return;
-            }
+          $('form').submit(function (e) {
 
-            hasRow = true;
+           // ================= HEADER VALIDATION =================
+           let validations = [
+               { field: '#JIRNH_RN_No', message: 'Receipt No required' },
+               { field: '#JIRNH_RN_Date', message: 'Receipt Date required' },
+               { field: '#JIRNH_JW_CustomerDC_No', message: 'Customer DC No required' },
+               { field: '#JIRNH_MS_Number', message: 'Select Material Segregation' },
+               { field: '#JWC_Name', message: 'Select JW Customer' },
+               { field: '#JIRNH_WH_Number', message: 'Select Warehouse' }
+           ];
 
-            if (!process) {
-                showAlert("Select Process", row.find('.PRS_Number'));
-                e.preventDefault();
-                return false;
-            }
+           for (let i = 0; i < validations.length; i++) {
 
-            if (!item) {
-                showAlert("Select Item", row.find('.Item_Code'));
-                e.preventDefault();
-                return false;
-            }
+               let item = validations[i];
 
-            if (!wh) {
-                showAlert("Select Warehouse in row", row.find('.WH_Number'));
-                e.preventDefault();
-                return false;
-            }
+               if (!$(item.field).val()) {
+                   showAlert(item.message, item.field);
+                   e.preventDefault();
+                   return false;
+               }
+           }
 
-            if (!uom) {
-                showAlert("Select UoM in row", row.find('.UoM_Number'));
-                e.preventDefault();
-                return false;
-            }
+           // ================= GRID VALIDATION =================
+           let hasRow = false;
 
-            if (qty <= 0) {
-                showAlert("Enter valid Qty", row.find('.Qty'));
-                e.preventDefault();
-                return false;
-            }
+           $('#ItemTable tbody tr.NewRow').each(function () {
 
-            if (price <= 0) {
-                showAlert("Enter valid Unit Price", row.find('.UnitPrice'));
-                e.preventDefault();
-                return false;
-            }
-        });
+               let row = $(this);
 
-        // ================= ATLEAST ONE ROW =================
-        if (!hasRow) {
-            showAlert("Add at least one item");
-            e.preventDefault();
-            return false;
-        }
+               // Skip deleted rows
+               if (row.find('.IsDeleted').val() == "1") {
+                   return;
+               }
 
-        // ================= BATCH VALIDATION =================
-        BatchJSON();
-             var result = ValidateBatch();
+               let item = row.find('.Item_Number').val();
+               let wh = row.find('.JIRNH_WH_Number').val();
+               let uom = row.find('.UoM_Number').val();
+               let process = row.find('.PRS_Number').val();
 
-    let missing = result.MissingItems;
- //   let mismatch = result.MismatchItems;
+               let qty = parseFloat(removeCommas(row.find('.Qty').val())) || 0;
+               let price = parseFloat(removeCommas(row.find('.UnitPrice').val())) || 0;
 
-    // =========================
-    // ❌ Missing batches
-    // =========================
-    if (missing.length > 0) {
+               // ===== Skip validation for empty row =====
+               let isEmptyRow =
+                   !item &&
+                   !wh &&
+                   !uom &&
+                   !process &&
+                   qty <= 0 &&
+                   price <= 0;
 
-        showAlert(
-            "Batch missing for Item: " + missing.join(", ")
-        );
+               // Skip only if table has more than 1 row
+               if (isEmptyRow && $('#ItemTable tbody tr.NewRow').length > 1) {
+                   return;
+               }
 
-        e.preventDefault();
-        return false;
-    }
+               hasRow = true;
 
-    // =========================
-    // ❌ Batch qty mismatch
-    // =========================
-    // if (mismatch.length > 0) {
+               if (!process) {
+                   showAlert("Select Process", row.find('.PRS_Number'));
+                   e.preventDefault();
+                   return false;
+               }
 
-    //     showAlert(
-    //         "Batch Qty mismatch:\n" + mismatch.join("\n")
-    //     );
+               if (!item) {
+                   showAlert("Select Item", row.find('.Item_Code'));
+                   e.preventDefault();
+                   return false;
+               }
 
-    //     e.preventDefault();
-    //     return false;
-    // }
+               if (!wh) {
+                   showAlert("Select Warehouse in row", row.find('.JIRNH_WH_Number'));
+                   e.preventDefault();
+                   return false;
+               }
+
+               if (!uom) {
+                   showAlert("Select UoM in row", row.find('.UoM_Number'));
+                   e.preventDefault();
+                   return false;
+               }
+
+               if (qty <= 0) {
+                   showAlert("Enter valid Qty", row.find('.Qty'));
+                   e.preventDefault();
+                   return false;
+               }
+
+               if (price <= 0) {
+                   showAlert("Enter valid Unit Price", row.find('.UnitPrice'));
+                   e.preventDefault();
+                   return false;
+               }
+           });
+
+           // ================= ATLEAST ONE ROW =================
+           if (!hasRow) {
+               showAlert("Add at least one item");
+               e.preventDefault();
+               return false;
+           }
+
+           // ================= BATCH VALIDATION =================
+           BatchJSON();
+                var result = ValidateBatch();
+
+       let missing = result.MissingItems;
+    //   let mismatch = result.MismatchItems;
+
+       // =========================
+       // ❌ Missing batches
+       // =========================
+       if (missing.length > 0) {
+
+           showAlert(
+               "Batch missing for Item: " + missing.join(", ")
+           );
+
+           e.preventDefault();
+           return false;
+       }
+
+       // =========================
+       // ❌ Batch qty mismatch
+       // =========================
+       // if (mismatch.length > 0) {
+
+       //     showAlert(
+       //         "Batch Qty mismatch:\n" + mismatch.join("\n")
+       //     );
+
+       //     e.preventDefault();
+       //     return false;
+       // }
 
       
-    });
+       });
 </script>
 <script>
-       $(document).on('change', "#RN_Date", function () {
-               var PIHDate = $("#RN_Date").val();
+       $(document).on('change', "#JIRNH_RN_Date", function () {
+               var PIHDate = $("#JIRNH_RN_Date").val();
 
     if (!PIHDate) return;
 
@@ -515,9 +515,9 @@
             success: function (data) {
 
                 if (data !== "") {
-                    $('#RN_No').val(data);
+                    $('#JIRNH_RN_No').val(data);
                 } else {
-                    $('#RN_No').val("");
+                    $('#JIRNH_RN_No').val("");
                 }
             }
         });

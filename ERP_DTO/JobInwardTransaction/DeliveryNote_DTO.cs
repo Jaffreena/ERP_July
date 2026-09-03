@@ -127,6 +127,9 @@ namespace ERP_DTO.JobInwardTransaction
         [Display(Name = "Quantity")]
         public double JIDNI_Qty { get; set; }
 
+        [Display(Name = "Quantity (Kgs)")]
+        public double JIDNI_Qty_Kgs { get; set; }
+
         [Display(Name = "Unit Price")]
         public double JIDNI_UnitPrice { get; set; }
 
@@ -135,7 +138,7 @@ namespace ERP_DTO.JobInwardTransaction
 
         [Display(Name = "JW Invoice Tracking")]
         [StringLength(3)]
-        public string JIDNI_JW_InvoiceTracking { get; set; }
+        public string JIDNI_IsJW_InvoiceApplicable { get; set; }
 
         public string? JIDNI_JW_ProcessName { get; set; }
         public string? JIDNI_JW_ItemName { get; set; }
@@ -165,19 +168,25 @@ namespace ERP_DTO.JobInwardTransaction
         public string? JIDNI_IsDeleted { get; set; }
         public long? CustomerNumber { get; set; }
 
-        public long? JISVOH_Number { get; set; }
-        public long? JISVOI_Number { get; set; }
+        public long? JIDNI_JIJWI_SVOH_Number { get; set; }
+        public long? JIDNI_JIJWI_SVOI_Number { get; set; }
 
         [Display(Name = "Freight Applicable")]
         [StringLength(3)]
-        public string? Freight_Applicable { get; set; }
+        public string? JIDNI_IsFreightApplicable { get; set; }
 
         [Display(Name = "Freight No")]
-        public string? Freight_ServiceOrder_Number { get; set; }
+        public long? JIDNI_JIFRT_SVOH_Number { get; set; }
 
         // NEW: Freight SO Item ID — needed by
         // USP_CheckDeliveredQtyExceeded_Freight's DN-side calculation
-        public long? JISVOI_Number_FRT { get; set; }
+        public long? JIDNI_JIFRT_SVOI_Number { get; set; }
+
+        [Display(Name = "From Warehouse")]
+        public long? JIDNI_FromWH { get; set; }
+
+        [Display(Name = "To Warehouse")]
+        public long? JIDNI_ToWH { get; set; }
 
 
     }

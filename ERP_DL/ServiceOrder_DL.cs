@@ -139,5 +139,130 @@ namespace ERP_DL
 
             return SOList;
         }
+
+        #region register
+        public List<JIJWIServiceOrderSummary_DTO> JIJWISOSummaryList(DataTable Dt)
+        {
+            List<JIJWIServiceOrderSummary_DTO> SOList = new List<JIJWIServiceOrderSummary_DTO>();
+
+            foreach (DataRow dr in Dt.Rows)
+            {
+                SOList.Add(new JIJWIServiceOrderSummary_DTO
+                {
+                    JIJWI_SVOH_Number = Convert.ToInt64(dr["JIJWI_SVOH_Number"]),
+                    JIJWI_SVOH_RegNo = Convert.ToString(dr["JIJWI_SVOH_RegNo"]),
+                    JIJWI_SVOH_RegDate = Convert.ToDateTime(dr["JIJWI_SVOH_RegDate"]),
+                    JIJWI_SVOH_ServiceOrderNo = Convert.ToString(dr["JIJWI_SVOH_ServiceOrderNo"]),
+                    JIJWI_SVOH_ServiceOrderDate = Convert.ToDateTime(dr["JIJWI_SVOH_ServiceOrderDate"]),
+                    CUS_Name = Convert.ToString(dr["CUS_Name"]),
+                    CurrencyCode = Convert.ToString(dr["CurrencyCode"]),
+                    PRS_ProcessName = dr["Process"] == DBNull.Value ? "" : Convert.ToString(dr["Process"]),
+                    NoOfLineItems = Convert.ToInt32(dr["NoOfLineItems"]),
+                    Qty = MH.DecimalConvertQty(Convert.ToDouble(dr["Qty"])),
+                    Amount = Convert.ToDouble(dr["Amount"]),
+                    JCG_JW_CustomerGroup = Convert.ToString(dr["JCG_JW_CustomerGroup"]),
+                    JCC_JW_CustomerCategory = Convert.ToString(dr["JCC_JW_CustomerCategory"])
+                });
+            }
+            return SOList;
+        }
+
+        public List<JIJWIServiceOrderDetailed_DTO> JIJWISODetailedList(DataTable Dt)
+        {
+            List<JIJWIServiceOrderDetailed_DTO> SOList = new List<JIJWIServiceOrderDetailed_DTO>();
+
+            foreach (DataRow dr in Dt.Rows)
+            {
+                SOList.Add(new JIJWIServiceOrderDetailed_DTO
+                {
+                    JIJWI_SVOH_Number = dr["JIJWI_SVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["JIJWI_SVOH_Number"]),
+                    JIJWI_SVOH_RegNo = dr["JIJWI_SVOH_RegNo"] == DBNull.Value ? "" : Convert.ToString(dr["JIJWI_SVOH_RegNo"]),
+                    JIJWI_SVOH_RegDate = dr["JIJWI_SVOH_RegDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dr["JIJWI_SVOH_RegDate"]),
+                    JIJWI_SVOH_ServiceOrderNo = dr["JIJWI_SVOH_ServiceOrderNo"] == DBNull.Value ? "" : Convert.ToString(dr["JIJWI_SVOH_ServiceOrderNo"]),
+                    JIJWI_SVOH_ServiceOrderDate = dr["JIJWI_SVOH_ServiceOrderDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dr["JIJWI_SVOH_ServiceOrderDate"]),
+                    JIJWI_SVOH_JW_Customer_Number = dr["JIJWI_SVOH_JW_Customer_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["JIJWI_SVOH_JW_Customer_Number"]),
+                    CUS_JCG_Number = dr["CUS_JCG_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["CUS_JCG_Number"]),
+                    JCG_JW_CustomerGroup = dr["JCG_JW_CustomerGroup"] == DBNull.Value ? "" : Convert.ToString(dr["JCG_JW_CustomerGroup"]),
+                    JCC_JW_CustomerCategory = dr["JCC_JW_CustomerCategory"] == DBNull.Value ? "" : Convert.ToString(dr["JCC_JW_CustomerCategory"]),
+                    CUS_Name = dr["CUS_Name"] == DBNull.Value ? "" : Convert.ToString(dr["CUS_Name"]),
+                    CurrencyCode = dr["CurrencyCode"] == DBNull.Value ? "" : Convert.ToString(dr["CurrencyCode"]),
+                    JIJWI_SVOI_PRS_Number = dr["JIJWI_SVOI_PRS_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["JIJWI_SVOI_PRS_Number"]),
+                    JIJWI_SVOI_Item_Number = dr["JIJWI_SVOI_Item_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["JIJWI_SVOI_Item_Number"]),
+                    PRS_ProcessName = dr["Process"] == DBNull.Value ? "" : Convert.ToString(dr["Process"]),
+                    ItemGroup = dr["ItemGroup"] == DBNull.Value ? "" : Convert.ToString(dr["ItemGroup"]),
+                    ItemCode = dr["ItemCode"] == DBNull.Value ? "" : Convert.ToString(dr["ItemCode"]),
+                    ItemDescription = dr["ItemDescription"] == DBNull.Value ? "" : Convert.ToString(dr["ItemDescription"]),
+                    OuterDia = dr["OuterDia"] == DBNull.Value ? "" : Convert.ToString(dr["OuterDia"]),
+                    Thickness = dr["Thickness"] == DBNull.Value ? "" : Convert.ToString(dr["Thickness"]),
+                    ItemLength = dr["ItemLength"] == DBNull.Value ? "" : Convert.ToString(dr["ItemLength"]),
+                    ITM_Width = dr["ITM_Width"] == DBNull.Value ? "" : Convert.ToString(dr["ITM_Width"]),
+                    MaterialGrade = dr["MaterialGrade"] == DBNull.Value ? "" : Convert.ToString(dr["MaterialGrade"]),
+                    UOM = dr["UOM"] == DBNull.Value ? "" : Convert.ToString(dr["UOM"]),
+                    Qty = dr["JIJWI_SVOI_Qty"] == DBNull.Value ? "0" : MH.DecimalConvertQty(Convert.ToDouble(dr["JIJWI_SVOI_Qty"])),
+                    UnitPrice = dr.Table.Columns.Contains("JIJWI_SVOI_UnitPrice") && dr["JIJWI_SVOI_UnitPrice"] != DBNull.Value ? Convert.ToDouble(dr["JIJWI_SVOI_UnitPrice"]) : 0,
+                    Amount = dr["JIJWI_SVOI_Amount"] == DBNull.Value ? 0 : Convert.ToDouble(dr["JIJWI_SVOI_Amount"]),
+                    DeliveryDate = dr["JIJWI_SVOI_DeliveryDate"] == DBNull.Value ? null : Convert.ToDateTime(dr["JIJWI_SVOI_DeliveryDate"])
+                });
+            }
+            return SOList;
+        }
+
+        public List<JIFRTServiceOrderSummary_DTO> JIFRTSOSummaryList(DataTable Dt)
+        {
+            List<JIFRTServiceOrderSummary_DTO> SOList = new List<JIFRTServiceOrderSummary_DTO>();
+
+            foreach (DataRow dr in Dt.Rows)
+            {
+                SOList.Add(new JIFRTServiceOrderSummary_DTO
+                {
+                    JIFRT_SVOH_Number = Convert.ToInt64(dr["JIFRT_SVOH_Number"]),
+                    JIFRT_SVOH_RegNo = Convert.ToString(dr["JIFRT_SVOH_RegNo"]),
+                    JIFRT_SVOH_RegDate = Convert.ToDateTime(dr["JIFRT_SVOH_RegDate"]),
+                    JIFRT_SVOH_ServiceOrderNo = Convert.ToString(dr["JIFRT_SVOH_ServiceOrderNo"]),
+                    JIFRT_SVOH_ServiceOrderDate = Convert.ToDateTime(dr["JIFRT_SVOH_ServiceOrderDate"]),
+                    CUS_Name = Convert.ToString(dr["CUS_Name"]),
+                    CurrencyCode = Convert.ToString(dr["CurrencyCode"]),
+                    NoOfLineItems = Convert.ToInt32(dr["NoOfLineItems"]),
+                    Qty = MH.DecimalConvertQty(Convert.ToDouble(dr["Qty"])),
+                    Amount = Convert.ToDouble(dr["Amount"]),
+                    JCG_JW_CustomerGroup = Convert.ToString(dr["JCG_JW_CustomerGroup"]),
+                    JCC_JW_CustomerCategory = Convert.ToString(dr["JCC_JW_CustomerCategory"])
+                });
+            }
+            return SOList;
+        }
+
+        public List<JIFRTServiceOrderDetailed_DTO> JIFRTSODetailedList(DataTable Dt)
+        {
+            List<JIFRTServiceOrderDetailed_DTO> SOList = new List<JIFRTServiceOrderDetailed_DTO>();
+
+            foreach (DataRow dr in Dt.Rows)
+            {
+                SOList.Add(new JIFRTServiceOrderDetailed_DTO
+                {
+                    JIFRT_SVOH_Number = dr["JIFRT_SVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["JIFRT_SVOH_Number"]),
+                    JIFRT_SVOH_RegNo = dr["JIFRT_SVOH_RegNo"] == DBNull.Value ? "" : Convert.ToString(dr["JIFRT_SVOH_RegNo"]),
+                    JIFRT_SVOH_RegDate = dr["JIFRT_SVOH_RegDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dr["JIFRT_SVOH_RegDate"]),
+                    JIFRT_SVOH_ServiceOrderNo = dr["JIFRT_SVOH_ServiceOrderNo"] == DBNull.Value ? "" : Convert.ToString(dr["JIFRT_SVOH_ServiceOrderNo"]),
+                    JIFRT_SVOH_ServiceOrderDate = dr["JIFRT_SVOH_ServiceOrderDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(dr["JIFRT_SVOH_ServiceOrderDate"]),
+                    JIFRT_SVOH_JW_Customer_Number = dr["JIFRT_SVOH_JW_Customer_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["JIFRT_SVOH_JW_Customer_Number"]),
+                    CUS_JCG_Number = dr["CUS_JCG_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["CUS_JCG_Number"]),
+                    JCG_JW_CustomerGroup = dr["JCG_JW_CustomerGroup"] == DBNull.Value ? "" : Convert.ToString(dr["JCG_JW_CustomerGroup"]),
+                    JCC_JW_CustomerCategory = dr["JCC_JW_CustomerCategory"] == DBNull.Value ? "" : Convert.ToString(dr["JCC_JW_CustomerCategory"]),
+                    CUS_Name = dr["CUS_Name"] == DBNull.Value ? "" : Convert.ToString(dr["CUS_Name"]),
+                    CurrencyCode = dr["CurrencyCode"] == DBNull.Value ? "" : Convert.ToString(dr["CurrencyCode"]),
+                    JIFRT_SVOI_PRS_Number = dr["JIFRT_SVOI_PRS_Number"] == DBNull.Value ? 0 : Convert.ToInt64(dr["JIFRT_SVOI_PRS_Number"]),
+                    FromWH = dr["FromWH"] == DBNull.Value ? "" : Convert.ToString(dr["FromWH"]),
+                    ToWH = dr["ToWH"] == DBNull.Value ? "" : Convert.ToString(dr["ToWH"]),
+                    UOM = dr["UOM"] == DBNull.Value ? "" : Convert.ToString(dr["UOM"]),
+                    Qty = dr["JIFRT_SVOI_Qty"] == DBNull.Value ? "0" : MH.DecimalConvertQty(Convert.ToDouble(dr["JIFRT_SVOI_Qty"])),
+                    Rate = dr.Table.Columns.Contains("JIFRT_SVOI_Rate") && dr["JIFRT_SVOI_Rate"] != DBNull.Value ? Convert.ToDouble(dr["JIFRT_SVOI_Rate"]) : 0,
+                    Amount = dr["JIFRT_SVOI_Amount"] == DBNull.Value ? 0 : Convert.ToDouble(dr["JIFRT_SVOI_Amount"])
+                });
+            }
+            return SOList;
+        }
+        #endregion
+
     }
 }

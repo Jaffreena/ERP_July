@@ -865,5 +865,30 @@ namespace ERP.Controllers.JobworkInward
 
         #endregion
 
+        #region GET FREIGHT SERVICE ORDER (dropdown, own JIFRT_ServiceOrderHead/Item)
+
+        [HttpGet]
+        public JsonResult GetFreightServiceOrder(long customerId, string category)
+        {
+            FreightInvoice_DAO dao = new FreightInvoice_DAO();
+
+            var dt = dao.GetFreightServiceOrderDB(customerId, category).Tables[0];
+
+            return new JsonResult(
+                dt.AsEnumerable().Select(r => new
+                {
+                    value = r["JISVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOH_Number"]),
+                    text = r["JISVOH_ServiceOrderNo"]?.ToString() ?? "",
+                    jisvoiNumber = r["JISVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOI_Number"])
+                }).ToList(),
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                });
+        }
+
+        #endregion
+
     }
 }

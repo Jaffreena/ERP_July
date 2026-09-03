@@ -230,7 +230,7 @@ namespace ERP_DL
                                 JIDNI_Amount =
                                     Convert.ToDouble(item["JIDNI_Amount"]),
 
-                                JIDNI_JW_InvoiceTracking =
+                                JIDNI_IsJW_InvoiceApplicable =
                                     Convert.ToString(item["JIDNI_JW_InvoiceTracking"]),
                                 JIDNI_JW_ProcessName =
                                 Convert.ToString(item["JIDNI_JW_ProcessName"]),

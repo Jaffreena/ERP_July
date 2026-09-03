@@ -25,8 +25,8 @@ namespace ERP.Controllers.JobworkInward
             {
                 SH_DTO = System.Text.Json.JsonSerializer.Deserialize<ReceiptNoteHead_DTO>(SHto);
             }
-            SH_DTO.JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");
-            //  SH_DTO.RN_No = OnReceiptNoteNumber(Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd")));
+            SH_DTO.JIRNH_JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");      // RENAMED: was JW_CustomerDC_Date
+            //  SH_DTO.JIRNH_RN_No = OnReceiptNoteNumber(Convert.ToInt32(DateTime.Now.ToString("yyyyMMdd")));
             ReceiptGetData();
             ViewBag.Collapse = true;
             return View(SH_DTO);
@@ -38,8 +38,8 @@ namespace ERP.Controllers.JobworkInward
             {
                 SH_DTO = System.Text.Json.JsonSerializer.Deserialize<ReceiptNoteHead_DTO>(SHto);
             }
-            SH_DTO.JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");
-              SH_DTO.RN_No = OnReceiptNoteNextNumber(DateTime.Now);
+            SH_DTO.JIRNH_JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");      // RENAMED: was JW_CustomerDC_Date
+            SH_DTO.JIRNH_RN_No = OnReceiptNoteNextNumber(DateTime.Now);              // RENAMED: was RN_No
             ReceiptGetData();
             ViewBag.Collapse = true;
             return View(SH_DTO);
@@ -67,17 +67,17 @@ namespace ERP.Controllers.JobworkInward
 
             return DTO.FinalRNNumber;
         }
-        RNNumber_DTO PON_DTO = new RNNumber_DTO();
-        RNNumber_DAO PON_DAO = new RNNumber_DAO();
+        JIRN_Numbering_DTO PON_DTO = new JIRN_Numbering_DTO();
+        JIRN_Numbering_DAO PON_DAO = new JIRN_Numbering_DAO();
         void OnReceiptNoteNumberGen(Int32 RNDate)
         {
             DataSet DS1 = new DataSet();
 
-            PON_DTO.RNN_Date = RNDate.ToString();
+            PON_DTO.JIRN_Date = RNDate.ToString();
             PON_DTO.CreatorCode = 1;
             PON_DTO.Id = 101;
 
-            DS1 = PON_DAO.RNNumberDB(PON_DTO);
+            DS1 = PON_DAO.JIRN_NumberingDB(PON_DTO);
 
             if (DS1.Tables[0].Rows.Count > 0)
             {
@@ -90,34 +90,33 @@ namespace ERP.Controllers.JobworkInward
                         // Existing range -> increment
                         Int32 Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["StartingNumber"].ToString());
 
-                        PON_DTO.RNN_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["RNR_Number"].ToString());
-                        PON_DTO.RNN_StartingNumber = Convert.ToString(Number + 1);
+                        PON_DTO.JIRN_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["RNR_Number"].ToString());
+                        PON_DTO.JIRN_StartingNumber = Convert.ToString(Number + 1);
                         PON_DTO.CreatorCode = 1;
                         PON_DTO.Id = 103;
 
-                        PON_DAO.RNNumberDB(PON_DTO);
+                        PON_DAO.JIRN_NumberingDB(PON_DTO);
                     }
                     else if (DS1.Tables[2].Rows.Count > 0)
                     {
                         // New range -> insert fresh, using Setup dates directly (no Frequency calculation)
-                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["RNR_Date"].ToString());
-                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["RNR_EndDate"].ToString());
-                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["RNR_StartingNumber"].ToString());
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIRN_NRS_StartDate"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIRN_NRS_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIRN_NRS_StartingNumber"].ToString());
 
-                        PON_DTO.RNN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["RNR_Number"].ToString());
-                        PON_DTO.RNN_StartingNumber = Convert.ToString(Start);
-                        PON_DTO.RNN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
-                        PON_DTO.RNN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
+                        PON_DTO.JIRN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIRN_NRS_Number"].ToString());
+                        PON_DTO.JIRN_StartingNumber = Convert.ToString(Start);
+                        PON_DTO.JIRN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
+                        PON_DTO.JIRN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
                         PON_DTO.CreatorCode = 1;
                         PON_DTO.Id = 102;
 
-                        PON_DAO.RNNumberDB(PON_DTO);
+                        PON_DAO.JIRN_NumberingDB(PON_DTO);
                     }
-                    
+
                 }
             }
         }
-        
         void ReceiptGetData()
         {
             SI_DTO.JIRNH_RN_Date = DateTime.Now;
@@ -162,7 +161,7 @@ namespace ERP.Controllers.JobworkInward
             ReceiptNoteHead_DTO S_Head_DTO = S_DTO;
 
             List<ReceiptNoteItem_DTO> ITM_DTO = dto.Items?
-                .Where(x => x.Item_Number != string.Empty)
+                .Where(x => x.JIRNI_Item_Number != string.Empty)      // RENAMED: was x.Item_Number
                 .ToList() ?? new List<ReceiptNoteItem_DTO>();
 
             List<ReceiptNoteBatch_DTO> BCH_DTO = dto.ItemBatch?
@@ -175,11 +174,11 @@ namespace ERP.Controllers.JobworkInward
             // SI_DTO.JIRN_CreatorCode = Convert.ToInt64(UserCode);
             if (Mode == "Save")
             {
-                //var CheckItem = ITM_DTO.Where(x => Convert.ToInt64(x.Item_Number) != Convert.ToInt64(S_DTO.MS_Number));
+                //var CheckItem = ITM_DTO.Where(x => Convert.ToInt64(x.JIRNI_Item_Number) != Convert.ToInt64(S_DTO.JIRNH_MS_Number));
                 ITM_DTO = ITM_DTO
-    .Where(x => !string.IsNullOrWhiteSpace(x.Item_Number))
+    .Where(x => !string.IsNullOrWhiteSpace(x.JIRNI_Item_Number))      // RENAMED: was x.Item_Number
     .ToList();
-                var ValueItem = ITM_DTO.Where(x => Convert.ToDouble(x.Qty) == 0 || Convert.ToDouble(x.UnitPrice) == 0 || Convert.ToDouble(x.Amount) == 0);
+                var ValueItem = ITM_DTO.Where(x => Convert.ToDouble(x.JIRNI_Qty) == 0 || Convert.ToDouble(x.JIRNI_UnitPrice) == 0 || Convert.ToDouble(x.JIRNI_Amount) == 0);   // RENAMED: was x.Qty / x.UnitPrice / x.Amount
 
                 //if (CheckItem.ToList().Count > 0)
                 //{
@@ -203,7 +202,7 @@ namespace ERP.Controllers.JobworkInward
                         message = "Item Atleast, One Row Required"
                     });
                 }
-                else if (Convert.ToInt32(S_DTO.JWC_Number) == 0)
+                else if (Convert.ToInt32(S_DTO.JIRNH_JWC_Number) == 0)      // RENAMED: was S_DTO.JWC_Number
                 {
                     return Json(new
                     {
@@ -246,22 +245,22 @@ namespace ERP.Controllers.JobworkInward
                         {
                             try
                             {
-                                string SIHOrderNoOld = S_DTO.RN_No;
+                                string SIHOrderNoOld = S_DTO.JIRNH_RN_No;      // RENAMED: was S_DTO.RN_No
                                 string SIHOrderNoNew = SIHOrderNoOld;
 
                                 // =========================
                                 // HEADER INSERT
                                 // =========================
-                                SI_DTO.JIRNH_RN_Date = Convert.ToDateTime(S_DTO.RN_Date);
+                                SI_DTO.JIRNH_RN_Date = Convert.ToDateTime(S_DTO.JIRNH_RN_Date);                    // RENAMED: was S_DTO.RN_Date
                                 SI_DTO.JIRNH_RN_No = SIHOrderNoOld;
-                                SI_DTO.JIRNH_JWC_Number = Convert.ToInt64(S_DTO.JWC_Number);
-                                SI_DTO.JIRNH_Currency_Number = Convert.ToInt64(S_DTO.Currency_Number);
-                                SI_DTO.JIRNH_JW_CustomerDC_No = Convert.ToString(S_DTO.JW_CustomerDC_No);
-                                SI_DTO.JIRNH_JW_CustomerDC_Date = Convert.ToDateTime(S_DTO.JW_CustomerDC_Date);
-                                SI_DTO.JIRNH_MS_Number = Convert.ToInt64(S_DTO.MS_Number);
-                                SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.Remarks);
-                                SI_DTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.WH_Number);
-                                SI_DTO.JIRNH_Freight_Applicable = S_DTO.Freight_Applicable;
+                                SI_DTO.JIRNH_JWC_Number = Convert.ToInt64(S_DTO.JIRNH_JWC_Number);                 // RENAMED: was S_DTO.JWC_Number
+                                SI_DTO.JIRNH_Currency_Number = Convert.ToInt64(S_DTO.JIRNH_Currency_Number);       // RENAMED: was S_DTO.Currency_Number
+                                SI_DTO.JIRNH_JW_CustomerDC_No = Convert.ToString(S_DTO.JIRNH_JW_CustomerDC_No);    // RENAMED: was S_DTO.JW_CustomerDC_No
+                                SI_DTO.JIRNH_JW_CustomerDC_Date = Convert.ToDateTime(S_DTO.JIRNH_JW_CustomerDC_Date); // RENAMED: was S_DTO.JW_CustomerDC_Date
+                                SI_DTO.JIRNH_MS_Number = Convert.ToInt64(S_DTO.JIRNH_MS_Number);                   // RENAMED: was S_DTO.MS_Number
+                                SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.JIRNH_Remarks);                      // RENAMED: was S_DTO.Remarks
+                                SI_DTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.JIRNH_WH_Number);                   // RENAMED: was S_DTO.WH_Number
+                                SI_DTO.JIRNH_IsFreightApplicable = S_DTO.JIRNH_IsFreightApplicable;                // RENAMED: was SI_DTO.JIRNH_Freight_Applicable = S_DTO.Freight_Applicable
                                 SI_DTO.JIRN_Id = 21;
 
                                 DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
@@ -270,7 +269,7 @@ namespace ERP.Controllers.JobworkInward
                                     throw new Exception("Header insert failed");
 
                                 long headerId = Convert.ToInt64(DS.Tables[0].Rows[0][0]);
-                                OnReceiptNoteNumberGen(Convert.ToInt32(Convert.ToDateTime(S_DTO.RN_Date).ToString("yyyyMMdd")));
+                                OnReceiptNoteNumberGen(Convert.ToInt32(Convert.ToDateTime(S_DTO.JIRNH_RN_Date).ToString("yyyyMMdd")));      // RENAMED: was S_DTO.RN_Date
                                 // =========================
                                 // ITEM INSERT
                                 // =========================
@@ -285,27 +284,27 @@ namespace ERP.Controllers.JobworkInward
                                     var itemDTO = new ReceiptNote_DTO();
 
                                     itemDTO.JIRNH_Number = headerId;
-                                    itemDTO.JIRNI_Item_Number = Convert.ToInt64(Item.Item_Number);
-                                    itemDTO.JIRNI_WH_Number = Convert.ToInt64(Item.WH_Number);
-                                    itemDTO.JIRNI_UoM_Number = Convert.ToInt64(Item.UoM_Number);
-                                    itemDTO.JIRNI_Qty = Convert.ToDouble(Item.Qty);
-                                    itemDTO.JIRNI_Qty_Kg = Convert.ToDouble(Item.Qty_Kg);
-                                    itemDTO.JIRNI_UnitPrice = Convert.ToDouble(Item.UnitPrice);
-                                    itemDTO.JIRNI_Amount = Convert.ToDouble(Item.Amount);
-                                    itemDTO.JIRNI_PRS_Number = Convert.ToInt64(Item.PRS_Number);
+                                    itemDTO.JIRNI_Item_Number = Convert.ToInt64(Item.JIRNI_Item_Number);              // RENAMED: was Item.Item_Number
+                                    itemDTO.JIRNI_WH_Number = Convert.ToInt64(Item.JIRNI_WH_Number);                  // RENAMED: was Item.WH_Number
+                                    itemDTO.JIRNI_UoM_Number = Convert.ToInt64(Item.JIRNI_UoM_Number);                // RENAMED: was Item.UoM_Number
+                                    itemDTO.JIRNI_Qty = Convert.ToDouble(Item.JIRNI_Qty);                             // RENAMED: was Item.Qty
+                                    itemDTO.JIRNI_Qty_Kgs = Convert.ToDouble(Item.JIRNI_Qty_Kgs);                     // RENAMED: was itemDTO.JIRNI_Qty_Kg = ...Item.Qty_Kg
+                                    itemDTO.JIRNI_UnitPrice = Convert.ToDouble(Item.JIRNI_UnitPrice);                 // RENAMED: was Item.UnitPrice
+                                    itemDTO.JIRNI_Amount = Convert.ToDouble(Item.JIRNI_Amount);                       // RENAMED: was Item.Amount
+                                    itemDTO.JIRNI_PRS_Number = Convert.ToInt64(Item.JIRNI_PRS_Number);                // RENAMED: was Item.PRS_Number
 
                                     // NEW: Freight logic
-                                    itemDTO.JIRNI_Freight_Applicable = Item.Freight_Applicable;
-                                    itemDTO.JIRNI_Freight_ServiceOrder_Number = Item.Freight_ServiceOrder_Number;
-                                    itemDTO.JIRNI_JISVOI_Number_FRT = string.IsNullOrEmpty(Item.JISVOI_Number_FRT)
+                                    itemDTO.JIRNI_IsFreightApplicable = Item.JIRNI_IsFreightApplicable;               // RENAMED: was itemDTO.JIRNI_Freight_Applicable = Item.Freight_Applicable
+                                    itemDTO.JIRNI_JIFRT_SVOH_Number = Item.JIRNI_JIFRT_SVOH_Number;                   // RENAMED: was itemDTO.JIRNI_Freight_ServiceOrder_Number = Item.Freight_ServiceOrder_Number
+                                    itemDTO.JIRNI_JIFRT_SVOI_Number = string.IsNullOrEmpty(Item.JIRNI_JIFRT_SVOI_Number)   // RENAMED: was itemDTO.JIRNI_JISVOI_Number_FRT / Item.JISVOI_Number_FRT
                                         ? 0
-                                        : Convert.ToInt64(Item.JISVOI_Number_FRT);
-                                    itemDTO.JIRNI_FromWH = string.IsNullOrEmpty(Item.FromWH)
+                                        : Convert.ToInt64(Item.JIRNI_JIFRT_SVOI_Number);
+                                    itemDTO.JIRNI_FromWH = string.IsNullOrEmpty(Item.JIRNI_FromWH)                    // RENAMED: was Item.FromWH
                                         ? (long?)null
-                                        : Convert.ToInt64(Item.FromWH);
-                                    itemDTO.JIRNI_ToWH = string.IsNullOrEmpty(Item.ToWH)
+                                        : Convert.ToInt64(Item.JIRNI_FromWH);
+                                    itemDTO.JIRNI_ToWH = string.IsNullOrEmpty(Item.JIRNI_ToWH)                        // RENAMED: was Item.ToWH
                                         ? (long?)null
-                                        : Convert.ToInt64(Item.ToWH);
+                                        : Convert.ToInt64(Item.JIRNI_ToWH);
 
                                     itemDTO.JIRN_Id = 22;
 
@@ -316,8 +315,8 @@ namespace ERP.Controllers.JobworkInward
                                     long itemID = Convert.ToInt64(itemResult.Tables[0].Rows[0][0]);
 
                                     itemIdMap.Add(itemIndex, itemID);
-                                    itemWHMap.Add(itemIndex, Convert.ToInt64(Item.WH_Number));
-                                    itemNumberMap.Add(itemIndex, Convert.ToInt64(Item.Item_Number));
+                                    itemWHMap.Add(itemIndex, Convert.ToInt64(Item.JIRNI_WH_Number));                  // RENAMED: was Item.WH_Number
+                                    itemNumberMap.Add(itemIndex, Convert.ToInt64(Item.JIRNI_Item_Number));            // RENAMED: was Item.Item_Number
 
                                     itemIndex++;
                                 }
@@ -329,18 +328,18 @@ namespace ERP.Controllers.JobworkInward
                                 {
                                     var batchDTO = new ReceiptNote_DTO();
 
-                                    batchDTO.JIRNI_BCH_Number = batch.RNI_BCH_No;
+                                    batchDTO.JIRNI_BCH_Number = batch.JIRNI_BCH_Number;                                        // RENAMED: was batch.RNI_BCH_No
                                     batchDTO.JIRNH_Number = headerId;
                                     batchDTO.JIRNI_Number = itemIdMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
                                     batchDTO.JIRNI_Item_Number = itemNumberMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
                                     batchDTO.JIRNI_BCH_BatchDate = DateTime.Now;
-                                    batchDTO.JIRNI_BCH_BatchNo = batch.RNI_BCH_Number;
+                                    batchDTO.JIRNI_BCH_BatchNo = batch.JIRNI_BCH_BatchNo;                                     // RENAMED: was batch.RNI_BCH_Number
                                     batchDTO.JIRNI_BCH_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
-                                    batchDTO.JIRNI_BCH_BatchQty = Convert.ToDouble(batch.RNI_BCH_Qty);
-                                    batchDTO.JIRNI_BCH_BatchUnitPrice = Convert.ToDouble(batch.RNI_BCH_UnitPrice);
-                                    batchDTO.JIRNI_BCH_BatchValue = Convert.ToDouble(batch.RNI_BCH_Value);
+                                    batchDTO.JIRNI_BCH_BatchQty = Convert.ToDouble(batch.JIRNI_BCH_BatchQty);                 // RENAMED: was batch.RNI_BCH_Qty
+                                    batchDTO.JIRNI_BCH_BatchUnitPrice = Convert.ToDouble(batch.JIRNI_BCH_BatchUnitPrice);     // RENAMED: was batch.RNI_BCH_UnitPrice
+                                    batchDTO.JIRNI_BCH_BatchValue = Convert.ToDouble(batch.JIRNI_BCH_BatchValue);             // RENAMED: was batch.RNI_BCH_Value
                                     batchDTO.JIRNI_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
-                                    batchDTO.JIRNH_WH_Number = Convert.ToInt32(S_DTO.WH_Number);
+                                    batchDTO.JIRNH_WH_Number = Convert.ToInt32(S_DTO.JIRNH_WH_Number);                        // RENAMED: was S_DTO.WH_Number
                                     batchDTO.JIRN_Id = 23;
 
                                     SI_DAO.JI_ReceiptNoteDB(batchDTO);
@@ -401,8 +400,8 @@ namespace ERP.Controllers.JobworkInward
             {
                 success = true,
                 header = DataTableToList(ds.Tables[0]),
-                items = DataTableToList(ds.Tables[1]) ,
-                itemBatch= DataTableToList(ds.Tables[2])
+                items = DataTableToList(ds.Tables[1]),
+                itemBatch = DataTableToList(ds.Tables[2])
             });
         }
 
@@ -526,18 +525,18 @@ namespace ERP.Controllers.JobworkInward
         #region Get Freight Service Order
         [HttpGet]
         [Route("receiptnote/transactions/receiptnote/get-freight-service-order")]
-        public JsonResult GetFreightServiceOrder(long customerId, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)
+        public JsonResult GetFreightServiceOrder(long customerId, long? fromWHNumber = null, long? toWHNumber = null)
         {
             var dt = SI_DAO
-                .GetFreightServiceOrderDB(customerId, prsNumber, itemNumber, uomNumber)
+                .GetFreightServiceOrderDB(customerId, fromWHNumber, toWHNumber)
                 .Tables[0];
 
             return new JsonResult(
                 dt.AsEnumerable().Select(r => new
                 {
-                    value = r["JISVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOH_Number"]),
-                    text = r["JISVOH_ServiceOrderNo"]?.ToString() ?? "",
-                    jisvoiNumber = r["JISVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOI_Number"]) // NEW
+                    value = r["JIFRT_SVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JIFRT_SVOH_Number"]),
+                    text = r["JIFRT_SVOH_ServiceOrderNo"]?.ToString() ?? "",
+                    jisvoiNumber = r["JIFRT_SVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JIFRT_SVOI_Number"])
                 }).ToList(),
                 new JsonSerializerOptions
                 {
@@ -550,17 +549,17 @@ namespace ERP.Controllers.JobworkInward
 
         #region Check Delivered Qty Exceeded - Freight
         [HttpGet]
-        [Route("receiptnote/transactions/receiptnote/check-delivered-qty-exceeded-freight")]
-        public JsonResult CheckDeliveredQtyExceededFreight(long jisvohNumber, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)
+        [Route("receiptnote/transactions/receiptnote/check-received-qty-exceeded-freight")]
+        public JsonResult CheckReceivedQtyExceededFreight(long jisvohNumber, long? fromWHNumber = null, long? toWHNumber = null)
         {
             var dt = SI_DAO
-                .CheckDeliveredQtyExceededFreightDB(jisvohNumber, prsNumber, itemNumber, uomNumber)
+                .CheckReceivedQtyExceededFreightDB(jisvohNumber, fromWHNumber, toWHNumber)
                 .Tables[0];
 
             var result = dt.AsEnumerable().Select(r => new
             {
-                deliveredQty = r["DeliveredQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["DeliveredQty"]),
-                jisvoiQty = r["JISVOI_Qty"] == DBNull.Value ? 0 : Convert.ToDouble(r["JISVOI_Qty"]),
+                receivedQty = r["ReceivedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["ReceivedQty"]),
+                jisvoiQty = r["JIFRT_SVOI_Qty"] == DBNull.Value ? 0 : Convert.ToDouble(r["JIFRT_SVOI_Qty"]),
                 isExceeded = r["IsExceeded"] != DBNull.Value && Convert.ToBoolean(r["IsExceeded"])
             }).ToList();
 

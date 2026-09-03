@@ -35,13 +35,13 @@ namespace ERP.Controllers
         List<DeliveryNoteDetailed_DTO> DND_List = new List<DeliveryNoteDetailed_DTO>();
         List<ConversionDetailed_DTO> Conversion_List = new List<ConversionDetailed_DTO>();
         List<ConversionSummary_DTO> Conversion_List_summary = new List<ConversionSummary_DTO>();
-        
+
         DeliveryNoteSummary_DTO DNS_DTO = new DeliveryNoteSummary_DTO();
         DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
-       DeliveryNote_DL DN_DL = new DeliveryNote_DL();
+        DeliveryNote_DL DN_DL = new DeliveryNote_DL();
         Conversion_DL Conversion_DL = new Conversion_DL();
         public Int64 UserCode => Int64.TryParse(User.FindFirst("ERP_ID")?.Value, out var No) ? No : 0;
-    
+
         [Route("jobinward/transactions/delivery-note/buyer/address")]
         public IActionResult SaleBuyerAddressID(String? Buyer, String ADTPNumber)
         {
@@ -53,12 +53,12 @@ namespace ERP.Controllers
             {
                 Buyer = "";
             }
-           
+
             DN_DTO.Header.DN_CUS_Number = Convert.ToInt32(Buyer);
             DN_DTO.Header.DN_ADD_ADTP_Number = Convert.ToInt32(ADTPNumber);
             DN_DTO.Header.DN_Id = 13;
             DS = DN_DAO.DeliveryNoteDB(DN_DTO);
-             
+
             SaleInvoiceAddress SIA = new SaleInvoiceAddress();
             SIA.BuyerAddressId = S_DL.JWCCustAddressID(DS.Tables[0]);
             SIA.BuyerAddress = S_DL.JWCCustAddress(DS.Tables[1]).FirstOrDefault();
@@ -89,7 +89,7 @@ namespace ERP.Controllers
         }
 
         [Route("jobinward/transactions/conversion/cutomer")]
-        public IActionResult SaleBuyer(String? Buyer,   String? SIHDate)
+        public IActionResult SaleBuyer(String? Buyer, String? SIHDate)
         {
             ReceiptNote_DL S_DL = new ReceiptNote_DL();
             DeliveryNoteCreate_DTO DN_DTO = new DeliveryNoteCreate_DTO();
@@ -100,8 +100,8 @@ namespace ERP.Controllers
             {
                 Buyer = "";
             }
-           
-         
+
+
             DN_DTO.Header.JIDNI_Item_Code = Convert.ToString(Buyer);
             DN_DTO.Header.JIDNH_DN_Date = Convert.ToDateTime(SIHDate);
             DN_DTO.Header.DN_Id = 5;
@@ -113,7 +113,7 @@ namespace ERP.Controllers
         public DeliveryNoteCreate_DTO InsertDummyDeliveryNote()
         {
 
-            DeliveryNoteCreate_DTO DN_   =new DeliveryNoteCreate_DTO();
+            DeliveryNoteCreate_DTO DN_ = new DeliveryNoteCreate_DTO();
             // ================================
             // 1. HEADER DUMMY DATA
             // ================================
@@ -151,7 +151,7 @@ namespace ERP.Controllers
             JIDNI_Qty = 5,
             JIDNI_UnitPrice = 100,
             JIDNI_Amount = 500,
-            JIDNI_JW_InvoiceTracking = "Y"
+            JIDNI_IsJW_InvoiceApplicable = "Y"
         },
 
         new DeliveryNoteItem_DTO
@@ -165,7 +165,7 @@ namespace ERP.Controllers
             JIDNI_Qty = 2,
             JIDNI_UnitPrice = 250,
             JIDNI_Amount = 500,
-            JIDNI_JW_InvoiceTracking = "N"
+            JIDNI_IsJW_InvoiceApplicable = "N"
         }
     };
 
@@ -189,9 +189,9 @@ namespace ERP.Controllers
             JIDNA_GSTIN = "33ABCDE1234F1Z5"
         }
     };
-            DN_.Header= header;
-            DN_.Items= items;
-            DN_.Addresses= addresses;
+            DN_.Header = header;
+            DN_.Items = items;
+            DN_.Addresses = addresses;
             return DN_;
 
 
@@ -366,7 +366,7 @@ namespace ERP.Controllers
         [HttpPost]
         public IActionResult SaveDeliveryNote([FromBody] ConversionCreate_DTO dto)
         {
-           
+
             try
             {
                 if (dto == null)
@@ -390,7 +390,7 @@ namespace ERP.Controllers
                 Conversion_DAO DN_DAO = new Conversion_DAO();
 
                 dto.Header.DN_Id = 10;
-           //    dto.Header.JIDNH_DN_Date = DateTime.Now;
+                //    dto.Header.JIDNH_DN_Date = DateTime.Now;
                 dto.Header.JIDNI_Item_Code = "1";
 
                 DataSet ds = DN_DAO.ConversionCreateDB(dto);
@@ -772,22 +772,22 @@ namespace ERP.Controllers
             DeliveryNoteCreate_DTO DN_DTO =
                 new DeliveryNoteCreate_DTO();
 
-          
+
             if (DN_List.Count > 0)
             {
                 DN_DTO = DN_List.FirstOrDefault();
             }
 
-         
+
             return View(DN_DTO);
         }
         public List<DeliveryNoteCreate_DTO> DeliveryNoteViewGetData(long JIDNH_Number)
         {
-            List<DeliveryNoteCreate_DTO> DN_List =   new List<DeliveryNoteCreate_DTO>();
+            List<DeliveryNoteCreate_DTO> DN_List = new List<DeliveryNoteCreate_DTO>();
 
-            DeliveryNote_DAO DN_DAO =  new DeliveryNote_DAO();
+            DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
 
-            DeliveryNote_DL DN_DL =   new DeliveryNote_DL();
+            DeliveryNote_DL DN_DL = new DeliveryNote_DL();
 
             DataSet DS = new DataSet();
 
@@ -799,7 +799,7 @@ namespace ERP.Controllers
             //-----------------------------------------
             // CONVERT DATASET TO DTO LIST
             //-----------------------------------------
-            DN_List =  DN_DL.DeliveryNoteViewList(DS);
+            DN_List = DN_DL.DeliveryNoteViewList(DS);
 
             return DN_List;
         }
@@ -815,10 +815,10 @@ namespace ERP.Controllers
             DeliveryNote_DAO DN_DAO =
                 new DeliveryNote_DAO();
 
-           
+
             GetDevliverNoteData();
 
-            
+
             DataSet DS = DN_DAO.DeliveryNoteEditDB(JIDNH_Number);
 
             long Root_JIDNI_Number = 0;
@@ -933,10 +933,10 @@ namespace ERP.Controllers
                     JIDNI_Amount =
                         Convert.ToDouble(item["JIDNI_Amount"]),
 
-                    JIDNI_JW_InvoiceTracking =
-                        Convert.ToString(item["JIDNI_JW_InvoiceTracking"]) ,
-                    JISVOH_Number =
-                        Convert.ToInt64(item["JISVOH_Number"])
+                    JIDNI_IsJW_InvoiceApplicable =
+                        Convert.ToString(item["JIDNI_IsJW_InvoiceApplicable"]),
+                    JIDNI_JIJWI_SVOH_Number =
+                        Convert.ToInt64(item["JIDNI_JIJWI_SVOH_Number"])
                 });
             }
 
@@ -954,16 +954,16 @@ namespace ERP.Controllers
             DeliveryNote_DAO dao = new DeliveryNote_DAO();
 
             dao.InsertEditBatchToTempDB(Root_JIDNI_Number);
-       
+
             ViewBag.Collapse = true;
-            var x = dto.Items[0].JISVOH_Number;
+            var x = dto.Items[0].JIDNI_JIJWI_SVOH_Number;
             return View("Edit", dto);
         }
         #endregion
 
         #region Show Batch
         [HttpGet]
-        public JsonResult GetBatchDetails(long FromWarehouse, long LineItem_Number,int ItemGridIndex)
+        public JsonResult GetBatchDetails(long FromWarehouse, long LineItem_Number, int ItemGridIndex)
         {
             DeliveryNote_DAO dao = new DeliveryNote_DAO();
             DataTable dt = dao.GetBatchDetailsDB(FromWarehouse, LineItem_Number, ItemGridIndex).Tables[0];
@@ -1003,15 +1003,15 @@ namespace ERP.Controllers
         #region Show Batch Edit
 
         [HttpGet]
-        public JsonResult GetBatchDetailsEdit(long FromWarehouse, long LineItem_Number,long JIDNI_Number,int ItemGridIndex,long JIDNH_Number)
+        public JsonResult GetBatchDetailsEdit(long FromWarehouse, long LineItem_Number, long JIDNI_Number, int ItemGridIndex, long JIDNH_Number)
         {
-           
+
 
             DeliveryNote_DAO dao = new DeliveryNote_DAO();
-           bool isTempEmpty = dao.IsTempDeliveryBatchEmpty();
+            bool isTempEmpty = dao.IsTempDeliveryBatchEmpty();
             DataTable dt = new DataTable();
-          dt=  dao.GetBatchStockDetails(LineItem_Number, FromWarehouse, JIDNH_Number, JIDNI_Number, ItemGridIndex);
-            
+            dt = dao.GetBatchStockDetails(LineItem_Number, FromWarehouse, JIDNH_Number, JIDNI_Number, ItemGridIndex);
+
 
 
             var data = dt.AsEnumerable().Select(r => new
@@ -1047,7 +1047,7 @@ namespace ERP.Controllers
         }
         #endregion
 
-     
+
         #region Validate Batch Details
 
         [HttpGet]
@@ -1108,8 +1108,8 @@ namespace ERP.Controllers
             DataTable dt = dao.GetBatchDetailsViewDB(FromWarehouse, LineItem_Number).Tables[0];
             var data = dt.AsEnumerable().Select(r => new
             {
-              //  LineBatch_Number = r["LineBatch_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["LineBatch_Number"]),
-             //   FromWarehouse = r["FromWarehouse"] == DBNull.Value ? 0 : Convert.ToInt64(r["FromWarehouse"]),
+                //  LineBatch_Number = r["LineBatch_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["LineBatch_Number"]),
+                //   FromWarehouse = r["FromWarehouse"] == DBNull.Value ? 0 : Convert.ToInt64(r["FromWarehouse"]),
 
                 BatchDate = r["BatchDate"] == DBNull.Value
                     ? ""
@@ -1157,7 +1157,7 @@ namespace ERP.Controllers
                 BatchNo = r["BatchNo"] == DBNull.Value ? "" : r["BatchNo"].ToString(),
 
                 BatchQty = r["BatchQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchQty"]),
-                    AvailableQty = r["AvailableQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["AvailableQty"]),
+                AvailableQty = r["AvailableQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["AvailableQty"]),
 
                 BatchUnitPrice = r["BatchUnitPrice"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchUnitPrice"]),
                 BatchValue = r["BatchValue"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchValue"]),
@@ -1192,9 +1192,9 @@ namespace ERP.Controllers
                 }
 
                 DeliveryNote_DAO DBCH_DAO = new DeliveryNote_DAO();
-                
 
-                    DBCH_DAO.TempDeliveryBatchSaveDB(dtoList);
+
+                DBCH_DAO.TempDeliveryBatchSaveDB(dtoList);
                 DBCH_DAO.UpdateTempBatchReservedQty();
 
                 return Json(new
@@ -1348,11 +1348,11 @@ namespace ERP.Controllers
         #region temp batch update row
         [Route("DeliveryNote/TempDeliveryBatchEditChangeItemDBRow")]
         [HttpPost]
-        public IActionResult TempDeliveryBatchEditChangeItemDBRow(int DBCH_Item_Number, int warehouse, int JINDI_Number, int JINDH_Number,int DBCH_Index)
+        public IActionResult TempDeliveryBatchEditChangeItemDBRow(int DBCH_Item_Number, int warehouse, int JINDI_Number, int JINDH_Number, int DBCH_Index)
         {
             try
             {
-  
+
 
                 DeliveryNote_DAO dbch_DAO = new DeliveryNote_DAO();
 
@@ -1483,11 +1483,11 @@ namespace ERP.Controllers
             // SI_DTO.JIRN_CreatorCode = Convert.ToInt64(UserCode);
             if (Mode == "Save")
             {
-                //var CheckItem = ITM_DTO.Where(x => Convert.ToInt64(x.Item_Number) != Convert.ToInt64(S_DTO.MS_Number));
+                //var CheckItem = ITM_DTO.Where(x => Convert.ToInt64(x.JIRNI_Item_Number) != Convert.ToInt64(S_DTO.JIRNH_MS_Number));
                 ITM_DTO = ITM_DTO
-    .Where(x => !string.IsNullOrWhiteSpace(x.Item_Number))
+    .Where(x => !string.IsNullOrWhiteSpace(x.JIRNI_Item_Number))                                            // RENAMED: was x.Item_Number
     .ToList();
-                var ValueItem = ITM_DTO.Where(x => Convert.ToDouble(x.Qty) == 0 || Convert.ToDouble(x.UnitPrice) == 0 || Convert.ToDouble(x.Amount) == 0);
+                var ValueItem = ITM_DTO.Where(x => Convert.ToDouble(x.JIRNI_Qty) == 0 || Convert.ToDouble(x.JIRNI_UnitPrice) == 0 || Convert.ToDouble(x.JIRNI_Amount) == 0);   // RENAMED: was x.Qty/x.UnitPrice/x.Amount
 
                 //if (CheckItem.ToList().Count > 0)
                 //{
@@ -1505,7 +1505,7 @@ namespace ERP.Controllers
                     ViewBag.ErrorCode = 2;
                     ViewBag.ErrorMessage = "Item Atleast, One Row Required";
                 }
-                else if (Convert.ToInt32(S_DTO.JWC_Number) == 0)
+                else if (Convert.ToInt32(S_DTO.JIRNH_JWC_Number) == 0)      // RENAMED: was S_DTO.JWC_Number
                 {
                     ViewBag.ErrorCode = 2;
                     ViewBag.ErrorMessage = "Buyer is Required";
@@ -1530,23 +1530,23 @@ namespace ERP.Controllers
                             {
                                 try
                                 {
-                                    string SIHOrderNoOld = S_DTO.RN_No;
+                                    string SIHOrderNoOld = S_DTO.JIRNH_RN_No;      // RENAMED: was S_DTO.RN_No
 
-                                   // String SIHOrderNoNew = OnReceiptNoteNumber(Convert.ToInt32(Convert.ToDateTime(S_DTO.RN_Date).ToString("yyyyMMdd")));
+                                    // String SIHOrderNoNew = OnReceiptNoteNumber(Convert.ToInt32(Convert.ToDateTime(S_DTO.JIRNH_RN_Date).ToString("yyyyMMdd")));
                                     String SIHOrderNoNew = SIHOrderNoOld;
 
                                     // =========================
                                     // 🔹 HEADER INSERT
                                     // =========================
-                                    SI_DTO.JIRNH_RN_Date = Convert.ToDateTime(S_DTO.RN_Date);
+                                    SI_DTO.JIRNH_RN_Date = Convert.ToDateTime(S_DTO.JIRNH_RN_Date);                    // RENAMED: was S_DTO.RN_Date
                                     SI_DTO.JIRNH_RN_No = SIHOrderNoOld;
-                                    SI_DTO.JIRNH_JWC_Number = Convert.ToInt64(S_DTO.JWC_Number);
-                                    SI_DTO.JIRNH_Currency_Number = Convert.ToInt64(S_DTO.Currency_Number);
-                                    SI_DTO.JIRNH_JW_CustomerDC_No = Convert.ToString(S_DTO.JW_CustomerDC_No);
-                                    SI_DTO.JIRNH_JW_CustomerDC_Date = Convert.ToDateTime(S_DTO.JW_CustomerDC_Date);
-                                    SI_DTO.JIRNH_MS_Number = Convert.ToInt64(S_DTO.MS_Number);
-                                    SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.Remarks);
-                                    SI_DTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.WH_Number);
+                                    SI_DTO.JIRNH_JWC_Number = Convert.ToInt64(S_DTO.JIRNH_JWC_Number);                 // RENAMED: was S_DTO.JWC_Number
+                                    SI_DTO.JIRNH_Currency_Number = Convert.ToInt64(S_DTO.JIRNH_Currency_Number);       // RENAMED: was S_DTO.Currency_Number
+                                    SI_DTO.JIRNH_JW_CustomerDC_No = Convert.ToString(S_DTO.JIRNH_JW_CustomerDC_No);    // RENAMED: was S_DTO.JW_CustomerDC_No
+                                    SI_DTO.JIRNH_JW_CustomerDC_Date = Convert.ToDateTime(S_DTO.JIRNH_JW_CustomerDC_Date); // RENAMED: was S_DTO.JW_CustomerDC_Date
+                                    SI_DTO.JIRNH_MS_Number = Convert.ToInt64(S_DTO.JIRNH_MS_Number);                   // RENAMED: was S_DTO.MS_Number
+                                    SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.JIRNH_Remarks);                      // RENAMED: was S_DTO.Remarks
+                                    SI_DTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.JIRNH_WH_Number);                   // RENAMED: was S_DTO.WH_Number
                                     SI_DTO.JIRN_Id = 21;
 
                                     DS = SI_DAO.JI_ReceiptNoteDB(SI_DTO);
@@ -1566,13 +1566,13 @@ namespace ERP.Controllers
                                         var itemDTO = new ReceiptNote_DTO(); // 🔥 IMPORTANT FIX (NO REUSE)
 
                                         itemDTO.JIRNH_Number = headerId;
-                                        itemDTO.JIRNI_Item_Number = Convert.ToInt64(Item.Item_Number);
-                                        itemDTO.JIRNI_WH_Number = Convert.ToInt64(Item.WH_Number);
-                                        itemDTO.JIRNI_UoM_Number = Convert.ToInt64(Item.UoM_Number);
-                                        itemDTO.JIRNI_Qty = Convert.ToDouble(Item.Qty);
-                                        itemDTO.JIRNI_UnitPrice = Convert.ToDouble(Item.UnitPrice);
-                                        itemDTO.JIRNI_Amount = Convert.ToDouble(Item.Amount);
-                                        itemDTO.JIRNI_PRS_Number = Convert.ToInt64(Item.PRS_Number);
+                                        itemDTO.JIRNI_Item_Number = Convert.ToInt64(Item.JIRNI_Item_Number);      // RENAMED: was Item.Item_Number
+                                        itemDTO.JIRNI_WH_Number = Convert.ToInt64(Item.JIRNI_WH_Number);          // RENAMED: was Item.WH_Number
+                                        itemDTO.JIRNI_UoM_Number = Convert.ToInt64(Item.JIRNI_UoM_Number);        // RENAMED: was Item.UoM_Number
+                                        itemDTO.JIRNI_Qty = Convert.ToDouble(Item.JIRNI_Qty);                     // RENAMED: was Item.Qty
+                                        itemDTO.JIRNI_UnitPrice = Convert.ToDouble(Item.JIRNI_UnitPrice);         // RENAMED: was Item.UnitPrice
+                                        itemDTO.JIRNI_Amount = Convert.ToDouble(Item.JIRNI_Amount);               // RENAMED: was Item.Amount
+                                        itemDTO.JIRNI_PRS_Number = Convert.ToInt64(Item.JIRNI_PRS_Number);        // RENAMED: was Item.PRS_Number
                                         itemDTO.JIRN_Id = 22;
 
                                         var itemResult = SI_DAO.JI_ReceiptNoteDB(itemDTO);
@@ -1587,26 +1587,26 @@ namespace ERP.Controllers
                                         // =========================
 
                                         var relatedBatches = BCH_DTO
-                                            .Where(x => x.RNI_BCH_Item_Number == Item.Item_Number)
+                                            .Where(x => x.RNI_BCH_Item_Number == Item.JIRNI_Item_Number)          // RENAMED: was Item.Item_Number
                                             .ToList();
 
                                         foreach (var batch in relatedBatches)
                                         {
                                             var batchDTO = new ReceiptNote_DTO(); // 🔥 NEW OBJECT
 
-                                            batchDTO.JIRNI_BCH_Number = batch.RNI_BCH_No;
-                                            batchDTO.JIRNI_Item_Number = Convert.ToInt64(Item.Item_Number);
+                                            batchDTO.JIRNI_BCH_Number = batch.JIRNI_BCH_Number;                        // RENAMED: was batch.RNI_BCH_No
+                                            batchDTO.JIRNI_Item_Number = Convert.ToInt64(Item.JIRNI_Item_Number);      // RENAMED: was Item.Item_Number
                                             batchDTO.JIRNH_Number = headerId;
                                             batchDTO.JIRNI_Number = itemID;
                                             batchDTO.JIRNI_BCH_BatchDate = DateTime.Now;
                                             //   batchDTO.JIRNI_BCH_BatchNo = "AUTO-" + headerId;
-                                            batchDTO.JIRNI_BCH_BatchNo = batch.RNI_BCH_Number;
-                                            batchDTO.JIRNI_BCH_WH_Number = Convert.ToInt64(Item.WH_Number);
-                                            batchDTO.JIRNI_BCH_BatchQty = Convert.ToDouble(batch.RNI_BCH_Qty);
-                                            batchDTO.JIRNI_BCH_BatchUnitPrice = Convert.ToDouble(batch.RNI_BCH_UnitPrice);
-                                            batchDTO.JIRNI_BCH_BatchValue = Convert.ToDouble(batch.RNI_BCH_Value);
-                                            batchDTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.WH_Number);
-                                            batchDTO.JIRNI_WH_Number = Convert.ToInt64(Item.WH_Number);
+                                            batchDTO.JIRNI_BCH_BatchNo = batch.JIRNI_BCH_BatchNo;                      // RENAMED: was batch.RNI_BCH_Number
+                                            batchDTO.JIRNI_BCH_WH_Number = Convert.ToInt64(Item.JIRNI_WH_Number);      // RENAMED: was Item.WH_Number
+                                            batchDTO.JIRNI_BCH_BatchQty = Convert.ToDouble(batch.JIRNI_BCH_BatchQty);  // RENAMED: was batch.RNI_BCH_Qty
+                                            batchDTO.JIRNI_BCH_BatchUnitPrice = Convert.ToDouble(batch.JIRNI_BCH_BatchUnitPrice);  // RENAMED: was batch.RNI_BCH_UnitPrice
+                                            batchDTO.JIRNI_BCH_BatchValue = Convert.ToDouble(batch.JIRNI_BCH_BatchValue);          // RENAMED: was batch.RNI_BCH_Value
+                                            batchDTO.JIRNH_WH_Number = Convert.ToInt64(S_DTO.JIRNH_WH_Number);         // RENAMED: was S_DTO.WH_Number
+                                            batchDTO.JIRNI_WH_Number = Convert.ToInt64(Item.JIRNI_WH_Number);          // RENAMED: was Item.WH_Number
                                             batchDTO.JIRN_Id = 23;
 
                                             SI_DAO.JI_ReceiptNoteDB(batchDTO);
@@ -1657,7 +1657,7 @@ namespace ERP.Controllers
             }
 
 
-          //  ReceiptGetData();
+            //  ReceiptGetData();
             return View(Original_DTO);
         }
 

@@ -1,0 +1,775 @@
+﻿@model ERP_DTO.JobInwardTransaction.ServiceOrderCreatePage_DTO
+
+@{
+    ViewData["Title"] = "Service Order";
+}
+<style>
+    #RightPane {
+        position: fixed;
+        top: 80px;
+        bottom: 0;
+        right: calc(-(50ch +4px));
+        width: calc(50ch + 4px);
+        background: #c6e0e7;
+        border: 1px solid #6c757d;
+        box-sizing: border-box;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 9999;
+        transition: right .25s ease, opacity .25s ease;
+    }
+
+        #RightPane.show {
+            right: calc(2px);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #RightPane .p-2 {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        #RightPane .buyer-search-results {
+            background: #c6e0e7;
+            margin-left: -2px !important;
+            width: 50ch !important;
+            min-width: 50ch !important;
+            max-width: 50ch !important;
+            height: auto !important;
+            min-height: 100% !important;
+            max-height: none !important;
+            overflow: visible !important;
+            overflow-x: visible !important;
+            overflow-y: visible !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+            box-sizing: border-box !important;
+        }
+
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td {
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                vertical-align: top;
+            }
+
+            #RightPane .buyer-search-results table,
+            #RightPane .buyer-search-results th,
+            #RightPane .buyer-search-results td,
+            #RightPane .buyer-search-results tr {
+                border: none !important;
+            }
+
+            #RightPane .buyer-search-results table {
+                width: 100%;
+                table-layout: fixed;
+                border-collapse: collapse;
+                margin-left: -2px !important;
+            }
+</style>
+
+<style>
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
+
+    .current-row td {
+        background: #dbeafe !important;
+    }
+</style>
+<style>
+    .batchPopup thead th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+        padding-top: 4px !important;
+        padding-bottom: 2px !important;
+        line-height: 1.1 !important;
+        height: 24px;
+    }
+</style>
+
+<style>
+    .jwcustomer-search-results {
+        width: 500px !important;
+        max-width: 600px;
+    }
+
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
+    .col-form-label {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
+        text-decoration: none !important;
+    }
+
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .row > .col-md-6.col-form-label {
+        flex: 0 0 45%;
+        max-width: 45%;
+    }
+
+        .row > .col-md-6.col-form-label + .col-md-6 {
+            flex: 0 0 55%;
+            max-width: 55%;
+        }
+
+    .row > .col-sm-5.col-form-label {
+        flex: 0 0 40%;
+        max-width: 40%;
+    }
+
+        .row > .col-sm-5.col-form-label + .col-sm-7 {
+            flex: 0 0 60%;
+            max-width: 60%;
+        }
+
+    .form-control,
+    .flatpickr-input,
+    .form-select,
+    textarea.form-control {
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        resize: vertical;
+        overflow: auto;
+    }
+
+    textarea.form-control {
+        min-height: 60px !important;
+    }
+
+    /* Item grid Description textarea should match row height, not header textarea height */
+    #JWIItemTable textarea.form-control.Description {
+        min-height: 25px !important;
+        height: 25px !important;
+    }
+
+    input.flatpickr-input.form-control,
+    input[type="date"].form-control {
+        width: 15ch !important;
+        max-width: 15ch !important;
+        padding-right: 30px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px 16px;
+        cursor: pointer;
+    }
+
+    .JW_Customer_Name {
+        padding-right: 24px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+    }
+
+    /* Service Type radio row */
+    .service-type-row {
+        padding: 6px 0 10px 0;
+    }
+
+        .service-type-row .form-check-label {
+            font-weight: 600;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            color: #000;
+        }
+
+    /* Panel toggle - hidden by default, JS controls visibility */
+    /* Panel toggle - hidden by default, JS controls visibility */
+    #FreightHeaderPanel,
+    #FreightItemTableWrap {
+        display: none;
+    }
+
+    /* Freight grid - let JS-computed widths control column size (like JWI table) */
+    #FreightItemTable {
+        table-layout: auto;
+        width: auto !important;
+    }
+</style>
+
+<form asp-action="SaveServiceOrder"
+      method="post"
+      id="ServiceOrderForm">
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Service Order
+                <a asp-controller="JobworkInward" asp-action="Index" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Popup -->
+    <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header draggable-modal-header">
+                    <p class="modal-title mb-0">Warning</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4 text-dark fs-6 text-center">
+                    <img src="~/img/danger.png" class="img-fluid mb-2" />
+                    <div id="AlertMessage">@Html.Raw(ViewBag.ErrorMessage)</div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-4" id="AlertOkay" data-bs-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row panel-body gx-2">
+
+        <div class="col-12 panel-card-fixed h-100">
+            <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
+                
+                <!-- SERVICE TYPE RADIO (controls which header + item panel is shown) -->
+                <div class="row ps-4">
+                    <div class="col-12 col-md-3 col-lg-3 service-type-row">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="ServiceType" id="ServiceType_JWI" value="JWI" checked>
+                            <label class="form-check-label" for="ServiceType_JWI">Job Work</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="ServiceType" id="ServiceType_Freight" value="FREIGHT">
+                            <label class="form-check-label" for="ServiceType_Freight">Freight</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== JWI HEADER PANEL ==================== -->
+                <div class="card rounded-0 bg-transparent shadow-none" id="JWIHeaderPanel">
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
+                        <div class="row ps-2">
+                            <div class="col-auto left-menu text-black">
+                                <div class="row">
+
+                                    <!-- COLUMN 1 -->
+                                    <div class="col-12 col-md-3 col-lg-3">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Reg No</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="JWIHeader.JIJWI_SVOH_RegNo" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Reg Date</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="JWIHeader.JIJWI_SVOH_RegDate" type="text" class="form-control datepicker RegDate" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Service Order No</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="JWIHeader.JIJWI_SVOH_ServiceOrderNo" maxlength="25" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Service Order Date</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="JWIHeader.JIJWI_SVOH_ServiceOrderDate" type="text" class="form-control datepicker" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Material Segregation</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select name="JWIHeader.JIJWI_SVOH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-3 col-lg-2" style="padding-right: 3rem;">
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
+                                            <label class="col-sm-5 col-form-label ps-0">JW Customer</label>
+                                            <div class="col-sm-7" style="padding-right: 5rem;">
+                                                <input name="JWIHeader.JIJWI_SVOH_JW_Customer_Number" type="hidden" class="JW_Customer_Number" />
+                                                <input name="JWIHeader.JW_Customer_Name" class="form-control JW_Customer_Name"
+                                                       autocomplete="off"
+                                                       onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                       oninput="OnBuyerInput(this)" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
+                                            <label class="col-sm-5 col-form-label ps-0">Currency</label>
+                                            <div class="col-sm-7 position-relative" style="padding-right: 5rem;">
+                                                <select name="JWIHeader.JIJWI_SVOH_Currency_Number" class="form-select Currency_Number" asp-items="@ViewBag.Currency">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3 ps-5">
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Payment Terms</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <input name="JWIHeader.JIJWI_SVOH_PaymentTerms" maxlength="100" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Delivery Terms</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <input name="JWIHeader.JIJWI_SVOH_DeliveryTerms" maxlength="100" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Delivery Mode</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <input name="JWIHeader.JIJWI_SVOH_DeliveryMode" maxlength="100" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Tax</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <textarea name="JWIHeader.JIJWI_SVOH_Tax" class="form-control" maxlength="500" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 4 -->
+                                    <div class="col-12 col-md-2 ps-5">
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-left: 6rem;">
+                                            <label class="col-sm-1 col-form-label">Technical <br />delivery conditions</label>
+                                            <div class="col-sm-2" style="padding-left: 6rem;">
+                                                <textarea name="JWIHeader.JIJWI_SVOH_TDC" class="form-control" maxlength="500" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-start gx-2 mb-0" style="padding-left: 6rem;">
+                                            <label class="col-sm-1 col-form-label ps-0">Remarks</label>
+                                            <div class="col-sm-2" style="padding-left: 6rem;">
+                                                <textarea name="JWIHeader.JIJWI_SVOH_Remarks" class="form-control" maxlength="500" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- RIGHT MENU -->
+                            <div class="col-auto right-menu text-center border-start">
+                                <input id="btnSave" name="Mode" value="Save" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                                <a asp-controller="ServiceOrder" asp-action="Create" class="btn btn-primary btn-sm px-2 w-100 mb-1">Clear All</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== FREIGHT HEADER PANEL ==================== -->
+                <div class="card rounded-0 bg-transparent shadow-none" id="FreightHeaderPanel">
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
+                        <div class="row ps-2">
+                            <div class="col-auto left-menu text-black">
+                                <div class="row">
+
+                                    <!-- COLUMN 1 -->
+                                    <div class="col-12 col-md-3 col-lg-3">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Reg No</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="FreightHeader.JIFRT_SVOH_RegNo" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Reg Date</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="FreightHeader.JIFRT_SVOH_RegDate" type="text" class="form-control datepicker RegDate" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Service Order No</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="FreightHeader.JIFRT_SVOH_ServiceOrderNo" maxlength="25" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Service Order Date</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input name="FreightHeader.JIFRT_SVOH_ServiceOrderDate" type="text" class="form-control datepicker" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Category</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select name="FreightHeader.JIFRT_SVOH_Category" class="form-select">
+                                                    <option value="DN" selected>Delivery Note</option>
+                                                    <option value="RN">Receipt Note</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-3 col-lg-2" style="padding-right: 3rem;">
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
+                                            <label class="col-sm-5 col-form-label ps-0">JW Customer</label>
+                                            <div class="col-sm-7" style="padding-right: 5rem;">
+                                                <input name="FreightHeader.JIFRT_SVOH_JW_Customer_Number" type="hidden" class="JW_Customer_Number" />
+                                                <input name="FreightHeader.JW_Customer_Name" class="form-control JW_Customer_Name"
+                                                       autocomplete="off"
+                                                       onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
+                                                       oninput="OnBuyerInput(this)" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-right: 5rem;">
+                                            <label class="col-sm-5 col-form-label ps-0">Currency</label>
+                                            <div class="col-sm-7 position-relative" style="padding-right: 5rem;">
+                                                <select name="FreightHeader.JIFRT_SVOH_Currency_Number" class="form-select Currency_Number" asp-items="@ViewBag.Currency">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3 ps-5">
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Payment Terms</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <input name="FreightHeader.JIFRT_SVOH_PaymentTerms" maxlength="100" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Delivery Terms</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <input name="FreightHeader.JIFRT_SVOH_DeliveryTerms" maxlength="100" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Delivery Mode</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <input name="FreightHeader.JIFRT_SVOH_DeliveryMode" maxlength="100" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0 ps-5">
+                                            <label class="col-sm-5 col-form-label ps-0">Tax</label>
+                                            <div class="col-sm-7 ps-5">
+                                                <textarea name="FreightHeader.JIFRT_SVOH_Tax" class="form-control" maxlength="500" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 4 -->
+                                    <div class="col-12 col-md-2 ps-5">
+                                        <div class="row align-items-center gx-2 mb-0" style="padding-left: 6rem;">
+                                            <label class="col-sm-1 col-form-label">Technical <br />delivery conditions</label>
+                                            <div class="col-sm-2" style="padding-left: 6rem;">
+                                                <textarea name="FreightHeader.JIFRT_SVOH_TDC" class="form-control" maxlength="500" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-start gx-2 mb-0" style="padding-left: 6rem;">
+                                            <label class="col-sm-1 col-form-label ps-0">Remarks</label>
+                                            <div class="col-sm-2" style="padding-left: 6rem;">
+                                                <textarea name="FreightHeader.JIFRT_SVOH_Remarks" class="form-control" maxlength="500" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- RIGHT MENU -->
+                            <div class="col-auto right-menu text-center border-start">
+                                <input id="btnSaveFreight" name="Mode" value="Save" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                                <a asp-controller="ServiceOrder" asp-action="Create" class="btn btn-primary btn-sm px-2 w-100 mb-1">Clear All</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== JWI ITEM TABLE ==================== -->
+                <div class="card rounded-0 bg-transparent shadow-none" id="JWIItemTableWrap">
+                    <div class="card-body h-100">
+                        <div class="row h-100">
+                            <div class="col-auto left-menu h-100">
+                                <ul class="nav nav-tabs tab-header d-flex align-items-end">
+                                    <li class="nav-item"><a class="nav-link active" aria-current="page">Item</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark">Other</a></li>
+                                    <li class="ms-auto me-2 mb-2">
+                                        <button type="button" id="AddRowButton" class="btn btn-primary btn-sm me-2">Add Row</button>
+                                        <button type="button" id="RemoveItemRowButton" class="btn btn-danger btn-sm RowRemove">Delete Row</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content tab-body tab-body-h-o">
+                                    <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" tabindex="0">
+                                        <div class="row h-100">
+                                            <div class="col table-fixed h-100">
+                                                <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
+                                                    <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="JWIItemTable">
+                                                        <thead>
+                                                            <tr class="table-info">
+                                                                <th class="px-2 del text-center"><input type="checkbox" class="IndexAllCheckItem form-check-input border-white"></th>
+                                                                <th style="text-align:left;">Process</th>
+                                                                <th style="text-align:left;">Item Code</th>
+                                                                <th style="text-align:left;">Description</th>
+                                                                <th style="text-align:center;">Outer Dia</th>
+                                                                <th style="text-align:center;">Thickness</th>
+                                                                <th style="text-align:center;">Length</th>
+                                                                <th style="text-align:center;">Width</th>
+                                                                <th style="text-align:left;">Material Grade</th>
+                                                                <th style="text-align:left;">Item Group</th>
+                                                                <th style="text-align:center;">Warehouse</th>
+                                                                <th style="text-align:center;">UOM</th>
+                                                                <th style="text-align:center;">Qty</th>
+                                                                <th style="text-align:right;">Unit Price</th>
+                                                                <th style="text-align:right;">Amount</th>
+                                                                <th style="text-align:center;">Delivery Date</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="JWITableBody">
+                                                            <tr id="JWITempRow" style="display:none">
+                                                                <td class="p-2 del"><input type="checkbox" class="CheckItem form-check-input"></td>
+                                                                <td>
+                                                                    <select name="JWIItems[0].JIJWI_SVOI_PRS_Number" class="form-select JIJWI_SVOI_PRS_Number" asp-items="@ViewBag.Process"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_Number" type="hidden" class="JIJWI_SVOI_Number" />
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_IsDeleted" type="hidden" value="false" class="JIJWI_SVOI_IsDeleted" />
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_Item_Number" type="hidden" class="JIJWI_SVOI_Item_Number" />
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_Item_Code" autocomplete="off" class="form-control JIJWI_SVOI_Item_Code"
+                                                                           oninput="OnInputItem(this)" onfocus="ShowItemPane();OnFocusItem(this)" />
+                                                                </td>
+                                                                <td><textarea name="JWIItems[0].Description" class="form-control Description" rows="2" readonly></textarea></td>
+                                                                <td><input name="JWIItems[0].OuterDia" class="form-control OuterDia text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].Thickness" class="form-control Thickness text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].Length" class="form-control Length text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].Width" class="form-control Width text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].MaterialGrade" class="form-control MaterialGrade" readonly /></td>
+                                                                <td><input name="JWIItems[0].ItemGroup" class="form-control ItemGroup" readonly /></td>
+                                                                <td>
+                                                                    <select name="JWIItems[0].JIJWI_SVOI_WH_Number" class="form-select JIJWI_SVOI_WH_Number text-center" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="JWIItems[0].JIJWI_SVOI_UoM_Number" class="form-select JIJWI_SVOI_UoM_Number text-center" asp-items="@ViewBag.UOM"></select>
+                                                                </td>
+                                                                <td><input name="JWIItems[0].JIJWI_SVOI_Qty" class="form-control JIJWI_SVOI_Qty text-center" /></td>
+                                                                <td><input name="JWIItems[0].JIJWI_SVOI_UnitPrice" class="form-control JIJWI_SVOI_UnitPrice text-end" /></td>
+                                                                <td><input name="JWIItems[0].JIJWI_SVOI_Amount" class="form-control JIJWI_SVOI_Amount text-end" readonly /></td>
+                                                                <td>
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_DeliveryDate" type="text" class="form-control datepicker JIJWI_SVOI_DeliveryDate text-center" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr class="JWINewRow NewRow" data-rowid="1">
+                                                                <td class="p-2 del"><input type="checkbox" class="CheckItem form-check-input"></td>
+                                                                <td>
+                                                                    <select name="JWIItems[0].JIJWI_SVOI_PRS_Number" class="form-select JIJWI_SVOI_PRS_Number" asp-items="@ViewBag.Process"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_Number" type="hidden" class="JIJWI_SVOI_Number" />
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_IsDeleted" type="hidden" value="false" class="JIJWI_SVOI_IsDeleted" />
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_Item_Number" type="hidden" class="JIJWI_SVOI_Item_Number" />
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_Item_Code" autocomplete="off" class="form-control JIJWI_SVOI_Item_Code"
+                                                                           oninput="OnInputItem(this)" onfocus="ShowItemPane();OnFocusItem(this)" />
+                                                                </td>
+                                                                <td><textarea name="JWIItems[0].Description" class="form-control Description" rows="2" readonly></textarea></td>
+                                                                <td><input name="JWIItems[0].OuterDia" class="form-control OuterDia text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].Thickness" class="form-control Thickness text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].Length" class="form-control Length text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].Width" class="form-control Width text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].MaterialGrade" class="form-control MaterialGrade" readonly /></td>
+                                                                <td><input name="JWIItems[0].ItemGroup" class="form-control ItemGroup" readonly /></td>
+                                                                <td>
+                                                                    <select name="JWIItems[0].JIJWI_SVOI_WH_Number" class="form-select JIJWI_SVOI_WH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="JWIItems[0].JIJWI_SVOI_UoM_Number" class="form-select JIJWI_SVOI_UoM_Number" asp-items="@ViewBag.UOM"></select>
+                                                                </td>
+                                                                <td><input name="JWIItems[0].JIJWI_SVOI_Qty" class="form-control JIJWI_SVOI_Qty text-center" /></td>
+                                                                <td><input name="JWIItems[0].JIJWI_SVOI_UnitPrice" class="form-control JIJWI_SVOI_UnitPrice text-end" /></td>
+                                                                <td><input name="JWIItems[0].JIJWI_SVOI_Amount" class="form-control JIJWI_SVOI_Amount text-end" readonly /></td>
+                                                                <td>
+                                                                    <input name="JWIItems[0].JIJWI_SVOI_DeliveryDate" type="text" class="form-control datepicker JIJWI_SVOI_DeliveryDate text-center" />
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr class="table-info">
+                                                                <td colspan="12" class="text-end py-2"><span class="float-end pe-3">Total</span></td>
+                                                                <td><input id="JWITotalQty" class="form-control text-center" readonly /></td>
+                                                                <td></td>
+                                                                <td><input id="JWITotalAmount" class="form-control text-end" readonly /></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== FREIGHT ITEM TABLE ==================== -->
+                <div class="card rounded-0 bg-transparent shadow-none" id="FreightItemTableWrap">
+                    <div class="card-body h-100">
+                        <div class="row h-100">
+                            <div class="col-auto left-menu h-100">
+                                <ul class="nav nav-tabs tab-header d-flex align-items-end">
+                                    <li class="nav-item"><a class="nav-link active" aria-current="page">Item</a></li>
+                                    <li class="nav-item"><a class="nav-link text-dark">Other</a></li>
+                                    <li class="ms-auto me-2 mb-2">
+                                        <button type="button" id="AddRowButtonFreight" class="btn btn-primary btn-sm me-2">Add Row</button>
+                                        <button type="button" id="RemoveItemRowButtonFreight" class="btn btn-danger btn-sm RowRemove">Delete Row</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content tab-body tab-body-h-o">
+                                    <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" tabindex="0">
+                                        <div class="row h-100">
+                                            <div class="col table-fixed h-100">
+                                                <div class="w-12 table-responsive table-body table-body-f" style="height:528px;">
+                                                    <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="FreightItemTable">
+                                                        <thead>
+                                                            <tr class="table-info">
+                                                                <th class="px-2 del text-center"><input type="checkbox" class="IndexAllCheckItem form-check-input border-white"></th>
+                                                                <th style="text-align:left;">Process</th>
+                                                                <th style="text-align:center;">From WH</th>
+                                                                <th style="text-align:center;">To WH</th>
+                                                                <th style="text-align:center;">UOM</th>
+                                                                <th style="text-align:center;">Qty</th>
+                                                                <th style="text-align:right;">Rate</th>
+                                                                <th style="text-align:right;">Amount</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="FreightTableBody">
+                                                            <tr id="FreightTempRow" style="display:none">
+                                                                <td class="p-2 del"><input type="checkbox" class="CheckItem form-check-input"></td>
+                                                                <td>
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_PRS_Number" class="form-select JIFRT_SVOI_PRS_Number" asp-items="@ViewBag.Process"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="FreightItems[0].JIFRT_SVOI_Number" type="hidden" class="JIFRT_SVOI_Number" />
+                                                                    <input name="FreightItems[0].JIFRT_SVOI_IsDeleted" type="hidden" value="false" class="JIFRT_SVOI_IsDeleted" />
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_FromWH_Number" class="form-select JIFRT_SVOI_FromWH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_ToWH_Number" class="form-select JIFRT_SVOI_ToWH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_UoM_Number" class="form-select JIFRT_SVOI_UoM_Number text-center" asp-items="@ViewBag.UOM"></select>
+                                                                </td>
+                                                                <td><input name="FreightItems[0].JIFRT_SVOI_Qty" class="form-control JIFRT_SVOI_Qty text-center" /></td>
+                                                                <td><input name="FreightItems[0].JIFRT_SVOI_Rate" class="form-control JIFRT_SVOI_Rate text-end" /></td>
+                                                                <td><input name="FreightItems[0].JIFRT_SVOI_Amount" class="form-control JIFRT_SVOI_Amount text-end" readonly /></td>
+                                                            </tr>
+                                                            <tr class="FreightNewRow NewRow" data-rowid="1">
+                                                                <td class="p-2 del"><input type="checkbox" class="CheckItem form-check-input"></td>
+                                                                <td>
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_PRS_Number" class="form-select JIFRT_SVOI_PRS_Number" asp-items="@ViewBag.Process"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="FreightItems[0].JIFRT_SVOI_Number" type="hidden" class="JIFRT_SVOI_Number" />
+                                                                    <input name="FreightItems[0].JIFRT_SVOI_IsDeleted" type="hidden" value="false" class="JIFRT_SVOI_IsDeleted" />
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_FromWH_Number" class="form-select JIFRT_SVOI_FromWH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_ToWH_Number" class="form-select JIFRT_SVOI_ToWH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="FreightItems[0].JIFRT_SVOI_UoM_Number" class="form-select JIFRT_SVOI_UoM_Number text-center" asp-items="@ViewBag.UOM"></select>
+                                                                </td>
+                                                                <td><input name="FreightItems[0].JIFRT_SVOI_Qty" class="form-control JIFRT_SVOI_Qty text-center" /></td>
+                                                                <td><input name="FreightItems[0].JIFRT_SVOI_Rate" class="form-control JIFRT_SVOI_Rate text-end" /></td>
+                                                                <td><input name="FreightItems[0].JIFRT_SVOI_Amount" class="form-control JIFRT_SVOI_Amount text-end" readonly /></td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr class="table-info">
+                                                                <td colspan="5" class="text-end py-2"><span class="float-end pe-3">Total</span></td>
+                                                                <td><input id="FreightTotalQty" class="form-control text-center" readonly /></td>
+                                                                <td></td>
+                                                                <td><input id="FreightTotalAmount" class="form-control text-end" readonly /></td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="RightPane">
+            <div class="p-2">
+                <div class="buyer-search-results"></div>
+            </div>
+        </div>
+        <div id="RightPane_Item">
+            <div class="p-2">
+                <div class="search-results"></div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
+    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+    <script src="~/js/jw_serviceorder/JW_ServiceOrder.js" asp-append-version="true"></script>
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
+
+    <script>
+        // Radio toggle: JWI <-> Freight panels
+        $(document).ready(function () {
+            function toggleServiceTypePanels() {
+                var type = $('input[name="ServiceType"]:checked').val();
+                if (type === 'FREIGHT') {
+                    $('#JWIHeaderPanel').hide();
+                    $('#JWIItemTableWrap').hide();
+                    $('#FreightHeaderPanel').show();
+                    $('#FreightItemTableWrap').show();
+                } else {
+                    $('#FreightHeaderPanel').hide();
+                    $('#FreightItemTableWrap').hide();
+                    $('#JWIHeaderPanel').show();
+                    $('#JWIItemTableWrap').show();
+                }
+            }
+
+            $('input[name="ServiceType"]').on('change', toggleServiceTypePanels);
+            toggleServiceTypePanels(); // initial state on page load
+        });
+    </script>
+}

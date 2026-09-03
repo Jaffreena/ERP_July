@@ -8,18 +8,18 @@ using System.Globalization;
 
 namespace ERP.Controllers.JobworkInward
 {
-    public class DeliveryNoteNumberController : Controller
+    public class JIDN_NumberController : Controller
     {
         DataSet DS = new DataSet();
         Help Help = new Help();
         //DN NUMBERING
         DNNumber_DTO DON_DTO = new DNNumber_DTO();
-        DNNumber_DAO DON_DAO = new DNNumber_DAO();
-        DNNumbering_DL DON_DL = new DNNumbering_DL();
+        JIDN_Numbering_DAO DON_DAO = new JIDN_Numbering_DAO();
+        JIDN_Numbering_DL DON_DL = new JIDN_Numbering_DL();
 
-        List<DNNumberReset_DTO> DOR_List = new List<DNNumberReset_DTO>();
-        List<DNNumberPrefix_DTO> DOP_List = new List<DNNumberPrefix_DTO>();
-        List<DNNumberSuffix_DTO> DOS_List = new List<DNNumberSuffix_DTO>();
+        List<JIDN_NumberReset_DTO> DOR_List = new List<JIDN_NumberReset_DTO>();
+        List<JIDN_NumberPrefix_DTO> DOP_List = new List<JIDN_NumberPrefix_DTO>();
+        List<JIDN_NumberSuffix_DTO> DOS_List = new List<JIDN_NumberSuffix_DTO>();
         public IActionResult Index()
         {
             return View();
@@ -29,13 +29,13 @@ namespace ERP.Controllers.JobworkInward
         public IActionResult DNNumbering()
         {
             GetDNNumber();
-            return View(DON_DTO);
+            return View("~/Views/JobworkInward/DeliveryNote/DeliveryNoteNumber/DNNumbering.cshtml", DON_DTO);
         }
         void GetDNNumber()
         {
             DON_DTO.CreatorCode = Convert.ToInt32(1);
             DON_DTO.Id = 1;
-            DS = DON_DAO.DNNumberDB(DON_DTO);
+            DS = DON_DAO.JIDN_NumberingDB(DON_DTO);
 
             ViewBag.Method = Help.GetCat(DS.Tables[0]);
             ViewBag.Frequency = Help.GetCat(DS.Tables[1]);
@@ -47,9 +47,9 @@ namespace ERP.Controllers.JobworkInward
                 DON_DTO.DNN_Method = DS.Tables[3].Rows[0]["DNN_Method"].ToString();
             }
 
-            DON_DTO.DNNumberReset = DON_DL.DORList(DS.Tables[4]);
-            DON_DTO.DNNumberPrefix = DON_DL.DOPList(DS.Tables[5]);
-            DON_DTO.DNNumberSuffix = DON_DL.DOSList(DS.Tables[6]);
+            DON_DTO.DNNumberReset = DON_DL.JIDN_NRList(DS.Tables[4]);
+            DON_DTO.DNNumberPrefix = DON_DL.JIDN_PrefixList(DS.Tables[5]);
+            DON_DTO.DNNumberSuffix = DON_DL.JIDN_SuffixList(DS.Tables[6]);
         }
 
         [Route("deliverynote/setup/deliverynote-numbering")]
@@ -59,9 +59,9 @@ namespace ERP.Controllers.JobworkInward
             bool IsValid = false;
             DNNumber_DTO P_Head_DTO = new DNNumber_DTO();
 
-            List<DNNumberReset_DTO>? Reset_DTO = new List<DNNumberReset_DTO>();
-            List<DNNumberPrefix_DTO>? Prefix_DTO = new List<DNNumberPrefix_DTO>();
-            List<DNNumberSuffix_DTO>? Suffix_DTO = new List<DNNumberSuffix_DTO>();
+            List<JIDN_NumberReset_DTO>? Reset_DTO = new List<JIDN_NumberReset_DTO>();
+            List<JIDN_NumberPrefix_DTO>? Prefix_DTO = new List<JIDN_NumberPrefix_DTO>();
+            List<JIDN_NumberSuffix_DTO>? Suffix_DTO = new List<JIDN_NumberSuffix_DTO>();
 
             P_Head_DTO = DON_DTO;
 
@@ -76,22 +76,22 @@ namespace ERP.Controllers.JobworkInward
 
             if (PN_DTO.DNN_Method == "2")
             {
-                String ResetDTO = string.Join(", ", Reset_DTO.Where(x => Convert.ToInt64(x.DNR_Number) != 0).Select(x => x.DNR_Number));
-                String PrefixDTO = string.Join(", ", Prefix_DTO.Where(x => Convert.ToInt64(x.DNP_Number) != 0).Select(x => x.DNP_Number));
-                String SuffixDTO = string.Join(", ", Suffix_DTO.Where(x => Convert.ToInt64(x.DNS_Number) != 0).Select(x => x.DNS_Number));
+                String ResetDTO = string.Join(", ", Reset_DTO.Where(x => Convert.ToInt64(x.JIDN_NR_Number) != 0).Select(x => x.JIDN_NR_Number));
+                String PrefixDTO = string.Join(", ", Prefix_DTO.Where(x => Convert.ToInt64(x.JIDN_Prefix_Number) != 0).Select(x => x.JIDN_Prefix_Number));
+                String SuffixDTO = string.Join(", ", Suffix_DTO.Where(x => Convert.ToInt64(x.JIDN_Suffix_Number) != 0).Select(x => x.JIDN_Suffix_Number));
 
                 DON_DTO.CreatorCode = Convert.ToInt32(1);
                 DON_DTO.DeleteNumbers = Convert.ToString(ResetDTO);
                 DON_DTO.Id = 31;
-                DON_DAO.DNNumberDB(DON_DTO);
+                DON_DAO.JIDN_NumberingDB(DON_DTO);
 
                 DON_DTO.DeleteNumbers = Convert.ToString(PrefixDTO);
                 DON_DTO.Id = 32;
-                DON_DAO.DNNumberDB(DON_DTO);
+                DON_DAO.JIDN_NumberingDB(DON_DTO);
 
                 DON_DTO.DeleteNumbers = Convert.ToString(SuffixDTO);
                 DON_DTO.Id = 33;
-                DON_DAO.DNNumberDB(DON_DTO);
+                DON_DAO.JIDN_NumberingDB(DON_DTO);
 
                 DON_DTO.DNN_Method = PN_DTO.DNN_Method;
                 if (PN_DTO.DNN_Number == 0)
@@ -103,66 +103,66 @@ namespace ERP.Controllers.JobworkInward
                     DON_DTO.Id = 41;
                     DON_DTO.DNN_Number = PN_DTO.DNN_Number;
                 }
-                DON_DAO.DNNumberDB(DON_DTO);
+                DON_DAO.JIDN_NumberingDB(DON_DTO);
 
                 foreach (var Reset in Reset_DTO)
                 {
-                    DON_DTO.DNN_Date = Convert.ToString(Convert.ToDateTime(Reset.DNR_Date).ToString("yyyyMMdd"));
-                    DON_DTO.DNN_EndDate = Convert.ToString(Convert.ToDateTime(Reset.DNR_EndDate).ToString("yyyyMMdd"));
-                    DON_DTO.DNN_StartingNumber = Convert.ToInt32(Reset.DNR_StartingNumber).ToString();
-                    DON_DTO.DNN_NumberofDigits = Convert.ToInt32(Reset.DNR_NumberofDigits).ToString();
-                    DON_DTO.DNN_PrefilZero = Convert.ToInt64(Reset.DNR_PrefilZero).ToString();
-                    DON_DTO.DNN_Frequency = Convert.ToInt64(Reset.DNR_Frequency).ToString();
+                    DON_DTO.DNN_Date = Convert.ToString(Convert.ToDateTime(Reset.JIDN_NR_Date).ToString("yyyyMMdd"));
+                    DON_DTO.DNN_EndDate = Convert.ToString(Convert.ToDateTime(Reset.JIDN_NR_EndDate).ToString("yyyyMMdd"));
+                    DON_DTO.DNN_StartingNumber = Convert.ToInt32(Reset.JIDN_NR_StartingNumber).ToString();
+                    DON_DTO.DNN_NumberofDigits = Convert.ToInt32(Reset.JIDN_NR_NumberofDigits).ToString();
+                    DON_DTO.DNN_PrefilZero = Convert.ToInt64(Reset.JIDN_NR_PrefilZero).ToString();
+                    DON_DTO.DNN_Frequency = Convert.ToInt64(Reset.JIDN_NR_Frequency).ToString();
 
-                    if (Reset.DNR_Number == 0)
+                    if (Reset.JIDN_NR_Number == 0)
                     {
                         DON_DTO.Id = 12;
                     }
                     else
                     {
                         DON_DTO.Id = 42;
-                        DON_DTO.DNN_Number = Reset.DNR_Number;
+                        DON_DTO.DNN_Number = Reset.JIDN_NR_Number;
                     }
 
-                    DON_DAO.DNNumberDB(DON_DTO);
+                    DON_DAO.JIDN_NumberingDB(DON_DTO);
                 }
 
                 foreach (var Prefix in Prefix_DTO)
                 {
-                    DON_DTO.DNN_Date = Convert.ToString(Convert.ToDateTime(Prefix.DNP_Date).ToString("yyyyMMdd"));
-                    DON_DTO.DNN_EndDate = Convert.ToString(Convert.ToDateTime(Prefix.DNP_EndDate).ToString("yyyyMMdd"));
-                    DON_DTO.DNN_Particulars = Convert.ToString(Prefix.DNP_Particulars);
+                    DON_DTO.DNN_Date = Convert.ToString(Convert.ToDateTime(Prefix.JIDN_Prefix_Date).ToString("yyyyMMdd"));
+                    DON_DTO.DNN_EndDate = Convert.ToString(Convert.ToDateTime(Prefix.JIDN_Prefix_EndDate).ToString("yyyyMMdd"));
+                    DON_DTO.DNN_Particulars = Convert.ToString(Prefix.JIDN_Prefix_Particulars);
 
-                    if (Prefix.DNP_Number == 0)
+                    if (Prefix.JIDN_Prefix_Number == 0)
                     {
                         DON_DTO.Id = 13;
                     }
                     else
                     {
                         DON_DTO.Id = 43;
-                        DON_DTO.DNN_Number = Prefix.DNP_Number;
+                        DON_DTO.DNN_Number = Prefix.JIDN_Prefix_Number;
                     }
 
-                    DON_DAO.DNNumberDB(DON_DTO);
+                    DON_DAO.JIDN_NumberingDB(DON_DTO);
                 }
 
                 foreach (var Suffix in Suffix_DTO)
                 {
-                    DON_DTO.DNN_Date = Convert.ToString(Convert.ToDateTime(Suffix.DNS_Date).ToString("yyyyMMdd"));
-                    DON_DTO.DNN_EndDate = Convert.ToString(Convert.ToDateTime(Suffix.DNS_EndDate).ToString("yyyyMMdd"));
-                    DON_DTO.DNN_Particulars = Convert.ToString(Suffix.DNS_Particulars);
+                    DON_DTO.DNN_Date = Convert.ToString(Convert.ToDateTime(Suffix.JIDN_Suffix_Date).ToString("yyyyMMdd"));
+                    DON_DTO.DNN_EndDate = Convert.ToString(Convert.ToDateTime(Suffix.JIDN_Suffix_EndDate).ToString("yyyyMMdd"));
+                    DON_DTO.DNN_Particulars = Convert.ToString(Suffix.JIDN_Suffix_Particulars);
 
-                    if (Suffix.DNS_Number == 0)
+                    if (Suffix.JIDN_Suffix_Number == 0)
                     {
                         DON_DTO.Id = 14;
                     }
                     else
                     {
                         DON_DTO.Id = 44;
-                        DON_DTO.DNN_Number = Suffix.DNS_Number;
+                        DON_DTO.DNN_Number = Suffix.JIDN_Suffix_Number;
                     }
 
-                    DON_DAO.DNNumberDB(DON_DTO);
+                    DON_DAO.JIDN_NumberingDB(DON_DTO);
                 }
 
                 DON_DTO.Reset();
@@ -185,10 +185,10 @@ namespace ERP.Controllers.JobworkInward
                     DON_DTO.DNN_Number = PN_DTO.DNN_Number;
                 }
 
-                DON_DAO.DNNumberDB(DON_DTO);
+                DON_DAO.JIDN_NumberingDB(DON_DTO);
             }
             GetDNNumber();
-            return View(DON_DTO);
+            return View("~/Views/JobworkInward/DeliveryNote/DeliveryNoteNumber/DNNumbering.cshtml", DON_DTO);
         }
 
         [HttpPost]
@@ -208,7 +208,7 @@ namespace ERP.Controllers.JobworkInward
             dto.DNN_EndDate = endDate.ToString();
             dto.Id = 51;
 
-            DataSet ds = DON_DAO.DNNumberDB(dto);
+            DataSet ds = DON_DAO.JIDN_NumberingDB(dto);
 
             bool exists = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
 
@@ -238,7 +238,7 @@ namespace ERP.Controllers.JobworkInward
             dto.DNN_EndDate = endDate.ToString();
             dto.Id = 52;
 
-            DataSet ds = DON_DAO.DNNumberDB(dto);
+            DataSet ds = DON_DAO.JIDN_NumberingDB(dto);
 
             bool exists = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
 
@@ -268,7 +268,7 @@ namespace ERP.Controllers.JobworkInward
             dto.DNN_EndDate = endDate.ToString();
             dto.Id = 53;
 
-            DataSet ds = DON_DAO.DNNumberDB(dto);
+            DataSet ds = DON_DAO.JIDN_NumberingDB(dto);
 
             bool exists = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
 

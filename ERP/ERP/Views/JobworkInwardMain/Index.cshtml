@@ -81,13 +81,20 @@
                                   
                                 </li>
                                 <li class="mb-2">
-                                    <a asp-controller="ServiceOrder" class="d-flex align-items-center" asp-action="ServiceOrderSummary">
+                                    <a asp-controller="ServiceOrder" class="d-flex align-items-center" asp-action="JIJWIServiceOrderSummary">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-right me-2" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
                                             <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
-                                        </svg> Service Order Register
+                                        </svg> Jobwork Service Order Register
                                     </a>
-                                  
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="ServiceOrder" class="d-flex align-items-center" asp-action="JIFRTServiceOrderSummary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-right me-2" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                                            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                                        </svg> Freight Service Order Register
+                                    </a>
                                 </li>
                                 <li class="mb-2">
                                     <a asp-controller="Conversion" class="d-flex align-items-center" asp-action="ConversionDetailed">
@@ -127,10 +134,10 @@
                                             </svg> Receipt Note Number
                                         </a>
                                     </li>
-                                    <li class="mb-2">
-    <a asp-controller="DeliveryNoteNumber"
-       asp-action="DNNumbering"
-       class="d-flex align-items-center">
+                                <li class="mb-2">
+                                    <a asp-controller="JIDN_Number"
+                                           asp-action="DNNumbering"
+                                           class="d-flex align-items-center">
         <svg xmlns="http://www.w3.org/2000/svg"
              width="10"
              height="10"
@@ -161,22 +168,38 @@
                                     </li>
 
 
-<li class="mb-2">
-    <a asp-controller="ServiceOrderNumber"
-       asp-action="JSONumbering"
-       class="d-flex align-items-center">
-        <svg xmlns="http://www.w3.org/2000/svg"
-             width="10"
-             height="10"
-             fill="currentColor"
-             class="bi bi-chevron-double-right me-2"
-             viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
-            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
-        </svg>
-        Service Order Number
-    </a>
-</li>
+                                <li class="mb-2">
+                                    <a asp-controller="JIJWI_SVO_Number"
+                                           asp-action="JIJWI_SVO_Numbering"
+                                           class="d-flex align-items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             width="10"
+                                             height="10"
+                                             fill="currentColor"
+                                             class="bi bi-chevron-double-right me-2"
+                                             viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                                            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                                        </svg>
+                                        Job Work Service Order Number
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JIFRT_SVO_Number"
+                                           asp-action="JIFRT_SVO_Numbering"
+                                           class="d-flex align-items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             width="10"
+                                             height="10"
+                                             fill="currentColor"
+                                             class="bi bi-chevron-double-right me-2"
+                                             viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                                            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                                        </svg>
+                                        Freight Service Order Number
+                                    </a>
+                                </li>
 <li class="mb-2">
     <a asp-controller="ConversionNumber"
        asp-action="JI_CONVNumbering"
@@ -214,7 +237,7 @@
                                 </li>
                               
                                 <li class="mb-2">
-                                    <a asp-controller="DFSDeliveryNote" class="d-flex align-items-center" asp-action="DeliveryNoteDefaultSetting">
+                                    <a asp-controller="JIDN_DFS" class="d-flex align-items-center" asp-action="DeliveryNoteDefaultSetting">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-right me-2" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
                                             <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
@@ -232,11 +255,19 @@
                                     </a>
                                 </li>
                                 <li class="mb-2">
-                                    <a asp-controller="DFSServiceOrder" class="d-flex align-items-center" asp-action="ServiceOrderDefaultSetting">
+                                    <a asp-controller="DFSServiceOrder" class="d-flex align-items-center" asp-action="FreightServiceOrderDefaultSetting">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-right me-2" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
                                             <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
-                                        </svg> Service Order
+                                        </svg> Freight Service Order
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="DFSServiceOrder" class="d-flex align-items-center" asp-action="JobworkInvoiceServiceOrderDefaultSetting">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-chevron-double-right me-2" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                                            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                                        </svg> Jobwork Invoice Service Order
                                     </a>
                                 </li>
                                 <li class="mb-2">

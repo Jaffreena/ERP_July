@@ -9,7 +9,7 @@
     //#endregion
 
     //#region JW_Customer – Focus Out
-    $(document).on("focusout", "#Header_JISVOH_JW_Customer_Name", function () {
+    $(document).on("focusout", ".JW_Customer_Name", function () {
         if (isMouseSelectingBuyer)
             return;
         let input = $(this);
@@ -38,7 +38,7 @@
     // 2. Arrow Up – highlight + move to top match
     // 3. Arrow Down – highlight + move to bottom match
     // 4. Enter/Escape, no record selected -> auto-select first record + close popup
-    $(document).on("keydown", "#Header_JISVOH_JW_Customer_Name", function (e) {
+    $(document).on("keydown", ".JW_Customer_Name", function (e) {
 
         if (e.key !== "ArrowDown" && e.key !== "ArrowUp" &&
             e.key !== "Enter" && e.key !== "Escape") {
@@ -104,7 +104,7 @@
     //#endregion
 
     //#region Item_Code – Keydown
-    $(document).on("keydown", ".JISVOI_Item_Code", function (e) {
+    $(document).on("keydown", ".JIJWI_SVOI_Item_Code", function (e) {
 
         if (e.key !== "ArrowDown" && e.key !== "ArrowUp" &&
             e.key !== "Enter" && e.key !== "Escape") {
@@ -146,15 +146,17 @@
             "#RightPane_Item",
             ".search-results",
             "#ItemMessage",
-            "#Header_JISVOH_MS_Number"
+            '[name="JWIHeader.JIJWI_SVOH_MS_Number"]'
         );
     });
 
     // mousedown -> (re)open the item pane and load/refresh the search.
-    $(document).on("mousedown", ".JISVOI_Item_Code", function (e) {
+    $(document).on("mousedown", ".JIJWI_SVOI_Item_Code", function (e) {
 
-        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
-            $("#Header_JISVOH_MS_Number").prop("selectedIndex", 1);
+        let $msField = $(this).closest(".card").find('[name="JWIHeader.JIJWI_SVOH_MS_Number"]');
+
+        if ($.trim($msField.val()) === "") {
+            $msField.prop("selectedIndex", 1);
             return;
         }
 
@@ -167,14 +169,15 @@
         $("#RightPane_Item .search-results").show();
     });
     //#endregion
-
     //#region Item_Code – Focus Out
-    $(document).on("focusout", ".JISVOI_Item_Code", function () {
+    $(document).on("focusout", ".JIJWI_SVOI_Item_Code", function () {
 
         if (isSelectingItem)
             return;
 
-        if ($.trim($("#Header_JISVOH_MS_Number").val()) === "") {
+        let $msField = $(this).closest(".card").find('[name="JWIHeader.JIJWI_SVOH_MS_Number"]');
+
+        if ($.trim($msField.val()) === "") {
             return;
         }
 
@@ -200,9 +203,9 @@
     //#endregion
 
 });
-const ItemTableFields = [
-    { cls: ".JISVOI_PRS_Number", min: 10, max: 25, align: "left" },   // Process
-    { cls: ".JISVOI_Item_Code", min: 10, max: 15, align: "left" },   // Item Code
+const JWIItemTableFields = [
+    { cls: ".JIJWI_SVOI_PRS_Number", min: 10, max: 25, align: "left" },   // Process
+    { cls: ".JIJWI_SVOI_Item_Code", min: 10, max: 15, align: "left" },   // Item Code
     { cls: ".Description", min: 40, max: 40, align: "left" },   // Description
 
     { cls: ".OuterDia", min: 8, max: 8, align: "center" }, // Outer Dia
@@ -213,17 +216,25 @@ const ItemTableFields = [
     { cls: ".MaterialGrade", min: 10, max: 25, align: "left" },   // Material Grade
     { cls: ".ItemGroup", min: 10, max: 30, align: "left" },   // Item Group
 
-    { cls: ".JISVOI_WH_Number", min: 10, max: 25, align: "left" }, // Warehouse
+    { cls: ".JIJWI_SVOI_WH_Number", min: 10, max: 25, align: "left" }, // Warehouse
 
-    { cls: ".JISVOI_UoM_Number", min: 10, max: 15, align: "center" }, // UoM
+    { cls: ".JIJWI_SVOI_UoM_Number", min: 10, max: 15, align: "center" }, // UoM
 
-    { cls: ".JISVOI_Qty", min: 10, max: 20, align: "center" }, // Qty
-    { cls: ".JISVOI_UnitPrice", min: 10, max: 20, align: "right" },  // Unit Price
-    { cls: ".JISVOI_Amount", min: 13, max: 25, align: "right" },  // Amount
+    { cls: ".JIJWI_SVOI_Qty", min: 10, max: 20, align: "center" }, // Qty
+    { cls: ".JIJWI_SVOI_UnitPrice", min: 10, max: 20, align: "right" },  // Unit Price
+    { cls: ".JIJWI_SVOI_Amount", min: 13, max: 25, align: "right" },  // Amount
 
-    { cls: ".JISVOI_DeliveryDate", min: 10, max: 10, align: "center" },  // Delivery Date
-    { cls: ".JISVOI_FromWH", min: 10, max: 25, align: "left" }, // From WH
-    { cls: ".JISVOI_ToWH", min: 10, max: 25, align: "left" }  // To WH
+    { cls: ".JIJWI_SVOI_DeliveryDate", min: 10, max: 10, align: "center" }  // Delivery Date
+];
+
+const FreightItemTableFields = [
+    { cls: ".JIFRT_SVOI_PRS_Number", min: 10, max: 25, align: "left", extraPadding: 28 },   // Process
+    { cls: ".JIFRT_SVOI_FromWH_Number", min: 10, max: 25, align: "left", extraPadding: 28 }, // From WH
+    { cls: ".JIFRT_SVOI_ToWH_Number", min: 10, max: 25, align: "left", extraPadding: 28 },   // To WH
+    { cls: ".JIFRT_SVOI_UoM_Number", min: 10, max: 15, align: "center", extraPadding: 28 }, // UoM
+    { cls: ".JIFRT_SVOI_Qty", min: 10, max: 20, align: "center" }, // Qty
+    { cls: ".JIFRT_SVOI_Rate", min: 10, max: 20, align: "right", extraPadding: 28 },  // Rate
+    { cls: ".JIFRT_SVOI_Amount", min: 13, max: 25, align: "right", extraPadding: 28 }  // Amount
 ];
 let isMouseSelectingBuyer = false;
  
@@ -270,18 +281,31 @@ function HighlightRow(rows, index) {
     });
 }
 function AutoFit() {
-    fitInputWidth("Header_JISVOH_RegNo", 20, 25);
-    fitInputWidth("Header_JISVOH_ServiceOrderNo", 20, 25);
-    fitInputWidth("Header_JISVOH_MS_Number", 20, 30);
-    fitInputWidth("Header_JISVOH_JW_Customer_Name", 40, 50);
-    fitInputWidth("Header_JISVOH_Currency_Number", 10, 10);
-    fitInputWidth("Header_JISVOH_Category", 20, 20);
-    fitInputWidth("Header_JISVOH_PaymentTerms", 30, 40);
-    fitInputWidth("Header_JISVOH_DeliveryTerms", 30, 40);
-    fitInputWidth("Header_JISVOH_DeliveryMode", 30, 40);
-    fitInputWidth("Header_JISVOH_Tax", 40, 40);
-    fitInputWidth("Header_JISVOH_TDC", 40, 40);
-    fitInputWidth("Header_JISVOH_Remarks", 40, 40);
+    // JWI panel
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_RegNo"]')[0], 20, 25);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]')[0], 20, 25);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_MS_Number"]')[0], 20, 30);
+    fitInputWidth($('[name="JWIHeader.JW_Customer_Name"]')[0], 40, 50);
+    fitInputWidth($('#JWIHeaderPanel .Currency_Number')[0], 10, 10);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_PaymentTerms"]')[0], 30, 40);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_DeliveryTerms"]')[0], 30, 40);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_DeliveryMode"]')[0], 30, 40);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_Tax"]')[0], 40, 40);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_TDC"]')[0], 40, 40);
+    fitInputWidth($('[name="JWIHeader.JIJWI_SVOH_Remarks"]')[0], 40, 40);
+
+    // Freight panel
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_RegNo"]')[0], 20, 25);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_ServiceOrderNo"]')[0], 20, 25);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_Category"]')[0], 20, 20);
+    fitInputWidth($('[name="FreightHeader.JW_Customer_Name"]')[0], 40, 50);
+    fitInputWidth($('#FreightHeaderPanel .Currency_Number')[0], 10, 10);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_PaymentTerms"]')[0], 30, 40);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_DeliveryTerms"]')[0], 30, 40);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_DeliveryMode"]')[0], 30, 40);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_Tax"]')[0], 40, 40);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_TDC"]')[0], 40, 40);
+    fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_Remarks"]')[0], 40, 40);
 }
 function LoadDefaultFormSetting() {
     $.ajax({
@@ -292,36 +316,37 @@ function LoadDefaultFormSetting() {
             if (response && response.success && response.data) {
                 var data = response.data;
 
+                // JWI panel defaults
                 if (data.dfS_JISVOH_ServiceOrderNo) {
-                    $('#Header_JISVOH_ServiceOrderNo').val(data.dfS_JISVOH_ServiceOrderNo);
+                    $('[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]').val(data.dfS_JISVOH_ServiceOrderNo);
                 }
                 if (data.dfS_JISVOH_JW_Customer_Number) {
-                    $('#Header_JISVOH_JW_Customer_Number').val(data.dfS_JISVOH_JW_Customer_Number);
-                    $('#Header_JISVOH_JW_Customer_Name').val(data.cuS_Name);
+                    $('#JWIHeaderPanel .JW_Customer_Number').val(data.dfS_JISVOH_JW_Customer_Number);
+                    $('[name="JWIHeader.JW_Customer_Name"]').val(data.cuS_Name);
                 }
                 if (data.dfS_JISVOH_Currency_Number) {
-                    $('#Header_JISVOH_Currency_Number').val(data.dfS_JISVOH_Currency_Number).trigger('change');
+                    $('#JWIHeaderPanel .Currency_Number').val(data.dfS_JISVOH_Currency_Number).trigger('change');
                 }
                 if (data.dfS_JISVOH_PaymentTerms) {
-                    $('#Header_JISVOH_PaymentTerms').val(data.dfS_JISVOH_PaymentTerms);
+                    $('[name="JWIHeader.JIJWI_SVOH_PaymentTerms"]').val(data.dfS_JISVOH_PaymentTerms);
                 }
                 if (data.dfS_JISVOH_DeliveryTerms) {
-                    $('#Header_JISVOH_DeliveryTerms').val(data.dfS_JISVOH_DeliveryTerms);
+                    $('[name="JWIHeader.JIJWI_SVOH_DeliveryTerms"]').val(data.dfS_JISVOH_DeliveryTerms);
                 }
                 if (data.dfS_JISVOH_DeliveryMode) {
-                    $('#Header_JISVOH_DeliveryMode').val(data.dfS_JISVOH_DeliveryMode);
+                    $('[name="JWIHeader.JIJWI_SVOH_DeliveryMode"]').val(data.dfS_JISVOH_DeliveryMode);
                 }
                 if (data.dfS_JISVOH_Tax) {
-                    $('#Header_JISVOH_Tax').val(data.dfS_JISVOH_Tax);
+                    $('[name="JWIHeader.JIJWI_SVOH_Tax"]').val(data.dfS_JISVOH_Tax);
                 }
                 if (data.dfS_JISVOH_TDC) {
-                    $('#Header_JISVOH_TDC').val(data.dfS_JISVOH_TDC);
+                    $('[name="JWIHeader.JIJWI_SVOH_TDC"]').val(data.dfS_JISVOH_TDC);
                 }
                 if (data.dfS_JISVOH_Remarks) {
-                    $('#Header_JISVOH_Remarks').val(data.dfS_JISVOH_Remarks);
+                    $('[name="JWIHeader.JIJWI_SVOH_Remarks"]').val(data.dfS_JISVOH_Remarks);
                 }
                 if (data.dfS_JISVOH_MS_Number) {
-                    $('#Header_JISVOH_MS_Number').val(data.dfS_JISVOH_MS_Number).trigger('change');
+                    $('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val(data.dfS_JISVOH_MS_Number).trigger('change');
                 }
             }
         },
@@ -330,31 +355,35 @@ function LoadDefaultFormSetting() {
         }
     });
 }
-$(document).on("change", "#Header_JISVOH_RegDate", function () {
-    GetServiceOrderNumber();
+$(document).on("change", ".RegDate", function () {
+    GetServiceOrderNumber($(this));
 });
-function GetServiceOrderNumber() {
-    let date = $("#Header_JISVOH_RegDate").val();
+
+function GetServiceOrderNumber($dateInput) {
+    let date = $dateInput.val();
     if (!date)
         return;
+
+    let $panel = $dateInput.closest(".card");
+    let $regNo = $panel.find('input[name$=".JIJWI_SVOH_RegNo"], input[name$=".JIFRT_SVOH_RegNo"]');
+    let orderType = $panel.attr("id") === "FreightHeaderPanel" ? "FREIGHT" : "JWI";
 
     $.ajax({
         url: "/serviceorder/transactions/serviceorder/next-jso-number",
         type: "GET",
-        data: { JSODate: date },
+        data: { JSODate: date, OrderType: orderType },
         success: function (response) {
             if (!response || response.trim() === "") {
-                alert("Please set numbering for this date range.");
-                $("#Header_JISVOH_RegNo").val("");
-                DateBind();
+                $regNo.val("");
                 return;
             }
-            $("#Header_JISVOH_RegNo").val(response);
+            $regNo.val(response);
         },
         error: function () {
         }
     });
 }
+
 $(document).ready(function () {
     LoadDefaultFormSetting();
     //#region GetDeliveryNoteNumber
@@ -389,19 +418,36 @@ $(document).ready(function () {
 
     //#region item grid alignment
     ApplyFieldWidths({
-        fields: ItemTableFields,
-        container: "#ItemTable",
-        tempRow: "#TempRow",
-        tableBody: "#TableBody",
+        fields: JWIItemTableFields,
+        container: "#JWIItemTable",
+        tempRow: "#JWITempRow",
+        tableBody: "#JWITableBody",
+        searchTable: "#tblsearch"
+    });
+    ApplyFieldWidths({
+        fields: FreightItemTableFields,
+        container: "#FreightItemTable",
+        tempRow: "#FreightTempRow",
+        tableBody: "#FreightTableBody",
         searchTable: "#tblsearch"
     });
 
-    $(document).on("input change blur", "#ItemTable input, #ItemTable textarea, #ItemTable select", function () {
+    $(document).on("input change blur", "#JWIItemTable input, #JWIItemTable textarea, #JWIItemTable select", function () {
         ApplyFieldWidths({
-            fields: ItemTableFields,
-            container: "#ItemTable",
-            tempRow: "#TempRow",
-            tableBody: "#TableBody",
+            fields: JWIItemTableFields,
+            container: "#JWIItemTable",
+            tempRow: "#JWITempRow",
+            tableBody: "#JWITableBody",
+            searchTable: "#tblsearch"
+        });
+    });
+
+    $(document).on("input change blur", "#FreightItemTable input, #FreightItemTable textarea, #FreightItemTable select", function () {
+        ApplyFieldWidths({
+            fields: FreightItemTableFields,
+            container: "#FreightItemTable",
+            tempRow: "#FreightTempRow",
+            tableBody: "#FreightTableBody",
             searchTable: "#tblsearch"
         });
     });
@@ -412,27 +458,50 @@ $(document).ready(function () {
     AutoFit();
     //#region Header AutoFit - KeyUp
 
+    const jwiFieldWidths = {
+        "JWIHeader.JIJWI_SVOH_RegNo": [20, 25],
+        "JWIHeader.JIJWI_SVOH_ServiceOrderNo": [20, 25],
+        "JWIHeader.JIJWI_SVOH_MS_Number": [20, 30],
+        "JWIHeader.JW_Customer_Name": [40, 50],
+        "JWIHeader.JIJWI_SVOH_PaymentTerms": [30, 40],
+        "JWIHeader.JIJWI_SVOH_DeliveryTerms": [30, 40],
+        "JWIHeader.JIJWI_SVOH_DeliveryMode": [30, 40],
+        "JWIHeader.JIJWI_SVOH_Tax": [40, 40],
+        "JWIHeader.JIJWI_SVOH_TDC": [40, 40],
+        "JWIHeader.JIJWI_SVOH_Remarks": [40, 40]
+    };
+
+    const freightFieldWidths = {
+        "FreightHeader.JIFRT_SVOH_RegNo": [20, 25],
+        "FreightHeader.JIFRT_SVOH_ServiceOrderNo": [20, 25],
+        "FreightHeader.JIFRT_SVOH_Category": [20, 20],
+        "FreightHeader.JW_Customer_Name": [40, 50],
+        "FreightHeader.JIFRT_SVOH_PaymentTerms": [30, 40],
+        "FreightHeader.JIFRT_SVOH_DeliveryTerms": [30, 40],
+        "FreightHeader.JIFRT_SVOH_DeliveryMode": [30, 40],
+        "FreightHeader.JIFRT_SVOH_Tax": [40, 40],
+        "FreightHeader.JIFRT_SVOH_TDC": [40, 40],
+        "FreightHeader.JIFRT_SVOH_Remarks": [40, 40]
+    };
+
     $(document).on("keyup change input",
-        "#Header_JISVOH_RegNo, #Header_JISVOH_ServiceOrderNo, #Header_JISVOH_MS_Number, #Header_JISVOH_JW_Customer_Name, #Header_JISVOH_Currency_Number, #Header_JISVOH_PaymentTerms, #Header_JISVOH_DeliveryTerms, #Header_JISVOH_DeliveryMode, #Header_JISVOH_Tax, #Header_JISVOH_TDC, #Header_JISVOH_Remarks",
+        Object.keys(jwiFieldWidths).map(n => `[name="${n}"]`).join(", "),
         function () {
-
-            const widths = {
-                Header_JISVOH_RegNo: [20, 25],
-                Header_JISVOH_ServiceOrderNo: [20, 25],
-                Header_JISVOH_MS_Number: [20, 30],
-                Header_JISVOH_JW_Customer_Name: [40, 50],
-                Header_JISVOH_Currency_Number: [10, 10],
-                Header_JISVOH_PaymentTerms: [30, 40],
-                Header_JISVOH_DeliveryTerms: [30, 40],
-                Header_JISVOH_DeliveryMode: [30, 40],
-                Header_JISVOH_Tax: [40, 40],
-                Header_JISVOH_TDC: [40, 40],
-                Header_JISVOH_Remarks: [40, 40]
-            };
-
-            const [min, max] = widths[this.id];
+            const [min, max] = jwiFieldWidths[this.name];
             fitInputWidth(this, min, max);
         });
+
+    $(document).on("keyup change input",
+        Object.keys(freightFieldWidths).map(n => `[name="${n}"]`).join(", "),
+        function () {
+            const [min, max] = freightFieldWidths[this.name];
+            fitInputWidth(this, min, max);
+        });
+
+    // Currency dropdown width - class based (shared by both panels)
+    $(document).on("keyup change input", ".Currency_Number", function () {
+        fitInputWidth(this, 10, 10);
+    });
 
     //#endregion
 
@@ -446,99 +515,80 @@ $(document).ready(function () {
  
     DateBind();
     //#region onkeypress qty and unit
-    $(document).on("keyup change", ".JISVOI_Qty, .JISVOI_UnitPrice", function () {
+    $(document).on("keyup change", ".JIJWI_SVOI_Qty, .JIJWI_SVOI_UnitPrice", function () {
 
         let row = $(this).closest("tr");
 
-        let qty = parseFloat((row.find(".JISVOI_Qty").val() || "0").replace(/,/g, "")) || 0;
-        let price = parseFloat((row.find(".JISVOI_UnitPrice").val() || "0").replace(/,/g, "")) || 0;
+        let qty = parseFloat((row.find(".JIJWI_SVOI_Qty").val() || "0").replace(/,/g, "")) || 0;
+        let price = parseFloat((row.find(".JIJWI_SVOI_UnitPrice").val() || "0").replace(/,/g, "")) || 0;
 
         let amount = qty * price;
 
-        // Only set row amount (read-only field)
-        row.find(".JISVOI_Amount").val(formatIndianCurrency(amount));
+        row.find(".JIJWI_SVOI_Amount").val(formatIndianCurrency(amount));
 
-        // Update footer totals separately
-        calculateTotal();
+        JWICalculateTotal();
 
-        // Auto add row
-        autoAddRow(row);
-
+        JWIAutoAddRow(row);
     });
-    //#region comma format on focusout
-    $(document).on("focusout", ".JISVOI_Qty, .JISVOI_UnitPrice, .JISVOI_Amount", function () {
 
-        let type = $(this).hasClass("JISVOI_Qty") ? "q" : "c";
+    $(document).on("keyup change", ".JIFRT_SVOI_Qty, .JIFRT_SVOI_Rate", function () {
+
+        let row = $(this).closest("tr");
+
+        let qty = parseFloat((row.find(".JIFRT_SVOI_Qty").val() || "0").replace(/,/g, "")) || 0;
+        let rate = parseFloat((row.find(".JIFRT_SVOI_Rate").val() || "0").replace(/,/g, "")) || 0;
+
+        let amount = qty * rate;
+
+        row.find(".JIFRT_SVOI_Amount").val(formatIndianCurrency(amount));
+
+        FreightCalculateTotal();
+
+        FreightAutoAddRow(row);
+    });
+
+    //#region comma format on focusout
+    $(document).on("focusout", ".JIJWI_SVOI_Qty, .JIJWI_SVOI_UnitPrice, .JIJWI_SVOI_Amount", function () {
+
+        let type = $(this).hasClass("JIJWI_SVOI_Qty") ? "q" : "c";
+
+        $(this).val(addComma($(this).val(), type));
+    });
+
+    $(document).on("focusout", ".JIFRT_SVOI_Qty, .JIFRT_SVOI_Rate, .JIFRT_SVOI_Amount", function () {
+
+        let type = $(this).hasClass("JIFRT_SVOI_Qty") ? "q" : "c";
 
         $(this).val(addComma($(this).val(), type));
     });
     //#endregion
     //#endregion
     //#region add row item grid
-    let rowIndex = 1; // start from 1 because 0 already exists
-
-    // NEW: Freight Service Order toggle
-    function ToggleFreightColumns() {
-        let isFreight = $("#Header_JISVOH_Freight_Applicable").is(":checked");
-
-        if (isFreight) {
-            $(".DeliveryDateHeader, .DeliveryDateCell").hide();
-            $(".FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell").show();
-        } else {
-            $(".DeliveryDateHeader, .DeliveryDateCell").show();
-            $(".FromWHHeader, .FromWHCell, .ToWHHeader, .ToWHCell").hide();
-        }
-    }
-
-    $(document).on("change", "#Header_JISVOH_Freight_Applicable", function () {
-        ToggleFreightColumns();
-    });
-
-    ToggleFreightColumns();
+    let jwiRowIndex = 1;
+    let freightRowIndex = 1;
 
     $("#AddRowButton").on("click", function () {
 
         let isValid = true;
 
-        $("#ItemTable tbody tr.NewRow:last").find("input, select").each(function () {
+        $("#JWIItemTable tbody tr.JWINewRow:last").find("input, select").each(function () {
 
             let el = $(this);
 
-            // skip hidden delete flag
-            if (el.hasClass("JISVOI_IsDeleted")) return;
+            if (el.hasClass("JIJWI_SVOI_IsDeleted")) return;
 
-            if (el.hasClass("JISVOI_Item_Code")) {
-                if (!el.val()) {
-                    isValid = false;
-                    el.focus();
-                    return false;
-                }
+            if (el.hasClass("JIJWI_SVOI_Item_Code")) {
+                if (!el.val()) { isValid = false; el.focus(); return false; }
             }
-
-            if (el.hasClass("JISVOI_Qty")) {
-                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
-                    isValid = false;
-                    el.focus();
-                    return false;
-                }
+            if (el.hasClass("JIJWI_SVOI_Qty")) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) { isValid = false; el.focus(); return false; }
             }
-
-            if (el.hasClass("JISVOI_UnitPrice")) {
-                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) {
-                    isValid = false;
-                    el.focus();
-                    return false;
-                }
+            if (el.hasClass("JIJWI_SVOI_UnitPrice")) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) { isValid = false; el.focus(); return false; }
             }
-
-            if (el.hasClass("JISVOI_PRS_Number")) {
-                if (!el.val() || el.val() === "0") {
-                    isValid = false;
-                    el.focus();
-                    return false;
-                }
+            if (el.hasClass("JIJWI_SVOI_PRS_Number")) {
+                if (!el.val() || el.val() === "0") { isValid = false; el.focus(); return false; }
             }
-
         });
 
         if (!isValid) {
@@ -546,63 +596,122 @@ $(document).ready(function () {
             return;
         }
 
-        let $newRow = $("#TempRow").clone();
+        let $newRow = $("#JWITempRow").clone();
+
+        // Clean up any flatpickr-generated elements from the template before reusing
+        $newRow.find(".flatpickr-input").remove();
+        $newRow.find("input.datepicker").removeClass("flatpickr-input").show();
 
         $newRow.removeAttr("id");
         $newRow.removeAttr("style");
-        $newRow.addClass("NewRow");
+        $newRow.addClass("JWINewRow").addClass("NewRow");
 
         $newRow.find("input, select").each(function () {
 
             let el = $(this);
 
-            if (el.attr("type") === "checkbox") {
-                el.prop("checked", false);
-            }
+            if (el.attr("type") === "checkbox") el.prop("checked", false);
 
-            if (!el.hasClass("JISVOI_IsDeleted")) {
-                el.val("");
-            }
+            if (!el.hasClass("JIJWI_SVOI_IsDeleted")) el.val("");
 
             let name = el.attr("name");
             if (name) {
-                let updatedName = name.replace(/\[\d+\]/, `[${rowIndex}]`);
-                el.attr("name", updatedName);
+                el.attr("name", name.replace(/\[\d+\]/, `[${jwiRowIndex}]`));
             }
         });
 
-        let rowID = new Date().getTime();
+        $newRow.attr("data-rowid", new Date().getTime());
 
-        $newRow.attr("data-rowid", rowID);
-
-        $("#TableBody").append($newRow);
-        $newRow.find("td.DeliveryDateCell").html(`
-    <input name="Items[${rowIndex}].JISVOI_DeliveryDate"
-           type="text"
-           class="form-control datepicker JISVOI_DeliveryDate" />
-`);
+        $("#JWITableBody").append($newRow);
 
         $newRow.find(".datepicker").flatpickr({
-            dateFormat: "Y-m-d",
+            dateFormat: "d-M-Y",
             altInput: true,
             altFormat: "d-M-Y",
             allowInput: true,
             defaultDate: new Date()
         });
-       // SetRowDate($newRow);
-        rowIndex++;
 
-        calculateTotal();
-        //#region item grid alignment
+        jwiRowIndex++;
+
+        JWICalculateTotal();
+
         ApplyFieldWidths({
-            fields: ItemTableFields,
-            container: "#ItemTable",
-            tempRow: "#TempRow",
-            tableBody: "#TableBody",
+            fields: JWIItemTableFields,
+            container: "#JWIItemTable",
+            tempRow: "#JWITempRow",
+            tableBody: "#JWITableBody",
             searchTable: "#tblsearch"
         });
-        //#endregion
-       
+    });
+
+    $("#AddRowButtonFreight").on("click", function () {
+
+        let isValid = true;
+
+        $("#FreightItemTable tbody tr.FreightNewRow:last").find("input, select").each(function () {
+
+            let el = $(this);
+
+            if (el.hasClass("JIFRT_SVOI_IsDeleted")) return;
+
+            if (el.hasClass("JIFRT_SVOI_FromWH_Number")) {
+                if (!el.val() || el.val() === "0") { isValid = false; el.focus(); return false; }
+            }
+            if (el.hasClass("JIFRT_SVOI_ToWH_Number")) {
+                if (!el.val() || el.val() === "0") { isValid = false; el.focus(); return false; }
+            }
+            if (el.hasClass("JIFRT_SVOI_Qty")) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) { isValid = false; el.focus(); return false; }
+            }
+            if (el.hasClass("JIFRT_SVOI_Rate")) {
+                if (!el.val() || parseFloat(removeComma(el.val())) <= 0) { isValid = false; el.focus(); return false; }
+            }
+            if (el.hasClass("JIFRT_SVOI_PRS_Number")) {
+                if (!el.val() || el.val() === "0") { isValid = false; el.focus(); return false; }
+            }
+        });
+
+        if (!isValid) {
+            alert("Please fill required fields before adding new row.");
+            return;
+        }
+
+        let $newRow = $("#FreightTempRow").clone();
+
+        $newRow.removeAttr("id");
+        $newRow.removeAttr("style");
+        $newRow.addClass("FreightNewRow").addClass("NewRow");
+
+        $newRow.find("input, select").each(function () {
+
+            let el = $(this);
+
+            if (el.attr("type") === "checkbox") el.prop("checked", false);
+
+            if (!el.hasClass("JIFRT_SVOI_IsDeleted")) el.val("");
+
+            let name = el.attr("name");
+            if (name) {
+                el.attr("name", name.replace(/\[\d+\]/, `[${freightRowIndex}]`));
+            }
+        });
+
+        $newRow.attr("data-rowid", new Date().getTime());
+
+        $("#FreightTableBody").append($newRow);
+
+        freightRowIndex++;
+
+        FreightCalculateTotal();
+
+        ApplyFieldWidths({
+            fields: FreightItemTableFields,
+            container: "#FreightItemTable",
+            tempRow: "#FreightTempRow",
+            tableBody: "#FreightTableBody",
+            searchTable: "#tblsearch"
+        });
     });
     //#endregion add row item grid
 
@@ -610,27 +719,62 @@ $(document).ready(function () {
 
         let row = $(this).closest("tr");
 
-        row.find(".JISVOI_IsDeleted").val("1");
-        row.hide();
-
-        calculateTotal();
+        if (row.closest("table").attr("id") === "JWIItemTable") {
+            row.find(".JIJWI_SVOI_IsDeleted").val("1");
+            row.hide();
+            JWICalculateTotal();
+        } else {
+            row.find(".JIFRT_SVOI_IsDeleted").val("1");
+            row.hide();
+            FreightCalculateTotal();
+        }
     });
 
     //#region Save Function
-    $("#btnSave").on("click", function (e) {
+    $("#btnSave, #btnSaveFreight").on("click", function (e) {
 
-        if (!validateHeaderById()) {
-            e.preventDefault();
-            return false;
-        }
-        let duplicateMessage = ValidateDuplicateItemCombination();
+        let serviceType = $('input[name="ServiceType"]:checked').val();
 
-        if (duplicateMessage) {
-            e.preventDefault();
-            showAlert(duplicateMessage);
-            return false;
+        let isHeaderValid, duplicateMessage, isGridValid, model;
+
+        if (serviceType === "FREIGHT") {
+
+            isHeaderValid = ValidateFreightHeader();
+            if (!isHeaderValid) { e.preventDefault(); return false; }
+
+            isGridValid = FreightValidateItemGrid();
+            if (!isGridValid) { e.preventDefault(); return false; }
+
+            duplicateMessage = FreightValidateDuplicateItemCombination();
+            if (duplicateMessage) { e.preventDefault(); showAlert(duplicateMessage); return false; }
+
+            model = {
+                ServiceType: "FREIGHT",
+                JWIHeader: null,
+                JWIItems: [],
+                FreightHeader: CreateFreightHeaderModel(),
+                FreightItems: CreateFreightItemsModel()
+            };
+
+        } else {
+
+            isHeaderValid = ValidateJWIHeader();
+            if (!isHeaderValid) { e.preventDefault(); return false; }
+
+            isGridValid = JWIValidateItemGrid();
+            if (!isGridValid) { e.preventDefault(); return false; }
+
+            duplicateMessage = JWIValidateDuplicateItemCombination();
+            if (duplicateMessage) { e.preventDefault(); showAlert(duplicateMessage); return false; }
+
+            model = {
+                ServiceType: "JWI",
+                JWIHeader: CreateJWIHeaderModel(),
+                JWIItems: CreateJWIItemsModel(),
+                FreightHeader: null,
+                FreightItems: []
+            };
         }
-        let model = CreateServiceOrderModel();
 
         console.log(JSON.stringify(model));
 
@@ -661,74 +805,78 @@ $(document).ready(function () {
     //#region remove checked rows
     $("#RemoveItemRowButton").on("click", function () {
 
-        let checkedRows =
-            $("#ItemTable tbody tr.NewRow:visible")
-                .has(".CheckItem:checked");
+        let checkedRows = $("#JWIItemTable tbody tr.JWINewRow:visible").has(".CheckItem:checked");
+        let totalVisibleRows = $("#JWIItemTable tbody tr.JWINewRow:visible").length;
 
-        let totalVisibleRows =
-            $("#ItemTable tbody tr.NewRow:visible").length;
-
-        if (checkedRows.length === 0) {
-            alert("Please select row.");
-            return;
-        }
-
-        if ((totalVisibleRows - checkedRows.length) <= 0) {
-            alert("At least one row required.");
-            return;
-        }
-
-        if (checkedRows.length > 1) {
-            alert("Please select only one row");
-            return;
-        }
+        if (checkedRows.length === 0) { alert("Please select row."); return; }
+        if ((totalVisibleRows - checkedRows.length) <= 0) { alert("At least one row required."); return; }
+        if (checkedRows.length > 1) { alert("Please select only one row"); return; }
 
         checkedRows.each(function () {
 
             let currentRow = $(this);
+            let itemNumber = currentRow.find(".JIJWI_SVOI_Number").val();
 
-            let itemNumber =
-                currentRow.find(".JISVOI_Number").val();
-
-            // already saved row → soft delete
             if (itemNumber && itemNumber !== "0") {
-
-                currentRow
-                    .find(".JISVOI_IsDeleted")
-                    .val("1");
-
+                currentRow.find(".JIJWI_SVOI_IsDeleted").val("1");
                 currentRow.hide();
-            }
-            else {
-                // new unsaved row → hard delete
+            } else {
                 currentRow.remove();
             }
-
         });
 
-        calculateTotal();
+        JWICalculateTotal();
+    });
+
+    $("#RemoveItemRowButtonFreight").on("click", function () {
+
+        let checkedRows = $("#FreightItemTable tbody tr.FreightNewRow:visible").has(".CheckItem:checked");
+        let totalVisibleRows = $("#FreightItemTable tbody tr.FreightNewRow:visible").length;
+
+        if (checkedRows.length === 0) { alert("Please select row."); return; }
+        if ((totalVisibleRows - checkedRows.length) <= 0) { alert("At least one row required."); return; }
+        if (checkedRows.length > 1) { alert("Please select only one row"); return; }
+
+        checkedRows.each(function () {
+
+            let currentRow = $(this);
+            let itemNumber = currentRow.find(".JIFRT_SVOI_Number").val();
+
+            if (itemNumber && itemNumber !== "0") {
+                currentRow.find(".JIFRT_SVOI_IsDeleted").val("1");
+                currentRow.hide();
+            } else {
+                currentRow.remove();
+            }
+        });
+
+        FreightCalculateTotal();
     });
     //#endregion
-    let firstRow = $("#ItemTable tbody tr.NewRow:first");
-    autoAddRow(firstRow);
+    let jwiFirstRow = $("#JWIItemTable tbody tr.JWINewRow:first");
+    JWIAutoAddRow(jwiFirstRow);
+
+    let freightFirstRow = $("#FreightItemTable tbody tr.FreightNewRow:first");
+    FreightAutoAddRow(freightFirstRow);
 });
 
 //#region validation
-function ValidateDuplicateItemCombination() {
+//#region validation
+function JWIValidateDuplicateItemCombination() {
 
     let combinationMap = {};
     let duplicateMessages = [];
 
-    $("#ItemTable tbody tr.NewRow").each(function (index) {
+    $("#JWIItemTable tbody tr.JWINewRow").each(function (index) {
 
         let row = $(this);
 
-        if (row.find(".JISVOI_IsDeleted").val() == "1") return;
-        if (!row.find(".JISVOI_Item_Number").val()) return;
+        if (row.find(".JIJWI_SVOI_IsDeleted").val() == "1") return;
+        if (!row.find(".JIJWI_SVOI_Item_Number").val()) return;
 
-        let prs = row.find(".JISVOI_PRS_Number").val() || 0;
-        let item = row.find(".JISVOI_Item_Number").val() || 0;
-        let uom = row.find(".JISVOI_UoM_Number").val() || 0;
+        let prs = row.find(".JIJWI_SVOI_PRS_Number").val() || 0;
+        let item = row.find(".JIJWI_SVOI_Item_Number").val() || 0;
+        let uom = row.find(".JIJWI_SVOI_UoM_Number").val() || 0;
 
         let key = prs + "_" + item + "_" + uom;
         let rowNo = index + 1;
@@ -754,17 +902,59 @@ function ValidateDuplicateItemCombination() {
 
     return "";
 }
+
+function FreightValidateDuplicateItemCombination() {
+
+    let combinationMap = {};
+    let duplicateMessages = [];
+
+    $("#FreightItemTable tbody tr.FreightNewRow").each(function (index) {
+
+        let row = $(this);
+
+        if (row.find(".JIFRT_SVOI_IsDeleted").val() == "1") return;
+
+        let prs = row.find(".JIFRT_SVOI_PRS_Number").val() || 0;
+        let fromWH = row.find(".JIFRT_SVOI_FromWH_Number").val() || 0;
+        let toWH = row.find(".JIFRT_SVOI_ToWH_Number").val() || 0;
+
+        if (fromWH === 0 && toWH === 0) return;
+
+        let key = prs + "_" + fromWH + "_" + toWH;
+        let rowNo = index + 1;
+
+        if (!combinationMap[key]) {
+            combinationMap[key] = [];
+        }
+
+        combinationMap[key].push(rowNo);
+    });
+
+    $.each(combinationMap, function (key, rows) {
+        if (rows.length > 1) {
+            duplicateMessages.push(
+                "Row # " + rows.join(", ") + " have the same combination of Process, From WH and To WH"
+            );
+        }
+    });
+
+    if (duplicateMessages.length > 0) {
+        return duplicateMessages.join("\n");
+    }
+
+    return "";
+}
+//#endregion
 //#endregion
 //#region auto add row function
-function autoAddRow(currentRow) {
+function JWIAutoAddRow(currentRow) {
 
-    let qty = parseFloat(removeComma(currentRow.find(".JISVOI_Qty").val())) || 0;
-    let price = parseFloat(removeComma(currentRow.find(".JISVOI_UnitPrice").val())) || 0;
+    let qty = parseFloat(removeComma(currentRow.find(".JIJWI_SVOI_Qty").val())) || 0;
+    let price = parseFloat(removeComma(currentRow.find(".JIJWI_SVOI_UnitPrice").val())) || 0;
 
-    let itemCode = currentRow.find(".JISVOI_Item_Code").val();
-    let prsNo = currentRow.find(".JISVOI_PRS_Number").val();
+    let itemCode = currentRow.find(".JIJWI_SVOI_Item_Code").val();
+    let prsNo = currentRow.find(".JIJWI_SVOI_PRS_Number").val();
 
-    // validate current row
     let isRowValid =
         itemCode &&
         qty > 0 &&
@@ -772,18 +962,43 @@ function autoAddRow(currentRow) {
         prsNo &&
         prsNo !== "0";
 
-    // allow only last row
     let isLastRow =
-        currentRow.is("#ItemTable tbody tr.NewRow:last");
+        currentRow.is("#JWIItemTable tbody tr.JWINewRow:last");
 
     if (isRowValid && isLastRow) {
 
-        // prevent multiple empty rows
         let nextRow = currentRow.next("tr");
 
         if (nextRow.length === 0) {
-
             $("#AddRowButton").trigger("click");
+        }
+    }
+}
+
+function FreightAutoAddRow(currentRow) {
+
+    let qty = parseFloat(removeComma(currentRow.find(".JIFRT_SVOI_Qty").val())) || 0;
+    let rate = parseFloat(removeComma(currentRow.find(".JIFRT_SVOI_Rate").val())) || 0;
+
+    let fromWH = currentRow.find(".JIFRT_SVOI_FromWH_Number").val();
+    let prsNo = currentRow.find(".JIFRT_SVOI_PRS_Number").val();
+
+    let isRowValid =
+        fromWH && fromWH !== "0" &&
+        qty > 0 &&
+        rate > 0 &&
+        prsNo &&
+        prsNo !== "0";
+
+    let isLastRow =
+        currentRow.is("#FreightItemTable tbody tr.FreightNewRow:last");
+
+    if (isRowValid && isLastRow) {
+
+        let nextRow = currentRow.next("tr");
+
+        if (nextRow.length === 0) {
+            $("#AddRowButtonFreight").trigger("click");
         }
     }
 }
@@ -805,7 +1020,8 @@ function ClearAll() {
                 $(this).val("");
             }
         });
-    $("#ItemTable tbody").empty();
+    $("#JWIItemTable tbody").empty();
+    $("#FreightItemTable tbody").empty();
     $(".jwcustomer-search-results").hide().html("");
 
 }
@@ -816,7 +1032,7 @@ function InitializeGstFlatpickrs() {
         altInput: true,        // shows formatted date
         altFormat: "d-M-Y",   // display format
         allowInput: true,     // user can type manually
-        defaultDate: new Date() // optional: today default
+        defaultDate: new Date() // today by default
     });
 }
 function SetRowDate($row) {
@@ -851,263 +1067,311 @@ function DateBind() {
     var formattedDate =
         day + "-" + months[today.getMonth()] + "-" + today.getFullYear();
 
-    var regDate = document.getElementById("Header_JISVOH_RegDate")?._flatpickr;
-    if (regDate)
-        regDate.setDate(formattedDate, true, "d-M-Y");
+    // JWI panel
+    var jwiRegDateInput = $('[name="JWIHeader.JIJWI_SVOH_RegDate"]')[0];
+    var jwiRegDate = jwiRegDateInput?._flatpickr;
+    if (jwiRegDate) jwiRegDate.setDate(formattedDate, true, "d-M-Y");
 
-    var serviceOrderDate = document.getElementById("Header_JISVOH_ServiceOrderDate")?._flatpickr;
-    if (serviceOrderDate)
-        serviceOrderDate.setDate(formattedDate, true, "d-M-Y");
-    console.log(formattedDate + '--formattedDate')
-    GetServiceOrderNumber();
+    var jwiSODateInput = $('[name="JWIHeader.JIJWI_SVOH_ServiceOrderDate"]')[0];
+    var jwiSODate = jwiSODateInput?._flatpickr;
+    if (jwiSODate) jwiSODate.setDate(formattedDate, true, "d-M-Y");
 
+    // Freight panel
+    var frtRegDateInput = $('[name="FreightHeader.JIFRT_SVOH_RegDate"]')[0];
+    var frtRegDate = frtRegDateInput?._flatpickr;
+    if (frtRegDate) frtRegDate.setDate(formattedDate, true, "d-M-Y");
+
+    var frtSODateInput = $('[name="FreightHeader.JIFRT_SVOH_ServiceOrderDate"]')[0];
+    var frtSODate = frtSODateInput?._flatpickr;
+    if (frtSODate) frtSODate.setDate(formattedDate, true, "d-M-Y");
+
+    if (jwiRegDateInput) GetServiceOrderNumber($(jwiRegDateInput));
+    if (frtRegDateInput) GetServiceOrderNumber($(frtRegDateInput));
+}
+function CreateJWIHeaderModel() {
+
+    return {
+        JIJWI_SVOH_Number: 0,
+
+        JIJWI_SVOH_RegNo:
+            $('[name="JWIHeader.JIJWI_SVOH_RegNo"]').val(),
+
+        JIJWI_SVOH_RegDate:
+            $('[name="JWIHeader.JIJWI_SVOH_RegDate"]').val()
+                ? new Date($('[name="JWIHeader.JIJWI_SVOH_RegDate"]').val()).toISOString()
+                : null,
+
+        JIJWI_SVOH_ServiceOrderNo:
+            $('[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]').val(),
+
+        JIJWI_SVOH_ServiceOrderDate:
+            $('[name="JWIHeader.JIJWI_SVOH_ServiceOrderDate"]').val()
+                ? new Date($('[name="JWIHeader.JIJWI_SVOH_ServiceOrderDate"]').val()).toISOString()
+                : null,
+
+        JIJWI_SVOH_MS_Number:
+            parseInt($('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val()) || null,
+
+        JIJWI_SVOH_JW_Customer_Number:
+            parseInt($('#JWIHeaderPanel .JW_Customer_Number').val()) || 0,
+
+        JIJWI_SVOH_Currency_Number:
+            parseInt($('#JWIHeaderPanel .Currency_Number').val()) || 0,
+
+        JIJWI_SVOH_PaymentTerms:
+            $('[name="JWIHeader.JIJWI_SVOH_PaymentTerms"]').val(),
+
+        JIJWI_SVOH_DeliveryTerms:
+            $('[name="JWIHeader.JIJWI_SVOH_DeliveryTerms"]').val(),
+
+        JIJWI_SVOH_DeliveryMode:
+            $('[name="JWIHeader.JIJWI_SVOH_DeliveryMode"]').val(),
+
+        JIJWI_SVOH_Tax:
+            $('[name="JWIHeader.JIJWI_SVOH_Tax"]').val(),
+
+        JIJWI_SVOH_TDC:
+            $('[name="JWIHeader.JIJWI_SVOH_TDC"]').val(),
+
+        JIJWI_SVOH_Remarks:
+            $('[name="JWIHeader.JIJWI_SVOH_Remarks"]').val()
+    };
 }
 
-function CreateServiceOrderModel() {
+function CreateJWIItemsModel() {
 
-    // =========================
-    // HEADER
-    // =========================
-    let header = {
-
-        JISVOH_Number:
-            parseInt($("#Header_JISVOH_Number").val()) || 0,
-
-        JISVOH_RegNo:
-            $("#Header_JISVOH_RegNo").val(),
-
-        JISVOH_RegDate:
-            $("#Header_JISVOH_RegDate").val()
-                ? new Date($("#Header_JISVOH_RegDate").val()).toISOString()
-                : null,
-
-        JISVOH_ServiceOrderNo:
-            $("#Header_JISVOH_ServiceOrderNo").val(),
-
-        JISVOH_ServiceOrderDate:
-            $("#Header_JISVOH_ServiceOrderDate").val()
-                ? new Date($("#Header_JISVOH_ServiceOrderDate").val()).toISOString()
-                : null,
-
-        JISVOH_JW_Customer_Number:
-            parseInt($("#Header_JISVOH_JW_Customer_Number").val()) || 0,
-
-        JISVOH_JW_Customer_Name:
-            $("#Header_JISVOH_JW_Customer_Name").val(),
-
-        JISVOH_Currency_Number:
-            parseInt($("#Header_JISVOH_Currency_Number").val()) || 0,
-
-        JISVOH_PaymentTerms:
-            $("#Header_JISVOH_PaymentTerms").val(),
-
-        JISVOH_DeliveryTerms:
-            $("#Header_JISVOH_DeliveryTerms").val(),
-
-        JISVOH_DeliveryMode:
-            $("#Header_JISVOH_DeliveryMode").val(),
-
-        JISVOH_Tax:
-            $("#Header_JISVOH_Tax").val(),
-
-        JISVOH_TDC:
-            $("#Header_JISVOH_TDC").val(),
-
-        JISVOH_Remarks:
-            $("#Header_JISVOH_Remarks").val(),
-
-        JISVOH_Category:
-            $("#Header_JISVOH_Category").val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE",
-
-        JISVOH_MS_Number:
-            parseInt($("#Header_JISVOH_MS_Number").val()) || null,
-
-        SVO_Id:
-            parseInt($("#Header_SVO_Id").val()) || 0,
-
-        JISVOI_Item_Code:
-            $("#Header_JISVOI_Item_Code").val(),
-
-        JISVOH_Freight_Applicable:
-            $("#Header_JISVOH_Freight_Applicable").is(":checked") ? "Yes" : "No"
-    };
-
-    // =========================
-    // ITEMS
-    // =========================
     let items = [];
 
-    $("#ItemTable tbody tr.NewRow").each(function () {
+    $("#JWIItemTable tbody tr.JWINewRow").each(function () {
 
         let row = $(this);
 
-        // deleted rows skip
-        if (row.find(".JISVOI_IsDeleted").val() == "1") {
-            return;
-        }
+        if (row.find(".JIJWI_SVOI_IsDeleted").val() == "1") return;
+        if (!row.find(".JIJWI_SVOI_Item_Number").val()) return;
 
-        // empty rows skip
-        if (!row.find(".JISVOI_Item_Number").val()) {
-            return;
-        }
+        items.push({
+            JIJWI_SVOI_Number:
+                parseInt(row.find(".JIJWI_SVOI_Number").val()) || 0,
 
-        let item = {
+            JIJWI_SVOI_IsDeleted: false,
 
-            JISVOI_JISVOH_Number:
-                parseInt(row.find(".JISVOI_JISVOH_Number").val()) || 0,
+            JIJWI_SVOI_PRS_Number:
+                parseInt(row.find(".JIJWI_SVOI_PRS_Number").val()) || 0,
 
-            JISVOI_Number:
-                parseInt(row.find(".JISVOI_Number").val()) || 0,
+            JIJWI_SVOI_Item_Number:
+                parseInt(row.find(".JIJWI_SVOI_Item_Number").val()) || 0,
 
-            JISVOI_PRS_Number:
-                parseInt(row.find(".JISVOI_PRS_Number").val()) || 0,
+            JIJWI_SVOI_WH_Number:
+                parseInt(row.find(".JIJWI_SVOI_WH_Number").val()) || null,
 
-            JISVOI_Item_Number:
-                parseInt(row.find(".JISVOI_Item_Number").val()) || 0,
+            JIJWI_SVOI_UoM_Number:
+                parseInt(row.find(".JIJWI_SVOI_UoM_Number").val()) || 0,
 
-            JISVOI_WH_Number:
-                parseInt(row.find(".JISVOI_WH_Number").val()) || 0,
+            JIJWI_SVOI_Qty:
+                parseFloat(removeComma(row.find(".JIJWI_SVOI_Qty").val())) || 0,
 
-            JISVOI_UoM_Number:
-                parseInt(row.find(".JISVOI_UoM_Number").val()) || 0,
+            JIJWI_SVOI_UnitPrice:
+                parseFloat(removeComma(row.find(".JIJWI_SVOI_UnitPrice").val())) || 0,
 
-            JISVOI_Qty:
-                parseFloat(removeComma(row.find(".JISVOI_Qty").val())) || 0,
+            JIJWI_SVOI_Amount:
+                parseFloat(removeComma(row.find(".JIJWI_SVOI_Amount").val())) || 0,
 
-            JISVOI_UnitPrice:
-                parseFloat(removeComma(row.find(".JISVOI_UnitPrice").val())) || 0,
-
-            JISVOI_Amount:
-                parseFloat(removeComma(row.find(".JISVOI_Amount").val())) || 0,
-
-            JISVOI_DeliveryDate:
-                row.find(".JISVOI_DeliveryDate").val()
-                    ? new Date(
-                        row.find(".JISVOI_DeliveryDate").val()
-                    ).toISOString()
+            JIJWI_SVOI_DeliveryDate:
+                row.find(".JIJWI_SVOI_DeliveryDate").val()
+                    ? new Date(row.find(".JIJWI_SVOI_DeliveryDate").val()).toISOString()
                     : null,
 
-            JISVOI_Category:
-                $("#Header_JISVOH_Category").val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE",
-
-            JISVOI_FromWH:
-                parseInt(row.find(".JISVOI_FromWH").val()) || null,
-
-            JISVOI_ToWH:
-                parseInt(row.find(".JISVOI_ToWH").val()) || null
-        };
-
-        items.push(item);
+            JIJWI_SVOI_Category: null
+        });
     });
 
-    // =========================
-    // FINAL MODEL
-    // =========================
-    let serviceOrderModel = {
-        Header: header,
-        Items: items
+    return items;
+}
+
+function CreateFreightHeaderModel() {
+
+    return {
+        JIFRT_SVOH_Number: 0,
+
+        JIFRT_SVOH_RegNo:
+            $('[name="FreightHeader.JIFRT_SVOH_RegNo"]').val(),
+
+        JIFRT_SVOH_RegDate:
+            $('[name="FreightHeader.JIFRT_SVOH_RegDate"]').val()
+                ? new Date($('[name="FreightHeader.JIFRT_SVOH_RegDate"]').val()).toISOString()
+                : null,
+
+        JIFRT_SVOH_ServiceOrderNo:
+            $('[name="FreightHeader.JIFRT_SVOH_ServiceOrderNo"]').val(),
+
+        JIFRT_SVOH_ServiceOrderDate:
+            $('[name="FreightHeader.JIFRT_SVOH_ServiceOrderDate"]').val()
+                ? new Date($('[name="FreightHeader.JIFRT_SVOH_ServiceOrderDate"]').val()).toISOString()
+                : null,
+
+        JIFRT_SVOH_Category:
+            $('[name="FreightHeader.JIFRT_SVOH_Category"]').val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE",
+
+        JIFRT_SVOH_JW_Customer_Number:
+            parseInt($('#FreightHeaderPanel .JW_Customer_Number').val()) || 0,
+
+        JIFRT_SVOH_Currency_Number:
+            parseInt($('#FreightHeaderPanel .Currency_Number').val()) || 0,
+
+        JIFRT_SVOH_PaymentTerms:
+            $('[name="FreightHeader.JIFRT_SVOH_PaymentTerms"]').val(),
+
+        JIFRT_SVOH_DeliveryTerms:
+            $('[name="FreightHeader.JIFRT_SVOH_DeliveryTerms"]').val(),
+
+        JIFRT_SVOH_DeliveryMode:
+            $('[name="FreightHeader.JIFRT_SVOH_DeliveryMode"]').val(),
+
+        JIFRT_SVOH_Tax:
+            $('[name="FreightHeader.JIFRT_SVOH_Tax"]').val(),
+
+        JIFRT_SVOH_TDC:
+            $('[name="FreightHeader.JIFRT_SVOH_TDC"]').val(),
+
+        JIFRT_SVOH_Remarks:
+            $('[name="FreightHeader.JIFRT_SVOH_Remarks"]').val()
     };
+}
 
-    console.log(serviceOrderModel);
+function CreateFreightItemsModel() {
 
-    return serviceOrderModel;
+    let selectedCategory =
+        $('select[name="FreightHeader.JIFRT_SVOH_Category"]').val() === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE";
+    let items = [];
+    $("#FreightItemTable tbody tr.FreightNewRow").each(function () {
+
+        let row = $(this);
+
+        if (row.find(".JIFRT_SVOI_IsDeleted").val() == "1") return;
+
+        let prs = row.find(".JIFRT_SVOI_PRS_Number").val();
+        let fromWH = row.find(".JIFRT_SVOI_FromWH_Number").val();
+
+        // empty row skip
+        if ((!prs || prs === "0") && (!fromWH || fromWH === "0")) return;
+
+        items.push({
+            JIFRT_SVOI_Number:
+                parseInt(row.find(".JIFRT_SVOI_Number").val()) || 0,
+            JIFRT_SVOI_IsDeleted: false,
+
+            JIFRT_SVOI_Category: selectedCategory,
+
+            JIFRT_SVOI_PRS_Number:
+                parseInt(prs) || 0,
+
+            JIFRT_SVOI_FromWH_Number:
+                parseInt(fromWH) || null,
+
+            JIFRT_SVOI_ToWH_Number:
+                parseInt(row.find(".JIFRT_SVOI_ToWH_Number").val()) || null,
+
+            JIFRT_SVOI_UoM_Number:
+                parseInt(row.find(".JIFRT_SVOI_UoM_Number").val()) || 0,
+
+            JIFRT_SVOI_Qty:
+                parseFloat(removeComma(row.find(".JIFRT_SVOI_Qty").val())) || 0,
+
+            JIFRT_SVOI_Rate:
+                parseFloat(removeComma(row.find(".JIFRT_SVOI_Rate").val())) || 0,
+
+            JIFRT_SVOI_Amount:
+                parseFloat(removeComma(row.find(".JIFRT_SVOI_Amount").val())) || 0
+        });
+    });
+
+    return items;
 }
 
 //#region SUBMIT VALIDATION
-function validateHeaderById() {
+function ValidateJWIHeader() {
 
-    // 1. Register No
-    if ($("#Header_JISVOH_RegNo").val().trim() === "") {
-        showAlert('Register No. is required', '#Header_JISVOH_RegNo');
+    if ($('[name="JWIHeader.JIJWI_SVOH_RegNo"]').val().trim() === "") {
+        showAlert('Register No. is required', '[name="JWIHeader.JIJWI_SVOH_RegNo"]');
         return false;
     }
 
-    // 2. Register Date
-    if ($("#Header_JISVOH_RegDate").val().trim() === "") {
-        showAlert('Register Date is required', '#Header_JISVOH_RegDate');
+    if ($('[name="JWIHeader.JIJWI_SVOH_RegDate"]').val().trim() === "") {
+        showAlert('Register Date is required', '[name="JWIHeader.JIJWI_SVOH_RegDate"]');
         return false;
     }
 
-    // 3. Service Order No
-    if ($("#Header_JISVOH_ServiceOrderNo").val().trim() === "") {
-        showAlert('Service Order No. is required', '#Header_JISVOH_ServiceOrderNo');
+    if ($('[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]').val().trim() === "") {
+        showAlert('Service Order No. is required', '[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]');
         return false;
     }
 
-    // 4. Service Order Date
-    if ($("#Header_JISVOH_ServiceOrderDate").val().trim() === "") {
-        showAlert('Service Order Date is required', '#Header_JISVOH_ServiceOrderDate');
+    if ($('[name="JWIHeader.JIJWI_SVOH_ServiceOrderDate"]').val().trim() === "") {
+        showAlert('Service Order Date is required', '[name="JWIHeader.JIJWI_SVOH_ServiceOrderDate"]');
         return false;
     }
 
-    // 5. JW Customer
     if (
-        $("#Header_JISVOH_JW_Customer_Number").val().trim() === "" ||
-        $("#Header_JISVOH_JW_Customer_Name").val().trim() === ""
+        $('#JWIHeaderPanel .JW_Customer_Number').val().trim() === "" ||
+        $('[name="JWIHeader.JW_Customer_Name"]').val().trim() === ""
     ) {
-        showAlert(
-            'JW Customer is required',
-            '#Header_JISVOH_JW_Customer_Name'
-        );
+        showAlert('JW Customer is required', '[name="JWIHeader.JW_Customer_Name"]');
         return false;
     }
 
-    // 6. Currency
     if (
-        $("#Header_JISVOH_Currency_Number").val() === "" ||
-        $("#Header_JISVOH_Currency_Number").val() === "0"
+        $('#JWIHeaderPanel .Currency_Number').val() === "" ||
+        $('#JWIHeaderPanel .Currency_Number').val() === "0"
     ) {
-        showAlert(
-            'Currency is required',
-            '#Header_JISVOH_Currency_Number'
-        );
+        showAlert('Currency is required', '#JWIHeaderPanel .Currency_Number');
         return false;
     }
 
-    //// 7. Payment Terms
-    //if ($("#Header_JISVOH_PaymentTerms").val().trim() === "") {
-    //    showAlert('Payment Terms is required', '#Header_JISVOH_PaymentTerms');
-    //    return false;
-    //}
+    return true;
+}
 
-    //// 8. Delivery Terms
-    //if ($("#Header_JISVOH_DeliveryTerms").val().trim() === "") {
-    //    showAlert('Delivery Terms is required', '#Header_JISVOH_DeliveryTerms');
-    //    return false;
-    //}
+function ValidateFreightHeader() {
 
-    //// 9. Delivery Mode
-    //if ($("#Header_JISVOH_DeliveryMode").val().trim() === "") {
-    //    showAlert('Delivery Mode is required', '#Header_JISVOH_DeliveryMode');
-    //    return false;
-    //}
+    if ($('[name="FreightHeader.JIFRT_SVOH_RegNo"]').val().trim() === "") {
+        showAlert('Register No. is required', '[name="FreightHeader.JIFRT_SVOH_RegNo"]');
+        return false;
+    }
 
-    //// 10. Tax
-    //if ($("#Header_JISVOH_Tax").val().trim() === "") {
-    //    showAlert('Tax is required', '#Header_JISVOH_Tax');
-    //    return false;
-    //}
+    if ($('[name="FreightHeader.JIFRT_SVOH_RegDate"]').val().trim() === "") {
+        showAlert('Register Date is required', '[name="FreightHeader.JIFRT_SVOH_RegDate"]');
+        return false;
+    }
 
-    //// 11. TDC
-    //if ($("#Header_JISVOH_TDC").val().trim() === "") {
-    //    showAlert('TDC is required', '#Header_JISVOH_TDC');
-    //    return false;
-    //}
+    if ($('[name="FreightHeader.JIFRT_SVOH_ServiceOrderNo"]').val().trim() === "") {
+        showAlert('Service Order No. is required', '[name="FreightHeader.JIFRT_SVOH_ServiceOrderNo"]');
+        return false;
+    }
 
-    //// 12. Remarks
-    //if ($("#Header_JISVOH_Remarks").val().trim() === "") {
-    //    showAlert('Remarks is required', '#Header_JISVOH_Remarks');
-    //    return false;
-    //}
+    if ($('[name="FreightHeader.JIFRT_SVOH_ServiceOrderDate"]').val().trim() === "") {
+        showAlert('Service Order Date is required', '[name="FreightHeader.JIFRT_SVOH_ServiceOrderDate"]');
+        return false;
+    }
 
-    // Grid Validation
-    if (!validateItemGrid()) {
+    if (
+        $('#FreightHeaderPanel .JW_Customer_Number').val().trim() === "" ||
+        $('[name="FreightHeader.JW_Customer_Name"]').val().trim() === ""
+    ) {
+        showAlert('JW Customer is required', '[name="FreightHeader.JW_Customer_Name"]');
+        return false;
+    }
+
+    if (
+        $('#FreightHeaderPanel .Currency_Number').val() === "" ||
+        $('#FreightHeaderPanel .Currency_Number').val() === "0"
+    ) {
+        showAlert('Currency is required', '#FreightHeaderPanel .Currency_Number');
         return false;
     }
 
     return true;
 }
 //#endregion
+
 //#region customer Search Functions
 function OnBuyerSelectCall(inputElement) {
 
@@ -1132,7 +1396,8 @@ let buyerSearchXHR = null;
 function SearchBuyer(inputElement) {
 
     var JWCustomer = inputElement.value;
-    var RegDate = $("input[name='Header.JISVOH_RegDate']").val();
+    var $panel = $(inputElement).closest(".card");
+    var RegDate = $panel.find(".RegDate").val();
     var resultsDiv = $("#RightPane").find(".buyer-search-results");
 
     if (buyerSearchXHR) {
@@ -1183,7 +1448,6 @@ function SearchBuyer(inputElement) {
                   // matched nothing — its manual $(...).val() lines
                   // below were the only thing actually working).
               });
-
                 table.find("tbody").on("mousedown", "tr", function (e) {
 
                     e.preventDefault();
@@ -1191,25 +1455,15 @@ function SearchBuyer(inputElement) {
                     const clickedCust = $(this).data("customer");
                     isMouseSelectingBuyer = true;
 
-                    SelectBuyer(
-                        clickedCust,
-                        "#Header_JISVOH_JW_Customer_Name",
-                        "#Header_JISVOH_JW_Customer_Number",
-                        "#Header_JISVOH_Currency_Name",
-                        "#Header_JISVOH_Currency_Number",
-                        "#Header_JISVOH_WH_Number",
-                        "#RightPane",
-                        ".buyer-search-results"
-                    );
-
                     $("#BuyerMessage").hide().text("");
 
                     $(inputElement).val(clickedCust.cuS_Name);
 
-                    $("#Header_JISVOH_JW_Customer_Number")
+                    $panel.find(".JW_Customer_Number")
                         .val(clickedCust.cuS_Number);
 
-                    $("#Header_JISVOH_Currency_Number")
+                    let $currency = $panel.find(".Currency_Number");
+                    $currency
                         .val(clickedCust.cuS_CUR_Number)
                         .trigger("change");
 
@@ -1217,11 +1471,11 @@ function SearchBuyer(inputElement) {
                     $("#RightPane .buyer-search-results").hide();
 
                     setTimeout(function () {
-                        $("#Header_JISVOH_Currency_Number").focus();
+                        $currency.focus();
                         isMouseSelectingBuyer = false;
                     }, 100);
                 });
-
+                //-------------------------------------------------
                 resultsDiv.append(table);
 
                 resultsDiv.append(`
@@ -1323,16 +1577,8 @@ function OnFocusItem(inputElement) {
         return;
     }
 
-    let resultsDiv = $("#RightPane_Item").find(".search-results");
-    let messageVisible = $("#ItemMessage").is(":visible") ||
-        $("#ItemEmptyView").is(":visible");
-    let alreadyOpen = $("#RightPane_Item").hasClass("show") &&
-        (resultsDiv.find("tbody tr").length > 0 || messageVisible);
-
-    if (alreadyOpen) {
-        return;
-    }
-
+    // Always re-bind search to the currently focused row,
+    // even if the panel is already open from a different row's search.
     SearchServiceOrderItem(inputElement);
 }
 function SearchServiceOrderItem(inputElement) {
@@ -1340,7 +1586,7 @@ function SearchServiceOrderItem(inputElement) {
     let itemCode = inputElement.value.trim();
     let row = $(inputElement).closest("tr");
     let resultsDiv = $("#RightPane_Item").find(".search-results");
-    let material = $("#Header_JISVOH_MS_Number").val();
+    let material = $('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val();
 
     if (!material) return;
 
@@ -1397,9 +1643,8 @@ function SearchServiceOrderItem(inputElement) {
 
                         isSelectingItem = true;
 
-                        row.find(".JISVOI_Item_Code").val(item.itemCode);
-                        row.find(".JISVOI_Item_Number").val(item.itemNumber);
-                        row.find(".JISVOI_Number").val(item.itemNumber);
+                        row.find(".JIJWI_SVOI_Item_Code").val(item.itemCode);
+                        row.find(".JIJWI_SVOI_Item_Number").val(item.itemNumber);
 
                         row.find(".Description").val(item.itemDescription);
                         row.find(".OuterDia").val(item.outerDia);
@@ -1408,10 +1653,10 @@ function SearchServiceOrderItem(inputElement) {
                         row.find(".Width").val(item.width);
                         row.find(".MaterialGrade").val(item.materialGrade);
                         row.find(".ItemGroup").val(item.itemGroup);
-                        row.find(".JISVOI_WH_Number").val(item.saleWarehouse);
-                        row.find(".JISVOI_UoM_Number").val(item.uoM);
+                        row.find(".JIJWI_SVOI_WH_Number").val(item.saleWarehouse);
+                        row.find(".JIJWI_SVOI_UoM_Number").val(item.uoM);
 
-                        row.find(".JISVOI_Qty").focus();
+                        row.find(".JIJWI_SVOI_Qty").focus();
 
                         setTimeout(function () {
                             isSelectingItem = false;
@@ -1510,158 +1755,191 @@ function SearchServiceOrderItem(inputElement) {
     });
 }
 //#region Calculate Total
-function calculateTotal() {
+function JWICalculateTotal() {
 
     let totalQty = 0;
     let totalAmount = 0;
 
-    // Loop through each row (only active rows)
-    $("#ItemTable tbody tr.NewRow").each(function () {
+    $("#JWIItemTable tbody tr.JWINewRow").each(function () {
 
         let row = $(this);
 
-        // Skip deleted rows
-        if (row.find(".JISVOI_IsDeleted").val() === "1" ||
-            row.find(".JISVOI_IsDeleted").val() === "true") {
+        if (row.find(".JIJWI_SVOI_IsDeleted").val() === "1" ||
+            row.find(".JIJWI_SVOI_IsDeleted").val() === "true") {
             return;
         }
 
-        // Get Qty
-        let qty = parseFloat(removeComma(row.find(".JISVOI_Qty").val())) || 0;
-
-        // Get Unit Price
-        let unitPrice = parseFloat(removeComma(row.find(".JISVOI_UnitPrice").val())) || 0;
-
-        // Row Amount = Qty × Unit Price
+        let qty = parseFloat(removeComma(row.find(".JIJWI_SVOI_Qty").val())) || 0;
+        let unitPrice = parseFloat(removeComma(row.find(".JIJWI_SVOI_UnitPrice").val())) || 0;
         let amount = qty * unitPrice;
 
-        // Set row amount field
-        row.find(".JISVOI_Amount").val(addComma(amount, "c"));
+        row.find(".JIJWI_SVOI_Amount").val(addComma(amount, "c"));
 
-        // Add to totals
         totalQty += qty;
         totalAmount += amount;
     });
 
-    // Footer totals
-    $("#TotalQty").val(addComma(totalQty, "q"));
-    $("#TotalAmount").val(addComma(totalAmount, "c"));
+    $("#JWITotalQty").val(addComma(totalQty, "q"));
+    $("#JWITotalAmount").val(addComma(totalAmount, "c"));
+}
+
+function FreightCalculateTotal() {
+
+    let totalQty = 0;
+    let totalAmount = 0;
+
+    $("#FreightItemTable tbody tr.FreightNewRow").each(function () {
+
+        let row = $(this);
+
+        if (row.find(".JIFRT_SVOI_IsDeleted").val() === "1" ||
+            row.find(".JIFRT_SVOI_IsDeleted").val() === "true") {
+            return;
+        }
+
+        let qty = parseFloat(removeComma(row.find(".JIFRT_SVOI_Qty").val())) || 0;
+        let rate = parseFloat(removeComma(row.find(".JIFRT_SVOI_Rate").val())) || 0;
+        let amount = qty * rate;
+
+        row.find(".JIFRT_SVOI_Amount").val(addComma(amount, "c"));
+
+        totalQty += qty;
+        totalAmount += amount;
+    });
+
+    $("#FreightTotalQty").val(addComma(totalQty, "q"));
+    $("#FreightTotalAmount").val(addComma(totalAmount, "c"));
 }
 //#endregion Calculate Total
 
 //#region VALIDATE ITEM GRID
 
-function validateItemGrid() {
+function JWIValidateItemGrid() {
 
     let hasValidRow = false;
     let isValid = true;
     let rowNumber = 0;
 
-    $("#ItemTable tbody tr").each(function () {
+    $("#JWIItemTable tbody tr").each(function () {
 
         let row = $(this);
 
-        // skip template row
-        if (row.hasClass("TempRow")) return;
+        if (row.attr("id") === "JWITempRow") return;
+        if (row.find(".JIJWI_SVOI_IsDeleted").val() === "1") return;
 
-        // skip deleted row
-        if (row.find(".JISVOI_IsDeleted").val() === "1") return;
+        let process = row.find(".JIJWI_SVOI_PRS_Number").val();
+        let itemCode = row.find(".JIJWI_SVOI_Item_Code").val();
+        let qty = row.find(".JIJWI_SVOI_Qty").val();
+        let unitPrice = row.find(".JIJWI_SVOI_UnitPrice").val();
 
-        let process = row.find(".JISVOI_PRS_Number").val();
-        let itemCode = row.find(".JISVOI_Item_Code").val();
-        let qty = row.find(".JISVOI_Qty").val();
-        let unitPrice = row.find(".JISVOI_UnitPrice").val();
-
-        // check if row has any data
         let isRowStarted =
             (process && process.trim() !== "") ||
             (itemCode && itemCode.trim() !== "") ||
             (qty && qty.trim() !== "") ||
             (unitPrice && unitPrice.trim() !== "");
 
-        // empty row → skip
         if (!isRowStarted) return;
 
         rowNumber++;
         hasValidRow = true;
 
-        // Process
         if (!process || process.trim() === "" || process === "0") {
-            showAlert(
-                'Process is required',
-                row.find(".JISVOI_PRS_Number")
-            );
+            showAlert('Process is required', row.find(".JIJWI_SVOI_PRS_Number"));
             isValid = false;
             return false;
         }
 
-        // Item Code
         if (!itemCode || itemCode.trim() === "") {
-            showAlert(
-                'Item Code is required',
-                row.find(".JISVOI_Item_Code")
-            );
+            showAlert('Item Code is required', row.find(".JIJWI_SVOI_Item_Code"));
             isValid = false;
             return false;
         }
 
-        // Qty
         if (!qty || qty.trim() === "" || qty.trim() === "0") {
-            showAlert(
-                'Row ' + rowNumber + ': Qty is required',
-                row.find(".JISVOI_Qty")
-            );
+            showAlert('Row ' + rowNumber + ': Qty is required', row.find(".JIJWI_SVOI_Qty"));
             isValid = false;
             return false;
         }
 
-        // Unit Price
-        if (
-            !unitPrice ||
-            unitPrice.trim() === "" ||
-            unitPrice.trim() === "0"
-        ) {
-            showAlert(
-                'Row ' + rowNumber + ': Unit Price is required',
-                row.find(".JISVOI_UnitPrice")
-            );
+        if (!unitPrice || unitPrice.trim() === "" || unitPrice.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': Unit Price is required', row.find(".JIJWI_SVOI_UnitPrice"));
             isValid = false;
             return false;
         }
-
-        // NEW: Freight Service Order - From WH / To WH mandatory
-        if ($("#Header_JISVOH_Freight_Applicable").is(":checked")) {
-
-            let fromWH = row.find(".JISVOI_FromWH").val();
-            let toWH = row.find(".JISVOI_ToWH").val();
-
-            if (!fromWH || fromWH.trim() === "" || fromWH.trim() === "0") {
-                showAlert(
-                    'Row ' + rowNumber + ': From WH is required',
-                    row.find(".JISVOI_FromWH")
-                );
-                isValid = false;
-                return false;
-            }
-
-            if (!toWH || toWH.trim() === "" || toWH.trim() === "0") {
-                showAlert(
-                    'Row ' + rowNumber + ': To WH is required',
-                    row.find(".JISVOI_ToWH")
-                );
-                isValid = false;
-                return false;
-            }
-        }
-
     });
 
-    // no rows
     if (!hasValidRow) {
-        showAlert(
-            'Please add at least one item in grid',
-            "#ItemTable tbody tr:first .JISVOI_PRS_Number"
-        );
+        showAlert('Please add at least one item in grid', "#JWIItemTable tbody tr:first .JIJWI_SVOI_PRS_Number");
+        return false;
+    }
+
+    return isValid;
+}
+
+function FreightValidateItemGrid() {
+
+    let hasValidRow = false;
+    let isValid = true;
+    let rowNumber = 0;
+
+    $("#FreightItemTable tbody tr").each(function () {
+
+        let row = $(this);
+
+        if (row.attr("id") === "FreightTempRow") return;
+        if (row.find(".JIFRT_SVOI_IsDeleted").val() === "1") return;
+
+        let process = row.find(".JIFRT_SVOI_PRS_Number").val();
+        let fromWH = row.find(".JIFRT_SVOI_FromWH_Number").val();
+        let toWH = row.find(".JIFRT_SVOI_ToWH_Number").val();
+        let qty = row.find(".JIFRT_SVOI_Qty").val();
+        let rate = row.find(".JIFRT_SVOI_Rate").val();
+
+        let isRowStarted =
+            (process && process.trim() !== "") ||
+            (fromWH && fromWH.trim() !== "") ||
+            (toWH && toWH.trim() !== "") ||
+            (qty && qty.trim() !== "") ||
+            (rate && rate.trim() !== "");
+
+        if (!isRowStarted) return;
+
+        rowNumber++;
+        hasValidRow = true;
+
+        if (!process || process.trim() === "" || process === "0") {
+            showAlert('Process is required', row.find(".JIFRT_SVOI_PRS_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!fromWH || fromWH.trim() === "" || fromWH.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': From WH is required', row.find(".JIFRT_SVOI_FromWH_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!toWH || toWH.trim() === "" || toWH.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': To WH is required', row.find(".JIFRT_SVOI_ToWH_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!qty || qty.trim() === "" || qty.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': Qty is required', row.find(".JIFRT_SVOI_Qty"));
+            isValid = false;
+            return false;
+        }
+
+        if (!rate || rate.trim() === "" || rate.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': Rate is required', row.find(".JIFRT_SVOI_Rate"));
+            isValid = false;
+            return false;
+        }
+    });
+
+    if (!hasValidRow) {
+        showAlert('Please add at least one item in grid', "#FreightItemTable tbody tr:first .JIFRT_SVOI_PRS_Number");
         return false;
     }
 

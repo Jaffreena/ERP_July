@@ -12,8 +12,8 @@
                         <input type="checkbox" id="IndexAllCheckItem" class="form-check-input border-white">
                     </th>
 
-                    <th>@Html.DisplayNameFor(m => m.First().PRS_Number)</th>
-                    <th>@Html.DisplayNameFor(m => m.First().Item_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_PRS_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_Item_Number)</th>
                     <th>@Html.DisplayNameFor(m => m.First().Description)</th>
 
                     <th class="text-end">@Html.DisplayNameFor(m => m.First().OuterDia)</th>
@@ -24,12 +24,12 @@
                     <th>@Html.DisplayNameFor(m => m.First().MaterialGrade)</th>
                     <th>@Html.DisplayNameFor(m => m.First().ItemGroup)</th>
 
-                    <th>@Html.DisplayNameFor(m => m.First().WH_Number)</th>
-                    <th>@Html.DisplayNameFor(m => m.First().UoM_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_WH_Number)</th>
+                    <th>@Html.DisplayNameFor(m => m.First().JIRNI_UoM_Number)</th>
 
-                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Qty)</th>
-                    <th class="text-end">@Html.DisplayNameFor(m => m.First().UnitPrice)</th>
-                    <th class="text-end">@Html.DisplayNameFor(m => m.First().Amount)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().JIRNI_Qty)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().JIRNI_UnitPrice)</th>
+                    <th class="text-end">@Html.DisplayNameFor(m => m.First().JIRNI_Amount)</th>
                 </tr>
             </thead>
 
@@ -41,13 +41,13 @@
                     <td><input type="checkbox" class="CheckItem form-check-input"> </td>
 
                     <td>
-                        <input id="PRS_Number" class="PRS_Number" type="hidden" />
+                        <input id="JIRNI_PRS_Number" class="JIRNI_PRS_Number" type="hidden" />
                         <input class="form-control PRS_Name" autocomplete="off" oninput="OnInputProcess(this)" id="prsnum" onfocus="OnFocusProcess(this)" />
                         <div class="search-results card" style="display:none"></div>
                     </td>
 
                     <td>
-                        <input id="Item_Number" class="Item_Number" type="hidden" />
+                        <input id="JIRNI_Item_Number" class="JIRNI_Item_Number" type="hidden" />
                         <input id="Item_Index" class="Item_Index" type="hidden" />
                         <input class="form-control Item_Code" oninput="OnInput(this)" onfocus="OnFocus(this)" />
                         <div class="search-results card" style="display:none"></div>
@@ -64,23 +64,23 @@
                     <td><input class="form-control ItemGroup" readonly /></td>
 
                     <td>
-                        <select class="form-select WH_Number" asp-items="@ViewBag.Warehouse"></select>
+                        <select class="form-select JIRNI_WH_Number" asp-items="@ViewBag.Warehouse"></select>
                     </td>
 
                     <td>
-                        <select class="form-select UoM_Number" asp-items="@ViewBag.UoM"></select>
+                        <select class="form-select JIRNI_UoM_Number" asp-items="@ViewBag.UoM"></select>
                     </td>
 
                     <td>
-                        <input class="form-control Qty text-end" />
+                        <input class="form-control JIRNI_Qty text-end" />
                     </td>
 
                     <td>
-                        <input class="form-control UnitPrice text-end" />
+                        <input class="form-control JIRNI_UnitPrice text-end" />
                     </td>
 
                     <td>
-                        <input class="form-control Amount text-end" readonly />
+                        <input class="form-control JIRNI_Amount text-end" readonly />
                         <input type="hidden" class="IsDeleted" value="0" />
                     </td>
                 </tr>
@@ -97,9 +97,9 @@
                             </td>
 
                             <td>
-                                <input name="Items[@i].PRS_Number"
-                                       class="form-control PRS_Number"
-                                       value="@Model[i].PRS_Number"
+                                <input name="Items[@i].JIRNI_PRS_Number"
+                                       class="form-control JIRNI_PRS_Number"
+                                       value="@Model[i].JIRNI_PRS_Number"
                                        oninput="OnInputProcess(this)"
                                        onfocus="OnFocusProcess(this)" autocomplete="off" />
 
@@ -107,9 +107,9 @@
                             </td>
 
                             <td>
-                                <input name="Items[@i].Item_Number"
-                                       class="form-control Item_Number"
-                                       value="@Model[i].Item_Number"
+                                <input name="Items[@i].JIRNI_Item_Number"
+                                       class="form-control JIRNI_Item_Number"
+                                       value="@Model[i].JIRNI_Item_Number"
                                        oninput="OnInput(this)" onfocus="OnFocus(this)" />
                                 <div class="search-results card" style="display:none"></div>
                             </td>
@@ -157,11 +157,11 @@
                             </td>
 
                             <td>
-                                <select name="Items[@i].WH_Number" class="form-select WH_Number">
+                                <select name="Items[@i].JIRNI_WH_Number" class="form-select JIRNI_WH_Number">
                                     @foreach (var w in (ViewBag.Warehouse as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                     {
                                         <option value="@w.Value"
-                                                selected="@(w.Value == Model[i]?.WH_Number)">
+                                                selected="@(w.Value == Model[i]?.JIRNI_WH_Number)">
                                             @w.Text
                                         </option>
                                     }
@@ -169,11 +169,11 @@
                             </td>
 
                             <td>
-                                <select name="Items[@i].UoM_Number" class="form-select UoM_Number">
+                                <select name="Items[@i].JIRNI_UoM_Number" class="form-select JIRNI_UoM_Number">
                                     @foreach (var u in (ViewBag.UoM as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>()))
                                     {
                                         <option value="@u.Value"
-                                                selected="@(u.Value == Model[i]?.UoM_Number)">
+                                                selected="@(u.Value == Model[i]?.JIRNI_UoM_Number)">
                                             @u.Text
                                         </option>
                                     }
@@ -181,21 +181,21 @@
                             </td>
 
                             <td>
-                                <input name="Items[@i].Qty"
-                                       class="form-control Qty text-end"
-                                       value="@Model[i].Qty" />
+                                <input name="Items[@i].JIRNI_Qty"
+                                       class="form-control JIRNI_Qty text-end"
+                                       value="@Model[i].JIRNI_Qty" />
                             </td>
 
                             <td>
-                                <input name="Items[@i].UnitPrice"
-                                       class="form-control UnitPrice text-end"
-                                       value="@Model[i].UnitPrice" />
+                                <input name="Items[@i].JIRNI_UnitPrice"
+                                       class="form-control JIRNI_UnitPrice text-end"
+                                       value="@Model[i].JIRNI_UnitPrice" />
                             </td>
 
                             <td>
-                                <input name="Items[@i].Amount"
-                                       class="form-control Amount text-end"
-                                       value="@Model[i].Amount" readonly />
+                                <input name="Items[@i].JIRNI_Amount"
+                                       class="form-control JIRNI_Amount text-end"
+                                       value="@Model[i].JIRNI_Amount" readonly />
 
                                 <input type="hidden"
                                        name="Items[@i].IsDeleted"
@@ -264,11 +264,11 @@
             .addClass("NewRow");
 
         // 🔹 Assign correct model binding names
-        NewRow.find(".PRS_Number")
-            .attr("name", "Items[" + rowCount + "].PRS_Number");
+        NewRow.find(".JIRNI_PRS_Number")
+            .attr("name", "Items[" + rowCount + "].JIRNI_PRS_Number");
 
-        NewRow.find(".Item_Number")
-            .attr("name", "Items[" + rowCount + "].Item_Number");
+        NewRow.find(".JIRNI_Item_Number")
+            .attr("name", "Items[" + rowCount + "].JIRNI_Item_Number");
 
         NewRow.find(".Description")
             .attr("name", "Items[" + rowCount + "].Description");
@@ -291,20 +291,20 @@
         NewRow.find(".ItemGroup")
             .attr("name", "Items[" + rowCount + "].ItemGroup");
 
-        NewRow.find(".WH_Number")
-            .attr("name", "Items[" + rowCount + "].WH_Number");
+        NewRow.find(".JIRNI_WH_Number")
+            .attr("name", "Items[" + rowCount + "].JIRNI_WH_Number");
 
-        NewRow.find(".UoM_Number")
-            .attr("name", "Items[" + rowCount + "].UoM_Number");
+        NewRow.find(".JIRNI_UoM_Number")
+            .attr("name", "Items[" + rowCount + "].JIRNI_UoM_Number");
 
-        NewRow.find(".Qty")
-            .attr("name", "Items[" + rowCount + "].Qty");
+        NewRow.find(".JIRNI_Qty")
+            .attr("name", "Items[" + rowCount + "].JIRNI_Qty");
 
-        NewRow.find(".UnitPrice")
-            .attr("name", "Items[" + rowCount + "].UnitPrice");
+        NewRow.find(".JIRNI_UnitPrice")
+            .attr("name", "Items[" + rowCount + "].JIRNI_UnitPrice");
 
-        NewRow.find(".Amount")
-            .attr("name", "Items[" + rowCount + "].Amount");
+        NewRow.find(".JIRNI_Amount")
+            .attr("name", "Items[" + rowCount + "].JIRNI_Amount");
 
         NewRow.find(".IsDeleted")
             .attr("name", "Items[" + rowCount + "].IsDeleted")
@@ -314,7 +314,7 @@
         NewRow.find("input").not(".IsDeleted").val("");
         NewRow.find("select").prop("selectedIndex", 0);
             // 🔹 Default values
-       NewRow.find(".UnitPrice").val("0.00");
+       NewRow.find(".JIRNI_UnitPrice").val("0.00");
        NewRow.find("select").prop("selectedIndex", 0);
         // 🔹 Append row
         $("#TableBody").append(NewRow);
@@ -343,7 +343,7 @@
 
             var firstInvalidField = null;
 
-            lastRow.find("select, input.PRS_Number, input.Item_Number, input.Qty, input.UnitPrice, input[type='text']")
+            lastRow.find("select, input.JIRNI_PRS_Number, input.JIRNI_Item_Number, input.JIRNI_Qty, input.JIRNI_UnitPrice, input[type='text']")
                 .each(function () {
 
                     if (!validateField($(this))) {
@@ -368,7 +368,7 @@
 
         $("#TableBody tr:visible").each(function () {
 
-            $(this).find("select, input.PRS_Number, input.Item_Number, input.Qty, input.UnitPrice")
+            $(this).find("select, input.JIRNI_PRS_Number, input.JIRNI_Item_Number, input.JIRNI_Qty, input.JIRNI_UnitPrice")
                 .each(function () {
 
                     if (!validateField($(this))) {
@@ -403,7 +403,7 @@
 
 </script>
 <script>
-                $(document).on('input', "input.Qty, input.UnitPrice", function () {
+                $(document).on('input', "input.JIRNI_Qty, input.JIRNI_UnitPrice", function () {
 
         var currentInput = $(this);
 
@@ -411,14 +411,14 @@
         var row = currentInput.closest("tr.NewRow");
 
         // 🔹 Get values
-        var qty = parseFloat(removeCommas(row.find("input.Qty").val())) || 0;
-        var unitPrice = parseFloat(removeCommas(row.find("input.UnitPrice").val())) || 0;
+        var qty = parseFloat(removeCommas(row.find("input.JIRNI_Qty").val())) || 0;
+        var unitPrice = parseFloat(removeCommas(row.find("input.JIRNI_UnitPrice").val())) || 0;
 
-        // 🔹 Calculate Amount
+        // 🔹 Calculate JIRNI_Amount
         var amount = qty * unitPrice;
 
-        // 🔹 Set Amount
-        row.find("input.Amount").val(DecimalIndianRupees(amount));
+        // 🔹 Set JIRNI_Amount
+        row.find("input.JIRNI_Amount").val(DecimalIndianRupees(amount));
 
         // 🔹 Recalculate Footer Total
           calculateFooterTotals();
@@ -443,7 +443,7 @@
     function searchItem(inputElement) {
         var itemCode = inputElement.value;
         var resultsDiv = $(inputElement).next('.search-results');
-        var Metrial = $("#MS_Number").val();
+        var Metrial = $("#JIRNH_MS_Number").val();
         
         //Metrial=1;
         if (Metrial) {
@@ -466,7 +466,7 @@
                             row.on('click', function () {
                                    $(inputElement).val(item.itemCode);
 
-    $(inputElement).closest('tr').find('input.Item_Number').val(item.itemNumber);
+    $(inputElement).closest('tr').find('input.JIRNI_Item_Number').val(item.itemNumber);
     $(inputElement).closest('tr').find('input.Item_Code').val(item.itemCode);
     $(inputElement).closest('tr').find('input.Description').val(item.itemDescription);
     $(inputElement).closest('tr').find('input.OuterDia').val(item.outerDia);
@@ -475,10 +475,10 @@
     $(inputElement).closest('tr').find('input.Width').val(item.width);
     $(inputElement).closest('tr').find('input.MaterialGrade').val(item.materialGrade);
     $(inputElement).closest('tr').find('input.ItemGroup').val(item.itemGroup);
-                                 $(inputElement).closest('tr').find('select.UoM_Number').val(item.uoM);
-    $(inputElement).closest('tr').find('select.WH_Number').val(item.saleWarehouse);
+                                 $(inputElement).closest('tr').find('select.JIRNI_UoM_Number').val(item.uoM);
+    $(inputElement).closest('tr').find('select.JIRNI_WH_Number').val(item.saleWarehouse);
 
-    let q=$(inputElement).closest('tr').find('input.Qty');
+    let q=$(inputElement).closest('tr').find('input.JIRNI_Qty');
     q.focus();
     setTimeout(()=>q[0].setSelectionRange(0,q.val().length),10);
 
@@ -486,8 +486,8 @@
                                 if (decimalPlaces === "") {
                                     decimalPlaces = 2;
                                 }
-                               var value = $(inputElement).closest('tr').find('input.Qty').val();
-                                 $(inputElement).closest('tr').find('input.Qty').val(
+                               var value = $(inputElement).closest('tr').find('input.JIRNI_Qty').val();
+                                 $(inputElement).closest('tr').find('input.JIRNI_Qty').val(
         QtyDecimalRupees(value, decimalPlaces)
     );
 
@@ -593,7 +593,7 @@
 
                             var rowEl = $(inputElement).closest('tr');
 
-                            rowEl.find('input.PRS_Number').val(p.processNumber);
+                            rowEl.find('input.JIRNI_PRS_Number').val(p.processNumber);
 
                             
                             // optional focus next
@@ -645,14 +645,14 @@
                 return;
             }
 
-            // Qty
+            // JIRNI_Qty
             let qty = parseFloat(
-                removeCommas($(this).find(".Qty").val())
+                removeCommas($(this).find(".JIRNI_Qty").val())
             ) || 0;
 
-            // Amount
+            // JIRNI_Amount
             let amount = parseFloat(
-                removeCommas($(this).find(".Amount").val())
+                removeCommas($(this).find(".JIRNI_Amount").val())
             ) || 0;
 
             totalQty += qty;
