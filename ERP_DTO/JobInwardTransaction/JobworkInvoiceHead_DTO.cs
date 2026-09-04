@@ -7,175 +7,174 @@ using System.Threading.Tasks;
 
 namespace ERP_DTO.JobInwardTransaction
 {
-    public class JobworkInvoiceHead_DTO
+    public class JobWorkInvoiceHead_DTO
     {
-        public long JISVIH_Number { get; set; }
+        public long JIJWIH_Number { get; set; }
 
         [Display(Name = "JW Invoice No.")]
         [StringLength(25)]
-        public string JISVIH_InvoiceNo { get; set; }
+        public string JIJWIH_InvoiceNo { get; set; }
 
         [Display(Name = "Invoice Date")]
         [DataType(DataType.Date)]
-        public DateTime JISVIH_InvoiceDate { get; set; }
+        public DateTime JIJWIH_InvoiceDate { get; set; }
         [Display(Name = "Material Segregation")]
-        public long JISVIH_MS_Number { get; set; }
+        public long JIJWIH_MS_Number { get; set; }
         [Display(Name = "JW Customer")]
-        public long JISVIH_JW_Customer_Number { get; set; }
-        public string JISVIH_JW_Customer_Name { get; set; }
-        
+        public long JIJWIH_JW_Customer_Number { get; set; }
+        public string JIJWIH_JW_Customer_Name { get; set; }
+
 
         [Display(Name = "Currency")]
-        public long JISVIH_Currency_Number { get; set; }
+        public long JIJWIH_Currency_Number { get; set; }
 
         [Display(Name = "Tax Cluster")]
-        public long JISVIH_TCT_Number { get; set; }
+        public long JIJWIH_TCT_Number { get; set; }
 
         [Display(Name = "Payment Terms")]
         [StringLength(50)]
-        public string JISVIH_PaymentTerms { get; set; }
+        public string JIJWIH_PaymentTerms { get; set; }
 
         [Display(Name = "Method of payment")]
         [StringLength(50)]
-        public string JISVIH_PaymentMethod { get; set; }
+        public string JIJWIH_PaymentMethod { get; set; }
 
         [Display(Name = "Remarks")]
         [StringLength(250)]
-        public string JISVIH_Remarks { get; set; }
+        public string JIJWIH_Remarks { get; set; }
         public int? JW_Inv_Id { get; set; }
     }
-    public class JobworkInvoiceItem_DTO
+    public class JobWorkInvoiceItem_DTO
     {
-        public long JISVII_JISVIH_Number { get; set; }
+        public long JIJWII_JIJWIH_Number { get; set; }
 
-        public long JIDNI_Number { get; set; }
-        public long? JISVOI_Number { get; set; }
-        
+        public long JIJWII_JIDNI_Number { get; set; }
+        public long? JIJWII_JISVOI_Number { get; set; }
 
-        public long JISVII_Number { get; set; }
+
+        public long JIJWII_Number { get; set; }
 
         [Display(Name = "JW Order")]
-        public long JISVII_JISVOH_Number { get; set; }
+        public long JIJWII_JISVOH_Number { get; set; }
 
         [Display(Name = "Delivery Note")]
-        public long JISVII_JIDNH_Number { get; set; }
+        public long JIJWII_JIDNH_Number { get; set; }
 
         [Display(Name = "PRS Number")]
-        public long JISVII_PRS_Number { get; set; }
+        public long JIJWII_PRS_Number { get; set; }
 
         [Display(Name = "Item")]
-        public long JISVII_Item_Number { get; set; }
+        public long JIJWII_Item_Number { get; set; }
 
         [Display(Name = "UOM")]
-        public long JISVII_UoM_Number { get; set; }
+        public long JIJWII_UoM_Number { get; set; }
 
         [Display(Name = "Qty")]
-        public double JISVII_Qty { get; set; }
+        public double JIJWII_Qty { get; set; }
 
         [Display(Name = "Unit Price")]
-        public double JISVII_UnitPrice { get; set; }
+        public double JIJWII_UnitPrice { get; set; }
 
         [Display(Name = "Amount")]
-        public double JISVII_Amount { get; set; }
+        public double JIJWII_Amount { get; set; }
 
         [Display(Name = "SAC")]
-        public long JISVII_SAC_Number { get; set; }
+        public long JIJWII_SAC_Number { get; set; }
 
         [Display(Name = "GST Amount")]
-        public double JISVII_GST_Amount { get; set; }
+        public double JIJWII_GST_Amount { get; set; }
         [Display(Name = "SO Assign")]
-        public string JISVII_SO_Assign { get; set; }
+        public string JIJWII_SVO_Assign { get; set; }
     }
 
-    public class JobworkInvoiceAddress_DTO
+    public class JobWorkInvoiceAddress_DTO
     {
-        public long JISVIA_JISVIH_Number { get; set; }
+        public long JIJWIA_JIJWIH_Number { get; set; }
 
-        public long JISVIA_Number { get; set; }
+        public long JIJWIA_Number { get; set; }
 
         [Display(Name = "Address Type")]
-        public long JISVIA_ADTP_Number { get; set; }
+        public long JIJWIA_ADTP_Number { get; set; }
 
         [Display(Name = "Address ID")]
         [StringLength(25)]
-        public string JISVIA_Address_ID { get; set; }
+        public string JIJWIA_Address_ID { get; set; }
 
         [Display(Name = "Address")]
         [StringLength(250)]
-        public string JISVIA_Address { get; set; }
+        public string JIJWIA_Address { get; set; }
 
         [Display(Name = "City")]
         [StringLength(25)]
-        public string JISVIA_City { get; set; }
+        public string JIJWIA_City { get; set; }
 
         [Display(Name = "State")]
         [StringLength(25)]
-        public string JISVIA_State { get; set; }
+        public string JIJWIA_State { get; set; }
 
         [Display(Name = "Country")]
         [StringLength(25)]
-        public string JISVIA_Country { get; set; }
+        public string JIJWIA_Country { get; set; }
 
         [Display(Name = "PIN")]
         [StringLength(10)]
-        public string JISVIA_PIN { get; set; }
+        public string JIJWIA_PIN { get; set; }
 
         [Display(Name = "GSTIN")]
         [StringLength(15)]
-        public string JISVIA_GSTIN { get; set; }
+        public string JIJWIA_GSTIN { get; set; }
     }
-
-    public class JobworkInvoiceGST_DTO
+    public class JobWorkInvoiceGST_DTO
     {
-        public long JISVIG_JISVIH_Number { get; set; }
+        public long JIJWIG_JIJWIH_Number { get; set; }
 
-        public long JISVIG_JISVII_Number { get; set; }
+        public long JIJWIG_JIJWII_Number { get; set; }
 
-        public long JISVIG_Number { get; set; }
+        public long JIJWIG_Number { get; set; }
 
         [Display(Name = "Index")]
-        public int JISVIG_Index { get; set; }
+        public int JIJWIG_Index { get; set; }
 
         [Display(Name = "GST Category")]
-        public long JISVIG_GSTC_Number { get; set; }
+        public long JIJWIG_GSTC_Number { get; set; }
 
         [Display(Name = "GST Type")]
-        public long JISVIG_GSTT_Number { get; set; }
+        public long JIJWIG_GSTT_Number { get; set; }
 
         [Display(Name = "GST Element")]
-        public long JISVIG_GSTE_Number { get; set; }
+        public long JIJWIG_GSTE_Number { get; set; }
 
         [Display(Name = "Assessable Value")]
-        public double JISVIG_AssessableValue { get; set; }
+        public double JIJWIG_AssessableValue { get; set; }
 
         [Display(Name = "Percent")]
-        public double JISVIG_Percent { get; set; }
+        public double JIJWIG_Percent { get; set; }
 
         [Display(Name = "GST Amount")]
-        public double JISVIG_GST_Amount { get; set; }
+        public double JIJWIG_GST_Amount { get; set; }
         [Display(Name = "SO Assign")]
-        public string JISVII_SO_Assign { get; set; }
+        public string JIJWII_SVO_Assign { get; set; }
     }
-    public class JobworkInvoiceCreate_DTO
+    public class JobWorkInvoiceCreate_DTO
     {
-        public JobworkInvoiceCreate_DTO()
+        public JobWorkInvoiceCreate_DTO()
         {
-            Header = new JobworkInvoiceHead_DTO();
+            Header = new JobWorkInvoiceHead_DTO();
 
-            Items = new List<JobworkInvoiceItem_DTO>();
+            Items = new List<JobWorkInvoiceItem_DTO>();
 
-            Addresses = new List<JobworkInvoiceAddress_DTO>();
+            Addresses = new List<JobWorkInvoiceAddress_DTO>();
 
-            GST = new List<JobworkInvoiceGST_DTO>();
+            GST = new List<JobWorkInvoiceGST_DTO>();
         }
 
-        public JobworkInvoiceHead_DTO Header { get; set; }
+        public JobWorkInvoiceHead_DTO Header { get; set; }
 
-        public List<JobworkInvoiceItem_DTO> Items { get; set; }
+        public List<JobWorkInvoiceItem_DTO> Items { get; set; }
 
-        public List<JobworkInvoiceAddress_DTO> Addresses { get; set; }
+        public List<JobWorkInvoiceAddress_DTO> Addresses { get; set; }
 
-        public List<JobworkInvoiceGST_DTO> GST { get; set; }
+        public List<JobWorkInvoiceGST_DTO> GST { get; set; }
     }
 
     public class JobInwardInvoiceGst
@@ -196,17 +195,17 @@ namespace ERP_DTO.JobInwardTransaction
         public long? GSTTNumber { get; set; }
         public long? GSTENumber { get; set; }
     }
-    public class JobworkInvoiceDetail_DTO
+    public class JobWorkInvoiceDetail_DTO
     {
         public long JIDNH_MS_Number { get; set; }
 
         public long JIDNH_WH_Number { get; set; }
 
-        public long JISVIH_Number { get; set; }
+        public long JIJWIH_Number { get; set; }
 
-        public string? JISVIH_InvoiceNo { get; set; }
+        public string? JIJWIH_InvoiceNo { get; set; }
 
-        public string? JISVIH_InvoiceDate { get; set; }
+        public string? JIJWIH_InvoiceDate { get; set; }
 
         public string? JIDNH_DN_No { get; set; }
 
@@ -222,11 +221,11 @@ namespace ERP_DTO.JobInwardTransaction
 
         public string? TaxCluster { get; set; }
 
-        public decimal JISVII_Qty { get; set; }
+        public decimal JIJWII_Qty { get; set; }
 
-        public decimal JISVII_Amount { get; set; }
+        public decimal JIJWII_Amount { get; set; }
 
-        public decimal JISVII_GST_Amount { get; set; }
+        public decimal JIJWII_GST_Amount { get; set; }
 
         public string? Segregation { get; set; }
 
@@ -251,21 +250,21 @@ namespace ERP_DTO.JobInwardTransaction
 
         public string UOM { get; set; }
     }
-   
-    public class JobworkInvoiceSummary_DTO
+
+    public class JobWorkInvoiceSummary_DTO
     {
-        public long JISVIH_Number { get; set; }
+        public long JIJWIH_Number { get; set; }
 
-        public string? JISVIH_InvoiceNo { get; set; }
+        public string? JIJWIH_InvoiceNo { get; set; }
 
-        public string? JISVIH_InvoiceDate { get; set; }
+        public string? JIJWIH_InvoiceDate { get; set; }
 
         public string? JIDNH_DN_No { get; set; }
         public string? JIDNH_DN_Date { get; set; }
 
-        
 
-            
+
+
 
         public string? CUS_Name { get; set; }
 

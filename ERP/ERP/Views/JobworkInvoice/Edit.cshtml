@@ -1,4 +1,4 @@
-﻿@model ERP_DTO.JobInwardTransaction.JobworkInvoiceCreate_DTO
+﻿@model ERP_DTO.JobInwardTransaction.JobWorkInvoiceCreate_DTO
 @{
     ViewData["Title"] = "Jobwork Invoice Edit";
 }
@@ -171,11 +171,11 @@
     }
 
     /* Invoice No */
-  
 
+  
     /* Invoice Date (Flatpickr) */
-    #Header_JISVIH_InvoiceDate,
-    #Header_JISVIH_InvoiceDate + input,
+    #Header_JIJWIH_InvoiceDate,
+    #Header_JIJWIH_InvoiceDate + input,
     input.flatpickr-input.form-control {
         width: 15ch !important;
         max-width: 15ch !important;
@@ -186,11 +186,10 @@
         background-size: 16px 16px;
         cursor: pointer;
     }
- 
 
+ 
     /* Job Work Customer */
-    #Header_JISVIH_JW_Customer_Name {
-       
+    #Header_JIJWIH_JW_Customer_Name {
         padding-right: 24px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
@@ -198,16 +197,12 @@
     }
 
     /* Hidden Customer Number */
-    #Header_JISVIH_JW_Customer_Number {
+    #Header_JIJWIH_JW_Customer_Number {
         display: none;
     }
-
-    
-
-    
 </style>
 
-<form asp-action="JobworkInvoiceCreate" method="post" id="JobworkInvoiceCreateForm">
+<form asp-action="JobWorkInvoiceCreate" method="post" id="JobWorkInvoiceCreateForm">
     <!-- GST Popup -->
     <div class="modal modal-lg fade" id="GSTView" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -530,16 +525,16 @@
                                     <div class="col-12 col-md-4">
 
                                         <div class="row align-items-center gx-2 mb-0">
-                                            <input asp-for="Header.JISVIH_Number"
+                                            <input asp-for="Header.JIJWIH_Number"
                                                    type="hidden"
-                                                   class="form-control JISVIH_Number" />
-                                            <label asp-for="Header.JISVIH_InvoiceNo"
+                                                   class="form-control JIJWIH_Number" />
+                                            <label asp-for="Header.JIJWIH_InvoiceNo"
                                                    class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
 
-                                                <input asp-for="Header.JISVIH_InvoiceNo"
+                                                <input asp-for="Header.JIJWIH_InvoiceNo"
                                                        class="form-control Key KeyDup" maxlength="25"
                                                        autocomplete="off" />
 
@@ -549,14 +544,14 @@
 
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_InvoiceDate"
+                                            <label asp-for="Header.JIJWIH_InvoiceDate"
                                                    class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
 
-                                                <input asp-for="Header.JISVIH_InvoiceDate" type="date"
-                                                       class="form-control Key datepicker" 
+                                                <input asp-for="Header.JIJWIH_InvoiceDate" type="date"
+                                                       class="form-control Key datepicker"
                                                        autocomplete="off" />
 
                                             </div>
@@ -564,13 +559,13 @@
                                         </div>
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_MS_Number"
+                                            <label asp-for="Header.JIJWIH_MS_Number"
                                                    class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
 
-                                                <select asp-for="Header.JISVIH_MS_Number"
+                                                <select asp-for="Header.JIJWIH_MS_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.MaterialSegregation">
                                                 </select>
@@ -578,28 +573,28 @@
                                             </div>
 
                                         </div>
+
  
                                   
-                                   
                                     </div>
 
                                     <!-- COLUMN 2 -->
                                     <div class="col-12 col-md-4">
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_JW_Customer_Number"
+                                            <label asp-for="Header.JIJWIH_JW_Customer_Number"
                                                    class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
 
                                                 <!-- HIDDEN VALUE -->
-                                                <input asp-for="Header.JISVIH_JW_Customer_Number"
+                                                <input asp-for="Header.JIJWIH_JW_Customer_Number"
                                                        type="hidden"
                                                        class="form-control" />
 
                                                 <!-- DISPLAY TEXT -->
-                                                <input asp-for="Header.JISVIH_JW_Customer_Name"
+                                                <input asp-for="Header.JIJWIH_JW_Customer_Name"
                                                        class="form-control"
                                                        autocomplete="off"
                                                        onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
@@ -616,13 +611,13 @@
 
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_Currency_Number"
+                                            <label asp-for="Header.JIJWIH_Currency_Number"
                                                    class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
 
-                                                <select asp-for="Header.JISVIH_Currency_Number"
+                                                <select asp-for="Header.JIJWIH_Currency_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Currency">
                                                 </select>
@@ -633,13 +628,13 @@
 
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_TCT_Number"
+                                            <label asp-for="Header.JIJWIH_TCT_Number"
                                                    class="col-md-3 col-lg-3 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-md-6 col-lg-7">
 
-                                                <select asp-for="Header.JISVIH_TCT_Number"
+                                                <select asp-for="Header.JIJWIH_TCT_Number"
                                                         class="form-select">
                                                 </select>
 
@@ -656,13 +651,13 @@
                                   
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_PaymentTerms"
+                                            <label asp-for="Header.JIJWIH_PaymentTerms"
                                                    class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
 
-                                                <input asp-for="Header.JISVIH_PaymentTerms"
+                                                <input asp-for="Header.JIJWIH_PaymentTerms"
                                                        class="form-control" maxlength="50"
                                                        autocomplete="off" />
 
@@ -672,13 +667,13 @@
 
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_PaymentMethod"
+                                            <label asp-for="Header.JIJWIH_PaymentMethod"
                                                    class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
 
-                                                <input asp-for="Header.JISVIH_PaymentMethod"
+                                                <input asp-for="Header.JIJWIH_PaymentMethod"
                                                        class="form-control" maxlength="50"
                                                        autocomplete="off" />
 
@@ -690,12 +685,12 @@
 
                                         <div class="row align-items-center gx-2 mb-0">
 
-                                            <label asp-for="Header.JISVIH_Remarks" class="col-sm-4 col-form-label ps-0">
+                                            <label asp-for="Header.JIJWIH_Remarks" class="col-sm-4 col-form-label ps-0">
                                             </label>
 
                                             <div class="col-sm-7">
 
-                                                <textarea asp-for="Header.JISVIH_Remarks" class="form-control" maxlength="250"
+                                                <textarea asp-for="Header.JIJWIH_Remarks" class="form-control" maxlength="250"
                                                           rows="2"></textarea>
 
                                             </div>
@@ -716,7 +711,7 @@
                                        value="Update"
                                        class="btn btn-primary btn-sm px-2 w-100 mb-1" />
 
-                                <a asp-controller="JobworkInvoice"
+                                <a asp-controller="JobWorkInvoice"
                                        asp-action="Edit"
                                        asp-route-SI_No="@Context.Request.Query["SI_No"]"
                                        class="btn btn-primary btn-sm px-2 w-100 mb-1">
@@ -769,203 +764,203 @@
                                                 <div class="w-12 table-responsive table-body table-body-f" style="max-height:450px; overflow-y:auto;">
 
 
-                                                                    <table class="table table-one table-striped table-bordered table-hover align-middle w-100"
-                                                                           id="ItemTable">
+                                                    <table class="table table-one table-striped table-bordered table-hover align-middle w-100"
+                                                           id="ItemTable">
 
-                                                                        <thead>
-                                                                            <tr class="table-info">
-                                                                                <th class="px-2 del text-center">
-                                                                                    <input type="checkbox" class="IndexAllCheckItem form-check-input border-white" id="IndexAllCheckItem">
-                                                                                </th>
-                                                                                <th>Service Order Number</th>
-                                                                                <th>Delivery Note Number</th>
-                                                                                <th>Process</th>
-                                                                                <th>Item Code</th>
-                                                                                <th>Description</th>
-                                                                                <th class="table-width-xl text-end">Outer Dia</th>
-                                                                                <th class="table-width-xl text-end">Thickness</th>
-                                                                                <th class="table-width-xl text-end">Length</th>
-                                                                                <th class="table-width-xl text-end">Width</th>
-                                                                                <th>Material Grade</th>
-                                                                                <th>Item Group</th>
-                                                                                <th class="table-width-md text-center">UOM</th>
-                                                                                <th class="table-width-xl text-end">
-                                                                                    Delivery Note Qty
-                                                                                </th>
+                                                        <thead>
+                                                            <tr class="table-info">
+                                                                <th class="px-2 del text-center">
+                                                                    <input type="checkbox" class="IndexAllCheckItem form-check-input border-white" id="IndexAllCheckItem">
+                                                                </th>
+                                                                <th>Service Order Number</th>
+                                                                <th>Delivery Note Number</th>
+                                                                <th>Process</th>
+                                                                <th>Item Code</th>
+                                                                <th>Description</th>
+                                                                <th class="table-width-xl text-end">Outer Dia</th>
+                                                                <th class="table-width-xl text-end">Thickness</th>
+                                                                <th class="table-width-xl text-end">Length</th>
+                                                                <th class="table-width-xl text-end">Width</th>
+                                                                <th>Material Grade</th>
+                                                                <th>Item Group</th>
+                                                                <th class="table-width-md text-center">UOM</th>
+                                                                <th class="table-width-xl text-end">
+                                                                    Delivery Note Qty
+                                                                </th>
 
-                                                                                <th class="table-width-xl text-end">
-                                                                                    Already Invoiced Qty
-                                                                                </th>
+                                                                <th class="table-width-xl text-end">
+                                                                    Already Invoiced Qty
+                                                                </th>
 
-                                                                                <th class="table-width-xl text-end">
-                                                                                    Invoice Qty
-                                                                                </th>
-                                                                                <th class="table-width-xl text-end">
-                                                                                    Amend Qty
-                                                                                </th>
-                                                                                <th class="table-width-xl text-end">Unit Price</th>
-                                                                                <th class="table-width-xl text-end">Amount</th>
-                                                                                <th>SAC</th>
-                                                                                <th class="table-width-xl text-end">GST Amount</th>
-                                                                            </tr>
+                                                                <th class="table-width-xl text-end">
+                                                                    Invoice Qty
+                                                                </th>
+                                                                <th class="table-width-xl text-end">
+                                                                    Amend Qty
+                                                                </th>
+                                                                <th class="table-width-xl text-end">Unit Price</th>
+                                                                <th class="table-width-xl text-end">Amount</th>
+                                                                <th>SAC</th>
+                                                                <th class="table-width-xl text-end">GST Amount</th>
+                                                            </tr>
 
                                                                             
 
-                                                                        </thead>
+                                                        </thead>
 
-                                                                        <tbody id="TableBody">
+                                                        <tbody id="TableBody">
 
-                                                                            <!-- TEMP ROW -->
-                                                                            <tr id="TempRow" style="display:none;">
+                                                            <!-- TEMP ROW -->
+                                                            <tr id="TempRow" style="display:none;">
 
-                                                                                <td class="p-2 del"><input type="checkbox" class="CheckItem form-check-input"></td>
+                                                                <td class="p-2 del"><input type="checkbox" class="CheckItem form-check-input"></td>
 
-                                                                                <!-- SERVICE ORDER -->
-                                                                                <td>
-                                                                                    <select class="form-select JISVII_JISVOH_Number" asp-items="@ViewBag.SON"></select>
-                                                                                </td>
+                                                                <!-- SERVICE ORDER -->
+                                                                <td>
+                                                                    <select class="form-select JIJWII_JISVOH_Number" asp-items="@ViewBag.SON"></select>
+                                                                </td>
 
-                                                                                <!-- DELIVERY NOTE -->
-                                                                                <td>
-                                                                                    <input class="form-control JISVII_DN_No" readonly />
-                                                                                </td>
+                                                                <!-- DELIVERY NOTE -->
+                                                                <td>
+                                                                    <input class="form-control JIJWII_DN_No" readonly />
+                                                                </td>
 
-                                                                                <!-- PROCESS -->
-                                                                                <td>
-                                                                                    <input class="form-control JISVII_Process" readonly />
-                                                                                </td>
+                                                                <!-- PROCESS -->
+                                                                <td>
+                                                                    <input class="form-control JIJWII_Process" readonly />
+                                                                </td>
 
-                                                                                <!-- ITEM CODE -->
-                                                                                <td>
-                                                                                    <input type="hidden" class="JISVII_Number" />
-                                                                                    <input type="hidden" class="JISVII_Item_Number" />
-                                                                                    <input class="form-control JISVII_ItemCode" readonly />
-                                                                                </td>
+                                                                <!-- ITEM CODE -->
+                                                                <td>
+                                                                    <input type="hidden" class="JIJWII_Number" />
+                                                                    <input type="hidden" class="JIJWII_Item_Number" />
+                                                                    <input class="form-control JIJWII_ItemCode" readonly />
+                                                                </td>
 
-                                                                                <!-- DESCRIPTION -->
-                                                                                <td>
-                                                                                    <input class="form-control JISVII_ItemDescription" readonly />
-                                                                                </td>
+                                                                <!-- DESCRIPTION -->
+                                                                <td>
+                                                                    <input class="form-control JIJWII_ItemDescription" readonly />
+                                                                </td>
 
-                                                                                <!-- OUTER DIA -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_OuterDia text-end" readonly />
-                                                                                </td>
+                                                                <!-- OUTER DIA -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_OuterDia text-end" readonly />
+                                                                </td>
 
-                                                                                <!-- THICKNESS -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_Thickness text-end" readonly />
-                                                                                </td>
+                                                                <!-- THICKNESS -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_Thickness text-end" readonly />
+                                                                </td>
 
-                                                                                <!-- LENGTH -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_Length text-end" readonly />
-                                                                                </td>
+                                                                <!-- LENGTH -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_Length text-end" readonly />
+                                                                </td>
 
-                                                                                <!-- WIDTH -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_Width text-end" readonly />
-                                                                                </td>
+                                                                <!-- WIDTH -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_Width text-end" readonly />
+                                                                </td>
 
-                                                                                <!-- MATERIAL GRADE -->
-                                                                                <td>
-                                                                                    <input class="form-control JISVII_MaterialGrade" readonly />
-                                                                                </td>
+                                                                <!-- MATERIAL GRADE -->
+                                                                <td>
+                                                                    <input class="form-control JIJWII_MaterialGrade" readonly />
+                                                                </td>
 
-                                                                                <!-- ITEM GROUP -->
-                                                                                <td>
-                                                                                    <input class="form-control JISVII_ItemGroup" readonly />
-                                                                                </td>
+                                                                <!-- ITEM GROUP -->
+                                                                <td>
+                                                                    <input class="form-control JIJWII_ItemGroup" readonly />
+                                                                </td>
 
-                                                                                <!-- UOM -->
-                                                                                <td class="table-width-md">
-                                                                                    <select class="form-select JISVII_UoM text-center" asp-items="@ViewBag.UOM"></select>
-                                                                                </td>
-                                                                                <!-- DELIVERED QTY -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control DeliveredQty text-end"
-                                                                                           autocomplete="off"
-                                                                                           readonly />
-                                                                                </td>
+                                                                <!-- UOM -->
+                                                                <td class="table-width-md">
+                                                                    <select class="form-select JIJWII_UoM text-center" asp-items="@ViewBag.UOM"></select>
+                                                                </td>
+                                                                <!-- DELIVERED QTY -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control DeliveredQty text-end"
+                                                                           autocomplete="off"
+                                                                           readonly />
+                                                                </td>
 
-                                                                                <!-- PREVIOUSLY INVOICED QTY -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control PreviouslyInvoicedQty text-end"
-                                                                                           autocomplete="off"
-                                                                                           readonly />
-                                                                                </td>
-                                                                                <!-- QTY -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_Qty text-end" readonly autocomplete="off" />
-                                                                                </td>
-                                                                                <!-- QTY -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_AmendQty text-end" autocomplete="off" />
-                                                                                </td>
+                                                                <!-- PREVIOUSLY INVOICED QTY -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control PreviouslyInvoicedQty text-end"
+                                                                           autocomplete="off"
+                                                                           readonly />
+                                                                </td>
+                                                                <!-- QTY -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_Qty text-end" readonly autocomplete="off" />
+                                                                </td>
+                                                                <!-- QTY -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_AmendQty text-end" autocomplete="off" />
+                                                                </td>
 
-                                                                                <!-- UNIT PRICE -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_UnitPrice text-end" autocomplete="off" />
-                                                                                </td>
+                                                                <!-- UNIT PRICE -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_UnitPrice text-end" autocomplete="off" />
+                                                                </td>
 
-                                                                                <!-- AMOUNT -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_Amount text-end" readonly />
-                                                                                </td>
+                                                                <!-- AMOUNT -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_Amount text-end" readonly />
+                                                                </td>
 
-                                                                                <!-- SAC -->
-                                                                                <td>
-                                                                                    <select class="form-select JISVII_SAC_Number" asp-items="@ViewBag.SAC"></select>
-                                                                                </td>
+                                                                <!-- SAC -->
+                                                                <td>
+                                                                    <select class="form-select JIJWII_SAC_Number" asp-items="@ViewBag.SAC"></select>
+                                                                </td>
 
-                                                                                <!-- GST AMOUNT -->
-                                                                                <td class="table-width-xl">
-                                                                                    <input class="form-control JISVII_GST_Amount text-end" readonly />
-                                                                                </td>
+                                                                <!-- GST AMOUNT -->
+                                                                <td class="table-width-xl">
+                                                                    <input class="form-control JIJWII_GST_Amount text-end" readonly />
+                                                                </td>
 
-                                                                            </tr>
+                                                            </tr>
 
                                                                        
-                                                                        </tbody>
-                                                                        <tfoot>
+                                                        </tbody>
+                                                        <tfoot>
 
-                                                                            <tr class="table-info">
+                                                            <tr class="table-info">
 
-                                                                                <td colspan="12" class="text-end py-2">
-                                                                                    <span class="float-end pe-3">Total</span>
-                                                                                </td>
-                                                                                <td></td>
-                                                                                <td>
-                                                                                    <input id="TotalDeliveredQty" class="form-control text-center" readonly />
-                                                                                </td>
-                                                                                <td>
-                                                                                    <input id="TotalPrevInvoiceQty" class="form-control text-center" readonly />
-                                                                                </td>
+                                                                <td colspan="12" class="text-end py-2">
+                                                                    <span class="float-end pe-3">Total</span>
+                                                                </td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <input id="TotalDeliveredQty" class="form-control text-center" readonly />
+                                                                </td>
+                                                                <td>
+                                                                    <input id="TotalPrevInvoiceQty" class="form-control text-center" readonly />
+                                                                </td>
 
 
-                                                                                <td>
-                                                                                    <input id="TotalQty" class="form-control text-center" readonly />
-                                                                                </td>
+                                                                <td>
+                                                                    <input id="TotalQty" class="form-control text-center" readonly />
+                                                                </td>
 
-                                                                                <td>   <input id="TotalAmendedQty" class="form-control text-center" readonly /></td>
-                                                                                <td></td>
-                                                                                <td>
-                                                                                    <input id="TotalAmount" class="form-control text-end" readonly />
-                                                                                </td>
+                                                                <td>   <input id="TotalAmendedQty" class="form-control text-center" readonly /></td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <input id="TotalAmount" class="form-control text-end" readonly />
+                                                                </td>
 
                                                                                
                                                                                 
-                                                                                <td></td>
-                                                                                <td>
-                                                                                    <input id="TotalGSTAmount" class="form-control text-end" readonly />
-                                                                                </td>
+                                                                <td></td>
+                                                                <td>
+                                                                    <input id="TotalGSTAmount" class="form-control text-end" readonly />
+                                                                </td>
 
-                                                                            </tr>
+                                                            </tr>
 
-                                                                        </tfoot>
+                                                        </tfoot>
 
-                                                                    </table>
-                                                       
+                                                    </table>
+
                                                        
                                                 </div>
 
@@ -975,11 +970,11 @@
 
                                                                      
 
-                                                                        <a id="RemoveItemRowButton" class="RowRemove btn btn-primary mb-2">
+                                                        <a id="RemoveItemRowButton" class="RowRemove btn btn-primary mb-2">
 
-                                                                            Delete Row
+                                                            Delete Row
 
-                                                                        </a>
+                                                        </a>
 
                                                     </div>
                                                 </div>
@@ -1003,9 +998,9 @@
                     </div>
                 </div>
                 <!-- BODY has ITEM -->
+
            
               
-
             </div>
 
         </div>

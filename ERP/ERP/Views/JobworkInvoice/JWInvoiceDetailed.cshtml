@@ -1,17 +1,17 @@
-﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobInwardTransaction.JobworkInvoiceDetail_DTO>
+﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobInwardTransaction.JobWorkInvoiceDetail_DTO>
 @using System.Globalization;
 @{
     CultureInfo India = new CultureInfo("hi-IN");
 }
 
 @{
-    ViewData["Title"] = "JobworkInvoice Detailed";
+    ViewData["Title"] = "JobWorkInvoice Detailed";
 }
 <form asp-action="JWInvoiceDetailed" class="h-100">
     <div class="row align-items-center panel-header gx-2">
         <div class="col h-100">
             <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
-                JobworkInvoice Detailed
+                JobWorkInvoice Detailed
                 <a asp-controller="JobworkInward" asp-action="Index" class="float-end btn p-0 shadow-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -28,7 +28,7 @@
                         <div class="card-body text-black nav-tab-fix h-100">
                             <ul class="nav nav-tabs tab-header">
                                 <li class="nav-item">
-                                    <a class="nav-link" aria-current="page" asp-controller="JobworkInvoice" asp-action="JWInvoiceSummary">Summary</a>
+                                    <a class="nav-link" aria-current="page" asp-controller="JobWorkInvoice" asp-action="JWInvoiceSummary">Summary</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link active">Detailed</a>
@@ -136,8 +136,8 @@
                                                         <th class="table-col-xxl">Width</th>
                                                         <th class="table-col-xxl">Material Grade</th>
                                                         <th class="table-col-xxl">UOM</th>
+
                                                    
-                                                       
                                                         <th class="table-width-md text-center">Warehouse</th>
                                                       
                                                         <th class="table-width-xxl text-center">Qty</th>
@@ -168,18 +168,18 @@
 
                                                         <tr>
                                                             <td class="p-2 del">
-                                                                <input type="checkbox" class="DeleteNumber form-check-input" name="DeleteNumber" value="@item.JISVIH_Number">
+                                                                <input type="checkbox" class="DeleteNumber form-check-input" name="DeleteNumber" value="@item.JIJWIH_Number">
                                                             </td>
                                                             <td>
-                                                                <a asp-controller="ReceiptNote" asp-action="PreviewReceiptNote" class="icon-link-hover" asp-all-route-data="@(new Dictionary<String, String> { { "SI_No", @item.JISVIH_Number.ToString() } })">
-                                                                    @item.JISVIH_InvoiceNo
+                                                                <a asp-controller="ReceiptNote" asp-action="PreviewReceiptNote" class="icon-link-hover" asp-all-route-data="@(new Dictionary<String, String> { { "SI_No", @item.JIJWIH_Number.ToString() } })">
+                                                                    @item.JIJWIH_InvoiceNo
                                                                 </a>
                                                             </td>
-                                                            <td class="datetype text-center">@Convert.ToDateTime(item.JISVIH_InvoiceDate).ToString("dd-MMM-yyyy")</td>
+                                                            <td class="datetype text-center">@Convert.ToDateTime(item.JIJWIH_InvoiceDate).ToString("dd-MMM-yyyy")</td>
+
                                                           
-                                                                 
-                                                               <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.JIDNH_DN_No)</td>
-                                                         @*    <td class="datetype text-center">@Convert.ToDateTime(item.JIDNH_DN_Date).ToString("dd-MMM-yyyy")</td> *@
+                                                            <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.JIDNH_DN_No)</td>
+                                                            @*    <td class="datetype text-center">@Convert.ToDateTime(item.JIDNH_DN_Date).ToString("dd-MMM-yyyy")</td> *@
                                                             <td class="table-col-xxl">@Html.DisplayFor(modelItem => item.JIDNH_DN_Date)</td>
                                                            
                                                             <td></td>
@@ -204,14 +204,14 @@
                                                             <td class="table-col-xxl">@item.UOM</td>
                                                         
                                                             <td class="table-width-md text-center">@item.WarehouseCode</td>
-                                                        <td class="Qty table-width-md text-center">   @item.JISVII_Qty</td>
+                                                            <td class="Qty table-width-md text-center">   @item.JIJWII_Qty</td>
+
                                                           
-                                                         
-                                                                                                                    <td class="Amount table-width-xl text-end">
-                                                                @String.Format(India, "{0:N2}", Convert.ToDouble(item.JISVII_Amount))
+                                                            <td class="Amount table-width-xl text-end">
+                                                                @String.Format(India, "{0:N2}", Convert.ToDouble(item.JIJWII_Amount))
                                                             </td>
                                                             <td class="GST table-width-xl text-end">
-                                                                @String.Format(India, "{0:N2}", Convert.ToDouble(item.JISVII_GST_Amount))
+                                                                @String.Format(India, "{0:N2}", Convert.ToDouble(item.JIJWII_GST_Amount))
                                                             </td>
                                                                 
                                                         </tr>
@@ -240,91 +240,92 @@
                                                         <td>
                                                             <input id="TotalGST" class="form-control text-end"
                                                                    value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfGST))" readonly />
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    @{
-                                        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                                        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-                                    }
-                                    <div class="row table-cal align-items-center">
-                                        <div class="col align-items-center">
-                                            <form asp-action="JWInvoiceDetailed" method="get">
-                                                <div class="row align-items-center">
-                                                    <div class="col py-1">
-                                                        @{
-                                                            Int32 TotalSize = Convert.ToInt32(ViewData["TotalSize"]);
-                                                            Int32 PageNumber = Convert.ToInt32(ViewData["PageNumber"]);
-                                                            Int32 PageSize = Convert.ToInt32(ViewData["PageSize"]);
-                                                            Int32 StartNumber = 1;
-                                                            Int32 EndNumber = 0;
+                                        @{
+                                            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                                            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                                        }
+                                        <div class="row table-cal align-items-center">
+                                            <div class="col align-items-center">
+                                                <form asp-action="JWInvoiceDetailed" method="get">
+                                                    <div class="row align-items-center">
+                                                        <div class="col py-1">
+                                                            @{
+                                                                Int32 TotalSize = Convert.ToInt32(ViewData["TotalSize"]);
+                                                                Int32 PageNumber = Convert.ToInt32(ViewData["PageNumber"]);
+                                                                Int32 PageSize = Convert.ToInt32(ViewData["PageSize"]);
+                                                                Int32 StartNumber = 1;
+                                                                Int32 EndNumber = 0;
 
-                                                            if (PageNumber > 1)
-                                                            {
-                                                                StartNumber = StartNumber + ((PageNumber - 1) * PageSize);
-                                                            }
-                                                            EndNumber = (EndNumber + PageSize) + ((PageNumber - 1) * PageSize);
-                                                            if (EndNumber > TotalSize)
-                                                            {
-                                                                EndNumber = TotalSize;
-                                                            }
+                                                                if (PageNumber > 1)
+                                                                {
+                                                                    StartNumber = StartNumber + ((PageNumber - 1) * PageSize);
+                                                                }
+                                                                EndNumber = (EndNumber + PageSize) + ((PageNumber - 1) * PageSize);
+                                                                if (EndNumber > TotalSize)
+                                                                {
+                                                                    EndNumber = TotalSize;
+                                                                }
 
-                                                            if (StartNumber > EndNumber)
-                                                            {
-                                                                StartNumber = EndNumber;
+                                                                if (StartNumber > EndNumber)
+                                                                {
+                                                                    StartNumber = EndNumber;
+                                                                }
                                                             }
-                                                        }
-                                                        Showing @StartNumber to @EndNumber
+                                                            Showing @StartNumber to @EndNumber
+                                                        </div>
+                                                        <div class="col text-center py-1">
+                                                            Total records @TotalSize
+                                                        </div>
+                                                        <div class="col">
+                                                            <nav>
+                                                                <ul class="pagination float-end mb-0">
+                                                                    <li class="page-item">
+                                                                        <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="1" class="page-link @prevDisabled">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                                                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+                                                                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+                                                                            </svg>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li class="page-item">
+                                                                        <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex - 1)" class="page-link @prevDisabled">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                                                                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+                                                                            </svg>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="page-link">
+                                                                            @ViewData["PageNumber"]
+                                                                        </a>
+                                                                    </li>
+                                                                    <li class="page-item">
+                                                                        <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex + 1)" class="page-link @nextDisabled">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                                                                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
+                                                                            </svg>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li class="page-item">
+                                                                        <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@ViewData["PageCount"]" class="page-link @nextDisabled">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                                                                                <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                                                                                <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                                                                            </svg>
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </nav>
+                                                        </div>
                                                     </div>
-                                                    <div class="col text-center py-1">
-                                                        Total records @TotalSize
-                                                    </div>
-                                                    <div class="col">
-                                                        <nav>
-                                                            <ul class="pagination float-end mb-0">
-                                                                <li class="page-item">
-                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="1" class="page-link @prevDisabled">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                                                                            <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
-                                                                            <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
-                                                                        </svg>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="page-item">
-                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex - 1)" class="page-link @prevDisabled">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-                                                                            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
-                                                                        </svg>
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="page-link">
-                                                                        @ViewData["PageNumber"]
-                                                                    </a>
-                                                                </li>
-                                                                <li class="page-item">
-                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@(Model.PageIndex + 1)" class="page-link @nextDisabled">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
-                                                                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
-                                                                        </svg>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="page-item">
-                                                                    <a asp-action="JWInvoiceDetailed" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-pageNumber="@ViewData["PageCount"]" class="page-link @nextDisabled">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
-                                                                            <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
-                                                                            <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
-                                                                        </svg>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </nav>
-                                                    </div>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -334,178 +335,177 @@
                 </div>
             </div>
         </div>
-    </div>
-</form>
-@section Scripts {
+    </form>
+    @section Scripts {
 
-    <partial name="_ValidationScriptsPartial" />
+        <partial name="_ValidationScriptsPartial" />
 
-    <script src="~/js/jw_invoice/JW_InvoiceDetailed.js" asp-append-version="true"></script>
+        <script src="~/js/jw_invoice/JW_InvoiceDetailed.js" asp-append-version="true"></script>
 
         
     
-}
-
-<script>
-    $(document).ready(function () {
-        const $tableBody = $('#MyTable tbody');
-
-        $tableBody.on('click', 'tr', function (e) {
-            if ($(e.target).is('input[type="checkbox"], a, button')) {
-                return;
-            }
-            $(this).find('.DeleteNumber').prop('checked', function (i, currentValue) {
-                return !currentValue;
-            }).trigger('change');
-            UpdateButtonWithData();
-        });
-    });
-
-    function PrintCheckedRows() {
-        var AllItem = $('#selectAllCheckbox').is(':checked');
-
-        var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) {
-            return c.value;
-        });
-        let PrintContent = "";
-        var Search = $("#Search").val();
-        $.ajax({
-            url: 'sale-invoice-register-summary/print',
-            data: { Search: Search, SelectedItem: array.join(','), AllItem: AllItem },
-            type: 'GET',
-            success: function (data) {
-                PrintContent = data;
-                const iframe = document.createElement('iframe');
-                document.body.appendChild(iframe);
-                const iframeDoc = iframe.contentWindow.document;
-                iframeDoc.open();
-                iframeDoc.write(data);
-                iframeDoc.close();
-
-                setTimeout(() => {
-                    try {
-                        iframe.contentWindow.focus();
-                        iframe.contentWindow.print();
-                    } catch (error) { console.error("Printing from iframe failed:", error); }
-                    finally { setTimeout(() => { document.body.removeChild(iframe); }, 1000); }
-                }, 250);
-            },
-            error: function () {
-            }
-        });
-
-        // const table = document.getElementById("MyTable");
-        // const rows = table.querySelectorAll("tbody tr");
-        // let printContent = `<table class="table table-bordered">`;
-
-        // const headers = table.querySelectorAll("thead tr");
-        // printContent += `<thead>`;
-        // headers.forEach(headerRow => {
-        //     const headerColumns = headerRow.querySelectorAll("th");
-        //     printContent += `<tr>`;
-        //     headerColumns.forEach((th, index) => {
-        //         if (index !== 0) {
-        //             printContent += `<th>${th.innerHTML}</th>`;
-        //         }
-        //     });
-        //     printContent += `</tr>`;
-        // });
-        // printContent += `</thead><tbody>`;
-
-        // var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) {
-        //     return c.value;
-        // });
-        // console.log(array);
-        // rows.forEach(row => {
-        //     const checkbox = row.querySelector(".DeleteNumber");
-        //     if (checkbox && checkbox.checked) {
-        //         const columns = row.querySelectorAll("td");
-        //         printContent += `<tr>`;
-        //         columns.forEach((td, index) => {
-        //             if (index !== 0) {
-        //                 printContent += `<td>${td.innerHTML}</td>`;
-        //             }
-        //         });
-        //         printContent += `</tr>`;
-        //     }
-        // });
-
-        // printContent += `</tbody></table>`;
-
-        // const originalContent = document.body.innerHTML;
-        // document.body.innerHTML = printContent;
-        // window.print();
-        // document.body.innerHTML = originalContent;
-        // return false;
-
-
-        return false;
     }
 
-    function UpdateButtonWithData() {
-        const checkboxes = document.querySelectorAll(".DeleteNumber:checked");
-        const selectedValues = [];
+    <script>
+        $(document).ready(function () {
+            const $tableBody = $('#MyTable tbody');
 
-        checkboxes.forEach(checkbox => {
-            const row = checkbox.closest("tr");
-            const orderNumber = row.cells[1].textContent;
-            selectedValues.push(orderNumber);
+            $tableBody.on('click', 'tr', function (e) {
+                if ($(e.target).is('input[type="checkbox"], a, button')) {
+                    return;
+                }
+                $(this).find('.DeleteNumber').prop('checked', function (i, currentValue) {
+                    return !currentValue;
+                }).trigger('change');
+                UpdateButtonWithData();
+            });
         });
 
-        const Viewbutton = document.getElementById("View");
-        const Editbutton = document.getElementById("Edit");
-        const Deletebutton = document.getElementById("Delete");
-        if (selectedValues.length == 1) {
-            Viewbutton.removeAttribute("disabled");
-            Editbutton.removeAttribute("disabled");
-            Deletebutton.removeAttribute("disabled");
-        } else {
-            Viewbutton.setAttribute("disabled", "true");
-            Editbutton.setAttribute("disabled", "true");
-            Deletebutton.setAttribute("disabled", "true");
-        }
-    }
+        function PrintCheckedRows() {
+            var AllItem = $('#selectAllCheckbox').is(':checked');
 
-    document.querySelectorAll(".DeleteNumber").forEach(checkbox => {
-        checkbox.addEventListener("change", UpdateButtonWithData);
-    });
-
-
-    $(function () {
-        $("#View").on('click', function () {
             var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) {
                 return c.value;
             });
-            $("#SI_No").val(array.join(","));
-            return true;
+            let PrintContent = "";
+            var Search = $("#Search").val();
+            $.ajax({
+                url: 'sale-invoice-register-summary/print',
+                data: { Search: Search, SelectedItem: array.join(','), AllItem: AllItem },
+                type: 'GET',
+                success: function (data) {
+                    PrintContent = data;
+                    const iframe = document.createElement('iframe');
+                    document.body.appendChild(iframe);
+                    const iframeDoc = iframe.contentWindow.document;
+                    iframeDoc.open();
+                    iframeDoc.write(data);
+                    iframeDoc.close();
+
+                    setTimeout(() => {
+                        try {
+                            iframe.contentWindow.focus();
+                            iframe.contentWindow.print();
+                        } catch (error) { console.error("Printing from iframe failed:", error); }
+                        finally { setTimeout(() => { document.body.removeChild(iframe); }, 1000); }
+                    }, 250);
+                },
+                error: function () {
+                }
+            });
+
+            // const table = document.getElementById("MyTable");
+            // const rows = table.querySelectorAll("tbody tr");
+            // let printContent = `<table class="table table-bordered">`;
+
+            // const headers = table.querySelectorAll("thead tr");
+            // printContent += `<thead>`;
+            // headers.forEach(headerRow => {
+            //     const headerColumns = headerRow.querySelectorAll("th");
+            //     printContent += `<tr>`;
+            //     headerColumns.forEach((th, index) => {
+            //         if (index !== 0) {
+            //             printContent += `<th>${th.innerHTML}</th>`;
+            //         }
+            //     });
+            //     printContent += `</tr>`;
+            // });
+            // printContent += `</thead><tbody>`;
+
+            // var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) {
+            //     return c.value;
+            // });
+            // console.log(array);
+            // rows.forEach(row => {
+            //     const checkbox = row.querySelector(".DeleteNumber");
+            //     if (checkbox && checkbox.checked) {
+            //         const columns = row.querySelectorAll("td");
+            //         printContent += `<tr>`;
+            //         columns.forEach((td, index) => {
+            //             if (index !== 0) {
+            //                 printContent += `<td>${td.innerHTML}</td>`;
+            //             }
+            //         });
+            //         printContent += `</tr>`;
+            //     }
+            // });
+
+            // printContent += `</tbody></table>`;
+
+            // const originalContent = document.body.innerHTML;
+            // document.body.innerHTML = printContent;
+            // window.print();
+            // document.body.innerHTML = originalContent;
+            // return false;
+
+
+            return false;
+        }
+
+        function UpdateButtonWithData() {
+            const checkboxes = document.querySelectorAll(".DeleteNumber:checked");
+            const selectedValues = [];
+
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.closest("tr");
+                const orderNumber = row.cells[1].textContent;
+                selectedValues.push(orderNumber);
+            });
+
+            const Viewbutton = document.getElementById("View");
+            const Editbutton = document.getElementById("Edit");
+            const Deletebutton = document.getElementById("Delete");
+            if (selectedValues.length == 1) {
+                Viewbutton.removeAttribute("disabled");
+                Editbutton.removeAttribute("disabled");
+                Deletebutton.removeAttribute("disabled");
+            } else {
+                Viewbutton.setAttribute("disabled", "true");
+                Editbutton.setAttribute("disabled", "true");
+                Deletebutton.setAttribute("disabled", "true");
+            }
+        }
+
+        document.querySelectorAll(".DeleteNumber").forEach(checkbox => {
+            checkbox.addEventListener("change", UpdateButtonWithData);
         });
 
-        $("#Edit").on('click', function () {
-            var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) { return c.value; })
-            $("#SI_No").val(array.join(","));
-            return true;
+
+        $(function () {
+            $("#View").on('click', function () {
+                var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) {
+                    return c.value;
+                });
+                $("#SI_No").val(array.join(","));
+                return true;
+            });
+
+            $("#Edit").on('click', function () {
+                var array = $.map($('input[name="DeleteNumber"]:checked'), function (c) { return c.value; })
+                $("#SI_No").val(array.join(","));
+                return true;
+            });
         });
-    });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-        selectAllCheckbox.addEventListener('change', function () {
-            UpdateButtonWithData();
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            selectAllCheckbox.addEventListener('change', function () {
+                UpdateButtonWithData();
+            });
         });
-    });
 
 
-      document.addEventListener("DOMContentLoaded", function () {
-          const MainDiv = document.getElementById('BodyHeight');
-          const HeadDiv = document.getElementById('BodyCardHeader');
-          const BodyDiv = document.getElementById('BodyCardBody');
+          document.addEventListener("DOMContentLoaded", function () {
+              const MainDiv = document.getElementById('BodyHeight');
+              const HeadDiv = document.getElementById('BodyCardHeader');
+              const BodyDiv = document.getElementById('BodyCardBody');
 
-          if (HeadDiv && BodyDiv) {
-              const MainDivHeight = MainDiv.offsetHeight;
-              const HeadDivHeight = HeadDiv.offsetHeight;
-              BodyDiv.style.height = (MainDivHeight - HeadDivHeight) + 'px';
-          }
+              if (HeadDiv && BodyDiv) {
+                  const MainDivHeight = MainDiv.offsetHeight;
+                  const HeadDivHeight = HeadDiv.offsetHeight;
+                  BodyDiv.style.height = (MainDivHeight - HeadDivHeight) + 'px';
+              }
 
-    });
-    $('.navbar-nav > .nav-item.sale > a').addClass("active");
-</script>
+        });
+        $('.navbar-nav > .nav-item.sale > a').addClass("active");
+    </script>

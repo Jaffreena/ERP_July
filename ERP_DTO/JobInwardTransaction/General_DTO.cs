@@ -38,15 +38,15 @@ namespace ERP_DTO.JobInwardTransaction
         public int Result_Number { get; set; }
         public string Result_Message { get; set; }
     }
-    public class JobworkInvoice_DTO
+    public class JobWorkInvoice_DFS_DTO
     {
-        public long JISVIH_JW_Customer_Number { get; set; }
-        public long JISVIH_Currency_Number { get; set; }
-        public long JISVIH_TCT_Number { get; set; }
-        public string JISVIH_PaymentTerms { get; set; }
-        public string JISVIH_PaymentMethod { get; set; }
-        public string JISVIH_Remarks { get; set; }
-        public long JISVIH_MS_Number { get; set; }
+        public long JIJWIH_JW_Customer_Number { get; set; }
+        public long JIJWIH_Currency_Number { get; set; }
+        public long JIJWIH_TCT_Number { get; set; }
+        public string JIJWIH_PaymentTerms { get; set; }
+        public string JIJWIH_PaymentMethod { get; set; }
+        public string JIJWIH_Remarks { get; set; }
+        public long JIJWIH_MS_Number { get; set; }
 
         public int Result_Number { get; set; }
         public string Result_Message { get; set; }

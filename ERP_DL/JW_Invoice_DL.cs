@@ -52,24 +52,24 @@ namespace ERP_DL
             return IList;
         }
 
-        public List<JobworkInvoiceSummary_DTO> JobworkInvoiceSummaryList(DataTable Dt)
+        public List<JobWorkInvoiceSummary_DTO> JobWorkInvoiceSummaryList(DataTable Dt)
         {
-            List<JobworkInvoiceSummary_DTO> InvoiceList =
-                new List<JobworkInvoiceSummary_DTO>();
+            List<JobWorkInvoiceSummary_DTO> InvoiceList =
+                new List<JobWorkInvoiceSummary_DTO>();
 
             foreach (DataRow dr in Dt.Rows)
             {
                 InvoiceList.Add(
-                    new JobworkInvoiceSummary_DTO
+                    new JobWorkInvoiceSummary_DTO
                     {
-                        JISVIH_Number =
-                            Convert.ToInt64(dr["JISVIH_Number"]),
+                        JIJWIH_Number =
+                            Convert.ToInt64(dr["JIJWIH_Number"]),
 
-                        JISVIH_InvoiceNo =
-                            Convert.ToString(dr["JISVIH_InvoiceNo"]),
+                        JIJWIH_InvoiceNo =
+                            Convert.ToString(dr["JIJWIH_InvoiceNo"]),
 
-                        JISVIH_InvoiceDate =
-                            Convert.ToString(dr["JISVIH_InvoiceDate"]),
+                        JIJWIH_InvoiceDate =
+                            Convert.ToString(dr["JIJWIH_InvoiceDate"]),
 
                         //JIDNH_DN_No =
                         //    Convert.ToString(dr["JIDNH_DN_No"]),
@@ -120,15 +120,15 @@ namespace ERP_DL
 
             return InvoiceList;
         }
-        public List<JobworkInvoiceDetail_DTO> JobworkInvoiceDetailList(DataTable Dt)
+        public List<JobWorkInvoiceDetail_DTO> JobWorkInvoiceDetailList(DataTable Dt)
         {
-            List<JobworkInvoiceDetail_DTO> InvoiceList =
-                new List<JobworkInvoiceDetail_DTO>();
+            List<JobWorkInvoiceDetail_DTO> InvoiceList =
+                new List<JobWorkInvoiceDetail_DTO>();
 
             foreach (DataRow dr in Dt.Rows)
             {
                 InvoiceList.Add(
-     new JobworkInvoiceDetail_DTO
+     new JobWorkInvoiceDetail_DTO
      {
          JIDNH_MS_Number =
              dr["JIDNH_MS_Number"] == DBNull.Value
@@ -140,20 +140,20 @@ namespace ERP_DL
                  ? 0
                  : Convert.ToInt64(dr["JIDNH_WH_Number"]),
 
-         JISVIH_Number =
-             dr["JISVIH_Number"] == DBNull.Value
+         JIJWIH_Number =
+             dr["JIJWIH_Number"] == DBNull.Value
                  ? 0
-                 : Convert.ToInt64(dr["JISVIH_Number"]),
+                 : Convert.ToInt64(dr["JIJWIH_Number"]),
 
-         JISVIH_InvoiceNo =
-             dr["JISVIH_InvoiceNo"] == DBNull.Value
+         JIJWIH_InvoiceNo =
+             dr["JIJWIH_InvoiceNo"] == DBNull.Value
                  ? ""
-                 : Convert.ToString(dr["JISVIH_InvoiceNo"]),
+                 : Convert.ToString(dr["JIJWIH_InvoiceNo"]),
 
-         JISVIH_InvoiceDate =
-             dr["JISVIH_InvoiceDate"] == DBNull.Value
+         JIJWIH_InvoiceDate =
+             dr["JIJWIH_InvoiceDate"] == DBNull.Value
                  ? ""
-                 : Convert.ToString(dr["JISVIH_InvoiceDate"]),
+                 : Convert.ToString(dr["JIJWIH_InvoiceDate"]),
 
          JIDNH_DN_No =
              dr["JIDNH_DN_No"] == DBNull.Value
@@ -190,20 +190,20 @@ namespace ERP_DL
                  ? ""
                  : Convert.ToString(dr["TaxCluster"]),
 
-         JISVII_Qty =
-             dr["JISVII_Qty"] == DBNull.Value
+         JIJWII_Qty =
+             dr["JIJWII_Qty"] == DBNull.Value
                  ? 0
-                 : Convert.ToDecimal(dr["JISVII_Qty"]),
+                 : Convert.ToDecimal(dr["JIJWII_Qty"]),
 
-         JISVII_Amount =
-             dr["JISVII_Amount"] == DBNull.Value
+         JIJWII_Amount =
+             dr["JIJWII_Amount"] == DBNull.Value
                  ? 0
-                 : Convert.ToDecimal(dr["JISVII_Amount"]),
+                 : Convert.ToDecimal(dr["JIJWII_Amount"]),
 
-         JISVII_GST_Amount =
-             dr["JISVII_GST_Amount"] == DBNull.Value
+         JIJWII_GST_Amount =
+             dr["JIJWII_GST_Amount"] == DBNull.Value
                  ? 0
-                 : Convert.ToDecimal(dr["JISVII_GST_Amount"]),
+                 : Convert.ToDecimal(dr["JIJWII_GST_Amount"]),
 
          Segregation =
              dr["Segregation"] == DBNull.Value

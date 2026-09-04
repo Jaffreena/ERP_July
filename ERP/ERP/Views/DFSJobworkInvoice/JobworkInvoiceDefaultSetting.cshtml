@@ -1,4 +1,4 @@
-﻿@model ERP_DTO.JobInwardTransaction.JobworkInvoiceHead_DTO;
+﻿@model ERP_DTO.JobInwardTransaction.JobWorkInvoiceHead_DTO;
 @{
     ViewData["Title"] = "Jobwork Invoice Create";
 }
@@ -95,7 +95,7 @@
         min-height: 60px !important;
     }
 
-    #JISVIH_JW_Customer_Name {
+    #JIJWIH_JW_Customer_Name {
         padding-right: 24px; /* Space for the triangle */
 
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
@@ -125,9 +125,9 @@
                 <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
                     <div class="card-body pb-0" style="margin-top: -10px !important;">
                         <div class="row ps-2">
-                            @if (Model.JISVIH_Number != 0)
+                            @if (Model.JIJWIH_Number != 0)
                             {
-                                <input asp-for="JISVIH_Number" type="hidden" class="Number" />
+                                <input asp-for="JIJWIH_Number" type="hidden" class="Number" />
                             }
                             <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
@@ -156,11 +156,11 @@
                                     <div class="col-12 col-md-4 col-lg-4">
 
                                         <div class="row align-items-center gx-2">
-                                            <label asp-for="JISVIH_JW_Customer_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
+                                            <label asp-for="JIJWIH_JW_Customer_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-6">
-                                                <input asp-for="JISVIH_JW_Customer_Number" type="hidden" />
+                                                <input asp-for="JIJWIH_JW_Customer_Number" type="hidden" />
 
-                                                <input asp-for="JISVIH_JW_Customer_Name"
+                                                <input asp-for="JIJWIH_JW_Customer_Name"
                                                        class="form-control"
                                                        autocomplete="off"
                                                        onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
@@ -169,18 +169,18 @@
                                         </div>
 
                                         <div class="row align-items-center gx-2">
-                                            <label asp-for="JISVIH_Currency_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
+                                            <label asp-for="JIJWIH_Currency_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-6">
-                                                <select asp-for="JISVIH_Currency_Number"
+                                                <select asp-for="JIJWIH_Currency_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Currency"></select>
                                             </div>
                                         </div>
 
                                         <div class="row align-items-center gx-2">
-                                            <label asp-for="JISVIH_TCT_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
+                                            <label asp-for="JIJWIH_TCT_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-6">
-                                                <select asp-for="JISVIH_TCT_Number"
+                                                <select asp-for="JIJWIH_TCT_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.TaxCluster"></select>
                                             </div>
@@ -190,23 +190,23 @@
 
                                     <div class="col-12 col-md-4 col-lg-4">
                                         <div class="row align-items-center gx-2">
-                                            <label asp-for="JISVIH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <label asp-for="JIJWIH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
-                                                <select asp-for="JISVIH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                                <select asp-for="JIJWIH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
                                             </div>
                                         </div>
 
                                         <div class="row align-items-center gx-2">
-                                            <label asp-for="JISVIH_PaymentTerms" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
+                                            <label asp-for="JIJWIH_PaymentTerms" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input asp-for="JISVIH_PaymentTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                                <input asp-for="JIJWIH_PaymentTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
                                         <div class="row align-items-center gx-2">
-                                            <label asp-for="JISVIH_PaymentMethod" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
+                                            <label asp-for="JIJWIH_PaymentMethod" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input asp-for="JISVIH_PaymentMethod" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                                <input asp-for="JIJWIH_PaymentMethod" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
@@ -215,9 +215,9 @@
                                     <div class="col-12 col-md-4 col-lg-4">
 
                                         <div class="row align-items-start gx-2">
-                                            <label asp-for="JISVIH_Remarks" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
+                                            <label asp-for="JIJWIH_Remarks" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
-                                                <textarea asp-for="JISVIH_Remarks" maxlength="250"
+                                                <textarea asp-for="JIJWIH_Remarks" maxlength="250"
                                                           class="form-control Key KeyDup"
                                                           autocomplete="off"></textarea>
                                             </div>
@@ -247,7 +247,7 @@
             </div>
         </div>
     </div>
-    </form>
+</form>
 @section Scripts {
 
     <partial name="_ValidationScriptsPartial" />
@@ -262,14 +262,14 @@
     let isMouseSelectingBuyer = false;
     
     function AutoFit() {
-        fitInputWidth("JISVIH_InvoiceNo", 20, 25);
-        fitInputWidth("JISVIH_MS_Number", 20, 30);
-        fitInputWidth("JISVIH_JW_Customer_Name", 40, 50);
-        fitInputWidth("JISVIH_Currency_Number", 10, 10);
-        fitInputWidth("JISVIH_TCT_Number", 20, 25);
-        fitInputWidth("JISVIH_PaymentTerms", 30, 40);
-        fitInputWidth("JISVIH_PaymentMethod", 30, 40);
-        fitInputWidth("JISVIH_Remarks", 40, 40);
+        fitInputWidth("JIJWIH_InvoiceNo", 20, 25);
+        fitInputWidth("JIJWIH_MS_Number", 20, 30);
+        fitInputWidth("JIJWIH_JW_Customer_Name", 40, 50);
+        fitInputWidth("JIJWIH_Currency_Number", 10, 10);
+        fitInputWidth("JIJWIH_TCT_Number", 20, 25);
+        fitInputWidth("JIJWIH_PaymentTerms", 30, 40);
+        fitInputWidth("JIJWIH_PaymentMethod", 30, 40);
+        fitInputWidth("JIJWIH_Remarks", 40, 40);
     }
 
     $(document).ready(function () {
@@ -277,18 +277,18 @@
 
     //#region Header AutoFit - KeyUp
     $(document).on("keyup change input",
-        "#JISVIH_MS_Number, #JISVIH_JW_Customer_Name, #JISVIH_Currency_Number, #JISVIH_TCT_Number, #JISVIH_PaymentTerms, #JISVIH_PaymentMethod, #JISVIH_Remarks",
+        "#JIJWIH_MS_Number, #JIJWIH_JW_Customer_Name, #JIJWIH_Currency_Number, #JIJWIH_TCT_Number, #JIJWIH_PaymentTerms, #JIJWIH_PaymentMethod, #JIJWIH_Remarks",
         function () {
 
             const widths = {
               
-                JISVIH_MS_Number: [20, 30],
-                JISVIH_JW_Customer_Name: [40, 50],
-                JISVIH_Currency_Number: [10, 10],
-                JISVIH_TCT_Number: [20, 25],
-                JISVIH_PaymentTerms: [30, 40],
-                JISVIH_PaymentMethod: [30, 40],
-                JISVIH_Remarks: [40, 40]
+                JIJWIH_MS_Number: [20, 30],
+                JIJWIH_JW_Customer_Name: [40, 50],
+                JIJWIH_Currency_Number: [10, 10],
+                JIJWIH_TCT_Number: [20, 25],
+                JIJWIH_PaymentTerms: [30, 40],
+                JIJWIH_PaymentMethod: [30, 40],
+                JIJWIH_Remarks: [40, 40]
             };
 
             const [min, max] = widths[this.id];
@@ -296,16 +296,16 @@
         });
     //#endregion
    
-            $(document).on("input", "#JISVIH_JW_Customer_Name", function () {
+            $(document).on("input", "#JIJWIH_JW_Customer_Name", function () {
 
             if ($(this).val().trim() === "") {
 
-                $("#JISVIH_JW_Customer_Number").val(0);
-                $("#JISVIH_Currency_Number").val(0);
+                $("#JIJWIH_JW_Customer_Number").val(0);
+                $("#JIJWIH_Currency_Number").val(0);
             }
         });
 
-         $(document).on("focusout", "#JISVIH_JW_Customer_Name", function () {
+         $(document).on("focusout", "#JIJWIH_JW_Customer_Name", function () {
 
             if (isMouseSelectingBuyer)
                 return;
@@ -313,8 +313,8 @@
             // If empty, clear values and close popup
             if ($(this).val().trim() === "") {
 
-                $("#JISVIH_JW_Customer_Number").val(0);
-                $("#JISVIH_Currency_Number").val(0);
+                $("#JIJWIH_JW_Customer_Number").val(0);
+                $("#JIJWIH_Currency_Number").val(0);
 
                 $("#BuyerMessage").hide().text("");
 
@@ -338,7 +338,7 @@
                 "#RightPane .buyer-search-results"
             );
         });
-            $(document).on("keydown", "#JISVIH_JW_Customer_Name", function (e) {
+            $(document).on("keydown", "#JIJWIH_JW_Customer_Name", function (e) {
 
                  if (e.key === "Escape" || e.key === "Tab") {
 
@@ -461,11 +461,11 @@
                                 $("#BuyerMessage").hide().text("");
                                 const clickedCust = $(this).data("customer");
 
-                                $("#JISVIH_JW_Customer_Name").val(clickedCust.cuS_Name);
-                                $("#JISVIH_JW_Customer_Number").val(clickedCust.cuS_Number);
+                                $("#JIJWIH_JW_Customer_Name").val(clickedCust.cuS_Name);
+                                $("#JIJWIH_JW_Customer_Number").val(clickedCust.cuS_Number);
 
                                 // Currency (dropdown)
-                                $("#JISVIH_Currency_Number").val(clickedCust.cuS_CUR_Number);
+                                $("#JIJWIH_Currency_Number").val(clickedCust.cuS_CUR_Number);
 
                                 $("#RightPane")
                                     .removeClass("show")
@@ -473,7 +473,7 @@
                                     .hide()
                                     .empty();
                                 setTimeout(function () {
-                                    $("#JISVIH_Currency_Number").focus();
+                                    $("#JIJWIH_Currency_Number").focus();
                                 }, 100);
 
                             });
@@ -490,9 +490,9 @@
                             isMouseSelectingBuyer = true;
                             SelectBuyer(
                                 clickedCust,
-                                "#JISVIH_JW_Customer_Name",
-                                "#JISVIH_JW_Customer_Number",
-                                "#JISVIH_Currency_Number",
+                                "#JIJWIH_JW_Customer_Name",
+                                "#JIJWIH_JW_Customer_Number",
+                                "#JIJWIH_Currency_Number",
                                 "#RightPane",
                                 ".buyer-search-results"
                             );
@@ -502,7 +502,7 @@
 
                 
                             setTimeout(function () {
-                                $("#JISVIH_Currency_Number").focus();
+                                $("#JIJWIH_Currency_Number").focus();
                             }, 100);
                         });
 
@@ -674,7 +674,7 @@
 
         e.preventDefault();
 
-        var dto = GetJobworkInvoiceDTO();
+        var dto = GetJobWorkInvoiceDTO();
 
         $.ajax({
             url: "/jobinward/transactions/jobwork-invoice/save",
@@ -705,17 +705,17 @@
         e.preventDefault();
     });
 
-    function GetJobworkInvoiceDTO() {
+    function GetJobWorkInvoiceDTO() {
 
         return {
-            JISVIH_Number: $("input.Number").val() || 0,
-            JISVIH_JW_Customer_Number: $("#JISVIH_JW_Customer_Number").val() || 0,
-            JISVIH_Currency_Number: $("#JISVIH_Currency_Number").val() || 0,
-            JISVIH_TCT_Number: $("#JISVIH_TCT_Number").val() || 0,
-            JISVIH_PaymentTerms: $("#JISVIH_PaymentTerms").val(),
-            JISVIH_PaymentMethod: $("#JISVIH_PaymentMethod").val(),
-            JISVIH_Remarks: $("#JISVIH_Remarks").val(),
-             JISVIH_MS_Number: $("#JISVIH_MS_Number").val() || 0
+            JIJWIH_Number: $("input.Number").val() || 0,
+            JIJWIH_JW_Customer_Number: $("#JIJWIH_JW_Customer_Number").val() || 0,
+            JIJWIH_Currency_Number: $("#JIJWIH_Currency_Number").val() || 0,
+            JIJWIH_TCT_Number: $("#JIJWIH_TCT_Number").val() || 0,
+            JIJWIH_PaymentTerms: $("#JIJWIH_PaymentTerms").val(),
+            JIJWIH_PaymentMethod: $("#JIJWIH_PaymentMethod").val(),
+            JIJWIH_Remarks: $("#JIJWIH_Remarks").val(),
+             JIJWIH_MS_Number: $("#JIJWIH_MS_Number").val() || 0
         };
     }
 </script>

@@ -1,20 +1,20 @@
-﻿ @model ERP_DTO.JobInwardTransaction.JobworkInvoiceCreate_DTO
+﻿@model ERP_DTO.JobInwardTransaction.JobWorkInvoiceCreate_DTO
 @{
     ViewData["Title"] = "Jobwork Invoice Create";
 }
-<form asp-action="JobworkInvoiceCreate" method="post" id="JobworkInvoiceCreateForm"> 
- <div class="row align-items-center panel-header gx-2">
-    <div class="col h-100 align-items-center">
-        <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
-            Jobwork Invoice View
-            <a asp-controller="JobworkInvoice" asp-action="Index" class="float-end btn p-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
-                </svg>
-            </a>
+<form asp-action="JobWorkInvoiceCreate" method="post" id="JobWorkInvoiceCreateForm">
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Jobwork Invoice View
+                <a asp-controller="JobWorkInvoice" asp-action="Index" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
         </div>
     </div>
-</div>
     <div class="row panel-body gx-2">
         <div class="col-12 panel-card-fixed h-100">
             <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
@@ -50,8 +50,8 @@
 
                                     </div>
                                 </div>
-                            
 
+                            
                                 <div class="col-auto left-menu text-black">
                                     <div class="row">
 
@@ -59,9 +59,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_InvoiceNo" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_InvoiceNo" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <input asp-for="Header.JISVIH_InvoiceNo" class="form-control" autocomplete="off" />
+                                                    <input asp-for="Header.JIJWIH_InvoiceNo" class="form-control" autocomplete="off" />
                                                 </div>
                                             </div>
                                         </div>
@@ -69,9 +69,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_InvoiceDate" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_InvoiceDate" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <input asp-for="Header.JISVIH_InvoiceDate" class="form-control" autocomplete="off" />
+                                                    <input asp-for="Header.JIJWIH_InvoiceDate" class="form-control" autocomplete="off" />
                                                 </div>
                                             </div>
                                         </div>
@@ -79,9 +79,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_JW_Customer_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_JW_Customer_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <input asp-for="Header.JISVIH_JW_Customer_Number" class="form-control" autocomplete="off" />
+                                                    <input asp-for="Header.JIJWIH_JW_Customer_Number" class="form-control" autocomplete="off" />
                                                 </div>
                                             </div>
                                         </div>
@@ -89,9 +89,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_Currency_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_Currency_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <input asp-for="Header.JISVIH_Currency_Number" class="form-control" autocomplete="off" />
+                                                    <input asp-for="Header.JIJWIH_Currency_Number" class="form-control" autocomplete="off" />
                                                 </div>
                                             </div>
                                         </div>
@@ -99,9 +99,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_TCT_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_TCT_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <input asp-for="Header.JISVIH_TCT_Number" class="form-control" autocomplete="off" />
+                                                    <input asp-for="Header.JIJWIH_TCT_Number" class="form-control" autocomplete="off" />
                                                 </div>
                                             </div>
                                         </div>
@@ -109,9 +109,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_PaymentTerms" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_PaymentTerms" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <input asp-for="Header.JISVIH_PaymentTerms" class="form-control" autocomplete="off" />
+                                                    <input asp-for="Header.JIJWIH_PaymentTerms" class="form-control" autocomplete="off" />
                                                 </div>
                                             </div>
                                         </div>
@@ -119,9 +119,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_PaymentMethod" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_PaymentMethod" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <input asp-for="Header.JISVIH_PaymentMethod" class="form-control" autocomplete="off" />
+                                                    <input asp-for="Header.JIJWIH_PaymentMethod" class="form-control" autocomplete="off" />
                                                 </div>
                                             </div>
                                         </div>
@@ -129,9 +129,9 @@
 
                                         <div class="col-12 col-md-3">
                                             <div class="row align-items-center px-2 mb-1">
-                                                <label asp-for="Header.JISVIH_Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                                <label asp-for="Header.JIJWIH_Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                                 <div class="col-md-6 col-lg-7">
-                                                    <textarea asp-for="Header.JISVIH_Remarks" class="form-control"></textarea>
+                                                    <textarea asp-for="Header.JIJWIH_Remarks" class="form-control"></textarea>
                                                 </div>
                                             </div>
                                         </div>

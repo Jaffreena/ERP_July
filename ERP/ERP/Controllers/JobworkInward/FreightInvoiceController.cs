@@ -71,13 +71,13 @@ namespace ERP.Controllers.JobworkInward
             // Reuses the same generic-reference SP Jobwork Invoice uses -
             // these dropdowns (Currency, UoM, Warehouse, AddressType,
             // Process, SAC, SON, MaterialSegregation) are not Jobwork-specific.
-            JobworkInvoiceCreate_DTO DN_DTO = new JobworkInvoiceCreate_DTO();
-            JobworkInvoice_DAO DN_DAO = new JobworkInvoice_DAO();
-            DN_DTO.Header.JISVIH_InvoiceDate = DateTime.Now;
+            JobWorkInvoiceCreate_DTO DN_DTO = new JobWorkInvoiceCreate_DTO();
+            JobWorkInvoice_DAO DN_DAO = new JobWorkInvoice_DAO();
+            DN_DTO.Header.JIJWIH_InvoiceDate = DateTime.Now;
             DN_DTO.Header.JW_Inv_Id = 1;
 
             DataSet DS = new DataSet();
-            DS = DN_DAO.JobworkInvoice(DN_DTO);
+            DS = DN_DAO.JobWorkInvoice(DN_DTO);
             ViewBag.Currency = Help.GetCat(DS.Tables[4]);
             ViewBag.UoM = Help.GetCat(DS.Tables[5]);
             ViewBag.Warehouse = Help.GetCat(DS.Tables[7]);
@@ -325,7 +325,7 @@ namespace ERP.Controllers.JobworkInward
         [HttpGet]
         public JsonResult GetJWCAddress(long JWCNumber)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
             DataTable dt = dao.GetJWCAddressDB(JWCNumber).Tables[0];
 
             var data = dt.AsEnumerable().Select(r => new
@@ -834,7 +834,7 @@ namespace ERP.Controllers.JobworkInward
             long Item_Number,
             long UoM_Number)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
             DataTable dt = dao.GetServiceOrderItemInfo(
                 Freight_ServiceOrder_Number,

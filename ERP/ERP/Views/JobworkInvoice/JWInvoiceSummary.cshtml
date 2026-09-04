@@ -1,11 +1,11 @@
-﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobInwardTransaction.JobworkInvoiceSummary_DTO>
+﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobInwardTransaction.JobWorkInvoiceSummary_DTO>
 @using System.Globalization;
 @{
     CultureInfo India = new CultureInfo("hi-IN");
 }
 
 @{
-    ViewData["Title"] = "JobworkInvoiceSummary";
+    ViewData["Title"] = "JobWorkInvoiceSummary";
 }
 <form asp-action="JWInvoiceSummary" class="h-100">
     <div class="row align-items-center panel-header gx-2">
@@ -31,7 +31,7 @@
                                     <a class="nav-link active" aria-current="page">Summary</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="JobworkInvoice" asp-action="JWInvoiceDetailed">Detailed</a>
+                                    <a class="nav-link" asp-controller="JobWorkInvoice" asp-action="JWInvoiceDetailed">Detailed</a>
                                 </li>
                             </ul>
                             <div class="tab-content tab-body">
@@ -143,7 +143,7 @@
                                                         string DNNo = "";
                                                         string DNDate = "";
 
-                                                        if (Convert.ToInt32( item.DN_Count) > 1)
+                                                        if (Convert.ToInt32(item.DN_Count) > 1)
                                                         {
                                                             var FirstDN = item.DN_List?
                                                                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -169,24 +169,24 @@
                                                                 <input type="checkbox"
                                                                        class="DeleteNumber form-check-input"
                                                                        name="DeleteNumber"
-                                                                       value="@item.JISVIH_Number">
+                                                                       value="@item.JIJWIH_Number">
                                                             </td>
 
                                                             <td>
                                                                 <a asp-controller="ReceiptNote"
                                                                        asp-action="PreviewReceiptNote"
                                                                        class="icon-link-hover"
-                                                                       asp-all-route-data="@(new Dictionary<String, String> { { "SI_No", item.JISVIH_Number.ToString() } })">
-                                                                    @item.JISVIH_InvoiceNo
+                                                                       asp-all-route-data="@(new Dictionary<String, String> { { "SI_No", item.JIJWIH_Number.ToString() } })">
+                                                                    @item.JIJWIH_InvoiceNo
                                                                 </a>
                                                             </td>
 
                                                             <td class="datetype text-center">
-                                                                @Convert.ToDateTime(item.JISVIH_InvoiceDate).ToString("dd-MMM-yyyy")
+                                                                @Convert.ToDateTime(item.JIJWIH_InvoiceDate).ToString("dd-MMM-yyyy")
                                                             </td>
 
                                                             <td>
-                                                                @if (Convert.ToInt32(  item.DN_Count) > 1)
+                                                                @if (Convert.ToInt32(item.DN_Count) > 1)
                                                                 {
                                                                     <a tabindex="0"
                                                                            role="button"
@@ -260,12 +260,12 @@
                                                         
                                                         <td>
                                                            
-                                                        <input id="TotalAmount" class="form-control text-end"
+                                                            <input id="TotalAmount" class="form-control text-end"
                                                                    value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfAmount))" readonly />
                                                         </td>
                                                         
                                                         <td>
-                                                        <input id="TotalGST" class="form-control text-end"
+                                                            <input id="TotalGST" class="form-control text-end"
                                                                    value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfGST))" readonly />
                                                         </td>
                                                     </tr>

@@ -12,25 +12,25 @@ using System.Threading.Tasks;
 
 namespace ERP_DAO.JobInwardTransaction
 {
-    public class JobworkInvoice_DAO
+    public class JobWorkInvoice_DAO
     {
         DBConnect DB = new DBConnect();
         DataSet DS = new DataSet();
-   //     JW_Invoice_DL JW_Inv_DL = new JW_Invoice_DL();
-        public DataSet JobworkInvoice(JobworkInvoiceCreate_DTO DN_DTO)
+        //     JW_Invoice_DL JW_Inv_DL = new JW_Invoice_DL();
+        public DataSet JobWorkInvoice(JobWorkInvoiceCreate_DTO DN_DTO)
         {
             Database db = new SqlDatabase(DB.Connection());
-            DbCommand cmd = db.GetStoredProcCommand("JI_JobworkInvoice_SP");
+            DbCommand cmd = db.GetStoredProcCommand("JI_JobWorkInvoice_SP");
 
             //   int DN_Id = 10; // INSERT MODE
 
             // 🔹 Mode
             db.AddInParameter(cmd, "@JW_Inv_Id", DbType.Int32, DN_DTO.Header.JW_Inv_Id);
 
-       //     DN_DTO.Header.JISVIH_InvoiceDate = DateTime.Now;
-            db.AddInParameter(cmd, "@JISVIH_InvoiceDate", DbType.Date, DN_DTO.Header.JISVIH_InvoiceDate);
+            //     DN_DTO.Header.JIJWIH_InvoiceDate = DateTime.Now;
+            db.AddInParameter(cmd, "@JIJWIH_InvoiceDate", DbType.Date, DN_DTO.Header.JIJWIH_InvoiceDate);
             //db.AddInParameter(cmd, "@JIDNI_Item_Code", DbType.String, DN_DTO.Header.it);
-            //db.AddInParameter(cmd, "@DN_CUS_Number", DbType.Int32, DN_DTO.Header.JISVIH_JW_Customer_Number);
+            //db.AddInParameter(cmd, "@DN_CUS_Number", DbType.Int32, DN_DTO.Header.JIJWIH_JW_Customer_Number);
             //db.AddInParameter(cmd, "@DN_ADD_ADTP_Number", DbType.Int32, DN_DTO.Header.DN_ADD_ADTP_Number);
 
 
@@ -51,7 +51,7 @@ namespace ERP_DAO.JobInwardTransaction
             return db.ExecuteDataSet(cmd);
         }
 
-        public DataSet GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber, long? JISVIH_Number = null)
+        public DataSet GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber, long? JIJWIH_Number = null)
         {
             Database db = new SqlDatabase(DB.Connection());
             DbCommand cmd = db.GetStoredProcCommand("JI_GetDeliveryNote_GroupItem_SP");
@@ -61,8 +61,8 @@ namespace ERP_DAO.JobInwardTransaction
 
             // NEW: NULL in Create mode (formula unaffected), actual invoice
             // number in Edit mode (adds back this invoice's own consumption)
-            db.AddInParameter(cmd, "@JISVIH_Number", DbType.Int64,
-                JISVIH_Number.HasValue ? (object)JISVIH_Number.Value : DBNull.Value);
+            db.AddInParameter(cmd, "@JIJWIH_Number", DbType.Int64,
+                JIJWIH_Number.HasValue ? (object)JIJWIH_Number.Value : DBNull.Value);
 
             return db.ExecuteDataSet(cmd);
         }
@@ -89,23 +89,23 @@ namespace ERP_DAO.JobInwardTransaction
         #endregion
         #region Get Jobwork Invoice Address
 
-        public DataSet GetJobworkInvoiceAddressDB(long JISVIHNumber)
+        public DataSet GetJobWorkInvoiceAddressDB(long JIJWIHNumber)
         {
             Database db = new SqlDatabase(DB.Connection());
 
-            DbCommand cmd = db.GetStoredProcCommand("JI_JobworkInvoiceAddress_GetByJISVIHNumber");
+            DbCommand cmd = db.GetStoredProcCommand("JI_JobWorkInvoiceAddress_GetByJIJWIHNumber");
 
             db.AddInParameter(cmd,
-                              "@JISVIH_Number",
+                              "@JIJWIH_Number",
                               DbType.Int64,
-                              JISVIHNumber);
+                              JIJWIHNumber);
 
             return db.ExecuteDataSet(cmd);
         }
 
         #endregion
-        public void JobworkInvoiceInsertDB(JobworkInvoiceCreate_DTO Invoice_DTO)
-         {
+        public void JobWorkInvoiceInsertDB(JobWorkInvoiceCreate_DTO Invoice_DTO)
+        {
             using (SqlConnection con = new SqlConnection(DB.Connection()))
             {
                 con.Open();
@@ -117,7 +117,7 @@ namespace ERP_DAO.JobInwardTransaction
                         //---------------------------------------------------
                         // HEAD INSERT
                         //---------------------------------------------------
-                        long JISVIH_Number = JobworkInvoiceHeadInsert(
+                        long JIJWIH_Number = JobWorkInvoiceHeadInsert(
                             Invoice_DTO,
                             con,
                             tr);
@@ -125,14 +125,14 @@ namespace ERP_DAO.JobInwardTransaction
                         //---------------------------------------------------
                         // ITEM INSERT
                         //---------------------------------------------------
-                        DataTable insertedItems = JobworkInvoiceItemBulkInsert(
-                            JISVIH_Number,
+                        DataTable insertedItems = JobWorkInvoiceItemBulkInsert(
+                            JIJWIH_Number,
                             Invoice_DTO,
                             con,
                             tr);
                         // GST INSERT
-                        JobworkInvoiceGSTInsert(
-                            JISVIH_Number,
+                        JobWorkInvoiceGSTInsert(
+                            JIJWIH_Number,
                             insertedItems,
                             Invoice_DTO,
                             con,
@@ -142,8 +142,8 @@ namespace ERP_DAO.JobInwardTransaction
                         //---------------------------------------------------
                         // ADDRESS INSERT
                         //---------------------------------------------------
-                        JobworkInvoiceAddressInsert(
-                            JISVIH_Number,
+                        JobWorkInvoiceAddressInsert(
+                            JIJWIH_Number,
                             Invoice_DTO.Addresses,
                             con,
                             tr);
@@ -161,31 +161,31 @@ namespace ERP_DAO.JobInwardTransaction
                 }
             }
         }
-        public void JobworkInvoiceGSTInsert(
-    long JISVIH_Number,
-    DataTable insertedItems,
-    JobworkInvoiceCreate_DTO Invoice_DTO,
-    SqlConnection con,
-    SqlTransaction tr)
+        public void JobWorkInvoiceGSTInsert(
+long JIJWIH_Number,
+DataTable insertedItems,
+JobWorkInvoiceCreate_DTO Invoice_DTO,
+SqlConnection con,
+SqlTransaction tr)
         {
             foreach (DataRow row in insertedItems.Rows)
             {
                 long itemNo =
-                    Convert.ToInt64(row["JISVII_Number"]);
+                    Convert.ToInt64(row["JIJWII_Number"]);
 
                 long sacNo =
-                    Convert.ToInt64(row["JISVII_SAC_Number"]);
+                    Convert.ToInt64(row["JIJWII_SAC_Number"]);
 
                 double amount =
-                    Convert.ToDouble(row["JISVII_Amount"]);
+                    Convert.ToDouble(row["JIJWII_Amount"]);
 
                 //-----------------------------------
                 // GST CALCULATION
                 //-----------------------------------
                 List<JobInwardInvoiceGst> gstRows =
                     CalculateGST(
-                        Invoice_DTO.Header.JISVIH_TCT_Number,
-                        Invoice_DTO.Header.JISVIH_InvoiceDate,
+                        Invoice_DTO.Header.JIJWIH_TCT_Number,
+                        Invoice_DTO.Header.JIJWIH_InvoiceDate,
                         sacNo,
                         amount
                     );
@@ -204,15 +204,15 @@ namespace ERP_DAO.JobInwardTransaction
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
 
-                        cmd.Parameters.AddWithValue("@JISVIG_JISVIH_Number", JISVIH_Number);
-                        cmd.Parameters.AddWithValue("@JISVIG_JISVII_Number", itemNo);
-                        cmd.Parameters.AddWithValue("@JISVIG_Index", gstIndex);
-                        cmd.Parameters.AddWithValue("@JISVIG_GSTC_Number", gst.GSTCNumber);
-                        cmd.Parameters.AddWithValue("@JISVIG_GSTT_Number", gst.GSTTNumber);
-                        cmd.Parameters.AddWithValue("@JISVIG_GSTE_Number", gst.GSTENumber);
-                        cmd.Parameters.AddWithValue("@JISVIG_AssessableValue", gst.AssessableValue);
-                        cmd.Parameters.AddWithValue("@JISVIG_Percent", gst.Percentage);
-                        cmd.Parameters.AddWithValue("@JISVIG_GST_Amount", gst.Amount);
+                        cmd.Parameters.AddWithValue("@JIJWIG_JIJWIH_Number", JIJWIH_Number);
+                        cmd.Parameters.AddWithValue("@JIJWIG_JIJWII_Number", itemNo);
+                        cmd.Parameters.AddWithValue("@JIJWIG_Index", gstIndex);
+                        cmd.Parameters.AddWithValue("@JIJWIG_GSTC_Number", gst.GSTCNumber);
+                        cmd.Parameters.AddWithValue("@JIJWIG_GSTT_Number", gst.GSTTNumber);
+                        cmd.Parameters.AddWithValue("@JIJWIG_GSTE_Number", gst.GSTENumber);
+                        cmd.Parameters.AddWithValue("@JIJWIG_AssessableValue", gst.AssessableValue);
+                        cmd.Parameters.AddWithValue("@JIJWIG_Percent", gst.Percentage);
+                        cmd.Parameters.AddWithValue("@JIJWIG_GST_Amount", gst.Amount);
 
                         cmd.ExecuteNonQuery();
                     }
@@ -222,33 +222,33 @@ namespace ERP_DAO.JobInwardTransaction
             }
         }
 
-        public void JobworkInvoiceAddressInsert(
-    long JISVIH_Number,
-    List<JobworkInvoiceAddress_DTO> addressList,
-    SqlConnection con,
-    SqlTransaction tr)
+        public void JobWorkInvoiceAddressInsert(
+long JIJWIH_Number,
+List<JobWorkInvoiceAddress_DTO> addressList,
+SqlConnection con,
+SqlTransaction tr)
         {
             long addressNo = 1;
 
             foreach (var address in addressList)
             {
                 using (SqlCommand cmd = new SqlCommand(
-                    "JI_JobworkInvoiceAddress_Insert_SP",
+                    "JI_JobWorkInvoiceAddress_Insert_SP",
                     con,
                     tr))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@JISVIA_JISVIH_Number", JISVIH_Number);
-                 
-                    cmd.Parameters.AddWithValue("@JISVIA_ADTP_Number", address.JISVIA_ADTP_Number);
-                    cmd.Parameters.AddWithValue("@JISVIA_Address_ID", address.JISVIA_Address_ID);
-                    cmd.Parameters.AddWithValue("@JISVIA_Address", address.JISVIA_Address ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@JISVIA_City", address.JISVIA_City ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@JISVIA_State", address.JISVIA_State ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@JISVIA_Country", address.JISVIA_Country ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@JISVIA_PIN", address.JISVIA_PIN ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@JISVIA_GSTIN", address.JISVIA_GSTIN ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@JIJWIA_JIJWIH_Number", JIJWIH_Number);
+
+                    cmd.Parameters.AddWithValue("@JIJWIA_ADTP_Number", address.JIJWIA_ADTP_Number);
+                    cmd.Parameters.AddWithValue("@JIJWIA_Address_ID", address.JIJWIA_Address_ID);
+                    cmd.Parameters.AddWithValue("@JIJWIA_Address", address.JIJWIA_Address ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@JIJWIA_City", address.JIJWIA_City ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@JIJWIA_State", address.JIJWIA_State ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@JIJWIA_Country", address.JIJWIA_Country ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@JIJWIA_PIN", address.JIJWIA_PIN ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@JIJWIA_GSTIN", address.JIJWIA_GSTIN ?? (object)DBNull.Value);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -391,110 +391,110 @@ namespace ERP_DAO.JobInwardTransaction
 
             return PurGST;
         }
-        public long JobworkInvoiceHeadInsert(
-    JobworkInvoiceCreate_DTO Invoice_DTO,
-    SqlConnection con,
-    SqlTransaction tr)
+        public long JobWorkInvoiceHeadInsert(
+JobWorkInvoiceCreate_DTO Invoice_DTO,
+SqlConnection con,
+SqlTransaction tr)
         {
-            long JISVIH_Number = 0;
+            long JIJWIH_Number = 0;
 
-            using (SqlCommand cmd = new SqlCommand("JI_JobworkInvoiceHead_Insert_SP", con, tr))
+            using (SqlCommand cmd = new SqlCommand("JI_JobWorkInvoiceHead_Insert_SP", con, tr))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                
 
-                cmd.Parameters.AddWithValue("@JISVIH_InvoiceNo",
-                    Invoice_DTO.Header.JISVIH_InvoiceNo);
 
-                cmd.Parameters.AddWithValue("@JISVIH_InvoiceDate",
-                    Invoice_DTO.Header.JISVIH_InvoiceDate);
+                cmd.Parameters.AddWithValue("@JIJWIH_InvoiceNo",
+                    Invoice_DTO.Header.JIJWIH_InvoiceNo);
 
-                cmd.Parameters.AddWithValue("@JISVIH_JW_Customer_Number",
-                    Invoice_DTO.Header.JISVIH_JW_Customer_Number);
-                cmd.Parameters.AddWithValue("@JISVIH_MS_Number",
-                   Invoice_DTO.Header.JISVIH_MS_Number);
-                cmd.Parameters.AddWithValue("@JISVIH_Currency_Number",
-                    Invoice_DTO.Header.JISVIH_Currency_Number);
+                cmd.Parameters.AddWithValue("@JIJWIH_InvoiceDate",
+                    Invoice_DTO.Header.JIJWIH_InvoiceDate);
 
-                cmd.Parameters.AddWithValue("@JISVIH_TCT_Number",
-                    Invoice_DTO.Header.JISVIH_TCT_Number);
+                cmd.Parameters.AddWithValue("@JIJWIH_JW_Customer_Number",
+                    Invoice_DTO.Header.JIJWIH_JW_Customer_Number);
+                cmd.Parameters.AddWithValue("@JIJWIH_MS_Number",
+                   Invoice_DTO.Header.JIJWIH_MS_Number);
+                cmd.Parameters.AddWithValue("@JIJWIH_Currency_Number",
+                    Invoice_DTO.Header.JIJWIH_Currency_Number);
 
-                cmd.Parameters.AddWithValue("@JISVIH_PaymentTerms",
-                    Invoice_DTO.Header.JISVIH_PaymentTerms ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@JIJWIH_TCT_Number",
+                    Invoice_DTO.Header.JIJWIH_TCT_Number);
 
-                cmd.Parameters.AddWithValue("@JISVIH_PaymentMethod",
-                    Invoice_DTO.Header.JISVIH_PaymentMethod ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@JIJWIH_PaymentTerms",
+                    Invoice_DTO.Header.JIJWIH_PaymentTerms ?? (object)DBNull.Value);
 
-                cmd.Parameters.AddWithValue("@JISVIH_Remarks",
-                    Invoice_DTO.Header.JISVIH_Remarks ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@JIJWIH_PaymentMethod",
+                    Invoice_DTO.Header.JIJWIH_PaymentMethod ?? (object)DBNull.Value);
 
-                JISVIH_Number = Convert.ToInt64(cmd.ExecuteScalar());
+                cmd.Parameters.AddWithValue("@JIJWIH_Remarks",
+                    Invoice_DTO.Header.JIJWIH_Remarks ?? (object)DBNull.Value);
+
+                JIJWIH_Number = Convert.ToInt64(cmd.ExecuteScalar());
             }
 
-            return JISVIH_Number;
+            return JIJWIH_Number;
         }
-        public DataTable JobworkInvoiceItemBulkInsert(
-    long JISVIH_Number,
-    JobworkInvoiceCreate_DTO Invoice_DTO,
-    SqlConnection con,
-    SqlTransaction tr)
+        public DataTable JobWorkInvoiceItemBulkInsert(
+long JIJWIH_Number,
+JobWorkInvoiceCreate_DTO Invoice_DTO,
+SqlConnection con,
+SqlTransaction tr)
         {
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("JISVII_JISVIH_Number", typeof(long));
-            dt.Columns.Add("JISVII_Number", typeof(long));
-            dt.Columns.Add("JISVOI_Number", typeof(long)); // added
-            dt.Columns.Add("JISVII_JISVOH_Number", typeof(long));
-            dt.Columns.Add("JISVII_JIDNH_Number", typeof(long));
-            dt.Columns.Add("JIDNI_Number", typeof(long));
-            dt.Columns.Add("JISVII_PRS_Number", typeof(long));
-            dt.Columns.Add("JISVII_Item_Number", typeof(long));
-            dt.Columns.Add("JISVII_UoM_Number", typeof(long));
-            dt.Columns.Add("JISVII_Qty", typeof(double));
-            dt.Columns.Add("JISVII_UnitPrice", typeof(double));
-            dt.Columns.Add("JISVII_Amount", typeof(double));
-            dt.Columns.Add("JISVII_SAC_Number", typeof(long));
-            dt.Columns.Add("JISVII_GST_Amount", typeof(double));
-            dt.Columns.Add("JISVII_SO_Assign", typeof(string)); // NEW
+            dt.Columns.Add("JIJWII_JIJWIH_Number", typeof(long));
+            dt.Columns.Add("JIJWII_Number", typeof(long));
+            dt.Columns.Add("JIJWII_JISVOI_Number", typeof(long)); // added
+            dt.Columns.Add("JIJWII_JISVOH_Number", typeof(long));
+            dt.Columns.Add("JIJWII_JIDNH_Number", typeof(long));
+            dt.Columns.Add("JIJWII_JIDNI_Number", typeof(long));
+            dt.Columns.Add("JIJWII_PRS_Number", typeof(long));
+            dt.Columns.Add("JIJWII_Item_Number", typeof(long));
+            dt.Columns.Add("JIJWII_UoM_Number", typeof(long));
+            dt.Columns.Add("JIJWII_Qty", typeof(double));
+            dt.Columns.Add("JIJWII_UnitPrice", typeof(double));
+            dt.Columns.Add("JIJWII_Amount", typeof(double));
+            dt.Columns.Add("JIJWII_SAC_Number", typeof(long));
+            dt.Columns.Add("JIJWII_GST_Amount", typeof(double));
+            dt.Columns.Add("JIJWII_SVO_Assign", typeof(string)); // NEW
 
             foreach (var item in Invoice_DTO.Items)
             {
                 dt.Rows.Add(
-                      item.JISVII_JISVIH_Number
-                    , item.JISVII_Number
-                    , item.JISVOI_Number       // added
-                    , item.JISVII_JISVOH_Number
-                    , item.JISVII_JIDNH_Number
-                    , item.JIDNI_Number
-                    , item.JISVII_PRS_Number
-                    , item.JISVII_Item_Number
-                    , item.JISVII_UoM_Number
-                    , item.JISVII_Qty
-                    , item.JISVII_UnitPrice
-                    , item.JISVII_Amount
-                    , item.JISVII_SAC_Number
-                    , item.JISVII_GST_Amount
-                    , item.JISVII_SO_Assign    // NEW
+                      item.JIJWII_JIJWIH_Number
+                    , item.JIJWII_Number
+                    , item.JIJWII_JISVOI_Number       // added
+                    , item.JIJWII_JISVOH_Number
+                    , item.JIJWII_JIDNH_Number
+                    , item.JIJWII_JIDNI_Number
+                    , item.JIJWII_PRS_Number
+                    , item.JIJWII_Item_Number
+                    , item.JIJWII_UoM_Number
+                    , item.JIJWII_Qty
+                    , item.JIJWII_UnitPrice
+                    , item.JIJWII_Amount
+                    , item.JIJWII_SAC_Number
+                    , item.JIJWII_GST_Amount
+                    , item.JIJWII_SVO_Assign    // NEW
                 );
             }
 
             using (SqlCommand cmd = new SqlCommand(
-                "JI_JobworkInvoiceItem_BulkInsert_SP",
+                "JI_JobWorkInvoiceItem_BulkInsert_SP",
                 con,
                 tr))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue(
-                    "@JISVIH_Number",
-                    JISVIH_Number);
+                    "@JIJWIH_Number",
+                    JIJWIH_Number);
 
                 SqlParameter tvp = cmd.Parameters.AddWithValue(
                     "@Items",
                     dt);
 
                 tvp.SqlDbType = SqlDbType.Structured;
-                tvp.TypeName = "dbo.JobworkInvoiceItemType";
+                tvp.TypeName = "dbo.JobWorkInvoiceItemType";
 
                 DataTable insertedItems = new DataTable();
 
@@ -629,21 +629,47 @@ namespace ERP_DAO.JobInwardTransaction
         #endregion
 
         #region summary
-        public DataSet GetJobworkInvoiceList()
+        public DataSet GetJobWorkInvoiceList()
         {
             Database db = new SqlDatabase(DB.Connection());
 
-            DbCommand cmd = db.GetStoredProcCommand("JI_JobworkInvoice_List_SP");
+            DbCommand cmd = db.GetStoredProcCommand("JI_JobWorkInvoice_List_SP");
 
             return db.ExecuteDataSet(cmd);
         }
-        public DataSet GetJobworkInvoiceListDetailed()
+        public DataSet GetJobWorkInvoiceListDetailed()
         {
             Database db = new SqlDatabase(DB.Connection());
 
-            DbCommand cmd = db.GetStoredProcCommand("JI_JobworkInvoice_ListDetailed_SP");
+            DbCommand cmd = db.GetStoredProcCommand("JI_JobWorkInvoice_ListDetailed_SP");
 
             return db.ExecuteDataSet(cmd);
+        }
+        #endregion
+
+        #region edit
+        public string GetJobWorkInvoiceJSON(long JIJWIH_Number)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+
+            DbCommand cmd =
+                db.GetStoredProcCommand("JI_JobWorkInvoice_Get_JSON_SP");
+
+            db.AddInParameter(cmd,
+                              "@JIJWIH_Number",
+                              DbType.Int64,
+                              JIJWIH_Number);
+
+            DataSet ds = db.ExecuteDataSet(cmd);
+
+            StringBuilder json = new StringBuilder();
+
+            foreach (DataRow row in ds.Tables[0].Rows)
+            {
+                json.Append(row[0].ToString());
+            }
+
+            return json.ToString();
         }
         #endregion
 
@@ -674,8 +700,68 @@ namespace ERP_DAO.JobInwardTransaction
         #endregion
 
         #region update header
-        public void JobworkInvoiceUpdateDB(
-    JobworkInvoiceCreate_DTO DN_DTO)
+        public void JobWorkInvoiceHeaderUpdate(
+JobWorkInvoiceCreate_DTO DN_DTO,
+SqlConnection con,
+SqlTransaction tr)
+        {
+            using (SqlCommand cmd = new SqlCommand(
+                "JI_JobWorkInvoiceHead_Update_SP",
+                con,
+                tr))
+            {
+                cmd.CommandType =
+                    CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_Number",
+                    DN_DTO.Header.JIJWIH_Number);
+                cmd.Parameters.AddWithValue(
+                "@JIJWIH_MS_Number",
+                DN_DTO.Header.JIJWIH_MS_Number);
+
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_InvoiceNo",
+                    DN_DTO.Header.JIJWIH_InvoiceNo);
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_InvoiceDate",
+                    DN_DTO.Header.JIJWIH_InvoiceDate);
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_JW_Customer_Number",
+                    DN_DTO.Header.JIJWIH_JW_Customer_Number);
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_Currency_Number",
+                    DN_DTO.Header.JIJWIH_Currency_Number);
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_TCT_Number",
+                    DN_DTO.Header.JIJWIH_TCT_Number);
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_PaymentTerms",
+                    DN_DTO.Header.JIJWIH_PaymentTerms
+                    ?? (object)DBNull.Value);
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_PaymentMethod",
+                    DN_DTO.Header.JIJWIH_PaymentMethod
+                    ?? (object)DBNull.Value);
+
+                cmd.Parameters.AddWithValue(
+                    "@JIJWIH_Remarks",
+                    DN_DTO.Header.JIJWIH_Remarks
+                    ?? (object)DBNull.Value);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+        #endregion
+        public void JobWorkInvoiceUpdateDB(
+    JobWorkInvoiceCreate_DTO DN_DTO)
         {
             using (SqlConnection con =
                 new SqlConnection(DB.Connection()))
@@ -687,19 +773,19 @@ namespace ERP_DAO.JobInwardTransaction
                 {
                     try
                     {
-                        JobworkInvoiceHeaderUpdate(
+                        JobWorkInvoiceHeaderUpdate(
                             DN_DTO,
                             con,
                             tr);
 
                         // Uncomment when item/address update is ready
 
-                        JobworkInvoiceItemBulkUpdate(
+                        JobWorkInvoiceItemBulkUpdate(
                             DN_DTO,
                             con,
                             tr);
 
-                        JobworkInvoiceAddressBulkUpdate(
+                        JobWorkInvoiceAddressBulkUpdate(
                             DN_DTO,
                             con,
                             tr);
@@ -714,114 +800,54 @@ namespace ERP_DAO.JobInwardTransaction
                 }
             }
         }
-        public void JobworkInvoiceHeaderUpdate(
-    JobworkInvoiceCreate_DTO DN_DTO,
-    SqlConnection con,
-    SqlTransaction tr)
-        {
-            using (SqlCommand cmd = new SqlCommand(
-                "JI_JobworkInvoiceHead_Update_SP",
-                con,
-                tr))
-            {
-                cmd.CommandType =
-                    CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_Number",
-                    DN_DTO.Header.JISVIH_Number);
-                cmd.Parameters.AddWithValue(
-                "@JISVIH_MS_Number",
-                DN_DTO.Header.JISVIH_MS_Number);
-
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_InvoiceNo",
-                    DN_DTO.Header.JISVIH_InvoiceNo);
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_InvoiceDate",
-                    DN_DTO.Header.JISVIH_InvoiceDate);
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_JW_Customer_Number",
-                    DN_DTO.Header.JISVIH_JW_Customer_Number);
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_Currency_Number",
-                    DN_DTO.Header.JISVIH_Currency_Number);
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_TCT_Number",
-                    DN_DTO.Header.JISVIH_TCT_Number);
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_PaymentTerms",
-                    DN_DTO.Header.JISVIH_PaymentTerms
-                    ?? (object)DBNull.Value);
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_PaymentMethod",
-                    DN_DTO.Header.JISVIH_PaymentMethod
-                    ?? (object)DBNull.Value);
-
-                cmd.Parameters.AddWithValue(
-                    "@JISVIH_Remarks",
-                    DN_DTO.Header.JISVIH_Remarks
-                    ?? (object)DBNull.Value);
-
-                cmd.ExecuteNonQuery();
-            }
-        }
-        #endregion
 
         #region update items
-        public void JobworkInvoiceItemBulkUpdate(
-    JobworkInvoiceCreate_DTO DN_DTO,
+        public void JobWorkInvoiceItemBulkUpdate(
+    JobWorkInvoiceCreate_DTO DN_DTO,
     SqlConnection con,
     SqlTransaction tr)
         {
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("JISVII_JISVIH_Number", typeof(long));   // 1
-            dt.Columns.Add("JISVII_Number", typeof(long));          // 2
-            dt.Columns.Add("JISVOI_Number", typeof(long));          // 3 <-- Missing
-            dt.Columns.Add("JISVII_JISVOH_Number", typeof(long));   // 4
-            dt.Columns.Add("JISVII_JIDNH_Number", typeof(long));    // 5
-            dt.Columns.Add("JIDNI_Number", typeof(long));           // 6
-            dt.Columns.Add("JISVII_PRS_Number", typeof(long));      // 7
-            dt.Columns.Add("JISVII_Item_Number", typeof(long));     // 8
-            dt.Columns.Add("JISVII_UoM_Number", typeof(long));      // 9
-            dt.Columns.Add("JISVII_Qty", typeof(decimal));          // 10
-            dt.Columns.Add("JISVII_UnitPrice", typeof(decimal));    // 11
-            dt.Columns.Add("JISVII_Amount", typeof(decimal));       // 12
-            dt.Columns.Add("JISVII_SAC_Number", typeof(long));      // 13
-            dt.Columns.Add("JISVII_GST_Amount", typeof(decimal));   // 14
-            dt.Columns.Add("JISVII_SO_Assign", typeof(string));     // 15 NEW
+            dt.Columns.Add("JIJWII_JIJWIH_Number", typeof(long));   // 1
+            dt.Columns.Add("JIJWII_Number", typeof(long));          // 2
+            dt.Columns.Add("JIJWII_JISVOI_Number", typeof(long));   // 3 <-- Missing
+            dt.Columns.Add("JIJWII_JISVOH_Number", typeof(long));   // 4
+            dt.Columns.Add("JIJWII_JIDNH_Number", typeof(long));    // 5
+            dt.Columns.Add("JIJWII_JIDNI_Number", typeof(long));    // 6
+            dt.Columns.Add("JIJWII_PRS_Number", typeof(long));      // 7
+            dt.Columns.Add("JIJWII_Item_Number", typeof(long));     // 8
+            dt.Columns.Add("JIJWII_UoM_Number", typeof(long));      // 9
+            dt.Columns.Add("JIJWII_Qty", typeof(decimal));          // 10
+            dt.Columns.Add("JIJWII_UnitPrice", typeof(decimal));    // 11
+            dt.Columns.Add("JIJWII_Amount", typeof(decimal));       // 12
+            dt.Columns.Add("JIJWII_SAC_Number", typeof(long));      // 13
+            dt.Columns.Add("JIJWII_GST_Amount", typeof(decimal));   // 14
+            dt.Columns.Add("JIJWII_SVO_Assign", typeof(string));    // 15 NEW
 
             foreach (var item in DN_DTO.Items)
             {
                 dt.Rows.Add(
-                    DN_DTO.Header.JISVIH_Number,   // 1
-                    item.JISVII_Number,            // 2
-                    item.JISVOI_Number,            // 3 <-- Added
-                    item.JISVII_JISVOH_Number,     // 4
-                    item.JISVII_JIDNH_Number,      // 5
-                    item.JIDNI_Number,             // 6
-                    item.JISVII_PRS_Number,        // 7
-                    item.JISVII_Item_Number,       // 8
-                    item.JISVII_UoM_Number,        // 9
-                    item.JISVII_Qty,               // 10
-                    item.JISVII_UnitPrice,         // 11
-                    item.JISVII_Amount,            // 12
-                    item.JISVII_SAC_Number,        // 13
-                    item.JISVII_GST_Amount,        // 14
-                    item.JISVII_SO_Assign          // 15 NEW
+                    DN_DTO.Header.JIJWIH_Number,   // 1
+                    item.JIJWII_Number,            // 2
+                    item.JIJWII_JISVOI_Number,     // 3 <-- Added
+                    item.JIJWII_JISVOH_Number,     // 4
+                    item.JIJWII_JIDNH_Number,      // 5
+                    item.JIJWII_JIDNI_Number,      // 6
+                    item.JIJWII_PRS_Number,        // 7
+                    item.JIJWII_Item_Number,       // 8
+                    item.JIJWII_UoM_Number,        // 9
+                    item.JIJWII_Qty,               // 10
+                    item.JIJWII_UnitPrice,         // 11
+                    item.JIJWII_Amount,            // 12
+                    item.JIJWII_SAC_Number,        // 13
+                    item.JIJWII_GST_Amount,        // 14
+                    item.JIJWII_SVO_Assign         // 15 NEW
                 );
             }
 
             using (SqlCommand cmd = new SqlCommand(
-                "JI_JobworkInvoiceItem_BulkUpdate_SP",
+                "JI_JobWorkInvoiceItem_BulkUpdate_SP",
                 con,
                 tr))
             {
@@ -837,7 +863,7 @@ namespace ERP_DAO.JobInwardTransaction
                     SqlDbType.Structured;
 
                 param.TypeName =
-                    "JobworkInvoiceItemType";
+                    "JobWorkInvoiceItemType";
 
                 cmd.ExecuteNonQuery();
             }
@@ -845,44 +871,44 @@ namespace ERP_DAO.JobInwardTransaction
         #endregion
 
         #region update address
-        public void JobworkInvoiceAddressBulkUpdate(
-            JobworkInvoiceCreate_DTO DN_DTO,
+        public void JobWorkInvoiceAddressBulkUpdate(
+            JobWorkInvoiceCreate_DTO DN_DTO,
             SqlConnection con,
             SqlTransaction tr)
         {
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("JISVIA_JISVIH_Number", typeof(long));
-            dt.Columns.Add("JISVIA_ADTP_Number", typeof(long));
-            dt.Columns.Add("JISVIA_Address_ID", typeof(string));
-            dt.Columns.Add("JISVIA_Address", typeof(string));
-            dt.Columns.Add("JISVIA_City", typeof(string));
-            dt.Columns.Add("JISVIA_State", typeof(string));
-            dt.Columns.Add("JISVIA_Country", typeof(string));
-            dt.Columns.Add("JISVIA_PIN", typeof(string));
-            dt.Columns.Add("JISVIA_GSTIN", typeof(string));
+            dt.Columns.Add("JIJWIA_JIJWIH_Number", typeof(long));
+            dt.Columns.Add("JIJWIA_ADTP_Number", typeof(long));
+            dt.Columns.Add("JIJWIA_Address_ID", typeof(string));
+            dt.Columns.Add("JIJWIA_Address", typeof(string));
+            dt.Columns.Add("JIJWIA_City", typeof(string));
+            dt.Columns.Add("JIJWIA_State", typeof(string));
+            dt.Columns.Add("JIJWIA_Country", typeof(string));
+            dt.Columns.Add("JIJWIA_PIN", typeof(string));
+            dt.Columns.Add("JIJWIA_GSTIN", typeof(string));
 
             foreach (var item in DN_DTO.Addresses)
             {
                 dt.Rows.Add(
-                    DN_DTO.Header.JISVIH_Number,
-                    item.JISVIA_ADTP_Number,
-                    item.JISVIA_Address_ID,
-                    item.JISVIA_Address,
-                    item.JISVIA_City,
-                    item.JISVIA_State,
-                    item.JISVIA_Country,
-                    item.JISVIA_PIN,
-                    item.JISVIA_GSTIN
+                    DN_DTO.Header.JIJWIH_Number,
+                    item.JIJWIA_ADTP_Number,
+                    item.JIJWIA_Address_ID,
+                    item.JIJWIA_Address,
+                    item.JIJWIA_City,
+                    item.JIJWIA_State,
+                    item.JIJWIA_Country,
+                    item.JIJWIA_PIN,
+                    item.JIJWIA_GSTIN
                 );
             }
-            using (SqlCommand cmd = new SqlCommand("JI_JobworkInvoiceAddress_Update_SP", con, tr))
+            using (SqlCommand cmd = new SqlCommand("JI_JobWorkInvoiceAddress_Update_SP", con, tr))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@JISVIA_JISVIH_Number", DN_DTO.Header.JISVIH_Number);
+                cmd.Parameters.AddWithValue("@JIJWIA_JIJWIH_Number", DN_DTO.Header.JIJWIH_Number);
                 SqlParameter param = cmd.Parameters.AddWithValue("@Address", dt);
                 param.SqlDbType = SqlDbType.Structured;
-                param.TypeName = "JI_JobworkInvoiceAddress_TableType";
+                param.TypeName = "JI_JobWorkInvoiceAddress_TableType";
                 cmd.ExecuteNonQuery();
             }
         }
@@ -905,6 +931,32 @@ namespace ERP_DAO.JobInwardTransaction
             db.AddInParameter(cmd, "@JISVOI_PRS_Number", DbType.Int64, prsNumber);
             db.AddInParameter(cmd, "@JISVOI_Item_Number", DbType.Int64, itemNumber);
             db.AddInParameter(cmd, "@JISVOI_UoM_Number", DbType.Int64, uomNumber);
+
+            return db.ExecuteDataSet(cmd);
+        }
+        #endregion
+
+        #region JIJWI Service Order Dropdown
+        public DataSet GetJobWorkInvoiceServiceOrderDB(
+            long customerId,
+            long? prsNumber = null,
+            long? itemNumber = null,
+            long? uomNumber = null)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+
+            DbCommand cmd = db.GetStoredProcCommand("JIJWI_ServiceOrder_GetByCustomer_SP");
+
+            db.AddInParameter(cmd, "@CustomerId", DbType.Int64, customerId);
+
+            db.AddInParameter(cmd, "@PRS_Number", DbType.Int64,
+                prsNumber.HasValue ? (object)prsNumber.Value : DBNull.Value);
+
+            db.AddInParameter(cmd, "@Item_Number", DbType.Int64,
+                itemNumber.HasValue ? (object)itemNumber.Value : DBNull.Value);
+
+            db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
+                uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
 
             return db.ExecuteDataSet(cmd);
         }

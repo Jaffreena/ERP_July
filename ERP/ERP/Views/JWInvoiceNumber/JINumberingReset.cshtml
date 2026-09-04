@@ -1,4 +1,4 @@
-﻿@model List<ERP_DTO.JobInwardTransaction.JINumberReset_DTO>
+﻿@model List<ERP_DTO.JobInwardTransaction.JIJWI_NumberReset_DTO>
 
 <div class="col table-fixed h-100">
     <div class="w-100 table-responsive table-body table-body-f">
@@ -17,25 +17,25 @@
             <tbody id="ResetTableBody">
                 <tr id="ResetTempRow" style="display: none;">
                     <td>
-                        <input id="JIR_Date" class="form-control JIR_Date datepicker text-center" autocomplete="off" />
+                        <input id="JIJWI__NRS_StartDate" class="form-control JIJWI__NRS_StartDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="JIR_EndDate" class="form-control JIR_EndDate datepicker text-center" autocomplete="off" />
+                        <input id="JIJWI__NRS_EndDate" class="form-control JIJWI__NRS_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td style="width:110px;">
-                        <input id="JIR_StartingNumber" class="form-control JIR_StartingNumber text-center" autocomplete="off" />
+                        <input id="JIJWI__NRS_StartingNumber" class="form-control JIJWI__NRS_StartingNumber text-center" autocomplete="off" />
                     </td>
                     <td style="width:110px;">
-                        <input id="JIR_NumberofDigits" class="form-control JIR_NumberofDigits text-center" autocomplete="off" />
+                        <input id="JIJWI__NRS_NumberofDigits" class="form-control JIJWI__NRS_NumberofDigits text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <select id="JIR_PrefilZero" class="form-select JIR_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
+                        <select id="JIJWI__NRS_PrefilZero" class="form-select JIJWI__NRS_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
                     </td>
                     <td>
-                        <select id="JIR_Frequency" class="form-select JIR_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
+                        <select id="JIJWI__NRS_Frequency" class="form-select JIJWI__NRS_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
                     </td>
                     <td class="text-center">
-                        <input type="hidden" name="JIR_IsDeleted" class="JIR_IsDeleted" value="false" />
+                        <input type="hidden" name="JIJWI__NRS_IsDeleted" class="JIJWI__NRS_IsDeleted" value="false" />
                         <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -49,22 +49,22 @@
                     {
                         <tr class="ResetNewRow">
                             <td>
-                                <input id="JIR_Date" name="JINumberReset[@i].JIR_Date" class="form-control JIR_Date datepicker text-center" autocomplete="off" value="@Model[i].JIR_Date" />
+                                <input id="JIJWI__NRS_StartDate" name="JIJWI_NumberReset[@i].JIJWI__NRS_StartDate" class="form-control JIJWI__NRS_StartDate datepicker text-center" autocomplete="off" value="@Model[i].JIJWI__NRS_StartDate" />
                             </td>
                             <td>
-                                <input id="JIR_EndDate" name="JINumberReset[@i].JIR_EndDate" class="form-control JIR_EndDate datepicker text-center" autocomplete="off" value="@Model[i].JIR_EndDate" />
+                                <input id="JIJWI__NRS_EndDate" name="JIJWI_NumberReset[@i].JIJWI__NRS_EndDate" class="form-control JIJWI__NRS_EndDate datepicker text-center" autocomplete="off" value="@Model[i].JIJWI__NRS_EndDate" />
                             </td>
                             <td style="width:110px;">
-                                <input id="JIR_StartingNumber" name="JINumberReset[@i].JIR_StartingNumber" class="form-control JIR_StartingNumber text-center" autocomplete="off" value="@Model[i].JIR_StartingNumber" />
+                                <input id="JIJWI__NRS_StartingNumber" name="JIJWI_NumberReset[@i].JIJWI__NRS_StartingNumber" class="form-control JIJWI__NRS_StartingNumber text-center" autocomplete="off" value="@Model[i].JIJWI__NRS_StartingNumber" />
                             </td>
                             <td style="width:110px;">
-                                <input id="JIR_NumberofDigits" name="JINumberReset[@i].JIR_NumberofDigits" class="form-control JIR_NumberofDigits text-center" autocomplete="off" value="@Model[i].JIR_NumberofDigits" />
+                                <input id="JIJWI__NRS_NumberofDigits" name="JIJWI_NumberReset[@i].JIJWI__NRS_NumberofDigits" class="form-control JIJWI__NRS_NumberofDigits text-center" autocomplete="off" value="@Model[i].JIJWI__NRS_NumberofDigits" />
                             </td>
                             <td>
-                                <select id="JIR_PrefilZero" name="JINumberReset[@i].JIR_PrefilZero" class="form-select JIR_PrefilZero text-center">
+                                <select id="JIJWI__NRS_PrefilZero" name="JIJWI_NumberReset[@i].JIJWI__NRS_PrefilZero" class="form-select JIJWI__NRS_PrefilZero text-center">
                                     @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Prefil)
                                     {
-                                        if (item.Value == Model[i].JIR_PrefilZero)
+                                        if (item.Value == Model[i].JIJWI__NRS_PrefilZero)
                                         {
                                             <option value="@item.Value" selected>@item.Text</option>
                                         }
@@ -76,17 +76,17 @@
                                 </select>
                             </td>
                             <td>
-                                <select id="JIR_Frequency" name="JINumberReset[@i].JIR_Frequency" class="form-select JIR_Frequency text-center">
-                                    <option value="1" selected="@(Model[i].JIR_Frequency == "1")">Monthly</option>
-                                    <option value="2" selected="@(Model[i].JIR_Frequency == "2")">Yearly</option>
+                                <select id="JIJWI__NRS_Frequency" name="JIJWI_NumberReset[@i].JIJWI__NRS_Frequency" class="form-select JIJWI__NRS_Frequency text-center">
+                                    <option value="1" selected="@(Model[i].JIJWI__NRS_Frequency == "1")">Monthly</option>
+                                    <option value="2" selected="@(Model[i].JIJWI__NRS_Frequency == "2")">Yearly</option>
                                 </select>
                             </td>
                             <td class="text-center">
-                                @if (@Model[i].JIR_Number != 0)
+                                @if (@Model[i].JIJWI__NRS_Number != 0)
                                 {
-                                    <input name="JINumberReset[@i].JIR_Number" type="hidden" class="JIR_Number" value="@Model[i].JIR_Number" />
+                                    <input name="JIJWI_NumberReset[@i].JIJWI__NRS_Number" type="hidden" class="JIJWI__NRS_Number" value="@Model[i].JIJWI__NRS_Number" />
                                 }
-                                <input type="hidden" name="JINumberReset[@i].JIR_IsDeleted" value="false" class="JIR_IsDeleted" />
+                                <input type="hidden" name="JIJWI_NumberReset[@i].JIJWI__NRS_IsDeleted" value="false" class="JIJWI__NRS_IsDeleted" />
                                 <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -119,15 +119,15 @@
 
         function ResetaddRow() {
             var NewRow = $("#ResetTempRow").clone().removeAttr("style").removeAttr("id").addClass("ResetNewRow");
-            NewRow.find("input.JIR_Date").attr("name", "JINumberReset[" + rowCount + "].JIR_Date").val();
-            NewRow.find("input.JIR_EndDate").attr("name", "JINumberReset[" + rowCount + "].JIR_EndDate").val();
-            NewRow.find("input.JIR_StartingNumber").attr("name", "JINumberReset[" + rowCount + "].JIR_StartingNumber");
-            NewRow.find("input.JIR_NumberofDigits").attr("name", "JINumberReset[" + rowCount + "].JIR_NumberofDigits");
-            NewRow.find("select.JIR_PrefilZero").attr("name", "JINumberReset[" + rowCount + "].JIR_PrefilZero");
-            NewRow.find("select.JIR_Frequency").attr("name", "JINumberReset[" + rowCount + "].JIR_Frequency");
-            NewRow.find("input.JIR_IsDeleted").attr("name", "JINumberReset[" + rowCount + "].JIR_IsDeleted");
+            NewRow.find("input.JIJWI__NRS_StartDate").attr("name", "JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_StartDate").val();
+            NewRow.find("input.JIJWI__NRS_EndDate").attr("name", "JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_EndDate").val();
+            NewRow.find("input.JIJWI__NRS_StartingNumber").attr("name", "JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_StartingNumber");
+            NewRow.find("input.JIJWI__NRS_NumberofDigits").attr("name", "JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_NumberofDigits");
+            NewRow.find("select.JIJWI__NRS_PrefilZero").attr("name", "JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_PrefilZero");
+            NewRow.find("select.JIJWI__NRS_Frequency").attr("name", "JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_Frequency");
+            NewRow.find("input.JIJWI__NRS_IsDeleted").attr("name", "JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_IsDeleted");
 
-            NewRow.find("input[name='JINumberReset[" + rowCount + "].JIR_IsDeleted']").val(false);
+            NewRow.find("input[name='JIJWI_NumberReset[" + rowCount + "].JIJWI__NRS_IsDeleted']").val(false);
 
             $("#ResetTableBody").append(NewRow);
             rowCount++;
@@ -142,7 +142,7 @@
         }
 
         $(document).on('click', '.ResetRowRemove', function () {
-            $(this).closest('tr').find("input[name*='JIR_IsDeleted']").val(true);
+            $(this).closest('tr').find("input[name*='JIJWI__NRS_IsDeleted']").val(true);
             $(this).closest('tr').hide();
         });
 
@@ -164,9 +164,9 @@
                            if (firstInvalidField == null) {
                                firstInvalidField = $(this);
                            }
-                           if ($(this).hasClass("JIR_StartingNumber")) {
+                           if ($(this).hasClass("JIJWI__NRS_StartingNumber")) {
                                startingNumberInvalid = true;
-                           } else if ($(this).hasClass("JIR_NumberofDigits")) {
+                           } else if ($(this).hasClass("JIJWI__NRS_NumberofDigits")) {
                                numberOfDigitsInvalid = true;
                            } else {
                                otherInvalid = true;
@@ -210,14 +210,14 @@
                  return false;
              }
 
-             if (currentInput.hasClass("JIR_StartingNumber")) {
+             if (currentInput.hasClass("JIJWI__NRS_StartingNumber")) {
                  var numValue = parseInt(inputValue, 10);
                  if (isNaN(numValue) || numValue <= 0) {
                      return false;
                  }
              }
 
-             if (currentInput.hasClass("JIR_NumberofDigits")) {
+             if (currentInput.hasClass("JIJWI__NRS_NumberofDigits")) {
                  if (!/^[3-9]$/.test($.trim(inputValue))) {
                      return false;
                  }

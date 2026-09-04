@@ -1,4 +1,4 @@
-﻿@model List<ERP_DTO.JobInwardTransaction.JINumberSuffix_DTO>
+﻿@model List<ERP_DTO.JobInwardTransaction.JIJWI_NumberSuffix_DTO>
 
 <div class="col table-fixed h-100">
     <div class="w-100 table-responsive table-body table-body-f">
@@ -14,16 +14,16 @@
             <tbody id="SubTableBody">
                 <tr id="SubTempRow" style="display: none;">
                     <td>
-                        <input id="JIS_Date" class="form-control JIS_Date datepicker text-center" autocomplete="off" />
+                        <input id="JIJWI_SFX_StartDate" class="form-control JIJWI_SFX_StartDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="JIS_EndDate" class="form-control JIS_EndDate datepicker text-center" autocomplete="off" />
+                        <input id="JIJWI_SFX_EndDate" class="form-control JIJWI_SFX_EndDate datepicker text-center" autocomplete="off" />
                     </td>
                     <td>
-                        <input id="JIS_Particulars" class="form-control JIS_Particulars" autocomplete="off" />
+                        <input id="JIJWI_SFX_Particulars" class="form-control JIJWI_SFX_Particulars" autocomplete="off" />
                     </td>
                     <td class="text-center">
-                        <input type="hidden" name="JIS_IsDeleted" class="JIS_IsDeleted" value="false" />
+                        <input type="hidden" name="JIJWI_SFX_IsDeleted" class="JIJWI_SFX_IsDeleted" value="false" />
                         <a class="SubRowRemove btn btn-sm btn-danger p-1 icon-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -37,20 +37,20 @@
                     {
                         <tr class="SubNewRow">
                             <td>
-                                <input id="JIS_Date" name="JINumberSuffix[@i].JIS_Date" class="form-control JIS_Date text-center datepicker" autocomplete="off" value="@Model[i].JIS_Date" />
+                                <input id="JIJWI_SFX_StartDate" name="JIJWI_NumberSuffix[@i].JIJWI_SFX_StartDate" class="form-control JIJWI_SFX_StartDate text-center datepicker" autocomplete="off" value="@Model[i].JIJWI_SFX_StartDate" />
                             </td>
                             <td>
-                                <input id="JIS_EndDate" name="JINumberSuffix[@i].JIS_EndDate" class="form-control JIS_EndDate text-center datepicker" autocomplete="off" value="@Model[i].JIS_EndDate" />
+                                <input id="JIJWI_SFX_EndDate" name="JIJWI_NumberSuffix[@i].JIJWI_SFX_EndDate" class="form-control JIJWI_SFX_EndDate text-center datepicker" autocomplete="off" value="@Model[i].JIJWI_SFX_EndDate" />
                             </td>
                             <td>
-                                <input id="JIS_Particulars" name="JINumberSuffix[@i].JIS_Particulars" class="form-control JIS_Particulars" autocomplete="off" value="@Model[i].JIS_Particulars" />
+                                <input id="JIJWI_SFX_Particulars" name="JIJWI_NumberSuffix[@i].JIJWI_SFX_Particulars" class="form-control JIJWI_SFX_Particulars" autocomplete="off" value="@Model[i].JIJWI_SFX_Particulars" />
                             </td>
                             <td class="text-center">
-                                @if (@Model[i].JIS_Number != 0)
+                                @if (@Model[i].JIJWI_SFX_Number != 0)
                                 {
-                                    <input name="JINumberSuffix[@i].JIS_Number" type="hidden" class="JIS_Number" value="@Model[i].JIS_Number" />
+                                    <input name="JIJWI_NumberSuffix[@i].JIJWI_SFX_Number" type="hidden" class="JIJWI_SFX_Number" value="@Model[i].JIJWI_SFX_Number" />
                                 }
-                                <input type="hidden" name="JINumberSuffix[@i].JIS_IsDeleted" value="false" class="JIS_IsDeleted" />
+                                <input type="hidden" name="JIJWI_NumberSuffix[@i].JIJWI_SFX_IsDeleted" value="false" class="JIJWI_SFX_IsDeleted" />
                                 <a class="SubRowRemove btn btn-sm btn-danger p-1 icon-link">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -83,12 +83,12 @@
 
         function SubaddRow() {
             var NewRow = $("#SubTempRow").clone().removeAttr("style").removeAttr("id").addClass("SubNewRow");
-            NewRow.find("input.JIS_Date").attr("name", "JINumberSuffix[" + rowCount + "].JIS_Date").val();
-               NewRow.find("input.JIS_EndDate").attr("name", "JINumberSuffix[" + rowCount + "].JIS_EndDate").val();
-            NewRow.find("input.JIS_Particulars").attr("name", "JINumberSuffix[" + rowCount + "].JIS_Particulars");
-            NewRow.find("input.JIS_IsDeleted").attr("name", "JINumberSuffix[" + rowCount + "].JIS_IsDeleted");
+            NewRow.find("input.JIJWI_SFX_StartDate").attr("name", "JIJWI_NumberSuffix[" + rowCount + "].JIJWI_SFX_StartDate").val();
+               NewRow.find("input.JIJWI_SFX_EndDate").attr("name", "JIJWI_NumberSuffix[" + rowCount + "].JIJWI_SFX_EndDate").val();
+            NewRow.find("input.JIJWI_SFX_Particulars").attr("name", "JIJWI_NumberSuffix[" + rowCount + "].JIJWI_SFX_Particulars");
+            NewRow.find("input.JIJWI_SFX_IsDeleted").attr("name", "JIJWI_NumberSuffix[" + rowCount + "].JIJWI_SFX_IsDeleted");
 
-            NewRow.find("input[name='JINumberSuffix[" + rowCount + "].JIS_IsDeleted']").val(false);
+            NewRow.find("input[name='JIJWI_NumberSuffix[" + rowCount + "].JIJWI_SFX_IsDeleted']").val(false);
 
             $("#SubTableBody").append(NewRow);
             rowCount++;
@@ -103,7 +103,7 @@
         }
 
         $(document).on('click', '.SubRowRemove', function () {
-            $(this).closest('tr').find("input[name*='JIS_IsDeleted']").val(true);
+            $(this).closest('tr').find("input[name*='JIJWI_SFX_IsDeleted']").val(true);
             $(this).closest('tr').hide();
         });
 
@@ -142,7 +142,7 @@
             return allFieldsValid;
         }
      function SubValidateField(currentInput) {
-            if (currentInput.hasClass("JIS_Particulars")) {
+            if (currentInput.hasClass("JIJWI_SFX_Particulars")) {
                 return true;
             }
 

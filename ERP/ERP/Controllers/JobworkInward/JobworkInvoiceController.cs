@@ -17,13 +17,13 @@ using System.Text.Json;
 
 namespace ERP.Controllers.JobworkInward
 {
-    public class JobworkInvoiceController : Controller
+    public class JobWorkInvoiceController : Controller
     {
         Help Help = new Help();
         DataSet DS = new DataSet();
         JW_Invoice_DL JW_Inv_DL = new JW_Invoice_DL();
-        List<JobworkInvoiceSummary_DTO> SIR_List = new List<JobworkInvoiceSummary_DTO>();
-        List<JobworkInvoiceDetail_DTO> SIR_List_detail = new List<JobworkInvoiceDetail_DTO>();
+        List<JobWorkInvoiceSummary_DTO> SIR_List = new List<JobWorkInvoiceSummary_DTO>();
+        List<JobWorkInvoiceDetail_DTO> SIR_List_detail = new List<JobWorkInvoiceDetail_DTO>();
         public Int64 UserCode => Int64.TryParse(User.FindFirst("ERP_ID")?.Value, out var No) ? No : 0;
         Int32? DPageNumber;
         Int32 DPageSize;
@@ -31,7 +31,7 @@ namespace ERP.Controllers.JobworkInward
         #region JobInvoice Edit
         public IActionResult Edit(long SI_No)
         {
-            GetJobworkInvoiceData();
+            GetJobWorkInvoiceData();
             ViewBag.Collapse = true;
             return View();
         }
@@ -48,14 +48,13 @@ namespace ERP.Controllers.JobworkInward
                 "yyyyMMdd",
                 CultureInfo.InvariantCulture);
 
-            JobworkInvoiceCreate_DTO INV_DTO = new JobworkInvoiceCreate_DTO();
-            INV_DTO.Header.JISVIH_InvoiceDate = invoiceDate;
+            JobWorkInvoiceCreate_DTO INV_DTO = new JobWorkInvoiceCreate_DTO();
+            INV_DTO.Header.JIJWIH_InvoiceDate = invoiceDate;
             INV_DTO.Header.JW_Inv_Id = 0;
 
 
-            JobworkInvoice_DAO INV_DAO = new JobworkInvoice_DAO();
-            DS = INV_DAO.JobworkInvoice(INV_DTO);
-
+            JobWorkInvoice_DAO INV_DAO = new JobWorkInvoice_DAO();
+            DS = INV_DAO.JobWorkInvoice(INV_DTO);
             if (DS.Tables[0].Rows.Count == 0 || DS.Tables[1].Rows.Count == 0)
             {
                 ViewBag.ErrorCode = 2;
@@ -106,26 +105,26 @@ namespace ERP.Controllers.JobworkInward
         #endregion
         public IActionResult Create()
         {
-            GetJobworkInvoiceData();
+            GetJobWorkInvoiceData();
             ViewBag.Collapse = true;
             return View();
         }
 
-        JINumber_DTO PON_DTO = new JINumber_DTO();
-        JINumber_DAO PON_DAO = new JINumber_DAO();
+        JIJWI_Numbering_DTO PON_DTO = new JIJWI_Numbering_DTO();
+        JIJWI_Numbering_DAO PON_DAO = new JIJWI_Numbering_DAO();
         void On_JI_NumberGen(Int32 JIDate)
         {
             DataSet DS1 = new DataSet();
 
-            PON_DTO.JIN_Date = JIDate.ToString();
+            PON_DTO.JIJWI_Date = JIDate.ToString();
             PON_DTO.CreatorCode = 1;
             PON_DTO.Id = 101;
 
-            DS1 = PON_DAO.JINumberDB(PON_DTO);
+            DS1 = PON_DAO.JIJWI_NumberingDB(PON_DTO);
 
             if (DS1.Tables[0].Rows.Count > 0)
             {
-                Int32 Order = Convert.ToInt32(DS1.Tables[0].Rows[0]["JIN_Method"].ToString());
+                Int32 Order = Convert.ToInt32(DS1.Tables[0].Rows[0]["JIJWI_Method"].ToString());
 
                 if (Order == 2)
                 {
@@ -134,43 +133,43 @@ namespace ERP.Controllers.JobworkInward
                         // Existing range -> increment
                         Int32 Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["StartingNumber"].ToString());
 
-                        PON_DTO.JIN_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["JIR_Number"].ToString());
-                        PON_DTO.JIN_StartingNumber = Convert.ToString(Number + 1);
+                        PON_DTO.JIJWI_Number = Convert.ToInt32(DS1.Tables[1].Rows[0]["JIJWI__NRS_Number"].ToString());
+                        PON_DTO.JIJWI_StartingNumber = Convert.ToString(Number + 1);
                         PON_DTO.CreatorCode = 1;
                         PON_DTO.Id = 103;
 
-                        PON_DAO.JINumberDB(PON_DTO);
+                        PON_DAO.JIJWI_NumberingDB(PON_DTO);
                     }
                     else if (DS1.Tables[2].Rows.Count > 0)
                     {
                         // New range -> insert fresh, using Setup dates directly (no Frequency calculation)
-                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIR_Date"].ToString());
-                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIR_EndDate"].ToString());
-                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIR_StartingNumber"].ToString());
+                        DateTime StartDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIJWI__NRS_StartDate"].ToString());
+                        DateTime EndDate = Convert.ToDateTime(DS1.Tables[2].Rows[0]["JIJWI__NRS_EndDate"].ToString());
+                        Int32 Start = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIJWI__NRS_StartingNumber"].ToString());
 
-                        PON_DTO.JIN_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIR_Number"].ToString());
-                        PON_DTO.JIN_StartingNumber = Convert.ToString(Start);
-                        PON_DTO.JIN_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
-                        PON_DTO.JIN_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
+                        PON_DTO.JIJWI_Number = Convert.ToInt32(DS1.Tables[2].Rows[0]["JIJWI__NRS_Number"].ToString());
+                        PON_DTO.JIJWI_StartingNumber = Convert.ToString(Start);
+                        PON_DTO.JIJWI_Date = Convert.ToString(StartDate.ToString("yyyyMMdd"));
+                        PON_DTO.JIJWI_Method = Convert.ToString(EndDate.ToString("yyyyMMdd"));
                         PON_DTO.CreatorCode = 1;
                         PON_DTO.Id = 102;
 
-                        PON_DAO.JINumberDB(PON_DTO);
+                        PON_DAO.JIJWI_NumberingDB(PON_DTO);
                     }
                     // else: இந்த Date-க்கு ஒரு Reset range-கூட setup பண்ணல -> insert நடக்காது
                 }
             }
         }
-        public void GetJobworkInvoiceData()
+        public void GetJobWorkInvoiceData()
         {
-            JobworkInvoiceCreate_DTO DN_DTO = new JobworkInvoiceCreate_DTO();
-            JobworkInvoice_DAO DN_DAO = new JobworkInvoice_DAO();
-            DN_DTO.Header.JISVIH_InvoiceDate = DateTime.Now;
+            JobWorkInvoiceCreate_DTO DN_DTO = new JobWorkInvoiceCreate_DTO();
+            JobWorkInvoice_DAO DN_DAO = new JobWorkInvoice_DAO();
+            DN_DTO.Header.JIJWIH_InvoiceDate = DateTime.Now;
             DN_DTO.Header.JW_Inv_Id = 1;
-           
+
             DataSet DS = new DataSet();
-            DS = DN_DAO.JobworkInvoice(DN_DTO);
-            ViewBag.Currency = Help.GetCat(DS.Tables[4]);         
+            DS = DN_DAO.JobWorkInvoice(DN_DTO);
+            ViewBag.Currency = Help.GetCat(DS.Tables[4]);
             ViewBag.UoM = Help.GetCat(DS.Tables[5]);
             ViewBag.Warehouse = Help.GetCat(DS.Tables[7]);
             ViewBag.AddressType = Help.GetCat(DS.Tables[11]);
@@ -210,7 +209,7 @@ namespace ERP.Controllers.JobworkInward
         [HttpGet]
         public JsonResult GetDeliveryNoteItems(long CustomerNumber)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
             DataTable dt = dao.GetDeliveryNoteItemsDB(CustomerNumber).Tables[0];
 
@@ -358,13 +357,13 @@ namespace ERP.Controllers.JobworkInward
         #region GET DELIVERY NOTE GROUP ITEMS
 
         [HttpGet]
-       
-        public JsonResult GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber, long? JISVIH_Number = null)
+
+        public JsonResult GetDeliveryNote_GroupItem(long CustomerNumber, long MSNumber, long? JIJWIH_Number = null)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
-            // CHANGED: pass JISVIH_Number through so the SP can add back
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
+            // CHANGED: pass JIJWIH_Number through so the SP can add back
             // this invoice's own already-consumed qty when editing
-            DataTable dt = dao.GetDeliveryNote_GroupItem(CustomerNumber, MSNumber, JISVIH_Number).Tables[0];
+            DataTable dt = dao.GetDeliveryNote_GroupItem(CustomerNumber, MSNumber, JIJWIH_Number).Tables[0];
 
             var data = dt.AsEnumerable().Select(r => new
             {
@@ -385,7 +384,7 @@ namespace ERP.Controllers.JobworkInward
         [HttpGet]
         public JsonResult GetJWCAddress(long JWCNumber)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
             DataTable dt = dao.GetJWCAddressDB(JWCNumber).Tables[0];
 
@@ -446,55 +445,54 @@ namespace ERP.Controllers.JobworkInward
         #region GET JOBWORK INVOICE ADDRESS
 
         [HttpGet]
-        public JsonResult GetJobworkInvoiceAddress(long JISVIHNumber)
+        public JsonResult GetJobWorkInvoiceAddress(long JIJWIHNumber)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
-            DataTable dt = dao.GetJobworkInvoiceAddressDB(JISVIHNumber).Tables[0];
+            DataTable dt = dao.GetJobWorkInvoiceAddressDB(JIJWIHNumber).Tables[0];
 
             var data = dt.AsEnumerable().Select(r => new
             {
-                JISVIA_Number = r["JISVIA_Number"] == DBNull.Value
+                JIJWIA_Number = r["JIJWIA_Number"] == DBNull.Value
                     ? 0
-                    : Convert.ToInt64(r["JISVIA_Number"]),
+                    : Convert.ToInt64(r["JIJWIA_Number"]),
 
-                JISVIA_JISVIH_Number = r["JISVIA_JISVIH_Number"] == DBNull.Value
+                JIJWIA_JIJWIH_Number = r["JIJWIA_JIJWIH_Number"] == DBNull.Value
                     ? 0
-                    : Convert.ToInt64(r["JISVIA_JISVIH_Number"]),
+                    : Convert.ToInt64(r["JIJWIA_JIJWIH_Number"]),
 
-                JISVIA_ADTP_Number = r["JISVIA_ADTP_Number"] == DBNull.Value
+                JIJWIA_ADTP_Number = r["JIJWIA_ADTP_Number"] == DBNull.Value
                     ? 0
-                    : Convert.ToInt64(r["JISVIA_ADTP_Number"]),
+                    : Convert.ToInt64(r["JIJWIA_ADTP_Number"]),
 
-                JISVIA_Address_ID = r["JISVIA_Address_ID"] == DBNull.Value
+                JIJWIA_Address_ID = r["JIJWIA_Address_ID"] == DBNull.Value
                     ? ""
-                    : r["JISVIA_Address_ID"].ToString(),
+                    : r["JIJWIA_Address_ID"].ToString(),
 
-                JISVIA_Address = r["JISVIA_Address"] == DBNull.Value
+                JIJWIA_Address = r["JIJWIA_Address"] == DBNull.Value
                     ? ""
-                    : r["JISVIA_Address"].ToString(),
+                    : r["JIJWIA_Address"].ToString(),
 
-                JISVIA_City = r["JISVIA_City"] == DBNull.Value
+                JIJWIA_City = r["JIJWIA_City"] == DBNull.Value
                     ? ""
-                    : r["JISVIA_City"].ToString(),
+                    : r["JIJWIA_City"].ToString(),
 
-                JISVIA_State = r["JISVIA_State"] == DBNull.Value
+                JIJWIA_State = r["JIJWIA_State"] == DBNull.Value
                     ? ""
-                    : r["JISVIA_State"].ToString(),
+                    : r["JIJWIA_State"].ToString(),
 
-                JISVIA_Country = r["JISVIA_Country"] == DBNull.Value
+                JIJWIA_Country = r["JIJWIA_Country"] == DBNull.Value
                     ? ""
-                    : r["JISVIA_Country"].ToString(),
+                    : r["JIJWIA_Country"].ToString(),
 
-                JISVIA_PIN = r["JISVIA_PIN"] == DBNull.Value
+                JIJWIA_PIN = r["JIJWIA_PIN"] == DBNull.Value
                     ? ""
-                    : r["JISVIA_PIN"].ToString(),
+                    : r["JIJWIA_PIN"].ToString(),
 
-                JISVIA_GSTIN = r["JISVIA_GSTIN"] == DBNull.Value
+                JIJWIA_GSTIN = r["JIJWIA_GSTIN"] == DBNull.Value
                     ? ""
-                    : r["JISVIA_GSTIN"].ToString()
+                    : r["JIJWIA_GSTIN"].ToString()
             }).ToList();
-
             return new JsonResult(data, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -509,23 +507,23 @@ namespace ERP.Controllers.JobworkInward
         #region save jobwork invoice
 
         [HttpPost]
-        public IActionResult SaveJobworkInvoice(
-            [FromBody] JobworkInvoiceCreate_DTO dto)
+        public IActionResult SaveJobWorkInvoice(
+       [FromBody] JobWorkInvoiceCreate_DTO dto)
         {
             try
             {
                 Console.Write(dto);
 
-                JobworkInvoice_DAO DAO = new JobworkInvoice_DAO();
+                JobWorkInvoice_DAO DAO = new JobWorkInvoice_DAO();
 
-                DAO.JobworkInvoiceInsertDB(dto);
-                On_JI_NumberGen(Convert.ToInt32(Convert.ToDateTime(dto.Header.JISVIH_InvoiceDate).ToString("yyyyMMdd")));
+                DAO.JobWorkInvoiceInsertDB(dto);
+                On_JI_NumberGen(Convert.ToInt32(Convert.ToDateTime(dto.Header.JIJWIH_InvoiceDate).ToString("yyyyMMdd")));
                 return Json(new
                 {
                     success = true,
                     redirectUrl = Url.Action(
-                        "JobworkInvoiceSummary",
-                        "JobworkInvoice")
+             "JWInvoiceSummary",
+             "JobWorkInvoice")
                 });
             }
             catch (Exception ex)
@@ -547,7 +545,7 @@ namespace ERP.Controllers.JobworkInward
         [HttpGet]
         public JsonResult GetDeliveryNote_ForInvoice(long CustomerNumber, string DNNumbers)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
             DataTable dt = dao.GetDeliveryNote_ForInvoice(CustomerNumber, DNNumbers).Tables[0];
 
@@ -594,10 +592,9 @@ namespace ERP.Controllers.JobworkInward
                 JIDNI_Amount = r["JIDNI_Amount"] == DBNull.Value
                ? 0
                : Convert.ToDecimal(r["JIDNI_Amount"]),
-
-                JIDNI_JW_InvoiceTracking = r["JIDNI_JW_InvoiceTracking"] == DBNull.Value
+                JIDNI_JW_InvoiceTracking = r["JIDNI_IsJW_InvoiceApplicable"] == DBNull.Value
                ? ""
-               : r["JIDNI_JW_InvoiceTracking"].ToString(),
+               : r["JIDNI_IsJW_InvoiceApplicable"].ToString(),
 
                 // HEAD
 
@@ -616,9 +613,9 @@ namespace ERP.Controllers.JobworkInward
                 JIDNH_MS_Number = r["JIDNH_MS_Number"] == DBNull.Value
                ? 0
                : Convert.ToInt64(r["JIDNH_MS_Number"]),
-                JISVOH_Number = r["JISVOH_Number"] == DBNull.Value
+                JISVOH_Number = r["JIDNI_JIJWI_SVOH_Number"] == DBNull.Value
            ? 0
-           : Convert.ToInt64(r["JISVOH_Number"]),
+           : Convert.ToInt64(r["JIDNI_JIJWI_SVOH_Number"]),
 
                 // NEW: SO Item ID — was missing, needed so it can be preserved
                 // through Create → Edit and used in the qty double-count
@@ -715,7 +712,7 @@ namespace ERP.Controllers.JobworkInward
                     ? ""
                     : r["SAC"].ToString(),
                 //invoiced qty
-                JISVII_Number =  0,
+                JIJWII_Number = 0,
                 InvoicedQty = r["InvoicedQty"] == DBNull.Value
       ? ""
       : r["InvoicedQty"].ToString(),
@@ -750,7 +747,7 @@ namespace ERP.Controllers.JobworkInward
         [HttpGet]
         public JsonResult Get_JW_Invoice_Taxcluster(long JWC_Number, DateTime CheckDate)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
             DataTable dt = dao.Get_JW_Invoice_Taxcluster(JWC_Number, CheckDate).Tables[0];
 
@@ -814,15 +811,13 @@ namespace ERP.Controllers.JobworkInward
         [Route("gst/view")]
         public JsonResult JobInvoiceInvoiceGstView(String? Cluster, String? SIHDate, String? SAC, String? BaseAmount)
         {
-          Int64 nUserCode = Convert.ToInt64(UserCode);
-         int nJI_InvoiceDate = Convert.ToInt32(Convert.ToDateTime(SIHDate).ToString("yyyyMMdd"));
+            Int64 nUserCode = Convert.ToInt64(UserCode);
+            int nJI_InvoiceDate = Convert.ToInt32(Convert.ToDateTime(SIHDate).ToString("yyyyMMdd"));
             Int64 nJI_TCT_Number = Convert.ToInt64(Cluster);
             Int64 nJI_SAC_Number = Convert.ToInt64(SAC);
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
-          
-            DataTable dt = dao.GetTaxClusterCalculation(nJI_TCT_Number, nJI_SAC_Number, nJI_InvoiceDate).Tables[0];
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
-            Double BaseValue = Convert.ToDouble(BaseAmount);
+            DataTable dt = dao.GetTaxClusterCalculation(nJI_TCT_Number, nJI_SAC_Number, nJI_InvoiceDate).Tables[0]; Double BaseValue = Convert.ToDouble(BaseAmount);
 
             List<JobInwardInvoiceGst> PurGST = new List<JobInwardInvoiceGst>();
 
@@ -906,7 +901,7 @@ namespace ERP.Controllers.JobworkInward
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true
             });
-          
+
         }
         [HttpGet]
         [Route("income/gst")]
@@ -920,7 +915,7 @@ namespace ERP.Controllers.JobworkInward
 
             Double BaseValue = Convert.ToDouble(BaseAmount);
 
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
             DataSet DS = dao.GetTaxClusterCalculationSAC(
                 nJI_TCT_Number,
@@ -985,7 +980,7 @@ namespace ERP.Controllers.JobworkInward
         {
             SIR_List = SISummaryGetData(SortOrder, Search, PageNumber, PSize, PageFilter);
             ViewBag.Collapse = true;
-            return View("JWInvoiceSummary", PaginatedList_DTO<JobworkInvoiceSummary_DTO>.CreateAsync(SIR_List, DPageNumber ?? 1, DPageSize));
+            return View("JWInvoiceSummary", PaginatedList_DTO<JobWorkInvoiceSummary_DTO>.CreateAsync(SIR_List, DPageNumber ?? 1, DPageSize));
         }
         [Route("JWInvoice/transactions/JWInvoice-summary")]
         [HttpPost]
@@ -1019,18 +1014,18 @@ namespace ERP.Controllers.JobworkInward
                 });
             }
             SIR_List = SISummaryGetData(SortOrder, Search, PageNumber, PSize, PageFilter);
-            return View(PaginatedList_DTO<JobworkInvoiceSummary_DTO>.CreateAsync(SIR_List, DPageNumber ?? 1, DPageSize));
+            return View(PaginatedList_DTO<JobWorkInvoiceSummary_DTO>.CreateAsync(SIR_List, DPageNumber ?? 1, DPageSize));
         }
 
 
-        List<JobworkInvoiceSummary_DTO> SISummaryGetData(String? SortOrder, String? Search, Int32? PageNumber, Int32 PSize, String? PageFilter)
+        List<JobWorkInvoiceSummary_DTO> SISummaryGetData(String? SortOrder, String? Search, Int32? PageNumber, Int32 PSize, String? PageFilter)
         {
             DPageSize = 10;
 
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
-            DataSet DS = dao.GetJobworkInvoiceList();
-            SIR_List = JW_Inv_DL.JobworkInvoiceSummaryList(DS.Tables[0]);
+            DataSet DS = dao.GetJobWorkInvoiceList();
+            SIR_List = JW_Inv_DL.JobWorkInvoiceSummaryList(DS.Tables[0]);
 
             if (String.IsNullOrEmpty(SortOrder))
             {
@@ -1049,7 +1044,7 @@ namespace ERP.Controllers.JobworkInward
             ViewData["KeySIrt"] = SortOrder == "Title" ? "Title_desc" : "Title";
             ViewData["CurrentFilter"] = Search;
 
-            var Key = SIR_List.OrderByDescending(Cs => Cs.JISVIH_Number);
+            var Key = SIR_List.OrderByDescending(Cs => Cs.JIJWIH_Number);
             if (!String.IsNullOrEmpty(Search))
             {
                 //Key = Key.Where(K => K.SI_InvoiceDate.ToString().ToLower().Contains(Search.ToLower()) ||
@@ -1060,13 +1055,12 @@ namespace ERP.Controllers.JobworkInward
                 // K.SI_NoOfItem.ToString().ToLower().Contains(Search.ToLower()) ||
                 // K.SI_Qty.ToString().ToLower().Contains(Search.ToLower())).OrderByDescending(Cs => Cs.SI_Number);
 
-
-                Key = Key.Where(K => K.JISVIH_InvoiceDate.ToString().ToLower().Contains(Search.ToLower()) ||
-                K.JISVIH_InvoiceNo.ToString().ToLower().Contains(Search.ToLower()) ||
+                Key = Key.Where(K => K.JIJWIH_InvoiceDate.ToString().ToLower().Contains(Search.ToLower()) ||
+                K.JIJWIH_InvoiceNo.ToString().ToLower().Contains(Search.ToLower()) ||
                 K.CUS_Name.ToString().ToLower().Contains(Search.ToLower()) ||
-                K.CurrencyCode.ToString().ToLower().Contains(Search.ToLower()) ||          
+                K.CurrencyCode.ToString().ToLower().Contains(Search.ToLower()) ||
                 K.Amount.ToString().ToLower().Contains(Search.ToLower()) ||
-                K.TotalQty.ToString().ToLower().Contains(Search.ToLower())).OrderByDescending(Cs => Cs.JISVIH_Number);
+                K.TotalQty.ToString().ToLower().Contains(Search.ToLower())).OrderByDescending(Cs => Cs.JIJWIH_Number);
 
 
 
@@ -1075,13 +1069,13 @@ namespace ERP.Controllers.JobworkInward
             switch (SortOrder)
             {
                 case "Title_desc":
-                    Key = Key.OrderByDescending(K => Convert.ToDateTime(K.JISVIH_InvoiceDate)!);
+                    Key = Key.OrderByDescending(K => Convert.ToDateTime(K.JIJWIH_InvoiceDate)!);
                     break;
                 case "Title":
-                    Key = Key.OrderBy(K => Convert.ToDateTime(K.JISVIH_InvoiceDate)!);
+                    Key = Key.OrderBy(K => Convert.ToDateTime(K.JIJWIH_InvoiceDate)!);
                     break;
                 default:
-                    Key = Key.OrderByDescending(K => K.JISVIH_InvoiceDate);
+                    Key = Key.OrderByDescending(K => K.JIJWIH_InvoiceDate);
                     break;
             }
 
@@ -1166,7 +1160,7 @@ namespace ERP.Controllers.JobworkInward
         {
             SIR_List_detail = DetailedGetData(SortOrder, Search, PageNumber, PSize, PageFilter);
             ViewBag.Collapse = true;
-            return View("JWInvoiceDetailed", PaginatedList_DTO<JobworkInvoiceDetail_DTO>.CreateAsync(SIR_List_detail, DPageNumber ?? 1, DPageSize));
+            return View("JWInvoiceDetailed", PaginatedList_DTO<JobWorkInvoiceDetail_DTO>.CreateAsync(SIR_List_detail, DPageNumber ?? 1, DPageSize));
         }
         [Route("JWInvoice/transactions/JWInvoice-JWInvoiceDetailed")]
         [HttpPost]
@@ -1200,17 +1194,17 @@ namespace ERP.Controllers.JobworkInward
                 });
             }
             SIR_List_detail = DetailedGetData(SortOrder, Search, PageNumber, PSize, PageFilter);
-            return View(PaginatedList_DTO<JobworkInvoiceDetail_DTO>.CreateAsync(SIR_List_detail, DPageNumber ?? 1, DPageSize));
+            return View(PaginatedList_DTO<JobWorkInvoiceDetail_DTO>.CreateAsync(SIR_List_detail, DPageNumber ?? 1, DPageSize));
         }
 
-        List<JobworkInvoiceDetail_DTO> DetailedGetData(String? SortOrder, String? Search, Int32? PageNumber, Int32 PSize, String? PageFilter)
+        List<JobWorkInvoiceDetail_DTO> DetailedGetData(String? SortOrder, String? Search, Int32? PageNumber, Int32 PSize, String? PageFilter)
         {
             DPageSize = 10;
 
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
-            DataSet DS = dao.GetJobworkInvoiceListDetailed();
-            SIR_List_detail = JW_Inv_DL.JobworkInvoiceDetailList(DS.Tables[0]);
+            DataSet DS = dao.GetJobWorkInvoiceListDetailed();
+            SIR_List_detail = JW_Inv_DL.JobWorkInvoiceDetailList(DS.Tables[0]);
 
             if (String.IsNullOrEmpty(SortOrder))
             {
@@ -1229,7 +1223,7 @@ namespace ERP.Controllers.JobworkInward
             ViewData["KeySIrt"] = SortOrder == "Title" ? "Title_desc" : "Title";
             ViewData["CurrentFilter"] = Search;
 
-            var Key = SIR_List_detail.OrderByDescending(Cs => Cs.JISVIH_Number);
+            var Key = SIR_List_detail.OrderByDescending(Cs => Cs.JIJWIH_Number);
             if (!String.IsNullOrEmpty(Search))
             {
                 //Key = Key.Where(K => K.SI_InvoiceDate.ToString().ToLower().Contains(Search.ToLower()) ||
@@ -1240,13 +1234,12 @@ namespace ERP.Controllers.JobworkInward
                 // K.SI_NoOfItem.ToString().ToLower().Contains(Search.ToLower()) ||
                 // K.SI_Qty.ToString().ToLower().Contains(Search.ToLower())).OrderByDescending(Cs => Cs.SI_Number);
 
-
-                Key = Key.Where(K => K.JISVIH_InvoiceDate.ToString().ToLower().Contains(Search.ToLower()) ||
-                K.JISVIH_InvoiceNo.ToString().ToLower().Contains(Search.ToLower()) ||
+                Key = Key.Where(K => K.JIJWIH_InvoiceDate.ToString().ToLower().Contains(Search.ToLower()) ||
+                K.JIJWIH_InvoiceNo.ToString().ToLower().Contains(Search.ToLower()) ||
                 K.CUS_Name.ToString().ToLower().Contains(Search.ToLower()) ||
                 K.CurrencyCode.ToString().ToLower().Contains(Search.ToLower()) ||
-                K.JISVII_Amount.ToString().ToLower().Contains(Search.ToLower()) ||
-                K.JISVII_Qty.ToString().ToLower().Contains(Search.ToLower())).OrderByDescending(Cs => Cs.JISVIH_Number);
+                K.JIJWII_Amount.ToString().ToLower().Contains(Search.ToLower()) ||
+                K.JIJWII_Qty.ToString().ToLower().Contains(Search.ToLower())).OrderByDescending(Cs => Cs.JIJWIH_Number);
 
 
 
@@ -1255,13 +1248,13 @@ namespace ERP.Controllers.JobworkInward
             switch (SortOrder)
             {
                 case "Title_desc":
-                    Key = Key.OrderByDescending(K => Convert.ToDateTime(K.JISVIH_InvoiceDate)!);
+                    Key = Key.OrderByDescending(K => Convert.ToDateTime(K.JIJWIH_InvoiceDate)!);
                     break;
                 case "Title":
-                    Key = Key.OrderBy(K => Convert.ToDateTime(K.JISVIH_InvoiceDate)!);
+                    Key = Key.OrderBy(K => Convert.ToDateTime(K.JIJWIH_InvoiceDate)!);
                     break;
                 default:
-                    Key = Key.OrderByDescending(K => K.JISVIH_InvoiceDate);
+                    Key = Key.OrderByDescending(K => K.JIJWIH_InvoiceDate);
                     break;
             }
 
@@ -1315,11 +1308,11 @@ namespace ERP.Controllers.JobworkInward
             Int32 PageCounts = Convert.ToInt32(Math.Ceiling(Pages));
 
             //  ViewBag.SumOfItem = Key.Sum(item => Convert.ToDouble(item.RN_NoOfItem));
-            ViewBag.SumOfQty = Key.Sum(item => Convert.ToDouble(item.JISVII_Qty));
+            ViewBag.SumOfQty = Key.Sum(item => Convert.ToDouble(item.JIJWII_Qty));
             //  ViewBag.SumOfItemIncome = Key.Sum(item => Convert.ToDouble(item.RN_TotalItemIncome));
             //  ViewBag.SumOfHeadIncome = Key.Sum(item => Convert.ToDouble(item.RN_TotalHeadIncome));
-            ViewBag.SumOfAmount = Key.Sum(item => Convert.ToDouble(item.JISVII_Amount));
-            ViewBag.SumOfHeadGst = Key.Sum(item => Convert.ToDouble(item.JISVII_GST_Amount));
+            ViewBag.SumOfAmount = Key.Sum(item => Convert.ToDouble(item.JIJWII_Amount));
+            ViewBag.SumOfHeadGst = Key.Sum(item => Convert.ToDouble(item.JIJWII_GST_Amount));
             //   ViewBag.SumOfReceivable = Key.Sum(item => Convert.ToDouble(item.RN_BuyerReceivable));
 
             ViewBag.Page = Help.PageSize(PSize.ToString());
@@ -1347,7 +1340,7 @@ namespace ERP.Controllers.JobworkInward
         public ActionResult JWInvoiceView()
         {
 
-            JobworkInvoiceCreate_DTO obj = new JobworkInvoiceCreate_DTO();
+            JobWorkInvoiceCreate_DTO obj = new JobWorkInvoiceCreate_DTO();
 
             return View(obj);
         }
@@ -1355,11 +1348,11 @@ namespace ERP.Controllers.JobworkInward
         #region EDIT GET JOBWORK INVOICE JSON
 
         [HttpGet]
-        public JsonResult GetJobworkInvoice(long JISVIH_Number)
+        public JsonResult GetJobWorkInvoice(long JIJWIH_Number)
         {
-            JobworkInvoice_DAO dao = new JobworkInvoice_DAO();
+            JobWorkInvoice_DAO dao = new JobWorkInvoice_DAO();
 
-            string json = dao.GetJobworkInvoiceJSON(JISVIH_Number);
+            string json = dao.GetJobWorkInvoiceJSON(JIJWIH_Number);
 
             if (string.IsNullOrEmpty(json))
             {
@@ -1382,30 +1375,29 @@ namespace ERP.Controllers.JobworkInward
         }
 
         #endregion
-
         #region UPDATE JOBWORK INVOICE
         [HttpPost]
-        public IActionResult UpdateJobworkInvoice(
-            [FromBody] JobworkInvoiceCreate_DTO dto)
+        public IActionResult UpdateJobWorkInvoice(
+            [FromBody] JobWorkInvoiceCreate_DTO dto)
         {
             try
             {
                 Console.Write(dto);
 
-                JobworkInvoice_DAO JI_DAO =
-                    new JobworkInvoice_DAO();
+                JobWorkInvoice_DAO JI_DAO =
+                    new JobWorkInvoice_DAO();
 
-                JI_DAO.JobworkInvoiceUpdateDB(dto);
+                JI_DAO.JobWorkInvoiceUpdateDB(dto);
 
-                // JI_DAO.JobworkInvoiceItemBulkUpdate(dto);
-                //// JI_DAO.JobworkInvoiceAddressBulkUpdate(dto);
+                // JI_DAO.JobWorkInvoiceItemBulkUpdate(dto);
+                //// JI_DAO.JobWorkInvoiceAddressBulkUpdate(dto);
 
                 return Json(new
                 {
                     success = true,
                     redirectUrl = Url.Action(
-                        "JobworkInvoiceSummary",
-                        "JobworkInvoice")
+                        "JWInvoiceSummary",
+                        "JobWorkInvoice")
                 });
             }
             catch (Exception ex)
@@ -1422,12 +1414,12 @@ namespace ERP.Controllers.JobworkInward
         #region
         [HttpGet]
         public JsonResult GetServiceOrderItemInfo(
-      long JISVOH_Number,
-      long PRS_Number,
-      long Item_Number,
-      long UoM_Number)
+long JISVOH_Number,
+long PRS_Number,
+long Item_Number,
+long UoM_Number)
         {
-            DataTable dt = new JobworkInvoice_DAO()
+            DataTable dt = new JobWorkInvoice_DAO()
                 .GetServiceOrderItemInfo(
                     JISVOH_Number,
                     PRS_Number,
@@ -1444,8 +1436,33 @@ namespace ERP.Controllers.JobworkInward
                 UnitPrice = row["JISVOI_UnitPrice"],
                 Amount = row["JISVOI_Amount"],
                 JISVOI_Number = row["JISVOI_Number"].ToString(),
-                
+
             });
+        }
+
+        #endregion
+
+        #region GET JIJWI SERVICE ORDER DROPDOWN
+
+        [HttpGet]
+        public JsonResult GetJobWorkInvoiceServiceOrder(long customerId, long? prsNumber = null, long? itemNumber = null, long? uomNumber = null)
+        {
+            var dt = new JobWorkInvoice_DAO()
+                .GetJobWorkInvoiceServiceOrderDB(customerId, prsNumber, itemNumber, uomNumber)
+                .Tables[0];
+
+            return new JsonResult(
+                dt.AsEnumerable().Select(r => new
+                {
+                    value = r["JIJWI_SVOH_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JIJWI_SVOH_Number"]),
+                    text = r["JIJWI_SVOH_ServiceOrderNo"]?.ToString() ?? "",
+                    jisvoiNumber = r["JIJWI_SVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JIJWI_SVOI_Number"])
+                }).ToList(),
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                });
         }
 
         #endregion

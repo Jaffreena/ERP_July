@@ -103,21 +103,21 @@ function revertField($field) {
 
 // Reset
 validateDateRange(
-    ".JIR_Date",
-    ".JIR_EndDate",
+    ".JIJWI__NRS_StartDate",
+    ".JIJWI__NRS_EndDate",
     "Reset"
 );
 
 // Prefix
 validateDateRange(
-    ".JIP_Date",
-    ".JIP_EndDate",
+    ".JIJWI_PFX_StartDate",
+    ".JIJWI_PFX_EndDate",
     "Prefix"
 );
 
 // Suffix
 validateDateRange(
-    ".JIS_Date",
-    ".JIS_EndDate",
+    ".JIJWI_SFX_StartDate",
+    ".JIJWI_SFX_EndDate",
     "Suffix"
 );

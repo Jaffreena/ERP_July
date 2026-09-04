@@ -138,26 +138,25 @@ namespace ERP_DAO.JobInwardTransaction
             return Db.ExecuteDataSet(DbC);
         }
     }
-
-    public class DFS_JI_JobworkInvoiceDAO
+    public class JIJWI_DFS_DAO
     {
         DBConnect DB = new DBConnect();
         DataSet DS = new DataSet();
 
-        public DataSet JI_JobworkInvoiceDB(JobworkInvoice_DTO DTO)
+        public DataSet JI_JobWorkInvoiceDB(JobWorkInvoice_DFS_DTO DTO)
         {
             Database Db = new SqlDatabase(DB.Connection());
-            DbCommand DbC = Db.GetStoredProcCommand("SP_DFS_JI_JobworkInvoice_Save");
+            DbCommand DbC = Db.GetStoredProcCommand("SP_JIJWI_DFS_Save");
 
             // Input Parameters
-            Db.AddInParameter(DbC, "@DFS_JISVIH_JW_Customer_Number", DbType.Int64, DTO.JISVIH_JW_Customer_Number);
-            Db.AddInParameter(DbC, "@DFS_JISVIH_MS_Number", DbType.Int64, DTO.JISVIH_MS_Number);
+            Db.AddInParameter(DbC, "@JIJWI_DFS_JW_Customer_Number", DbType.Int64, DTO.JIJWIH_JW_Customer_Number);
+            Db.AddInParameter(DbC, "@JIJWI_DFS_MS_Number", DbType.Int64, DTO.JIJWIH_MS_Number);
 
-            Db.AddInParameter(DbC, "@DFS_JISVIH_Currency_Number", DbType.Int64, DTO.JISVIH_Currency_Number);
-            Db.AddInParameter(DbC, "@DFS_JISVIH_TCT_Number", DbType.Int64, DTO.JISVIH_TCT_Number);
-            Db.AddInParameter(DbC, "@DFS_JISVIH_PaymentTerms", DbType.String, DTO.JISVIH_PaymentTerms);
-            Db.AddInParameter(DbC, "@DFS_JISVIH_PaymentMethod", DbType.String, DTO.JISVIH_PaymentMethod);
-            Db.AddInParameter(DbC, "@DFS_JISVIH_Remarks", DbType.String, DTO.JISVIH_Remarks);
+            Db.AddInParameter(DbC, "@JIJWI_DFS_Currency_Number", DbType.Int64, DTO.JIJWIH_Currency_Number);
+            Db.AddInParameter(DbC, "@JIJWI_DFS_TCT_Number", DbType.Int64, DTO.JIJWIH_TCT_Number);
+            Db.AddInParameter(DbC, "@JIJWI_DFS_PaymentTerms", DbType.String, DTO.JIJWIH_PaymentTerms);
+            Db.AddInParameter(DbC, "@JIJWI_DFS_PaymentMethod", DbType.String, DTO.JIJWIH_PaymentMethod);
+            Db.AddInParameter(DbC, "@JIJWI_DFS_Remarks", DbType.String, DTO.JIJWIH_Remarks);
 
             // Output Parameters
             Db.AddOutParameter(DbC, "@Result_Number", DbType.Int32, 4);
@@ -171,10 +170,10 @@ namespace ERP_DAO.JobInwardTransaction
             return DS;
         }
 
-        public DataSet JI_JobworkInvoiceGet()
+        public DataSet JI_JobWorkInvoiceGet()
         {
             Database Db = new SqlDatabase(DB.Connection());
-            DbCommand DbC = Db.GetStoredProcCommand("SP_DFS_JI_JobworkInvoice_Get");
+            DbCommand DbC = Db.GetStoredProcCommand("SP_JIJWI_DFS_Get");
 
             return Db.ExecuteDataSet(DbC);
         }

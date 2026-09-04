@@ -67,26 +67,26 @@ namespace ERP_DAO.JobInwardTransaction
             return DS;
         }
     }
-  
-    public class JINumber_DAO
+
+    public class JIJWI_Numbering_DAO
     {
         DBConnect DB = new DBConnect();
         DataSet DS = new DataSet();
 
-        public DataSet JINumberDB(JINumber_DTO P_DTO)
+        public DataSet JIJWI_NumberingDB(JIJWI_Numbering_DTO P_DTO)
         {
             Database Db = new SqlDatabase(DB.Connection());
-            DbCommand DbC = Db.GetStoredProcCommand("JINumbering_SP");
+            DbCommand DbC = Db.GetStoredProcCommand("JIJWI_Numbering_SP");
 
-            Db.AddInParameter(DbC, "@JIN_Number", DbType.Int64, P_DTO.JIN_Number);
-            Db.AddInParameter(DbC, "@JIN_Method", DbType.Int64, P_DTO.JIN_Method);
-            Db.AddInParameter(DbC, "@JIN_Date", DbType.Int32, P_DTO.JIN_Date);
-            Db.AddInParameter(DbC, "@JIN_EndDate", DbType.Int32, P_DTO.JIN_EndDate);
-            Db.AddInParameter(DbC, "@JIN_StartingNumber", DbType.Int32, P_DTO.JIN_StartingNumber);
-            Db.AddInParameter(DbC, "@JIN_NumberofDigits", DbType.Int32, P_DTO.JIN_NumberofDigits);
-            Db.AddInParameter(DbC, "@JIN_PrefilZero", DbType.Int64, P_DTO.JIN_PrefilZero);
-            Db.AddInParameter(DbC, "@JIN_Frequency", DbType.Int64, P_DTO.JIN_Frequency);
-            Db.AddInParameter(DbC, "@JIN_Particulars", DbType.String, P_DTO.JIN_Particulars);
+            Db.AddInParameter(DbC, "@JIJWI_Number", DbType.Int64, P_DTO.JIJWI_Number);
+            Db.AddInParameter(DbC, "@JIJWI_Method", DbType.Int64, P_DTO.JIJWI_Method);
+            Db.AddInParameter(DbC, "@JIJWI_Date", DbType.Int32, P_DTO.JIJWI_Date);
+            Db.AddInParameter(DbC, "@JIJWI_EndDate", DbType.Int32, P_DTO.JIJWI_EndDate);
+            Db.AddInParameter(DbC, "@JIJWI_StartingNumber", DbType.Int32, P_DTO.JIJWI_StartingNumber);
+            Db.AddInParameter(DbC, "@JIJWI_NumberofDigits", DbType.Int32, P_DTO.JIJWI_NumberofDigits);
+            Db.AddInParameter(DbC, "@JIJWI_PrefilZero", DbType.Int64, P_DTO.JIJWI_PrefilZero);
+            Db.AddInParameter(DbC, "@JIJWI_Frequency", DbType.Int64, P_DTO.JIJWI_Frequency);
+            Db.AddInParameter(DbC, "@JIJWI_Particulars", DbType.String, P_DTO.JIJWI_Particulars);
 
             Db.AddInParameter(DbC, "@DeleteNumbers", DbType.String, P_DTO.DeleteNumbers);
 
