@@ -1399,7 +1399,7 @@ function CreateJobWorkInvoiceItemModel() {
             JIJWII_Number:
                 parseInt(row.find(".JIJWII_Number").val()) || 0,
 
-            JISVOI_Number:                                    // added
+            JIJWII_JISVOI_Number:                             // FIXED: match DTO property name
                 parseInt(row.find(".JISVOI_Number").val()) || 0,
 
             JIJWII_JISVOH_Number:
@@ -1464,7 +1464,7 @@ function CreateJobWorkInvoiceItemModel() {
             JIJWII_JIDNH_Number:
                 parseInt(row.find(".JIJWII_JIDNH_Number").val()) || 0,
 
-            JIDNI_Number:
+            JIJWII_JIDNI_Number:
                 parseInt(row.find(".JIDNI_Number").val()) || 0
         };
 
@@ -2083,6 +2083,7 @@ function ResizeDeliveryNotePopup() {
     dialog.style.width = tableWidth + "px";
 }
 // Load delivery note items from SP and fill table
+
 function LoadDeliveryNoteItems() {
 
     var customerNumber = $("#Header_JIJWIH_JW_Customer_Number").val();
@@ -2375,9 +2376,11 @@ function OnServiceOrderChange(ele) {
 
                 return;
             }
-
             // Set JISVOI_Number
             serviceOrderItemBox.val(response.jisvoI_Number || 0);
+
+            // Previously Invoiced Qty
+            row.find(".JIJWII_PrevInvoiceQty").val(response.prevInvoiceQty || 0);
 
             // Unit Price
             if (response.unitPrice == null || response.unitPrice === "") {

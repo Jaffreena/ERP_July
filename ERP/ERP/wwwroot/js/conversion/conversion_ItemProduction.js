@@ -75,7 +75,7 @@ $(document).ready(function () {
     InitializeGstFlatpickrs();
 
     function InitializeGstFlatpickrs() {
-        $(".datepicker").flatpickr({
+        $(".datepicker").not("#IBatTempRow .datepicker").flatpickr({
             dateFormat: "d-M-Y",   // 30-Apr-2026
             altInput: true,        // shows formatted date
             altFormat: "d-M-Y",   // display format
@@ -88,18 +88,20 @@ $(document).ready(function () {
     //#endregion Initialize Flatpickr
 
     //#region onkeypress qty and unit
-    $(document).on("keyup change", ".JIDNI_Qty", function () {
+    $(document).on("keyup change", ".JIDNI_Qty, .JIDNI_UnitPrice", function () {
 
         let row = $(this).closest("tr");
 
         let qty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+        let unitPrice = parseFloat(row.find(".JIDNI_UnitPrice").val()) || 0;
 
-
+        let amount = qty * unitPrice;
+        row.find(".JIDNI_Amount").val(amount.toFixed(2));
 
         // update footer totals separately
         calculateTotal_P();
         // auto add row
-        autoAddRow_P (row);
+        autoAddRow_P(row);
 
 
     });
@@ -110,16 +112,16 @@ $(document).ready(function () {
     });
 
     //#region auto add row function
-    function autoAddRow_P (currentRow) {
+    function autoAddRow_P(currentRow) {
 
-        let qty = parseFloat(currentRow.find(".JIDNI_Qty").val()) || 0;   
+        let qty = parseFloat(currentRow.find(".JIDNI_Qty").val()) || 0;
 
         let itemCode = currentRow.find(".JIDNI_Item_Code").val();
 
 
         let isRowValid =
             itemCode &&
-            qty > 0 ;
+            qty > 0;
 
         // allow only last row
         let isLastRow =
@@ -250,7 +252,7 @@ $(document).ready(function () {
 
 
     //#region Save Function
-    
+
     function GetBatchMismatchRowIds() {
         return batchMismatchData
             .map(x => x.rowId)
@@ -343,7 +345,7 @@ $(document).ready(function () {
 
         return deliveryNoteBatches;
     }
-   
+
     //#endregion Save Function
 
     //#region remove checked rows
@@ -396,6 +398,12 @@ $(document).ready(function () {
 
                 success: function (response) {
                     // remove selected row
+                    batchMismatchData_P = batchMismatchData_P
+                        .filter(x => x.rowId !== ItemGridindex)
+                        .map(x => x.rowId > ItemGridindex
+                            ? { ...x, rowId: x.rowId - 1 }
+                            : x
+                        );
                     currentRow.remove();
                     calculateTotal_P();
                 },
@@ -512,7 +520,7 @@ function calculateTotal_P() {
 }
 //#endregion Calculate Total
 
- 
+
 
 
 
@@ -733,8 +741,8 @@ function validateItemGrid() {
 function validateDeliveryNoteBatchList() {
 
     let batchRows =
-        $("#DeliveryNoteBatchList tbody tr")
-            .not("#DeliveryNoteBatchTemplateRow");
+        $("#IBatTableBody_P tr")
+            .not("#IBatTempRow");
 
     let hasValidQty = false;
 
@@ -743,7 +751,7 @@ function validateDeliveryNoteBatchList() {
         let row = $(this);
 
         let qty =
-            row.find(".JIDNI_BCH_QtyInvoice").val();
+            row.find(".JIRNI_BCH_BatchQty").val();
 
         qty = parseFloat(qty) || 0;
 
@@ -759,8 +767,8 @@ function validateDeliveryNoteBatchList() {
     if (!hasValidQty) {
 
         showAlert(
-            "Please enter Consumed Qty in batch details",
-            '#DeliveryNoteBatchList tbody tr:visible:first .JIDNI_BCH_QtyInvoice'
+            "Please enter Production Qty in batch details",
+            '#IBatTableBody_P tr:visible:first .JIRNI_BCH_BatchQty'
         );
 
         return false;
@@ -821,8 +829,3 @@ function CreateTempDeliveryBatchModel(row) {
 }
 
 //#endregion TEMP DELIVERY BATCH MODEL
-
-
- 
- 
-

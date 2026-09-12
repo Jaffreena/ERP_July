@@ -90,33 +90,33 @@ namespace ERP_DAO.JobInwardTransaction
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@FRTIH_InvoiceNo",
-                    Invoice_DTO.Header.FRTIH_InvoiceNo);
+                    Invoice_DTO.Header.JIFTIH_InvoiceNo);
 
                 cmd.Parameters.AddWithValue("@FRTIH_InvoiceDate",
-                    Invoice_DTO.Header.FRTIH_InvoiceDate);
+                    Invoice_DTO.Header.JIFTIH_InvoiceDate);
 
                 cmd.Parameters.AddWithValue("@FRTIH_JW_Customer_Number",
-                    Invoice_DTO.Header.FRTIH_JW_Customer_Number);
+                    Invoice_DTO.Header.JIFTIH_JW_Customer_Number);
 
                 cmd.Parameters.AddWithValue("@FRTIH_MS_Number",
-                    Invoice_DTO.Header.FRTIH_MS_Number);
+                    Invoice_DTO.Header.JIFTIH_MS_Number);
 
                 cmd.Parameters.AddWithValue("@FRTIH_Currency_Number",
-                    Invoice_DTO.Header.FRTIH_Currency_Number);
+                    Invoice_DTO.Header.JIFTIH_Currency_Number);
 
                 cmd.Parameters.AddWithValue("@FRTIH_TCT_Number",
-                    Invoice_DTO.Header.FRTIH_TCT_Number);
+                    Invoice_DTO.Header.JIFTIH_TCT_Number);
 
                 cmd.Parameters.AddWithValue("@FRTIH_PaymentTerms",
-                    Invoice_DTO.Header.FRTIH_PaymentTerms ?? (object)DBNull.Value);
+                    Invoice_DTO.Header.JIFTIH_PaymentTerms ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue("@FRTIH_PaymentMethod",
-                    Invoice_DTO.Header.FRTIH_PaymentMethod ?? (object)DBNull.Value);
+                    Invoice_DTO.Header.JIFTIH_PaymentMethod ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@FRTIH_Remarks",
-                    Invoice_DTO.Header.FRTIH_Remarks ?? (object)DBNull.Value);
+                    Invoice_DTO.Header.JIFTIH_Remarks ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue("@FRTIH_SourceCategory",
-                    Invoice_DTO.Header.FRTIH_SourceCategory ?? "DELIVERY NOTE");
+                    Invoice_DTO.Header.JIFTIH_SourceCategory ?? "DELIVERY NOTE");
 
                 FRTIH_Number = Convert.ToInt64(cmd.ExecuteScalar());
             }
@@ -135,46 +135,48 @@ namespace ERP_DAO.JobInwardTransaction
             SqlTransaction tr)
         {
             DataTable dt = new DataTable();
-
-            dt.Columns.Add("FRTII_FRTIH_Number", typeof(long));
-            dt.Columns.Add("FRTII_Number", typeof(long));
-            dt.Columns.Add("FRTII_JIDNH_Number", typeof(long));
-            dt.Columns.Add("JIDNI_Number", typeof(long));
-            dt.Columns.Add("FRTII_ServiceOrder_Number", typeof(string));
-            dt.Columns.Add("FRTII_PRS_Number", typeof(long));
-            dt.Columns.Add("FRTII_Item_Number", typeof(long));
-            dt.Columns.Add("FRTII_UoM_Number", typeof(long));
-            dt.Columns.Add("FRTII_Qty", typeof(double));
-            dt.Columns.Add("FRTII_UnitPrice", typeof(double));
-            dt.Columns.Add("FRTII_Amount", typeof(double));
-            dt.Columns.Add("FRTII_SAC_Number", typeof(long));
-            dt.Columns.Add("FRTII_GST_Amount", typeof(double));
-            dt.Columns.Add("JISVOI_Number", typeof(long));      // NEW
-            dt.Columns.Add("FRTII_SO_Assign", typeof(string));  // NEW
-            dt.Columns.Add("FRTII_SourceCategory", typeof(string));  // NEW
+            dt.Columns.Add("JIFTII_JIFTIH_Number", typeof(long));
+            dt.Columns.Add("JIFTII_Number", typeof(long));
+            dt.Columns.Add("JIFTII_JIDNH_Number", typeof(long));
+            dt.Columns.Add("JIFTII_JIDNI_Number", typeof(long));
+            dt.Columns.Add("JIFTII_JISVOH_Number", typeof(string));
+            dt.Columns.Add("JIFTII_PRS_Number", typeof(long));
+            dt.Columns.Add("JIFTII_Item_Number", typeof(long));
+            dt.Columns.Add("JIFTII_UoM_Number", typeof(long));
+            dt.Columns.Add("JIFTII_Qty_Kgs", typeof(double));
+            dt.Columns.Add("JIFTII_Rate", typeof(double));
+            dt.Columns.Add("JIFTII_Amount", typeof(double));
+            dt.Columns.Add("JIFTII_SAC_Number", typeof(long));
+            dt.Columns.Add("JIFTII_GST_Amount", typeof(double));
+            dt.Columns.Add("JIFTII_JISVOI_Number", typeof(long));
+            dt.Columns.Add("JIFTII_SVO_Assign", typeof(string));
+            dt.Columns.Add("JIFTII_SourceCategory", typeof(string));
+            dt.Columns.Add("JIFTII_FromWH_Number", typeof(long));
+            dt.Columns.Add("JIFTII_ToWH_Number", typeof(long));
 
             foreach (var item in Invoice_DTO.Items)
             {
                 dt.Rows.Add(
                     FRTIH_Number,
-                    0,   // FRTII_Number - always 0 on insert
-                    item.FRTII_JIDNH_Number,
-                    item.JIDNI_Number,
-                    item.FRTII_ServiceOrder_Number,
-                    item.FRTII_PRS_Number,
-                    item.FRTII_Item_Number,
-                    item.FRTII_UoM_Number,
-                    item.FRTII_Qty,
-                    item.FRTII_UnitPrice,
-                    item.FRTII_Amount,
-                    item.FRTII_SAC_Number,
-                    item.FRTII_GST_Amount,
-                    item.JISVOI_Number,      // NEW
-                    item.FRTII_SO_Assign,    // NEW
-                    item.FRTII_SourceCategory // NEW
+                    0,   // JIFTII_Number - always 0 on insert
+                    item.JIFTII_JIDNH_Number,
+                    item.JIFTII_JIDNI_Number,
+                    item.JIFTII_JISVOH_Number,
+                    item.JIFTII_PRS_Number,
+                    item.JIFTII_Item_Number,
+                    item.JIFTII_UoM_Number,
+                    item.JIFTII_Qty_Kgs,
+                    item.JIFTII_Rate,
+                    item.JIFTII_Amount,
+                    item.JIFTII_SAC_Number,
+                    item.JIFTII_GST_Amount,
+                    item.JIFTII_JISVOI_Number,
+                    item.JIFTII_SVO_Assign,
+                    item.JIFTII_SourceCategory,
+                    (object)item.JIFTII_FromWH_Number ?? DBNull.Value,
+                    (object)item.JIFTII_ToWH_Number ?? DBNull.Value
                 );
             }
-
             using (SqlCommand cmd = new SqlCommand(
                 "JI_FreightInvoiceItem_BulkInsert_SP",
                 con,
@@ -218,21 +220,21 @@ namespace ERP_DAO.JobInwardTransaction
             foreach (DataRow row in insertedItems.Rows)
             {
                 long itemNo =
-                    Convert.ToInt64(row["FRTII_Number"]);
+    Convert.ToInt64(row["JIFTII_Number"]);
 
                 long sacNo =
-                    Convert.ToInt64(row["FRTII_SAC_Number"]);
+                    Convert.ToInt64(row["JIFTII_SAC_Number"]);
 
                 double amount =
-                    Convert.ToDouble(row["FRTII_Amount"]);
+                    Convert.ToDouble(row["JIFTII_Amount"]);
 
                 //-----------------------------------
                 // GST CALCULATION (reuses same engine as Jobwork Invoice)
                 //-----------------------------------
                 List<JobInwardInvoiceGst> gstRows =
                     CalculateGST(
-                        Invoice_DTO.Header.FRTIH_TCT_Number,
-                        Invoice_DTO.Header.FRTIH_InvoiceDate,
+                        Invoice_DTO.Header.JIFTIH_TCT_Number,
+                        Invoice_DTO.Header.JIFTIH_InvoiceDate,
                         sacNo,
                         amount
                     );
@@ -435,14 +437,14 @@ namespace ERP_DAO.JobInwardTransaction
 
                     cmd.Parameters.AddWithValue("@FRTIA_FRTIH_Number", FRTIH_Number);
 
-                    cmd.Parameters.AddWithValue("@FRTIA_ADTP_Number", address.FRTIA_ADTP_Number);
-                    cmd.Parameters.AddWithValue("@FRTIA_Address_ID", address.FRTIA_Address_ID);
-                    cmd.Parameters.AddWithValue("@FRTIA_Address", address.FRTIA_Address ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@FRTIA_City", address.FRTIA_City ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@FRTIA_State", address.FRTIA_State ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@FRTIA_Country", address.FRTIA_Country ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@FRTIA_PIN", address.FRTIA_PIN ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@FRTIA_GSTIN", address.FRTIA_GSTIN ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FRTIA_ADTP_Number", address.JIFTIA_ADTP_Number);
+                    cmd.Parameters.AddWithValue("@FRTIA_Address_ID", address.JIFTIA_Address_ID);
+                    cmd.Parameters.AddWithValue("@FRTIA_Address", address.JIFTIA_Address ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FRTIA_City", address.JIFTIA_City ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FRTIA_State", address.JIFTIA_State ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FRTIA_Country", address.JIFTIA_Country ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FRTIA_PIN", address.JIFTIA_PIN ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FRTIA_GSTIN", address.JIFTIA_GSTIN ?? (object)DBNull.Value);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -505,50 +507,50 @@ namespace ERP_DAO.JobInwardTransaction
                     CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue(
-                    "@FRTIH_Number",
-                    DN_DTO.Header.FRTIH_Number);
+         "@FRTIH_Number",
+         DN_DTO.Header.JIFTIH_Number);
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_MS_Number",
-                    DN_DTO.Header.FRTIH_MS_Number);
+                    DN_DTO.Header.JIFTIH_MS_Number);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_InvoiceNo",
-                    DN_DTO.Header.FRTIH_InvoiceNo);
+                    DN_DTO.Header.JIFTIH_InvoiceNo);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_InvoiceDate",
-                    DN_DTO.Header.FRTIH_InvoiceDate);
+                    DN_DTO.Header.JIFTIH_InvoiceDate);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_JW_Customer_Number",
-                    DN_DTO.Header.FRTIH_JW_Customer_Number);
+                    DN_DTO.Header.JIFTIH_JW_Customer_Number);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_Currency_Number",
-                    DN_DTO.Header.FRTIH_Currency_Number);
+                    DN_DTO.Header.JIFTIH_Currency_Number);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_TCT_Number",
-                    DN_DTO.Header.FRTIH_TCT_Number);
+                    DN_DTO.Header.JIFTIH_TCT_Number);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_PaymentTerms",
-                    DN_DTO.Header.FRTIH_PaymentTerms
+                    DN_DTO.Header.JIFTIH_PaymentTerms
                     ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_PaymentMethod",
-                    DN_DTO.Header.FRTIH_PaymentMethod
+                    DN_DTO.Header.JIFTIH_PaymentMethod
                     ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue(
      "@FRTIH_Remarks",
-     DN_DTO.Header.FRTIH_Remarks
+     DN_DTO.Header.JIFTIH_Remarks
      ?? (object)DBNull.Value);
 
                 cmd.Parameters.AddWithValue(
                     "@FRTIH_SourceCategory",
-                    DN_DTO.Header.FRTIH_SourceCategory ?? "DELIVERY NOTE");
+                    DN_DTO.Header.JIFTIH_SourceCategory ?? "DELIVERY NOTE");
 
                 cmd.ExecuteNonQuery();
             }
@@ -565,42 +567,46 @@ namespace ERP_DAO.JobInwardTransaction
         {
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("FRTII_Number", typeof(long));
-            dt.Columns.Add("FRTII_FRTIH_Number", typeof(long));
-            dt.Columns.Add("FRTII_JIDNH_Number", typeof(long));
-            dt.Columns.Add("JIDNI_Number", typeof(long));
-            dt.Columns.Add("FRTII_ServiceOrder_Number", typeof(string));
-            dt.Columns.Add("FRTII_PRS_Number", typeof(long));
-            dt.Columns.Add("FRTII_Item_Number", typeof(long));
-            dt.Columns.Add("FRTII_UoM_Number", typeof(long));
-            dt.Columns.Add("FRTII_Qty", typeof(decimal));
-            dt.Columns.Add("FRTII_UnitPrice", typeof(decimal));
-            dt.Columns.Add("FRTII_Amount", typeof(decimal));
-            dt.Columns.Add("FRTII_SAC_Number", typeof(long));
-            dt.Columns.Add("FRTII_GST_Amount", typeof(decimal));
-            dt.Columns.Add("JISVOI_Number", typeof(long));      // NEW
-            dt.Columns.Add("FRTII_SO_Assign", typeof(string));  // NEW
-            dt.Columns.Add("FRTII_SourceCategory", typeof(string));  // NEW
+            dt.Columns.Add("JIFTII_Number", typeof(long));
+            dt.Columns.Add("JIFTII_JIFTIH_Number", typeof(long));
+            dt.Columns.Add("JIFTII_JIDNH_Number", typeof(long));
+            dt.Columns.Add("JIFTII_JIDNI_Number", typeof(long));
+            dt.Columns.Add("JIFTII_JISVOH_Number", typeof(string));
+            dt.Columns.Add("JIFTII_PRS_Number", typeof(long));
+            dt.Columns.Add("JIFTII_Item_Number", typeof(long));
+            dt.Columns.Add("JIFTII_UoM_Number", typeof(long));
+            dt.Columns.Add("JIFTII_Qty_Kgs", typeof(decimal));
+            dt.Columns.Add("JIFTII_Rate", typeof(decimal));
+            dt.Columns.Add("JIFTII_Amount", typeof(decimal));
+            dt.Columns.Add("JIFTII_SAC_Number", typeof(long));
+            dt.Columns.Add("JIFTII_GST_Amount", typeof(decimal));
+            dt.Columns.Add("JIFTII_JISVOI_Number", typeof(long));
+            dt.Columns.Add("JIFTII_SVO_Assign", typeof(string));
+            dt.Columns.Add("JIFTII_SourceCategory", typeof(string));
+            dt.Columns.Add("JIFTII_FromWH_Number", typeof(long));
+            dt.Columns.Add("JIFTII_ToWH_Number", typeof(long));
 
             foreach (var item in DN_DTO.Items)
             {
                 dt.Rows.Add(
-       item.FRTII_Number,
-       DN_DTO.Header.FRTIH_Number,
-       item.FRTII_JIDNH_Number,
-       item.JIDNI_Number,
-                    item.FRTII_ServiceOrder_Number,
-                    item.FRTII_PRS_Number,
-                    item.FRTII_Item_Number,
-                    item.FRTII_UoM_Number,
-                    item.FRTII_Qty,
-                    item.FRTII_UnitPrice,
-                    item.FRTII_Amount,
-                    item.FRTII_SAC_Number,
-                    item.FRTII_GST_Amount,
-                    item.JISVOI_Number,      // NEW
-                    item.FRTII_SO_Assign,    // NEW
-                    item.FRTII_SourceCategory // NEW
+       item.JIFTII_Number,
+       DN_DTO.Header.JIFTIH_Number,
+       item.JIFTII_JIDNH_Number,
+       item.JIFTII_JIDNI_Number,
+                    item.JIFTII_JISVOH_Number,
+                    item.JIFTII_PRS_Number,
+                    item.JIFTII_Item_Number,
+                    item.JIFTII_UoM_Number,
+                    item.JIFTII_Qty_Kgs,
+                    item.JIFTII_Rate,
+                    item.JIFTII_Amount,
+                    item.JIFTII_SAC_Number,
+                    item.JIFTII_GST_Amount,
+                    item.JIFTII_JISVOI_Number,
+                    item.JIFTII_SVO_Assign,
+                    item.JIFTII_SourceCategory,
+                    (object)item.JIFTII_FromWH_Number ?? DBNull.Value,
+                    (object)item.JIFTII_ToWH_Number ?? DBNull.Value
                 );
             }
 
@@ -638,34 +644,34 @@ namespace ERP_DAO.JobInwardTransaction
         {
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("FRTIA_FRTIH_Number", typeof(long));
-            dt.Columns.Add("FRTIA_ADTP_Number", typeof(long));
-            dt.Columns.Add("FRTIA_Address_ID", typeof(string));
-            dt.Columns.Add("FRTIA_Address", typeof(string));
-            dt.Columns.Add("FRTIA_City", typeof(string));
-            dt.Columns.Add("FRTIA_State", typeof(string));
-            dt.Columns.Add("FRTIA_Country", typeof(string));
-            dt.Columns.Add("FRTIA_PIN", typeof(string));
-            dt.Columns.Add("FRTIA_GSTIN", typeof(string));
+            dt.Columns.Add("JIFTIA_FRTIH_Number", typeof(long));
+            dt.Columns.Add("JIFTIA_ADTP_Number", typeof(long));
+            dt.Columns.Add("JIFTIA_Address_ID", typeof(string));
+            dt.Columns.Add("JIFTIA_Address", typeof(string));
+            dt.Columns.Add("JIFTIA_City", typeof(string));
+            dt.Columns.Add("JIFTIA_State", typeof(string));
+            dt.Columns.Add("JIFTIA_Country", typeof(string));
+            dt.Columns.Add("JIFTIA_PIN", typeof(string));
+            dt.Columns.Add("JIFTIA_GSTIN", typeof(string));
 
             foreach (var item in DN_DTO.Addresses)
             {
                 dt.Rows.Add(
-                    DN_DTO.Header.FRTIH_Number,
-                    item.FRTIA_ADTP_Number,
-                    item.FRTIA_Address_ID,
-                    item.FRTIA_Address,
-                    item.FRTIA_City,
-                    item.FRTIA_State,
-                    item.FRTIA_Country,
-                    item.FRTIA_PIN,
-                    item.FRTIA_GSTIN
+                    DN_DTO.Header.JIFTIH_Number,
+                    item.JIFTIA_ADTP_Number,
+                    item.JIFTIA_Address_ID,
+                    item.JIFTIA_Address,
+                    item.JIFTIA_City,
+                    item.JIFTIA_State,
+                    item.JIFTIA_Country,
+                    item.JIFTIA_PIN,
+                    item.JIFTIA_GSTIN
                 );
             }
             using (SqlCommand cmd = new SqlCommand("JI_FreightInvoiceAddress_Update_SP", con, tr))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@FRTIA_FRTIH_Number", DN_DTO.Header.FRTIH_Number);
+                cmd.Parameters.AddWithValue("@FRTIA_FRTIH_Number", DN_DTO.Header.JIFTIH_Number);
                 SqlParameter param = cmd.Parameters.AddWithValue("@Address", dt);
                 param.SqlDbType = SqlDbType.Structured;
                 param.TypeName = "JI_FreightInvoiceAddress_TableType";
@@ -823,13 +829,17 @@ namespace ERP_DAO.JobInwardTransaction
 
         #region Source: Freight Service Order dropdown
 
-        public DataSet GetFreightServiceOrderDB(long customerId, string category)
+        public DataSet GetFreightServiceOrderDB(long customerId, string category, long? uomNumber = null, long? fromWH = null, long? toWH = null)
         {
             Database db = new SqlDatabase(DB.Connection());
+
             DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrder_ForDropdown_SP");
 
             db.AddInParameter(cmd, "@CustomerId", DbType.Int64, customerId);
             db.AddInParameter(cmd, "@Category", DbType.String, category);
+            db.AddInParameter(cmd, "@UoM_Number", DbType.Int64, uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+            db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64, fromWH.HasValue ? (object)fromWH.Value : DBNull.Value);
+            db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64, toWH.HasValue ? (object)toWH.Value : DBNull.Value);
 
             return db.ExecuteDataSet(cmd);
         }
@@ -858,6 +868,14 @@ namespace ERP_DAO.JobInwardTransaction
         }
 
         #endregion
+
+        public DataSet FreightInvoice(FreightInvoiceCreate_DTO DN_DTO)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JI_FreightInvoice_SP");
+
+            return db.ExecuteDataSet(cmd);
+        }
     }
     public class FRTI_NextNumber_DAO
     {

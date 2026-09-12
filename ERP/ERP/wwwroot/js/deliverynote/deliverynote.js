@@ -775,7 +775,7 @@ $(document).ready(function () {
     InitializeGstFlatpickrs();
 
     function InitializeGstFlatpickrs() {
-        $(".datepicker").flatpickr({
+        $(".datepicker").not("#IBatTempRow .datepicker").flatpickr({
             dateFormat: "d-M-Y",   // 30-Apr-2026
             altInput: true,        // shows formatted date
             altFormat: "d-M-Y",   // display format
@@ -1415,13 +1415,13 @@ $(document).ready(function () {
                         : "No",
 
                 JIDNI_JIFRT_SVOH_Number:
-                    row.find(".JIDNI_JIFRT_SVOH_Number").val() || "",
+                    parseInt(row.find(".JIDNI_JIFRT_SVOH_Number").val()) || 0,
 
                 JIDNI_FromWH:
-                    row.find(".JIDNI_FromWH").val() || "",
+                    parseInt(row.find(".JIDNI_FromWH").val()) || null,
 
                 JIDNI_ToWH:
-                    row.find(".JIDNI_ToWH").val() || "",
+                    parseInt(row.find(".JIDNI_ToWH").val()) || null,
 
                 // NEW: SO Item IDs — needed by USP_CheckDeliveredQtyExceeded_Freight's
                 // DN-side calculation
@@ -2197,6 +2197,9 @@ $(document).on("change", ".JIDNI_JIJWI_SVOH_Number", function () {
     let jisvohNumber = $(this).val();
     row.find(".JIDNI_JIJWI_SVOH_Number").val(jisvohNumber)
 
+    let jisvoiNumber = $(this).find("option:selected").data("jisvoi") || 0;
+    row.find(".JIDNI_JIJWI_SVOI_Number_Row").val(jisvoiNumber);
+
     let prsNumber = row.find(".JIDNI_PRS_Number").val();
     let itemNumber = row.find(".JIDNI_Item_Number").val();
     let uomNumber = row.find(".JIDNI_UoM_Number").val();
@@ -2275,7 +2278,7 @@ function BindServiceOrder(customerId, prsNumber = null, itemNumber = null, uomNu
 
             if (!item.value || item.value === "" || item.value === "0") return;
 
-            $(".JIDNI_JIJWI_SVOH_Number").append(`<option value="${item.value}">${item.text}</option>`)
+            $(".JIDNI_JIJWI_SVOH_Number").append(`<option value="${item.value}" data-jisvoi="${item.jisvoiNumber || 0}">${item.text}</option>`)
         })
     );
 }

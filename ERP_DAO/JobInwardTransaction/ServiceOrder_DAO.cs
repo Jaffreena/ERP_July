@@ -330,7 +330,6 @@ namespace ERP_DAO.JobInwardTransaction
 
             return ds.Tables[0];
         }
-
         #region edit
         public string GetServiceOrderJSON(long JISVOH_Number)
         {
@@ -350,6 +349,28 @@ namespace ERP_DAO.JobInwardTransaction
             string json =
                 db.ExecuteScalar(cmd)?.ToString();
 
+            return json;
+        }
+
+        public string JIJWI_GetServiceOrderJSON(long JIJWI_SVOH_Number)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JIJWI_ServiceOrder_Get_JSON_SP");
+
+            db.AddInParameter(cmd, "@JIJWI_SVOH_Number", DbType.Int64, JIJWI_SVOH_Number);
+
+            string json = db.ExecuteScalar(cmd)?.ToString();
+            return json;
+        }
+
+        public string JIFRT_GetServiceOrderJSON(long JIFRT_SVOH_Number)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrder_Get_JSON_SP");
+
+            db.AddInParameter(cmd, "@JIFRT_SVOH_Number", DbType.Int64, JIFRT_SVOH_Number);
+
+            string json = db.ExecuteScalar(cmd)?.ToString();
             return json;
         }
         #endregion
@@ -496,7 +517,7 @@ namespace ERP_DAO.JobInwardTransaction
                 row["JIJWI_SVOI_UnitPrice"] = item.JIJWI_SVOI_UnitPrice;
                 row["JIJWI_SVOI_Amount"] = item.JIJWI_SVOI_Amount;
                 row["JIJWI_SVOI_DeliveryDate"] = item.JIJWI_SVOI_DeliveryDate.HasValue ? item.JIJWI_SVOI_DeliveryDate.Value : DBNull.Value;
-                row["JIJWI_SVOI_Category"] = item.JIJWI_SVOI_Category ?? (object)DBNull.Value;
+                row["JIJWI_SVOI_Category"] = item.JIJWI_SVOI_Category ?? "DELIVERY NOTE";
 
                 dt.Rows.Add(row);
             }
@@ -571,6 +592,204 @@ namespace ERP_DAO.JobInwardTransaction
             param.TypeName = "dbo.JIFRT_ServiceOrderItemType";
 
             cmd.ExecuteNonQuery();
+        }
+
+        #endregion
+
+        #region update service order (JIJWI / JIFRT)
+
+        public void JIJWI_ServiceOrderUpdateDB(JIJWI_ServiceOrder_DTO dto)
+        {
+            using SqlConnection con = new SqlConnection(DB.Connection());
+            con.Open();
+
+            using SqlTransaction tr = con.BeginTransaction();
+            try
+            {
+                JIJWI_ServiceOrderHeadUpdate(dto.Header, con, tr);
+                JIJWI_ServiceOrderItemUpdate(dto.Header.JIJWI_SVOH_Number, dto.Items, con, tr);
+
+                tr.Commit();
+            }
+            catch
+            {
+                tr.Rollback();
+                throw;
+            }
+        }
+
+        public void JIFRT_ServiceOrderUpdateDB(JIFRT_ServiceOrder_DTO dto)
+        {
+            using SqlConnection con = new SqlConnection(DB.Connection());
+            con.Open();
+
+            using SqlTransaction tr = con.BeginTransaction();
+            try
+            {
+                JIFRT_ServiceOrderHeadUpdate(dto.Header, con, tr);
+                JIFRT_ServiceOrderItemUpdate(dto.Header.JIFRT_SVOH_Number, dto.Items, con, tr);
+
+                tr.Commit();
+            }
+            catch
+            {
+                tr.Rollback();
+                throw;
+            }
+        }
+
+        private void JIJWI_ServiceOrderHeadUpdate(JIJWI_ServiceOrderHead_DTO h, SqlConnection con, SqlTransaction tr)
+        {
+            using SqlCommand cmd = new SqlCommand("JIJWI_ServiceOrderHead_Update_SP", con, tr);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_Number", h.JIJWI_SVOH_Number);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_RegNo", h.JIJWI_SVOH_RegNo);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_RegDate", h.JIJWI_SVOH_RegDate);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_ServiceOrderNo", h.JIJWI_SVOH_ServiceOrderNo);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_ServiceOrderDate", h.JIJWI_SVOH_ServiceOrderDate);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_MS_Number", (object)h.JIJWI_SVOH_MS_Number ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_JW_Customer_Number", h.JIJWI_SVOH_JW_Customer_Number);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_Currency_Number", h.JIJWI_SVOH_Currency_Number);
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_PaymentTerms", h.JIJWI_SVOH_PaymentTerms ?? "");
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_DeliveryTerms", h.JIJWI_SVOH_DeliveryTerms ?? "");
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_DeliveryMode", h.JIJWI_SVOH_DeliveryMode ?? "");
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_Tax", h.JIJWI_SVOH_Tax ?? "");
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_TDC", h.JIJWI_SVOH_TDC ?? "");
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_Remarks", h.JIJWI_SVOH_Remarks ?? "");
+
+            cmd.ExecuteNonQuery();
+        }
+
+        private void JIFRT_ServiceOrderHeadUpdate(JIFRT_ServiceOrderHead_DTO h, SqlConnection con, SqlTransaction tr)
+        {
+            using SqlCommand cmd = new SqlCommand("JIFRT_ServiceOrderHead_Update_SP", con, tr);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_Number", h.JIFRT_SVOH_Number);
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_RegNo", h.JIFRT_SVOH_RegNo);
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_RegDate", h.JIFRT_SVOH_RegDate);
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_ServiceOrderNo", h.JIFRT_SVOH_ServiceOrderNo);
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_ServiceOrderDate", h.JIFRT_SVOH_ServiceOrderDate);
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_Category", h.JIFRT_SVOH_Category ?? "");
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_JW_Customer_Number", h.JIFRT_SVOH_JW_Customer_Number);
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_Currency_Number", h.JIFRT_SVOH_Currency_Number);
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_PaymentTerms", h.JIFRT_SVOH_PaymentTerms ?? "");
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_DeliveryTerms", h.JIFRT_SVOH_DeliveryTerms ?? "");
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_DeliveryMode", h.JIFRT_SVOH_DeliveryMode ?? "");
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_Tax", h.JIFRT_SVOH_Tax ?? "");
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_TDC", h.JIFRT_SVOH_TDC ?? "");
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_Remarks", h.JIFRT_SVOH_Remarks ?? "");
+
+            cmd.ExecuteNonQuery();
+        }
+
+        private void JIJWI_ServiceOrderItemUpdate(long headerNumber, List<JIJWI_ServiceOrderItem_DTO> items, SqlConnection con, SqlTransaction tr)
+        {
+            DataTable dt = CreateJIJWIServiceOrderItemUpdateTable(items);
+
+            using SqlCommand cmd = new SqlCommand("JIJWI_ServiceOrderItem_Update_SP", con, tr);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@JIJWI_SVOH_Number", headerNumber);
+
+            SqlParameter param = cmd.Parameters.AddWithValue("@Items", dt);
+            param.SqlDbType = SqlDbType.Structured;
+            param.TypeName = "dbo.JIJWI_ServiceOrderItem_Update_TableType";
+
+            cmd.ExecuteNonQuery();
+        }
+
+        private void JIFRT_ServiceOrderItemUpdate(long headerNumber, List<JIFRT_ServiceOrderItem_DTO> items, SqlConnection con, SqlTransaction tr)
+        {
+            DataTable dt = CreateJIFRTServiceOrderItemUpdateTable(items);
+
+            using SqlCommand cmd = new SqlCommand("JIFRT_ServiceOrderItem_Update_SP", con, tr);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@JIFRT_SVOH_Number", headerNumber);
+
+            SqlParameter param = cmd.Parameters.AddWithValue("@Items", dt);
+            param.SqlDbType = SqlDbType.Structured;
+            param.TypeName = "dbo.JIFRT_ServiceOrderItem_Update_TableType";
+
+            cmd.ExecuteNonQuery();
+        }
+
+        private DataTable CreateJIJWIServiceOrderItemUpdateTable(List<JIJWI_ServiceOrderItem_DTO> items)
+        {
+            DataTable dt = new DataTable();
+
+            dt.Columns.Add("JIJWI_SVOI_Number", typeof(long));
+            dt.Columns.Add("JIJWI_SVOI_PRS_Number", typeof(long));
+            dt.Columns.Add("JIJWI_SVOI_Item_Number", typeof(long));
+            dt.Columns.Add("JIJWI_SVOI_WH_Number", typeof(long));
+            dt.Columns.Add("JIJWI_SVOI_UoM_Number", typeof(long));
+            dt.Columns.Add("JIJWI_SVOI_Qty", typeof(double));
+            dt.Columns.Add("JIJWI_SVOI_UnitPrice", typeof(double));
+            dt.Columns.Add("JIJWI_SVOI_Amount", typeof(double));
+            dt.Columns.Add("JIJWI_SVOI_DeliveryDate", typeof(DateTime));
+            dt.Columns.Add("JIJWI_SVOI_Category", typeof(string));
+
+            foreach (var item in items)
+            {
+                if (item.JIJWI_SVOI_IsDeleted)
+                    continue;
+
+                DataRow row = dt.NewRow();
+
+                row["JIJWI_SVOI_Number"] = item.JIJWI_SVOI_Number > 0 ? item.JIJWI_SVOI_Number : (object)DBNull.Value;
+                row["JIJWI_SVOI_PRS_Number"] = item.JIJWI_SVOI_PRS_Number;
+                row["JIJWI_SVOI_Item_Number"] = item.JIJWI_SVOI_Item_Number;
+                row["JIJWI_SVOI_WH_Number"] = item.JIJWI_SVOI_WH_Number.HasValue ? item.JIJWI_SVOI_WH_Number.Value : DBNull.Value;
+                row["JIJWI_SVOI_UoM_Number"] = item.JIJWI_SVOI_UoM_Number;
+                row["JIJWI_SVOI_Qty"] = item.JIJWI_SVOI_Qty;
+                row["JIJWI_SVOI_UnitPrice"] = item.JIJWI_SVOI_UnitPrice;
+                row["JIJWI_SVOI_Amount"] = item.JIJWI_SVOI_Amount;
+                row["JIJWI_SVOI_DeliveryDate"] = item.JIJWI_SVOI_DeliveryDate.HasValue ? item.JIJWI_SVOI_DeliveryDate.Value : DBNull.Value;
+                row["JIJWI_SVOI_Category"] = item.JIJWI_SVOI_Category ?? "DELIVERY NOTE";
+
+                dt.Rows.Add(row);
+            }
+
+            return dt;
+        }
+
+        private DataTable CreateJIFRTServiceOrderItemUpdateTable(List<JIFRT_ServiceOrderItem_DTO> items)
+        {
+            DataTable dt = new DataTable();
+
+            dt.Columns.Add("JIFRT_SVOI_Number", typeof(long));
+            dt.Columns.Add("JIFRT_SVOI_Category", typeof(string));
+            dt.Columns.Add("JIFRT_SVOI_PRS_Number", typeof(long));
+            dt.Columns.Add("JIFRT_SVOI_FromWH_Number", typeof(long));
+            dt.Columns.Add("JIFRT_SVOI_ToWH_Number", typeof(long));
+            dt.Columns.Add("JIFRT_SVOI_UoM_Number", typeof(long));
+            dt.Columns.Add("JIFRT_SVOI_Qty", typeof(double));
+            dt.Columns.Add("JIFRT_SVOI_Rate", typeof(double));
+            dt.Columns.Add("JIFRT_SVOI_Amount", typeof(double));
+
+            foreach (var item in items)
+            {
+                if (item.JIFRT_SVOI_IsDeleted)
+                    continue;
+
+                DataRow row = dt.NewRow();
+
+                row["JIFRT_SVOI_Number"] = item.JIFRT_SVOI_Number > 0 ? item.JIFRT_SVOI_Number : (object)DBNull.Value;
+                row["JIFRT_SVOI_Category"] = item.JIFRT_SVOI_Category ?? (object)DBNull.Value;
+                row["JIFRT_SVOI_PRS_Number"] = item.JIFRT_SVOI_PRS_Number;
+                row["JIFRT_SVOI_FromWH_Number"] = item.JIFRT_SVOI_FromWH_Number.HasValue ? item.JIFRT_SVOI_FromWH_Number.Value : DBNull.Value;
+                row["JIFRT_SVOI_ToWH_Number"] = item.JIFRT_SVOI_ToWH_Number.HasValue ? item.JIFRT_SVOI_ToWH_Number.Value : DBNull.Value;
+                row["JIFRT_SVOI_UoM_Number"] = item.JIFRT_SVOI_UoM_Number;
+                row["JIFRT_SVOI_Qty"] = item.JIFRT_SVOI_Qty;
+                row["JIFRT_SVOI_Rate"] = item.JIFRT_SVOI_Rate;
+                row["JIFRT_SVOI_Amount"] = item.JIFRT_SVOI_Amount;
+
+                dt.Rows.Add(row);
+            }
+
+            return dt;
         }
 
         #endregion

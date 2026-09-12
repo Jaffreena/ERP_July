@@ -374,4 +374,17 @@ namespace ERP_DTO.JobInwardTransaction
     }
     #endregion
 
+    #region edit
+    public class ServiceOrderUpdatePage_DTO
+    {
+        public string ServiceType { get; set; }   // "JWI" or "FREIGHT"
+
+        public JIJWI_ServiceOrderHead_DTO JWIHeader { get; set; }
+        public List<JIJWI_ServiceOrderItem_DTO> JWIItems { get; set; }
+
+        public JIFRT_ServiceOrderHead_DTO FreightHeader { get; set; }
+        public List<JIFRT_ServiceOrderItem_DTO> FreightItems { get; set; }
+    }
+    #endregion
+
 }

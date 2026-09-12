@@ -75,7 +75,7 @@ $(document).ready(function () {
     InitializeGstFlatpickrs();
 
     function InitializeGstFlatpickrs() {
-        $(".datepicker").flatpickr({
+        $(".datepicker").not("#IBatTempRow .datepicker").flatpickr({
             dateFormat: "d-M-Y",   // 30-Apr-2026
             altInput: true,        // shows formatted date
             altFormat: "d-M-Y",   // display format
@@ -88,13 +88,15 @@ $(document).ready(function () {
     //#endregion Initialize Flatpickr
 
     //#region onkeypress qty and unit
-    $(document).on("keyup change", ".JIDNI_Qty", function () {
+    $(document).on("keyup change", ".JIDNI_Qty, .JIDNI_UnitPrice", function () {
 
         let row = $(this).closest("tr");
 
         let qty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+        let unitPrice = parseFloat(row.find(".JIDNI_UnitPrice").val()) || 0;
 
-
+        let amount = qty * unitPrice;
+        row.find(".JIDNI_Amount").val(amount.toFixed(2));
 
         // update footer totals separately
         calculateTotal_S();
@@ -396,6 +398,12 @@ $(document).ready(function () {
 
                 success: function (response) {
                     // remove selected row
+                    batchMismatchData_S = batchMismatchData_S
+                        .filter(x => x.rowId !== ItemGridindex)
+                        .map(x => x.rowId > ItemGridindex
+                            ? { ...x, rowId: x.rowId - 1 }
+                            : x
+                        );
                     currentRow.remove();
                     calculateTotal_S();
                 },
@@ -513,7 +521,7 @@ function calculateTotal_S() {
 }
 //#endregion Calculate Total
 
- 
+
 
 
 
@@ -734,8 +742,8 @@ function validateItemGrid() {
 function validateDeliveryNoteBatchList() {
 
     let batchRows =
-        $("#DeliveryNoteBatchList tbody tr")
-            .not("#DeliveryNoteBatchTemplateRow");
+        $("#IBatTableBody_S tr")
+            .not("#IBatTempRow");
 
     let hasValidQty = false;
 
@@ -744,7 +752,7 @@ function validateDeliveryNoteBatchList() {
         let row = $(this);
 
         let qty =
-            row.find(".JIDNI_BCH_QtyInvoice").val();
+            row.find(".JIRNI_BCH_BatchQty").val();
 
         qty = parseFloat(qty) || 0;
 
@@ -760,8 +768,8 @@ function validateDeliveryNoteBatchList() {
     if (!hasValidQty) {
 
         showAlert(
-            "Please enter Delivered Qty in batch details",
-            '#DeliveryNoteBatchList tbody tr:visible:first .JIDNI_BCH_QtyInvoice'
+            "Please enter Scrap Qty in batch details",
+            '#IBatTableBody_S tr:visible:first .JIRNI_BCH_BatchQty'
         );
 
         return false;
@@ -822,8 +830,3 @@ function CreateTempDeliveryBatchModel(row) {
 }
 
 //#endregion TEMP DELIVERY BATCH MODEL
-
-
-
-
-

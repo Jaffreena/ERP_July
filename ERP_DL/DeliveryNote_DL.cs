@@ -231,7 +231,7 @@ namespace ERP_DL
                                     Convert.ToDouble(item["JIDNI_Amount"]),
 
                                 JIDNI_IsJW_InvoiceApplicable =
-                                    Convert.ToString(item["JIDNI_JW_InvoiceTracking"]),
+                                    Convert.ToString(item["JIDNI_IsJW_InvoiceApplicable"]),
                                 JIDNI_JW_ProcessName =
                                 Convert.ToString(item["JIDNI_JW_ProcessName"]),
                                 JIDNI_JW_ItemName =
@@ -405,8 +405,8 @@ namespace ERP_DL
                         JIDNI_Amount =
                             dr["JIDNI_Amount"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["JIDNI_Amount"]),
 
-                        JIDNI_JW_InvoiceTracking =
-                            dr["JIDNI_JW_InvoiceTracking"] == DBNull.Value ? "" : Convert.ToString(dr["JIDNI_JW_InvoiceTracking"])
+                        JIDNI_IsJW_InvoiceApplicable =
+                            dr["JIDNI_IsJW_InvoiceApplicable"] == DBNull.Value ? "" : Convert.ToString(dr["JIDNI_IsJW_InvoiceApplicable"])
                     });
             }
 

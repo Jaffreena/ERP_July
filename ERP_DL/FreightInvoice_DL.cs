@@ -23,14 +23,14 @@ namespace ERP_DL
                 InvoiceList.Add(
                     new FreightInvoiceSummary_DTO
                     {
-                        FRTIH_Number =
-                            Convert.ToInt64(dr["FRTIH_Number"]),
+                        JIFTIH_Number =
+                            Convert.ToInt64(dr["JIFTIH_Number"]),
 
-                        FRTIH_InvoiceNo =
-                            Convert.ToString(dr["FRTIH_InvoiceNo"]),
+                        JIFTIH_InvoiceNo =
+                            Convert.ToString(dr["JIFTIH_InvoiceNo"]),
 
-                        FRTIH_InvoiceDate =
-                            Convert.ToString(dr["FRTIH_InvoiceDate"]),
+                        JIFTIH_InvoiceDate =
+                            Convert.ToString(dr["JIFTIH_InvoiceDate"]),
 
                         CUS_Name =
                             Convert.ToString(dr["CUS_Name"]),
@@ -98,20 +98,20 @@ namespace ERP_DL
                                 ? 0
                                 : Convert.ToInt64(dr["JIDNH_WH_Number"]),
 
-                        FRTIH_Number =
-                            dr["FRTIH_Number"] == DBNull.Value
+                        JIFTIH_Number =
+                            dr["JIFTIH_Number"] == DBNull.Value
                                 ? 0
-                                : Convert.ToInt64(dr["FRTIH_Number"]),
+                                : Convert.ToInt64(dr["JIFTIH_Number"]),
 
-                        FRTIH_InvoiceNo =
-                            dr["FRTIH_InvoiceNo"] == DBNull.Value
+                        JIFTIH_InvoiceNo =
+                            dr["JIFTIH_InvoiceNo"] == DBNull.Value
                                 ? ""
-                                : Convert.ToString(dr["FRTIH_InvoiceNo"]),
+                                : Convert.ToString(dr["JIFTIH_InvoiceNo"]),
 
-                        FRTIH_InvoiceDate =
-                            dr["FRTIH_InvoiceDate"] == DBNull.Value
+                        JIFTIH_InvoiceDate =
+                            dr["JIFTIH_InvoiceDate"] == DBNull.Value
                                 ? ""
-                                : Convert.ToString(dr["FRTIH_InvoiceDate"]),
+                                : Convert.ToString(dr["JIFTIH_InvoiceDate"]),
 
                         JIDNH_DN_No =
                             dr["JIDNH_DN_No"] == DBNull.Value
@@ -148,20 +148,20 @@ namespace ERP_DL
                                 ? ""
                                 : Convert.ToString(dr["TaxCluster"]),
 
-                        FRTII_Qty =
-                            dr["FRTII_Qty"] == DBNull.Value
+                        JIFTII_Qty_Kgs =
+                            dr["JIFTII_Qty_Kgs"] == DBNull.Value
                                 ? 0
-                                : Convert.ToDecimal(dr["FRTII_Qty"]),
+                                : Convert.ToDecimal(dr["JIFTII_Qty_Kgs"]),
 
-                        FRTII_Amount =
-                            dr["FRTII_Amount"] == DBNull.Value
+                        JIFTII_Amount =
+                            dr["JIFTII_Amount"] == DBNull.Value
                                 ? 0
-                                : Convert.ToDecimal(dr["FRTII_Amount"]),
+                                : Convert.ToDecimal(dr["JIFTII_Amount"]),
 
-                        FRTII_GST_Amount =
-                            dr["FRTII_GST_Amount"] == DBNull.Value
+                        JIFTII_GST_Amount =
+                            dr["JIFTII_GST_Amount"] == DBNull.Value
                                 ? 0
-                                : Convert.ToDecimal(dr["FRTII_GST_Amount"]),
+                                : Convert.ToDecimal(dr["JIFTII_GST_Amount"]),
 
                         Segregation =
                             dr["Segregation"] == DBNull.Value

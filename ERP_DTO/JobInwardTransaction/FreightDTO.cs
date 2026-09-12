@@ -9,162 +9,164 @@ namespace ERP_DTO.JobInwardTransaction
 {
     public class FreightInvoiceHead_DTO
     {
-        public long FRTIH_Number { get; set; }
+        public long JIFTIH_Number { get; set; }
 
         [Display(Name = "Freight Invoice No.")]
         [StringLength(50)]
-        public string FRTIH_InvoiceNo { get; set; }
+        public string JIFTIH_InvoiceNo { get; set; }
 
         [Display(Name = "Invoice Date")]
         [DataType(DataType.Date)]
-        public DateTime FRTIH_InvoiceDate { get; set; }
+        public DateTime JIFTIH_InvoiceDate { get; set; }
 
         [Display(Name = "Material Segregation")]
-        public long FRTIH_MS_Number { get; set; }
+        public long JIFTIH_MS_Number { get; set; }
 
         [Display(Name = "Category")]
         [StringLength(20)]
-        public string FRTIH_SourceCategory { get; set; } = "DELIVERY NOTE";
+        public string JIFTIH_SourceCategory { get; set; } = "DELIVERY NOTE";
 
         [Display(Name = "JW Customer")]
-        public long FRTIH_JW_Customer_Number { get; set; }
-        public string FRTIH_JW_Customer_Name { get; set; }
+        public long JIFTIH_JW_Customer_Number { get; set; }
+        public string JIFTIH_JW_Customer_Name { get; set; }
 
         [Display(Name = "Currency")]
-        public long FRTIH_Currency_Number { get; set; }
+        public long JIFTIH_Currency_Number { get; set; }
 
         [Display(Name = "Tax Cluster")]
-        public long FRTIH_TCT_Number { get; set; }
+        public long JIFTIH_TCT_Number { get; set; }
 
         [Display(Name = "Payment Terms")]
         [StringLength(50)]
-        public string FRTIH_PaymentTerms { get; set; }
+        public string JIFTIH_PaymentTerms { get; set; }
 
         [Display(Name = "Method of payment")]
         [StringLength(50)]
-        public string FRTIH_PaymentMethod { get; set; }
+        public string JIFTIH_PaymentMethod { get; set; }
 
         [Display(Name = "Remarks")]
         [StringLength(250)]
-        public string FRTIH_Remarks { get; set; }
+        public string JIFTIH_Remarks { get; set; }
     }
-
     public class FreightInvoiceItem_DTO
     {
-        public long FRTII_FRTIH_Number { get; set; }
+        public long JIFTII_JIFTIH_Number { get; set; }
 
-        public long JIDNI_Number { get; set; }
+        public long JIFTII_JIDNI_Number { get; set; }
 
-        public long FRTII_Number { get; set; }
+        public long JIFTII_Number { get; set; }
 
         [Display(Name = "Delivery Note")]
-        public long FRTII_JIDNH_Number { get; set; }
+        public long JIFTII_JIDNH_Number { get; set; }
 
         [Display(Name = "Freight No")]
         [StringLength(50)]
-        public string FRTII_ServiceOrder_Number { get; set; }
+        public string JIFTII_JISVOH_Number { get; set; }
 
         [Display(Name = "PRS Number")]
-        public long FRTII_PRS_Number { get; set; }
+        public long JIFTII_PRS_Number { get; set; }
 
         [Display(Name = "Item")]
-        public long FRTII_Item_Number { get; set; }
+        public long JIFTII_Item_Number { get; set; }
 
         [Display(Name = "UOM")]
-        public long FRTII_UoM_Number { get; set; }
+        public long JIFTII_UoM_Number { get; set; }
 
         [Display(Name = "Qty")]
-        public double FRTII_Qty { get; set; }
+        public double JIFTII_Qty_Kgs { get; set; }
 
-        [Display(Name = "Unit Price")]
-        public double FRTII_UnitPrice { get; set; }
+        [Display(Name = "Rate")]
+        public double JIFTII_Rate { get; set; }
 
         [Display(Name = "Amount")]
-        public double FRTII_Amount { get; set; }
+        public double JIFTII_Amount { get; set; }
 
         [Display(Name = "SAC")]
-        public long FRTII_SAC_Number { get; set; }
+        public long JIFTII_SAC_Number { get; set; }
 
         [Display(Name = "GST Amount")]
-        public double FRTII_GST_Amount { get; set; }
+        public double JIFTII_GST_Amount { get; set; }
 
-        public long JISVOI_Number { get; set; }        // NEW: SO Item ID, mirrors JWI's linkage
-
-        [StringLength(20)]
-        public string FRTII_SO_Assign { get; set; }     // NEW: 'DELIVERY NOTE' / 'INVOICE', mirrors JISVII_SO_Assign
+        public long JIFTII_JISVOI_Number { get; set; }
 
         [StringLength(20)]
-        public string FRTII_SourceCategory { get; set; } = "DELIVERY NOTE";   // NEW: 'DELIVERY NOTE' / 'RECEIPT NOTE'
+        public string JIFTII_SVO_Assign { get; set; }
+
+        [StringLength(20)]
+        public string JIFTII_SourceCategory { get; set; } = "DELIVERY NOTE";
+
+        [Display(Name = "From Warehouse")]
+        public long? JIFTII_FromWH_Number { get; set; }
+
+        [Display(Name = "To Warehouse")]
+        public long? JIFTII_ToWH_Number { get; set; }
     }
-
     public class FreightInvoiceAddress_DTO
     {
-        public long FRTIA_FRTIH_Number { get; set; }
+        public long JIFTIA_FRTIH_Number { get; set; }
 
-        public long FRTIA_Number { get; set; }
+        public long JIFTIA_Number { get; set; }
 
         [Display(Name = "Address Type")]
-        public long FRTIA_ADTP_Number { get; set; }
+        public long JIFTIA_ADTP_Number { get; set; }
 
         [Display(Name = "Address ID")]
         [StringLength(100)]
-        public string FRTIA_Address_ID { get; set; }
+        public string JIFTIA_Address_ID { get; set; }
 
         [Display(Name = "Address")]
         [StringLength(1000)]
-        public string FRTIA_Address { get; set; }
+        public string JIFTIA_Address { get; set; }
 
         [Display(Name = "City")]
         [StringLength(100)]
-        public string FRTIA_City { get; set; }
+        public string JIFTIA_City { get; set; }
 
         [Display(Name = "State")]
         [StringLength(100)]
-        public string FRTIA_State { get; set; }
+        public string JIFTIA_State { get; set; }
 
         [Display(Name = "Country")]
         [StringLength(100)]
-        public string FRTIA_Country { get; set; }
+        public string JIFTIA_Country { get; set; }
 
         [Display(Name = "PIN")]
         [StringLength(40)]
-        public string FRTIA_PIN { get; set; }
+        public string JIFTIA_PIN { get; set; }
 
         [Display(Name = "GSTIN")]
         [StringLength(60)]
-        public string FRTIA_GSTIN { get; set; }
+        public string JIFTIA_GSTIN { get; set; }
     }
-
     public class FreightInvoiceGST_DTO
     {
-        public long FRTIG_FRTIH_Number { get; set; }
+        public long JIFTIG_JIFTIH_Number { get; set; }
 
-        public long FRTIG_FRTII_Number { get; set; }
+        public long JIFTIG_JIFTII_Number { get; set; }
 
-        public long FRTIG_Number { get; set; }
+        public long JIFTIG_Number { get; set; }
 
         [Display(Name = "Index")]
-        public int FRTIG_Index { get; set; }
+        public int JIFTIG_Index { get; set; }
 
         [Display(Name = "GST Category")]
-        public long FRTIG_GSTC_Number { get; set; }
+        public long JIFTIG_GSTC_Number { get; set; }
 
         [Display(Name = "GST Type")]
-        public long FRTIG_GSTT_Number { get; set; }
+        public long JIFTIG_GSTT_Number { get; set; }
 
         [Display(Name = "GST Element")]
-        public long FRTIG_GSTE_Number { get; set; }
+        public long JIFTIG_GSTE_Number { get; set; }
 
         [Display(Name = "Assessable Value")]
-        public double FRTIG_AssessableValue { get; set; }
+        public double JIFTIG_AssessableValue { get; set; }
 
         [Display(Name = "Percent")]
-        public double FRTIG_Percent { get; set; }
+        public double JIFTIG_Percent { get; set; }
 
         [Display(Name = "GST Amount")]
-        public double FRTIG_GST_Amount { get; set; }
+        public double JIFTIG_GST_Amount { get; set; }
     }
-
     public class FreightInvoiceCreate_DTO
     {
         public FreightInvoiceCreate_DTO()
@@ -189,11 +191,11 @@ namespace ERP_DTO.JobInwardTransaction
 
     public class FreightInvoiceDetail_DTO
     {
-        public long FRTIH_Number { get; set; }
+        public long JIFTIH_Number { get; set; }
 
-        public string? FRTIH_InvoiceNo { get; set; }
+        public string? JIFTIH_InvoiceNo { get; set; }
 
-        public string? FRTIH_InvoiceDate { get; set; }
+        public string? JIFTIH_InvoiceDate { get; set; }
 
         public long JIDNH_MS_Number { get; set; }
 
@@ -212,12 +214,11 @@ namespace ERP_DTO.JobInwardTransaction
         public string? CurrencyCode { get; set; }
 
         public string? TaxCluster { get; set; }
+        public decimal JIFTII_Qty_Kgs { get; set; }
 
-        public decimal FRTII_Qty { get; set; }
+        public decimal JIFTII_Amount { get; set; }
 
-        public decimal FRTII_Amount { get; set; }
-
-        public decimal FRTII_GST_Amount { get; set; }
+        public decimal JIFTII_GST_Amount { get; set; }
 
         public string? Segregation { get; set; }
 
@@ -246,11 +247,11 @@ namespace ERP_DTO.JobInwardTransaction
 
     public class FreightInvoiceSummary_DTO
     {
-        public long FRTIH_Number { get; set; }
+        public long JIFTIH_Number { get; set; }
 
-        public string? FRTIH_InvoiceNo { get; set; }
+        public string? JIFTIH_InvoiceNo { get; set; }
 
-        public string? FRTIH_InvoiceDate { get; set; }
+        public string? JIFTIH_InvoiceDate { get; set; }
 
         public string? DN_List { get; set; }
         public string? DN_Count { get; set; }

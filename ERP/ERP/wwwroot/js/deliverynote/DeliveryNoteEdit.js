@@ -228,7 +228,7 @@ function ResizeColumns() {
     });
 }
 
- 
+
 const ItemTableFields = [
     { cls: ".JIDNI_PRS_Number", min: 10, max: 25, align: "left" },
     { cls: ".JIDNI_Item_Code", min: 10, max: 15, align: "left" },
@@ -252,9 +252,11 @@ const ItemTableFields = [
     { cls: ".JIDNI_UnitPrice", min: 10, max: 20, align: "right" },
     { cls: ".JIDNI_Amount", min: 13, max: 25, align: "right" },
 
-     
-    { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" } ,// Extra field
-    { cls: ".Freight_ServiceOrder_Number", min: 10, max: 25, align: "left" }
+
+    { cls: ".JISVOH_Number", min: 10, max: 25, align: "left" },// Extra field
+    { cls: ".JIDNI_FromWH", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNI_ToWH", min: 10, max: 25, align: "left" },
+    { cls: ".JIDNI_JIFRT_SVOH_Number", min: 10, max: 25, align: "left" }
 ];
 //#region batch grid alignment
 
@@ -553,12 +555,12 @@ function getTextWidth(text, element) {
 
     return Math.ceil(ctx.measureText(text).width);
 }
-  
+
 //#endregion
 
 
 //#region COMMON FUNCTIONS
- 
+
 function DecimalIndianRupees(value) {
     if (value === "" || isNaN(value)) {
         return "0.00";
@@ -635,17 +637,72 @@ function AutoFit() {
     fitInputWidth("Header_JIDNH_DespatchedThrough", 30, 40);
     fitInputWidth("Header_JIDNH_Remarks", 40, 40);
 }
+// Header Freight Applicable toggle (show/hide item-grid freight columns)
+function ToggleFreightColumns_DN() {
+    let isFreight = $("#Header_Freight_Applicable").is(":checked");
+
+    let freightCols = ".FreightApplicableHeader, .FreightApplicableCell, .FreightApplicableFooterCell, " +
+        ".FromWHHeader, .FromWHCell, .FromWHFooterCell, " +
+        ".ToWHHeader, .ToWHCell, .ToWHFooterCell, " +
+        ".FreightSOHeader, .FreightSOCell, .FreightSOFooterCell";
+
+    if (isFreight) {
+        $(freightCols).show();
+    } else {
+        $(freightCols).hide();
+    }
+}
+
+$(document).on("change", "#Header_Freight_Applicable", function () {
+    ToggleFreightColumns_DN();
+
+    // When turning Freight off at the header level, clear every row's
+    // own Freight Applicable flag too — otherwise the row-level 'Yes'
+    // persists in the DB and re-checks the header on next reload
+    if (!$(this).is(":checked")) {
+        $("#ItemTable tbody tr.NewRow").each(function () {
+            let row = $(this);
+            row.find(".JIDNI_IsFreightApplicable").prop("checked", false);
+            row.find(".JIDNI_FromWH").val("");
+            row.find(".JIDNI_ToWH").val("");
+            row.find(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
+            row.find(".JIDNI_JIFRT_SVOI_Number_Row").val("0");
+        });
+    }
+});
+
 $(document).ready(function () {
-    // NEW: page load ஆகும்போதே, ஏற்கனவே Freight_Applicable=checked rows-க்கு
-    // dropdown options populate பண்ணு — "change" event காத்திருக்காம
+    // Auto-check header toggle if any saved row already has Freight
+    // Applicable checked — otherwise the freight columns stay hidden
+    // even though the data needs them shown
+    if ($("#ItemTable tbody tr.NewRow .JIDNI_IsFreightApplicable:checked").length > 0) {
+        $("#Header_Freight_Applicable").prop("checked", true);
+    }
+
+    // Freight columns show/hide on load, based on header checkbox
+    ToggleFreightColumns_DN();
+
     $("#ItemTable tbody tr.NewRow").each(function () {
         let row = $(this);
-        if (row.find(".Freight_Applicable").is(":checked")) {
-            BindFreightServiceOrder(
+        if (row.find(".JIDNI_JW_InvoiceTracking").is(":checked")) {
+            BindServiceOrder(
                 row,
                 $("#Header_JIDNH_JW_Customer_Number").val(),
+                row.find(".JIDNI_PRS_Number").val(),
                 row.find(".JIDNI_Item_Number").val(),
                 row.find(".JIDNI_UoM_Number").val()
+            );
+        }
+    });
+
+    $("#ItemTable tbody tr.NewRow").each(function () {
+        let row = $(this);
+        if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
+            BindFreightServiceOrder_DN(
+                $("#Header_JIDNH_JW_Customer_Number").val(),
+                row.find(".JIDNI_UoM_Number").val(),
+                row.find(".JIDNI_FromWH").val(),
+                row.find(".JIDNI_ToWH").val()
             );
         }
     });
@@ -691,8 +748,8 @@ $(document).ready(function () {
             ResizeAddressColumns();
         });
     //#endregion
-   
-  
+
+
     //#region batch grid alignment
     $(document).on("input change blur", "#DeliveryNoteBatchList input, #DeliveryNoteBatchList textarea, #DeliveryNoteBatchList select", function () {
         ApplyBatchFieldWidths("#DeliveryNoteBatchList");
@@ -709,7 +766,7 @@ $(document).ready(function () {
     ApplyOtherBatchFieldWidths("#DeliveryNoteOtherBatchList");
     //#endregion
     //#region item grid alignment
-  
+
 
     $(document).on("input", "#ItemTable input", function () {
         ResizeColumns();
@@ -746,7 +803,7 @@ $(document).ready(function () {
 
     //#endregion
 
-   
+
     //#region JIDNI_JW_InvoiceTracking change
 
     $(document).on(
@@ -770,54 +827,47 @@ $(document).ready(function () {
         }
     );
 
-    // NEW: mirrors the JIDNI_JW_InvoiceTracking handler above, for Freight_Applicable
-
-
+    // Freight Applicable change handler — auto-refresh Freight SO dropdown
     $(document).on(
         "change",
-        ".Freight_Applicable, .JIDNI_Item_Code, .JIDNI_UoM_Number",
+        ".JIDNI_IsFreightApplicable, .JIDNI_UoM_Number, .JIDNI_FromWH, .JIDNI_ToWH",
         function () {
 
             let row = $(this).closest("tr");
 
-            if (row.find(".Freight_Applicable").is(":checked")) {
-                BindFreightServiceOrder(
-                    row,
+            if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
+                BindFreightServiceOrder_DN(
                     $("#Header_JIDNH_JW_Customer_Number").val(),
-                    row.find(".JIDNI_Item_Number").val(),
-                    row.find(".JIDNI_UoM_Number").val()
+                    row.find(".JIDNI_UoM_Number").val(),
+                    row.find(".JIDNI_FromWH").val(),
+                    row.find(".JIDNI_ToWH").val()
                 );
             } else {
-                row.find(".Freight_ServiceOrder_Number").html('<option value="0"></option>');
+                row.find(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
             }
         }
     );
 
-    function BindFreightServiceOrder(row, customerId, itemNumber = null, uomNumber = null) {
-
-        let dropdown = row.find(".Freight_ServiceOrder_Number");
-        // CHANGED: read the saved value from the data attribute (set by
-        // Razor at page render), not from the dropdown itself — the
-        // dropdown is empty on first load, so .val() would return nothing
-        let selectedValue = dropdown.attr("data-saved-value") || dropdown.val();
-
-        dropdown.html('<option value="0"></option>');
-
+    // Renamed vs Create's BindFreightServiceOrder to avoid clashing with
+    // BindServiceOrder below (different signature, different endpoint)
+    function BindFreightServiceOrder_DN(customerId, uomNumber = null, fromWHNumber = null, toWHNumber = null) {
+        $(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
         if (!customerId) return;
 
-        $.get("/DeliveryNote/GetServiceOrder",
-            { customerId, prsNumber: FREIGHT_PRS_NUMBER, itemNumber, uomNumber },
-            function (data) {
+        $.get("/deliverynote/transactions/deliverynote/get-freight-service-order",
+            { customerId, uomNumber, fromWHNumber, toWHNumber },
+            data => {
+                // Reset again right here, immediately before appending —
+                // guards against duplicate options from overlapping calls
+                $(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
 
-                $.each(data, function (_, item) {
+                $.each(data, (_, item) => {
                     if (!item.value || item.value === "" || item.value === "0") return;
 
-                    dropdown.append(
-                        `<option value="${item.value}">${item.text}</option>`
-                    );
+                    $(".JIDNI_JIFRT_SVOH_Number").append(
+                        `<option value="${item.value}" data-jisvoi="${item.jisvoiNumber || 0}">${item.text}</option>`
+                    )
                 });
-
-                dropdown.val(selectedValue);
             }
         );
     }
@@ -825,7 +875,10 @@ $(document).ready(function () {
     function BindServiceOrder(row, customerId, prsNumber = null, itemNumber = null, uomNumber = null) {
 
         let dropdown = row.find(".JISVOH_Number");
-        let selectedValue = dropdown.val(); // existing selected value
+        // ViewBag.SON is empty server-side (pre-existing gap), so the
+        // dropdown never has a real pre-selected value — read the saved
+        // value from the data attribute set at Razor render time instead
+        let selectedValue = dropdown.attr("data-saved-value") || dropdown.val();
 
         dropdown.html('<option value="0"></option>');
 
@@ -834,6 +887,12 @@ $(document).ready(function () {
         $.get("/DeliveryNote/GetServiceOrder",
             { customerId, prsNumber, itemNumber, uomNumber },
             function (data) {
+
+                // Reset again right here, immediately before appending —
+                // guards against duplicate options if this function was
+                // triggered more than once for the same row before the
+                // first AJAX call returned (race condition)
+                dropdown.html('<option value="0"></option>');
 
                 $.each(data, function (_, item) {
                     // NEW: skip entries with no real value/text — server
@@ -862,8 +921,9 @@ $(document).ready(function () {
                 row.find(".JIDNI_IsDeleted").val() === "true") return;
 
             let rowSO = row.find(".JISVOH_Number").val() || 0;
+            let rowFreightSO = row.find(".JIDNI_JIFRT_SVOH_Number").val() || 0;
 
-            if (rowSO == jisvohNumber) {
+            if (rowSO == jisvohNumber || rowFreightSO == jisvohNumber) {
                 total += parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
             }
         });
@@ -963,39 +1023,33 @@ $(document).ready(function () {
         });
     });
 
-    // NEW: mirrors the .JISVOH_Number change handler above, using the
-    // dedicated Freight endpoint (CheckDeliveredQtyExceededFreight) and
-    // the JISVOI_Number_FRT field per the confirmed SP logic
-    $(document).on("change", ".Freight_ServiceOrder_Number", function () {
+    // Freight Qty-Exceeded validation — mirrors Create's change handler
+    $(document).on("change", ".JIDNI_JIFRT_SVOH_Number", function () {
 
         let row = $(this).closest("tr");
         let freightSO = $(this).val();
-        row.find(".Freight_ServiceOrder_Number").val(freightSO)
-        let itemNumber = row.find(".JIDNI_Item_Number").val();
+
+        // capture SO item id for JIDNI_JIFRT_SVOI_Number (needed for the
+        // qty-exceeded calc, same as GetOtherRowsQtyForSO linkage)
+        let selectedJisvoi = $(this).find("option:selected").attr("data-jisvoi") || 0;
+        row.find(".JIDNI_JIFRT_SVOI_Number_Row").val(selectedJisvoi);
+
+        if (!freightSO || freightSO === "0") return;
+
         let uomNumber = row.find(".JIDNI_UoM_Number").val();
+        let fromWHNumber = row.find(".JIDNI_FromWH").val();
+        let toWHNumber = row.find(".JIDNI_ToWH").val();
         let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
 
-        if (!freightSO || freightSO === "0") return;
-
-        // NEW: fetch and store the SO Item ID for Freight — feeds
-        // JISVOI_Number_FRT, needed by the SP's DN-side calculation
-        $.get("/FreightInvoice/GetServiceOrderItemInfo", {
-            Freight_ServiceOrder_Number: freightSO,
-            PRS_Number: FREIGHT_PRS_NUMBER,
-            Item_Number: itemNumber,
-            UoM_Number: uomNumber
-        }, function (soRes) {
-            row.find(".JISVOI_Number_FRT_Row").val(soRes && soRes.jisvoI_Number ? soRes.jisvoI_Number : 0);
-        });
-
-        $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+        $.get("/deliverynote/transactions/deliverynote/check-delivered-qty-exceeded-freight-new", {
             jisvohNumber: freightSO,
-            prsNumber: FREIGHT_PRS_NUMBER,
-            itemNumber,
-            uomNumber
+            uomNumber,
+            fromWHNumber,
+            toWHNumber
         }, function (res) {
 
             if (!res || res.length === 0) return;
+
             let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
             let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
 
@@ -1008,41 +1062,7 @@ $(document).ready(function () {
                     row.find(".JIDNI_Qty")
                         .focus()
                         .select();
-                    row.find(".Freight_ServiceOrder_Number").val("0");
-                }, 300);
-            }
-        });
-    });
-
-    $(document).on("focusout", ".JIDNI_Qty", function () {
-
-        let row = $(this).closest("tr");
-        let freightSO = row.find(".Freight_ServiceOrder_Number").val();
-        if (!freightSO || freightSO === "0") return;
-        let itemNumber = row.find(".JIDNI_Item_Number").val();
-        let uomNumber = row.find(".JIDNI_UoM_Number").val();
-        let originalQty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
-
-        $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
-            jisvohNumber: freightSO,
-            prsNumber: FREIGHT_PRS_NUMBER,
-            itemNumber,
-            uomNumber
-        }, function (res) {
-            if (!res || res.length === 0) return;
-            let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
-            let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
-
-            let otherRowsQty = GetOtherRowsQtyForSO(freightSO, row);
-            let realDeliveredQty = deliveredQty + otherRowsQty;
-
-            if ((realDeliveredQty + originalQty) > jisvoiQty) {
-                alert("Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty));
-                setTimeout(function () {
-                    row.find(".JIDNI_Qty")
-                        .focus()
-                        .select();
-                    row.find(".Freight_ServiceOrder_Number").val("0");
+                    row.find(".JIDNI_JIFRT_SVOH_Number").val("0");
                 }, 300);
             }
         });
@@ -1075,7 +1095,7 @@ $(document).ready(function () {
         }, 10);
     });
 
-    
+
     //#endregion
 
     //#region CLOSE DELIVERY NOTE BATCH MODAL
@@ -1096,9 +1116,9 @@ $(document).ready(function () {
 
     //#endregion
 
-   
 
- 
+
+
 
     //#region Initialize Flatpickr
     InitializeGstFlatpickrs();
@@ -1308,7 +1328,7 @@ $(document).ready(function () {
 
                 el.val("");
             }
-         
+
             // SELECT
             else if (el.is("select")) {
 
@@ -1360,7 +1380,7 @@ $(document).ready(function () {
 
     //#endregion Edit add row item grid
 
-  
+
 
     //#region remove checked rows
     $("#RemoveItemRowButton_Edit").on("click", function () {
@@ -1399,7 +1419,7 @@ $(document).ready(function () {
                 ) + 1;
             let currentRow_temp = $(this).closest("tr");
 
-            
+
 
             // Get values from current row
             let JIDNI_Number = currentRow_temp.find(".JIDNI_Number").val();
@@ -1413,7 +1433,7 @@ $(document).ready(function () {
 
             let DBCH_DBCH_Number =
                 currentRow_temp.find(".JIDNI_DBCH_Number").val();
-         
+
 
             deletedRows.push({
                 ItemGridindex: ItemGridindex,
@@ -1464,7 +1484,7 @@ $(document).ready(function () {
 });
 
 
-let DeliveryNoteBatchList_Edit  = [];
+let DeliveryNoteBatchList_Edit = [];
 let DeliveryNoteItemBatchList_Edit = [];
 let CurrentBatchItemRow_Edit = null;
 let CurrentItemGridRowIndex = 0;
@@ -1486,7 +1506,7 @@ function calculateTotal() {
             return;
         }
 
-        
+
         // Get Qty
         let qty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
 
@@ -1916,7 +1936,7 @@ function SearchEditItemJIDNI(inputElement) {
 
                     table.find("tbody").append(tr);
                 });
-                resultsDiv.append(table); 
+                resultsDiv.append(table);
                 resultsDiv.append(`
 <div id="ItemMessage"
      style="
@@ -1981,7 +2001,7 @@ function SearchEditItemJIDNI(inputElement) {
 
                 //#endregion
                 //resultsDiv.append(closeButton);
-              
+
 
             } else {
                 resultsDiv.append(GetItemEmptyView());
@@ -2034,13 +2054,13 @@ function DeleteItemRowTempTable(inputElement) {
 
 //#endregion
 
- 
+
 
 //#region Edit grid
 function EditItemRowTempTable(DBCH_Item_Number, n_warehouse, JINDI_Number, JINDH_Number, DBCH_Index) {
 
- 
- 
+
+
     $.ajax({
 
         url: '/DeliveryNote/TempDeliveryBatchEditChangeItemDBRow',
@@ -2052,7 +2072,7 @@ function EditItemRowTempTable(DBCH_Item_Number, n_warehouse, JINDI_Number, JINDH
         success: function (response) {
 
             calculateTotal();
-          
+
         },
 
         error: function (xhr) {
@@ -2060,7 +2080,7 @@ function EditItemRowTempTable(DBCH_Item_Number, n_warehouse, JINDI_Number, JINDH
             console.log(xhr.responseText);
         }
     });
-} 
+}
 
 //#endregion
 
@@ -2071,7 +2091,7 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
 
     e.preventDefault();
     //console.log("ROW ID :", rowID);
-  
+
 
     let checkedCheckbox = $(".CheckItem:checked");
 
@@ -2092,7 +2112,7 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
     let selectedRow = checkedCheckbox.closest("tr");
 
     CurrentBatchItemRow_Edit = selectedRow;
-    
+
 
     //let ItemGridindex =
     //    CurrentBatchItemRow_Edit.closest("tbody")
@@ -2115,7 +2135,7 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
     let jIDNI_Number =
         selectedRow.find(".JIDNI_Number").val();
     G_JINI_Number = jIDNI_Number;
-   
+
 
     let invoiceQty =
         selectedRow.find(".JIDNI_Qty").val();
@@ -2137,78 +2157,78 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
         .find(".DeliveryNoteBatchRow")
         .remove();
 
-   
 
-        //#region AJAX
 
-        $.ajax({
+    //#region AJAX
 
-            url: "/DeliveryNote/GetBatchDetailsEdit",
+    $.ajax({
 
-            type: "GET",
+        url: "/DeliveryNote/GetBatchDetailsEdit",
 
-            data: {
-                FromWarehouse: fromWarehouse,
-                LineItem_Number: lineItemNumber,
-                JIDNI_Number: jIDNI_Number,
-                ItemGridIndex: ItemGridindex,               
-                JIDNH_Number: G_JINH_Number
-            },
+        type: "GET",
 
-            success: function (response) {
+        data: {
+            FromWarehouse: fromWarehouse,
+            LineItem_Number: lineItemNumber,
+            JIDNI_Number: jIDNI_Number,
+            ItemGridIndex: ItemGridindex,
+            JIDNH_Number: G_JINH_Number
+        },
 
-                console.log(response);
+        success: function (response) {
 
-                DeliveryNoteBatchList_Edit = [];
+            console.log(response);
 
-                if (response && response.length > 0) {
+            DeliveryNoteBatchList_Edit = [];
 
-                    $.each(response, function (i, batch) {
+            if (response && response.length > 0) {
 
-                        DeliveryNoteBatchList_Edit.push({
+                $.each(response, function (i, batch) {
 
-                            JIDNI_BCH_WH_Number: batch.fromWarehouse,
-                            JIDNI_BCH_JIDNI_Number: lineItemNumber,
-                            JIDNI_BCH_WH_Name: batch.wareHouseCode,
-                            JIDNI_BCH_BatchDate: batch.batchDate,
-                            JIDNI_BCH_BatchNo: batch.batchNo,
-                            JIDNI_BCH_QtyAvailable: batch.availableQty,
-                            JIDNI_BCH_QtyReserved: batch.reservedQty,
-                            JIDNI_BCH_QtyInvoice: batch.deliveredQty,
-                            JIDNI_BCH_BatchUnitPrice: batch.batchUnitPrice,
-                            JIDNI_BCH_BatchValue: batch.batchValue,
-                            JIDNI_BCH_Number: batch.lineBatch_Number,
-                            JIDNI_Number: G_JINI_Number,
-                            JIDNH_Number: G_JINH_Number,
-                            RefBatch_Number: batch.refBatch_Number
-                        });
+                    DeliveryNoteBatchList_Edit.push({
 
+                        JIDNI_BCH_WH_Number: batch.fromWarehouse,
+                        JIDNI_BCH_JIDNI_Number: lineItemNumber,
+                        JIDNI_BCH_WH_Name: batch.wareHouseCode,
+                        JIDNI_BCH_BatchDate: batch.batchDate,
+                        JIDNI_BCH_BatchNo: batch.batchNo,
+                        JIDNI_BCH_QtyAvailable: batch.availableQty,
+                        JIDNI_BCH_QtyReserved: batch.reservedQty,
+                        JIDNI_BCH_QtyInvoice: batch.deliveredQty,
+                        JIDNI_BCH_BatchUnitPrice: batch.batchUnitPrice,
+                        JIDNI_BCH_BatchValue: batch.batchValue,
+                        JIDNI_BCH_Number: batch.lineBatch_Number,
+                        JIDNI_Number: G_JINI_Number,
+                        JIDNH_Number: G_JINH_Number,
+                        RefBatch_Number: batch.refBatch_Number
                     });
 
-                } else {
+                });
 
-                    DeliveryNoteBatchList_Edit.push({});
-                }
+            } else {
 
-                BindDeliveryNoteBatchTable();
-                BindOtherBatch(fromWarehouse, lineItemNumber, ItemGridindex);
-
-                $("#DeliveryNoteBatchModal").modal("show");
-            },
-
-            error: function (xhr, status, error) {
-
-                console.log("Status:", status);
-                console.log("Error:", error);
-                console.log("Response Text:", xhr.responseText);
-
-                alert("Error loading batch details");
+                DeliveryNoteBatchList_Edit.push({});
             }
 
-        });
+            BindDeliveryNoteBatchTable();
+            BindOtherBatch(fromWarehouse, lineItemNumber, ItemGridindex);
 
-        //#endregion
- 
+            $("#DeliveryNoteBatchModal").modal("show");
+        },
+
+        error: function (xhr, status, error) {
+
+            console.log("Status:", status);
+            console.log("Error:", error);
+            console.log("Response Text:", xhr.responseText);
+
+            alert("Error loading batch details");
+        }
+
+    });
+
+    //#endregion
+
 
 });
 
@@ -2279,7 +2299,7 @@ function BindDeliveryNoteBatchTable() {
             row.find(".JIDNI_BCH_QtyInvoice").val(addComma(data.JIDNI_BCH_QtyInvoice, "q"));
             row.find(".JIDNI_BCH_BatchUnitPrice").val(addComma(data.JIDNI_BCH_BatchUnitPrice, "c"));
             row.find(".JIDNI_BCH_BatchValue").val(addComma(data.JIDNI_BCH_BatchValue, "c"));
-                
+
             row.find(".JIDNI_Number")
                 .val(data.JIDNI_Number);
 
@@ -2384,7 +2404,7 @@ function BindOtherBatch(fromWarehouse, lineItemNumber, ItemGridindex) {
         success: function (response) {
 
             console.log(response);
-            BindDeliveryNoteOtherBatchTable(response); 
+            BindDeliveryNoteOtherBatchTable(response);
 
         },
 
@@ -2584,7 +2604,7 @@ function SaveTempBatch_Edit() {
             return;
 
         let rowID = CurrentBatchItemRow_Edit.closest("tr").attr("data-rowid");
-  
+
         let checkedCheckbox = $(".CheckItem:checked");
 
         //#region VALIDATION
@@ -2605,7 +2625,7 @@ function SaveTempBatch_Edit() {
 
         CurrentBatchItemRow_Edit = selectedRow;
 
-        
+
         let ItemGridindex =
             checkedCheckbox.closest("tr")
                 .index("#ItemTable tbody tr.NewRow:visible") + 1;
@@ -2613,7 +2633,7 @@ function SaveTempBatch_Edit() {
         CurrentItemGridRowIndex = ItemGridindex;
 
 
-     
+
 
         let model = {
             DBCH_RowGuid: rowID,
@@ -2710,7 +2730,7 @@ function SaveTempBatch_AddRow(ItemGridindex) {
 
     let selectedRow = checkedCheckbox.closest("tr");
 
-   
+
 
     //#endregion
 
@@ -2748,7 +2768,7 @@ function SaveTempBatch_AddRow(ItemGridindex) {
 
             console.log(response);
 
-            
+
         },
 
         error: function (xhr) {
@@ -2780,7 +2800,7 @@ $(document).on(
             e.preventDefault();
             return false;
         }
-    
+
 
         CloseDeliveryNoteBatchModal_Edit();
 
@@ -2878,7 +2898,7 @@ $(document).on(
 
         if (firstRecord.JIDNI_NUMBER == "") {
             SaveTempBatch_Edit();
-        } else if (parseInt(firstRecord.JIDNI_NUMBER) > 0)  {
+        } else if (parseInt(firstRecord.JIDNI_NUMBER) > 0) {
             SaveTempBatch_Edit();
         }
 
@@ -2961,9 +2981,9 @@ function validateHeaderById_Edit() {
         return false;
     }
 
-   
 
-    
+
+
     // =========================
     // GRID VALIDATION CALL
     // =========================
@@ -2983,8 +3003,8 @@ function validateHeaderById_Edit() {
         return false;
     }
 
-    
-    
+
+
 
 
     return true;
@@ -3102,6 +3122,25 @@ function validateItemGrid_Edit() {
             return false;
         }
 
+        // validate From WH / To WH when Freight Applicable is checked
+        if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
+
+            let fromWH = row.find(".JIDNI_FromWH").val();
+            let toWH = row.find(".JIDNI_ToWH").val();
+
+            if (!fromWH || fromWH === "0") {
+                showAlert("From WH is required.", row.find(".JIDNI_FromWH"));
+                isValid = false;
+                return false;
+            }
+
+            if (!toWH || toWH === "0") {
+                showAlert("To WH is required.", row.find(".JIDNI_ToWH"));
+                isValid = false;
+                return false;
+            }
+        }
+
     });
 
     // no valid row added
@@ -3171,7 +3210,7 @@ $("#btnUpdate").on("click", function (e) {
     if (!validateHeaderById_Edit()) {
         e.preventDefault();
         return false;
-    }    
+    }
     else {
 
         // Disable button
@@ -3180,9 +3219,9 @@ $("#btnUpdate").on("click", function (e) {
         var model = CreateDeliveryNoteModel_Edit();
         DeleteRemovedRows(model);
 
-       
 
-     
+
+
 
     }
 
@@ -3207,6 +3246,8 @@ function DeleteRemovedRows(model) {
         error: function (xhr) {
 
             console.log(xhr.responseText);
+            showAlert('Update failed: ' + xhr.responseText);
+            $("#btnUpdate").prop("disabled", false);
 
         }
 
@@ -3227,14 +3268,21 @@ function UpdateDeliveryNote(model) {
         success: function (response) {
 
             if (response.success) {
-             
-                showAlert('Record Updated')
-                setTimeout(function () {
+
+                showAlert('Record Updated');
+
+                // Reload only after the user clicks OK (modal hidden),
+                // not on a fixed timer
+                $('#ModelAlert').off('hidden.bs.modal').on('hidden.bs.modal', function () {
                     window.location.reload();
-                }, 1000); // 1000 ms = 1 second
-              
-                //  window.location.href = response.redirectUrl;
+                });
+
                 console.log(JSON.stringify(model));
+            } else {
+
+                console.log(response.message);
+                showAlert('Update failed: ' + response.message);
+                $("#btnUpdate").prop("disabled", false);
             }
 
 
@@ -3243,6 +3291,8 @@ function UpdateDeliveryNote(model) {
         error: function (xhr) {
 
             console.log(xhr.responseText);
+            showAlert('Update failed: ' + xhr.responseText);
+            $("#btnUpdate").prop("disabled", false);
 
         }
 
@@ -3449,28 +3499,35 @@ function CreateDeliveryNoteModel_Edit() {
             JIDNI_Amount:
                 parseFloat((row.find(".JIDNI_Amount").val() || "0").replace(/,/g, "")) || 0,
 
-            JIDNI_JW_InvoiceTracking:
+            JIDNI_IsJW_InvoiceApplicable:
                 row.find(".JIDNI_JW_InvoiceTracking").is(":checked")
                     ? "Yes"
                     : "No",
 
-            JISVOH_Number:
+            JIDNI_JIJWI_SVOH_Number:
                 parseInt(row.find(".JISVOH_Number").val()) || 0,
-            Freight_Applicable:
-                row.find(".Freight_Applicable").is(":checked")
+
+            JIDNI_IsFreightApplicable:
+                row.find(".JIDNI_IsFreightApplicable").is(":checked")
                     ? "Yes"
                     : "No",
 
-            Freight_ServiceOrder_Number:
-                row.find(".Freight_ServiceOrder_Number").val() || "",
+            JIDNI_JIFRT_SVOH_Number:
+                parseInt(row.find(".JIDNI_JIFRT_SVOH_Number").val()) || 0,
 
-            // NEW: SO Item IDs — needed by USP_CheckDeliveredQtyExceeded_Freight's
+            JIDNI_FromWH:
+                parseInt(row.find(".JIDNI_FromWH").val()) || null,
+
+            JIDNI_ToWH:
+                parseInt(row.find(".JIDNI_ToWH").val()) || null,
+
+            // SO Item IDs — needed by USP_CheckDeliveredQtyExceeded_Freight's
             // DN-side calculation
-            JISVOI_Number:
+            JIDNI_JIJWI_SVOI_Number:
                 parseInt(row.find(".JISVOI_Number_Row").val()) || 0,
 
-            JISVOI_Number_FRT:
-                parseInt(row.find(".JISVOI_Number_FRT_Row").val()) || 0
+            JIDNI_JIFRT_SVOI_Number:
+                parseInt(row.find(".JIDNI_JIFRT_SVOI_Number_Row").val()) || 0
         };
 
         items.push(item);
@@ -3636,10 +3693,10 @@ $(document).on('change', 'tr.AddNewRow select.JIDNA_ADTP_Number', function () {
 
             var AddressID = data.buyerAddressId;
             var AddressDefault = data.buyerAddress;
- 
+
             // set default + fill fields
             if (AddressDefault != null) {
-              //  $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
+                //  $AddressDropdown.val(AddressDefault.buY_ADD_AddressID);
                 ADDAddress_ID.val(AddressDefault.buY_ADD_AddressID);
                 ADDAddress.text(AddressDefault.buY_ADD_Address);
                 ADDCity.val(AddressDefault.buY_ADD_City);
@@ -3956,7 +4013,7 @@ function LoadJWCAddress() {
 
                         row.find(".JIDNA_Address_ID")
                             .val(addr.jwC_ADD_Address_ID);
-                          
+
 
 
                         row.find(".JIDNA_Address")
@@ -4006,7 +4063,7 @@ function ResizeAddressPopup(tableSelector = "#AddressTable", modalSelector = "#B
 
 //#endregion
 
- 
+
 //#region comma format on focusout - Batch WH row fields (Edit)
 $(document).on("focusout",
     ".JIDNI_BCH_QtyAvailable, .JIDNI_BCH_QtyReserved, .JIDNI_BCH_QtyInvoice, .JIDNI_BCH_BatchUnitPrice, .JIDNI_BCH_BatchValue",
@@ -4022,4 +4079,3 @@ $(document).on("focusout",
         $(this).val(addComma($(this).val(), type));
     });
 //#endregion
-

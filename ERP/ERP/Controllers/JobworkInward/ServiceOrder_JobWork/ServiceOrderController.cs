@@ -119,21 +119,49 @@ namespace ERP.Controllers.JobworkInward
             }
         }
         [HttpPost]
-        public IActionResult UpdateServiceOrder([FromBody] JI_ServiceOrder_DTO dto)
+        public IActionResult UpdateServiceOrder([FromBody] ServiceOrderUpdatePage_DTO model)
         {
             try
             {
-                if (dto == null)
-                    return Json(new { success = false, message = "DTO is null" });
+                if (model == null || string.IsNullOrEmpty(model.ServiceType))
+                {
+                    return Json(new { success = false, message = "Invalid request" });
+                }
 
-                if (dto.Header == null)
-                    return Json(new { success = false, message = "Header is null" });
+                ServiceOrder_DAO serviceOrderDAO = new ServiceOrder_DAO();
 
-                if (dto.Header.JISVOH_Number <= 0)
-                    return Json(new { success = false, message = "Invalid Service Order Number" });
+                if (model.ServiceType == "FREIGHT")
+                {
+                    if (model.FreightHeader == null)
+                        return Json(new { success = false, message = "Header is null" });
 
-                ServiceOrder_DAO dao = new ServiceOrder_DAO();
-                dao.ServiceOrderUpdateDB(dto);
+                    if (model.FreightHeader.JIFRT_SVOH_Number <= 0)
+                        return Json(new { success = false, message = "Invalid Service Order Number" });
+
+                    var freightDto = new JIFRT_ServiceOrder_DTO
+                    {
+                        Header = model.FreightHeader,
+                        Items = model.FreightItems
+                    };
+
+                    serviceOrderDAO.JIFRT_ServiceOrderUpdateDB(freightDto);
+                }
+                else // "JWI"
+                {
+                    if (model.JWIHeader == null)
+                        return Json(new { success = false, message = "Header is null" });
+
+                    if (model.JWIHeader.JIJWI_SVOH_Number <= 0)
+                        return Json(new { success = false, message = "Invalid Service Order Number" });
+
+                    var jwiDto = new JIJWI_ServiceOrder_DTO
+                    {
+                        Header = model.JWIHeader,
+                        Items = model.JWIItems
+                    };
+
+                    serviceOrderDAO.JIJWI_ServiceOrderUpdateDB(jwiDto);
+                }
 
                 return Json(new
                 {
@@ -150,7 +178,6 @@ namespace ERP.Controllers.JobworkInward
                 });
             }
         }
-
         [HttpPost]
         public IActionResult SaveServiceOrder(
 [FromBody] ServiceOrderCreatePage_DTO model)
@@ -270,13 +297,15 @@ namespace ERP.Controllers.JobworkInward
 
         }
 
-        public IActionResult Edit()
+        public IActionResult Edit(long SI_No, string OrderType)
         {
 
             GetServiceOrderData();
             ViewBag.Collapse = true;
+            ViewBag.SI_No = SI_No;
+            ViewBag.OrderType = OrderType;
 
-            return View();
+            return View("~/Views/JobworkInward/ServiceOrder/Edit.cshtml");
 
         }
         #region Service Order Summary
@@ -774,13 +803,13 @@ namespace ERP.Controllers.JobworkInward
         #region EDIT GET SERVICE ORDER JSON
 
         [HttpGet]
-        public JsonResult GetServiceOrder(long JISVOH_Number)
+        public JsonResult GetServiceOrder(long Number, string OrderType)
         {
-            ServiceOrder_DAO dao =
-                new ServiceOrder_DAO();
+            ServiceOrder_DAO dao = new ServiceOrder_DAO();
 
-            string json =
-                dao.GetServiceOrderJSON(JISVOH_Number);
+            string json = OrderType == "FREIGHT"
+                ? dao.JIFRT_GetServiceOrderJSON(Number)
+                : dao.JIJWI_GetServiceOrderJSON(Number);
 
             if (string.IsNullOrEmpty(json))
             {
@@ -791,16 +820,13 @@ namespace ERP.Controllers.JobworkInward
                 });
             }
 
-            var obj =
-                JsonSerializer.Deserialize<object>(json);
+            var obj = JsonSerializer.Deserialize<object>(json);
 
             return new JsonResult(
                 obj,
                 new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy =
-                        JsonNamingPolicy.CamelCase,
-
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     WriteIndented = true
                 });
         }
@@ -864,7 +890,7 @@ namespace ERP.Controllers.JobworkInward
 
             if (Mode == "Edit")
             {
-                return RedirectToAction("Edit", new { SI_No = SI_No });
+                return RedirectToAction("Edit", new { SI_No = SI_No, OrderType = "JWI" });
             }
 
             JIJWISOS_List = JIJWISOSummaryGetData(
@@ -1141,10 +1167,9 @@ namespace ERP.Controllers.JobworkInward
             {
                 return RedirectToAction("JIFRTServiceOrderView", new { JIFRTSVOH_Number = SI_No });
             }
-
             if (Mode == "Edit")
             {
-                return RedirectToAction("Edit", new { SI_No = SI_No });
+                return RedirectToAction("Edit", new { SI_No = SI_No, OrderType = "FREIGHT" });
             }
 
             JIFRTSOS_List = JIFRTSOSummaryGetData(SortOrder, Search, PageNumber, PSize, PageFilter);

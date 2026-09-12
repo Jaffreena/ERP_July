@@ -567,6 +567,9 @@ $(document).on("click", ".ItemBatch_F", function (e) {
 
                     $.each(response, function (i, batch) {
 
+                        let qtyInvoice = batch.deliveredQty || 0;
+                        let unitPrice = batch.batchUnitPrice || 0;
+
                         DeliveryNoteBatchList_F.push({
 
                             JIDNI_BCH_WH_Number: batch.fromWarehouse,
@@ -576,9 +579,9 @@ $(document).on("click", ".ItemBatch_F", function (e) {
                             JIDNI_BCH_BatchNo: batch.batchNo,
                             JIDNI_BCH_QtyAvailable: batch.availableQty,
                             JIDNI_BCH_QtyReserved: batch.reservedQty,
-                            JIDNI_BCH_QtyInvoice: batch.deliveredQty,
-                            JIDNI_BCH_BatchUnitPrice: batch.batchUnitPrice,
-                            JIDNI_BCH_BatchValue: batch.batchValue,
+                            JIDNI_BCH_QtyInvoice: qtyInvoice,
+                            JIDNI_BCH_BatchUnitPrice: unitPrice,
+                            JIDNI_BCH_BatchValue: (parseFloat(qtyInvoice) * parseFloat(unitPrice)) || 0,
                             JIDNI_BCH_Number: batch.lineBatch_Number
                         });
 
@@ -733,6 +736,14 @@ function BindDeliveryNoteOtherBatchTable(response) {
 
         tbody.append(row);
 
+        row.find(".JIDNI_BCH_BatchDate").flatpickr({
+            dateFormat: "d-M-Y",
+            altInput: true,
+            altFormat: "d-M-Y",
+            allowInput: true,
+            defaultDate: data.batchDate || new Date()
+        });
+
     });
     if (response.length === 0) {
         tbody.append(`
@@ -870,6 +881,14 @@ function BindDeliveryNoteBatchTable() {
                 .val(data.JIDNI_BCH_BatchValue);
 
             $("#DeliveryNoteBatchTableBody").append(row);
+
+            row.find(".JIDNI_BCH_BatchDate").flatpickr({
+                dateFormat: "d-M-Y",
+                altInput: true,
+                altFormat: "d-M-Y",
+                allowInput: true,
+                defaultDate: data.JIDNI_BCH_BatchDate || new Date()
+            });
 
         } else {
 

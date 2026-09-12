@@ -353,7 +353,7 @@ namespace ERP_DAO.JobInwardTransaction
 
 
                             using (SqlCommand cmd = new SqlCommand(@"
-         INSERT INTO JI_ConversionConsumption
+         INSERT INTO JICNV_Consumption
          (
              JICNVC_JICNVH_Number,
              JICNVC_Item_Number,
@@ -431,7 +431,7 @@ namespace ERP_DAO.JobInwardTransaction
                                 long batchNumber = 0;
 
                                 using (SqlCommand cmd = new SqlCommand(@"
-                            INSERT INTO JI_CVSN_CONS_BATCH
+                            INSERT INTO JICNV_ConsBatch
                             (
                                 JICNVC_BCH_JICNVH_Number,
                                 JICNVC_BCH_JICNVC_Number,
@@ -480,19 +480,21 @@ namespace ERP_DAO.JobInwardTransaction
                                 using (SqlCommand cmd = new SqlCommand(@"
                             INSERT INTO OUT_COMMON_BATCH
                             (
-                                TransType,
-                                Header_Number,
-                                LineItem_Number,
-                                LineBatch_Number,
-                                Warehouse,
-                                BatchDate,
-                                BatchNo,
-                                ItemStatus,
-                                BatchQty,
-                                BatchUnitPrice,
-                                BatchValue,
-                                RefBatch_Number,
-                                Item_Number
+                                OCB_TransType,
+                                OCB_Header_Number,
+                                OCB_LineItem_Number,
+                                OCB_LineBatch_Number,
+                                OCB_Warehouse_Number,
+                                OCB_BatchDate,
+                                OCB_BatchNo,
+                                OCB_ItemStatus,
+                                OCB_BatchQty,
+                                OCB_BatchUnitPrice,
+                                OCB_BatchValue,
+                                OCB_RefBatch_Number,
+                                OCB_Item_Number,
+                                OCB_CreatorCode,
+                                OCB_CreatorDate
 
                             )
 
@@ -510,13 +512,15 @@ namespace ERP_DAO.JobInwardTransaction
                                 @BatchUnitPrice,
                                 @BatchValue,
                                 @RefBatchNumber,
-                                @Item_Number
+                                @Item_Number,
+                                1,
+                                GETDATE()
                             )", con, tr))
                                 {
-                                    cmd.Parameters.AddWithValue("@TransType", "Delivery Note");
+                                    cmd.Parameters.AddWithValue("@TransType", "Conversion Consumption");
                                     cmd.Parameters.AddWithValue("@Header_Number", DN_Number);
                                     cmd.Parameters.AddWithValue("@LineItem_Number", item.ItemNumber);
-                                    cmd.Parameters.AddWithValue("@LineBatch_Number", batchNumber);
+                                    cmd.Parameters.AddWithValue("@LineBatch_Number", batch.JIDNI_BCH_Number);
                                     cmd.Parameters.AddWithValue("@Warehouse", batch.JIDNI_BCH_WH_Number);
                                     cmd.Parameters.AddWithValue("@BatchDate", batch.JIDNI_BCH_BatchDate);
                                     cmd.Parameters.AddWithValue("@BatchNo", batch.JIDNI_BCH_BatchNo);
@@ -524,7 +528,7 @@ namespace ERP_DAO.JobInwardTransaction
                                     cmd.Parameters.AddWithValue("@BatchQty", useQty);
                                     cmd.Parameters.AddWithValue("@BatchUnitPrice", batch.JIDNI_BCH_BatchUnitPrice);
                                     cmd.Parameters.AddWithValue("@BatchValue", batch.JIDNI_BCH_BatchValue);
-                                    cmd.Parameters.AddWithValue("@RefBatchNumber", batch.JIDNI_BCH_Number);
+                                    cmd.Parameters.AddWithValue("@RefBatchNumber", 0);
                                     cmd.Parameters.AddWithValue("@Item_Number", item.ItemMasterNumber);
                                     outcommon =
                                       Convert.ToInt64(cmd.ExecuteScalar());
@@ -552,7 +556,7 @@ namespace ERP_DAO.JobInwardTransaction
                             p1.SqlDbType = SqlDbType.Structured;
                             p1.TypeName = "dbo.ProductionItemType";
 
-                            DataTable dtProductionBatch = CreateProductionBatchTable(DN_DTO.ItemBatch_Production);
+                            DataTable dtProductionBatch = CreateProductionBatchTable(DN_DTO.ItemBatch_Production, DN_DTO.Items_Production);
                             SqlParameter p2 = cmd.Parameters.AddWithValue("@ProductionBatches", dtProductionBatch);
                             p2.SqlDbType = SqlDbType.Structured;
                             p2.TypeName = "dbo.ProductionBatchType";
@@ -574,7 +578,7 @@ namespace ERP_DAO.JobInwardTransaction
                             p1.SqlDbType = SqlDbType.Structured;
                             p1.TypeName = "dbo.ScrapItemType";
 
-                            DataTable dtScrapBatch = CreateScrapBatchTable(DN_DTO.ItemBatch_Scrap);
+                            DataTable dtScrapBatch = CreateScrapBatchTable(DN_DTO.ItemBatch_Scrap, DN_DTO.Items_Scrap);
                             SqlParameter p2 = cmd.Parameters.AddWithValue("@ScrapBatches", dtScrapBatch);
                             p2.SqlDbType = SqlDbType.Structured;
                             p2.TypeName = "dbo.ScrapBatchType";
@@ -615,6 +619,7 @@ namespace ERP_DAO.JobInwardTransaction
         {
             DataTable dt = new DataTable();
 
+            dt.Columns.Add("RowIndex", typeof(long));
             dt.Columns.Add("JICNVP_Item_Number", typeof(long));
             dt.Columns.Add("JICNVP_WH_Number", typeof(long));
             dt.Columns.Add("JICNVP_UoM_Number", typeof(long));
@@ -624,26 +629,30 @@ namespace ERP_DAO.JobInwardTransaction
             if (items == null)
                 return dt;
 
+            long rowIndex = 1;
+
             foreach (var item in items)
             {
                 dt.Rows.Add(
+                    rowIndex,
                     Convert.ToInt64(item.JIRNI_Item_Number),          // RENAMED: was item.Item_Number
                     Convert.ToInt64(item.JIRNI_WH_Number),             // RENAMED: was item.WH_Number
                     Convert.ToInt64(item.JIRNI_UoM_Number),            // RENAMED: was item.UoM_Number
                     "1",
                     Convert.ToDecimal(item.JIRNI_Qty)                  // RENAMED: was item.Qty
                 );
+
+                rowIndex++;
             }
 
             return dt;
         }
-
-        private DataTable CreateProductionBatchTable(List<ReceiptNoteBatch_DTO> batches)
+        private DataTable CreateProductionBatchTable(List<ReceiptNoteBatch_DTO> batches, List<ReceiptNoteItem_DTO> items)
         {
             DataTable dt = new DataTable();
 
             dt.Columns.Add("JICNVP_BCH_JICNVP_Number", typeof(long));
-
+            dt.Columns.Add("ItemMasterNumber", typeof(long));
             dt.Columns.Add("JICNVP_BCH_WH_Number", typeof(long));
             dt.Columns.Add("JICNVP_BCH_BatchDate", typeof(DateTime));
             dt.Columns.Add("JICNVP_BCH_BatchNo", typeof(string));
@@ -655,15 +664,28 @@ namespace ERP_DAO.JobInwardTransaction
             if (batches == null)
                 return dt;
 
-            long batchNo = 1;
-
             foreach (var batch in batches)
             {
-                dt.Rows.Add(
-                    batch.RNI_BCH_Item_Index + 1,
+                DateTime batchDate;
+                if (!DateTime.TryParse(Convert.ToString(batch.JIRNI_BCH_BatchDate), out batchDate) ||
+                    batchDate.Year < 1900)
+                {
+                    batchDate = DateTime.Now;
+                }
 
+                long rowIndex = batch.RNI_BCH_Item_Index + 1;
+
+                long itemMasterNumber = 0;
+                if (items != null && batch.RNI_BCH_Item_Index >= 0 && batch.RNI_BCH_Item_Index < items.Count)
+                {
+                    itemMasterNumber = Convert.ToInt64(items[(int)batch.RNI_BCH_Item_Index].JIRNI_Item_Number);
+                }
+
+                dt.Rows.Add(
+                    rowIndex,
+                    itemMasterNumber,
                     Convert.ToInt64(batch.JIRNI_BCH_WH_Number),
-                    Convert.ToDateTime(batch.JIRNI_BCH_BatchDate),      // RENAMED: was batch.RNI_BCH_Date
+                    batchDate,
                     batch.JIRNI_BCH_BatchNo,                            // RENAMED: was batch.RNI_BCH_Number
                     "1",
                     Convert.ToDecimal(batch.JIRNI_BCH_BatchQty),        // RENAMED: was batch.RNI_BCH_Qty
@@ -671,14 +693,13 @@ namespace ERP_DAO.JobInwardTransaction
                     Convert.ToDecimal(batch.JIRNI_BCH_BatchValue)       // RENAMED: was batch.RNI_BCH_Value
                 );
             }
-
             return dt;
         }
-
         private DataTable CreateScrapItemTable(List<ReceiptNoteItem_DTO> items)
         {
             DataTable dt = new DataTable();
 
+            dt.Columns.Add("RowIndex", typeof(long));
             dt.Columns.Add("JICNVS_Item_Number", typeof(long));
             dt.Columns.Add("JICNVS_WH_Number", typeof(long));
             dt.Columns.Add("JICNVS_UoM_Number", typeof(long));
@@ -687,24 +708,29 @@ namespace ERP_DAO.JobInwardTransaction
             if (items == null)
                 return dt;
 
+            long rowIndex = 1;
+
             foreach (var item in items)
             {
                 dt.Rows.Add(
+                    rowIndex,
                     Convert.ToInt64(item.JIRNI_Item_Number),          // RENAMED: was item.Item_Number
                     Convert.ToInt64(item.JIRNI_WH_Number),             // RENAMED: was item.WH_Number
                     Convert.ToInt64(item.JIRNI_UoM_Number),            // RENAMED: was item.UoM_Number
                     Convert.ToDecimal(item.JIRNI_Qty)                  // RENAMED: was item.Qty
                 );
+
+                rowIndex++;
             }
 
             return dt;
         }
-
-        private DataTable CreateScrapBatchTable(List<ReceiptNoteBatch_DTO> batches)
+        private DataTable CreateScrapBatchTable(List<ReceiptNoteBatch_DTO> batches, List<ReceiptNoteItem_DTO> items)
         {
             DataTable dt = new DataTable();
 
             dt.Columns.Add("JICNVS_BCH_JICNVS_Number", typeof(long));
+            dt.Columns.Add("ItemMasterNumber", typeof(long));
             dt.Columns.Add("JICNVS_BCH_Number", typeof(long));
             dt.Columns.Add("JICNVS_BCH_WH_Number", typeof(long));
             dt.Columns.Add("JICNVS_BCH_BatchDate", typeof(DateTime));
@@ -720,8 +746,17 @@ namespace ERP_DAO.JobInwardTransaction
 
             foreach (var batch in batches)
             {
+                long rowIndex = batch.RNI_BCH_Item_Index + 1;
+
+                long itemMasterNumber = 0;
+                if (items != null && batch.RNI_BCH_Item_Index >= 0 && batch.RNI_BCH_Item_Index < items.Count)
+                {
+                    itemMasterNumber = Convert.ToInt64(items[(int)batch.RNI_BCH_Item_Index].JIRNI_Item_Number);
+                }
+
                 dt.Rows.Add(
-                    batch.RNI_BCH_Item_Index + 1,
+                    rowIndex,
+                    itemMasterNumber,
                     batchNo++,
                     Convert.ToInt64(batch.JIRNI_BCH_WH_Number),
                     Convert.ToDateTime(batch.JIRNI_BCH_BatchDate),      // RENAMED: was batch.RNI_BCH_Date
@@ -734,7 +769,6 @@ namespace ERP_DAO.JobInwardTransaction
 
             return dt;
         }
-
         public class ItemMapDTO
         {
             public long ItemMasterNumber { get; set; }

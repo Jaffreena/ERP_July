@@ -17,7 +17,7 @@
 
                 JWI Service Order Summary
 
-                <a asp-controller="JobworkInward"
+                <a asp-controller="JobworkInwardMain"
                    asp-action="Index"
                    class="float-end btn p-0 shadow-none">
 
@@ -132,7 +132,9 @@
                                                             <input type="submit" name="Mode" id="View" disabled value="View" class="btn btn-primary" />
                                                         </div>
                                                         <div class="col-auto me-1">
-                                                            <input type="submit" name="Mode" id="Edit" value="Edit" disabled class="btn btn-primary" />
+                                                            <input type="submit" name="Mode" id="Edit" value="Edit"
+                                                                   formaction="/service-order/transactions/jijwi-service-order-summary"
+                                                                   disabled class="btn btn-primary" />
                                                         </div>
                                                         <div class="col-auto me-1">
                                                             <a class="DeleteAllButton btn btn-danger" id="Delete" disabled>

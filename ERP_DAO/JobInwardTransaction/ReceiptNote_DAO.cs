@@ -246,6 +246,7 @@ namespace ERP_DAO.JobInwardTransaction
             dtItems.Columns.Add("JIRNI_WH_Number", typeof(long));
             dtItems.Columns.Add("JIRNI_UoM_Number", typeof(long));
             dtItems.Columns.Add("JIRNI_Qty", typeof(decimal));
+            dtItems.Columns.Add("JIRNI_Qty_Kgs", typeof(decimal));     // NEW
             dtItems.Columns.Add("JIRNI_UnitPrice", typeof(decimal));
             dtItems.Columns.Add("JIRNI_Amount", typeof(decimal));
 
@@ -253,6 +254,10 @@ namespace ERP_DAO.JobInwardTransaction
             dtItems.Columns.Add("JIRNI_Freight_Applicable", typeof(string));
             dtItems.Columns.Add("JIRNI_Freight_ServiceOrder_Number", typeof(long));
             dtItems.Columns.Add("JIRNI_JISVOI_Number_FRT", typeof(long));
+
+            // NEW: FromWH / ToWH
+            dtItems.Columns.Add("JIRNI_FromWH", typeof(long));
+            dtItems.Columns.Add("JIRNI_ToWH", typeof(long));
 
             foreach (var item in RN_DTO.Items)
             {
@@ -264,11 +269,14 @@ namespace ERP_DAO.JobInwardTransaction
                     item.JIRNI_WH_Number,                   // RENAMED: was item.WH_Number
                     item.JIRNI_UoM_Number,                  // RENAMED: was item.UoM_Number
                     item.JIRNI_Qty,                         // RENAMED: was item.Qty
+                    item.JIRNI_Qty_Kgs,                     // NEW
                     item.JIRNI_UnitPrice,                   // RENAMED: was item.UnitPrice
                     item.JIRNI_Amount,                      // RENAMED: was item.Amount
                     item.JIRNI_IsFreightApplicable,         // RENAMED: was item.Freight_Applicable
                     item.JIRNI_JIFRT_SVOH_Number,           // RENAMED: was item.Freight_ServiceOrder_Number
-                    item.JIRNI_JIFRT_SVOI_Number            // RENAMED: was item.JISVOI_Number_FRT
+                    item.JIRNI_JIFRT_SVOI_Number,           // RENAMED: was item.JISVOI_Number_FRT
+                    string.IsNullOrEmpty(item.JIRNI_FromWH) ? (object)DBNull.Value : Convert.ToInt64(item.JIRNI_FromWH),  // NEW
+                    string.IsNullOrEmpty(item.JIRNI_ToWH) ? (object)DBNull.Value : Convert.ToInt64(item.JIRNI_ToWH)     // NEW
                 );
             }
 
@@ -349,6 +357,8 @@ namespace ERP_DAO.JobInwardTransaction
 
                 cmd.Parameters.AddWithValue("@JIRNH_Remarks",
                     RN_DTO.Header.JIRNH_Remarks ?? (object)DBNull.Value);                                      // RENAMED: was Header.Remarks
+
+                cmd.Parameters.AddWithValue("@JIRNH_IsFreightApplicable", RN_DTO.Header.JIRNH_IsFreightApplicable ?? "No");
 
                 cmd.Parameters.AddWithValue("@UserCode", 0);
 

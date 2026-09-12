@@ -189,7 +189,7 @@ namespace ERP.Controllers.JobworkInward
                 SON_DAO.JIFRT_SVO_NumberingDB(SON_DTO);
             }
             GetJIFRT_SVO_Number();
-            return View("~/Views/JobworkInward/ServiceOrder_Freight/JIFRT_SVO_Numbering.cshtml", SON_DTO);
+            return View("~/Views/JobworkInward/ServiceOrder_Freight/JIFRT_SVO_Number/JIFRT_SVO_Numbering.cshtml", SON_DTO);
         }
 
         [HttpPost]

@@ -315,7 +315,7 @@ namespace ERP_DTO.JobInwardTransaction
         public decimal JIDNI_Qty { get; set; }
         public decimal JIDNI_Amount { get; set; }
 
-        public string JIDNI_JW_InvoiceTracking { get; set; }
+        public string JIDNI_IsJW_InvoiceApplicable { get; set; }
     }
     public class OutCommonBatch_DTO
     {
