@@ -25,6 +25,7 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIRN_DFS_Currency_Number", DbType.Int64, DTO.JIRNH_Currency_Number);
             Db.AddInParameter(DbC, "@JIRN_DFS_WH_Number", DbType.Int64, DTO.JIRNH_WH_Number);
             Db.AddInParameter(DbC, "@JIRN_DFS_Remarks", DbType.String, DTO.JIRNH_Remarks);
+            Db.AddInParameter(DbC, "@JIRN_DFS_IsFreightApplicable", DbType.String, DTO.JIRNH_IsFreightApplicable);
 
             // Output Parameters
             Db.AddOutParameter(DbC, "@Result_Number", DbType.Int32, 4);
@@ -70,6 +71,7 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIDN_DFS_DespatchDocument", DbType.String, DTO.JIDNH_DespatchDocument);
             Db.AddInParameter(DbC, "@JIDN_DFS_DespatchedThrough", DbType.String, DTO.JIDNH_DespatchedThrough);
             Db.AddInParameter(DbC, "@JIDN_DFS_Remarks", DbType.String, DTO.JIDNH_Remarks);
+            Db.AddInParameter(DbC, "@JIDN_DFS_IsFreightApplicable", DbType.String, DTO.JIDNH_IsFreightApplicable);
 
             // Output Parameters
             Db.AddOutParameter(DbC, "@Result_Number", DbType.Int32, 4);
@@ -191,7 +193,7 @@ namespace ERP_DAO.JobInwardTransaction
             // Input Parameters
             Db.AddInParameter(DbC, "@DFS_JICNVH_SFT_Number", DbType.Int64, DTO.JICNVH_SFT_Number);
             Db.AddInParameter(DbC, "@DFS_JICNVH_WC_Number", DbType.Int64, DTO.JICNVH_WC_Number);
-            Db.AddInParameter(DbC, "@DFS_JICNVH_Operator", DbType.Int64, DTO.JICNVH_Operator);
+            Db.AddInParameter(DbC, "@DFS_JICNVH_Operator", DbType.String, DTO.JICNVH_Operator);
             Db.AddInParameter(DbC, "@DFS_JICNVH_PRS_Number", DbType.Int64, DTO.JICNVH_PRS_Number);
             Db.AddInParameter(DbC, "@DFS_JICNVH_MS_Number", DbType.Int64, DTO.JICNVH_MS_Number);
             // Output Parameters
@@ -236,6 +238,7 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIFRT_SVOH_DFS_TDC", DbType.String, DTO.JIFRT_SVOH_TDC);
             Db.AddInParameter(DbC, "@JIFRT_SVOH_DFS_Remarks", DbType.String, DTO.JIFRT_SVOH_Remarks);
             Db.AddInParameter(DbC, "@JIFRT_SVOH_DFS_MS_Number", DbType.Int64, DTO.JIFRT_SVOH_MS_Number);
+            Db.AddInParameter(DbC, "@JIFRT_SVOH_DFS_Category", DbType.String, DTO.JIFRT_SVOH_Category);
 
             // Output Parameters
             Db.AddOutParameter(DbC, "@Result_Number", DbType.Int32, 4);

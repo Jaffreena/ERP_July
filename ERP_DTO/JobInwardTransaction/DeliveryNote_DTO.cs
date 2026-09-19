@@ -91,6 +91,10 @@ namespace ERP_DTO.JobInwardTransaction
         [StringLength(250)]
         public string? JIDNH_Remarks { get; set; }
 
+        [Display(Name = "Freight Applicable")]
+        [StringLength(5)]
+        public string? JIDNH_IsFreightApplicable { get; set; }
+
         public int? DN_Id { get; set; }
         public int? DN_CUS_Number { get; set; }
         public int? DN_ADD_ADTP_Number { get; set; }

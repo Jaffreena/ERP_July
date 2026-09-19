@@ -166,6 +166,7 @@ namespace ERP.Controllers.JobworkInward
                 FS_DTO.JIFRT_SVOH_Remarks = Convert.ToString(row["JIFRT_SVOH_DFS_Remarks"]);
                 FS_DTO.JIFRT_SVOH_MS_Number = Convert.ToInt64(row["JIFRT_SVOH_DFS_MS_Number"]);
                 FS_DTO.JIFRT_SVOH_JW_Customer_Name = Convert.ToString(row["CUS_Name"]);
+                FS_DTO.JIFRT_SVOH_Category = Convert.ToString(row["JIFRT_SVOH_DFS_Category"]);
             }
 
             ViewBag.Collapse = true;
@@ -258,7 +259,8 @@ namespace ERP.Controllers.JobworkInward
                         dfS_JIFRT_SVOH_Tax = row["JIFRT_SVOH_DFS_Tax"],
                         dfS_JIFRT_SVOH_TDC = row["JIFRT_SVOH_DFS_TDC"],
                         dfS_JIFRT_SVOH_MS_Number = row["JIFRT_SVOH_DFS_MS_Number"],
-                        dfS_JIFRT_SVOH_Remarks = row["JIFRT_SVOH_DFS_Remarks"]
+                        dfS_JIFRT_SVOH_Remarks = row["JIFRT_SVOH_DFS_Remarks"],
+                        dfS_JIFRT_SVOH_Category = row["JIFRT_SVOH_DFS_Category"]
                     }
                 });
             }
@@ -300,25 +302,24 @@ namespace ERP.Controllers.JobworkInward
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 var row = ds.Tables[0].Rows[0];
-
                 return Json(new
                 {
                     success = true,
                     data = new
                     {
-                        dfS_JIJWI_SVOH_Number = row["DFS_JIJWI_SVOH_Number"],
-                        dfS_JIJWI_SVOH_ServiceOrderNo = row["DFS_JIJWI_SVOH_ServiceOrderNo"],
-                        dfS_JIJWI_SVOH_JW_Customer_Number = row["DFS_JIJWI_SVOH_JW_Customer_Number"],
+                        dfS_JIJWI_SVOH_Number = row["JIJWI_SVOH_DFS_Number"],
+                        dfS_JIJWI_SVOH_ServiceOrderNo = row["JIJWI_SVOH_DFS_ServiceOrderNo"],
+                        dfS_JIJWI_SVOH_JW_Customer_Number = row["JIJWI_SVOH_DFS_JW_Customer_Number"],
                         cuS_Name = row["CUS_Name"],
-                        dfS_JIJWI_SVOH_Currency_Number = row["DFS_JIJWI_SVOH_Currency_Number"],
+                        dfS_JIJWI_SVOH_Currency_Number = row["JIJWI_SVOH_DFS_Currency_Number"],
                         currency_Name = row["Currency_Name"],
-                        dfS_JIJWI_SVOH_PaymentTerms = row["DFS_JIJWI_SVOH_PaymentTerms"],
-                        dfS_JIJWI_SVOH_DeliveryTerms = row["DFS_JIJWI_SVOH_DeliveryTerms"],
-                        dfS_JIJWI_SVOH_DeliveryMode = row["DFS_JIJWI_SVOH_DeliveryMode"],
-                        dfS_JIJWI_SVOH_Tax = row["DFS_JIJWI_SVOH_Tax"],
-                        dfS_JIJWI_SVOH_TDC = row["DFS_JIJWI_SVOH_TDC"],
-                        dfS_JIJWI_SVOH_MS_Number = row["DFS_JIJWI_SVOH_MS_Number"],
-                        dfS_JIJWI_SVOH_Remarks = row["DFS_JIJWI_SVOH_Remarks"]
+                        dfS_JIJWI_SVOH_PaymentTerms = row["JIJWI_SVOH_DFS_PaymentTerms"],
+                        dfS_JIJWI_SVOH_DeliveryTerms = row["JIJWI_SVOH_DFS_DeliveryTerms"],
+                        dfS_JIJWI_SVOH_DeliveryMode = row["JIJWI_SVOH_DFS_DeliveryMode"],
+                        dfS_JIJWI_SVOH_Tax = row["JIJWI_SVOH_DFS_Tax"],
+                        dfS_JIJWI_SVOH_TDC = row["JIJWI_SVOH_DFS_TDC"],
+                        dfS_JIJWI_SVOH_MS_Number = row["JIJWI_SVOH_DFS_MS_Number"],
+                        dfS_JIJWI_SVOH_Remarks = row["JIJWI_SVOH_DFS_Remarks"]
                     }
                 });
             }

@@ -670,7 +670,7 @@ $(document).ready(function () {
                     parseInt(row.find(".JIDNI_UoM_Number").val()) || 0,
 
                 JIDNI_Qty:
-                    parseFloat(row.find(".JIDNI_Qty").val()) || 0,
+                    parseFloat(removeCommas(row.find(".JIDNI_Qty").val())) || 0,
 
                 JIDNI_UnitPrice:
                     parseFloat(row.find(".JIDNI_UnitPrice").val()) || 0,
@@ -996,7 +996,7 @@ function GetConversionNumber() {
         data: { CNVDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-                //       alert("Please set numbering for this date range.");
+                     alert("Please set numbering for this date range.");
                 $("#Header_JIDNH_DN_No").val("");
 
                 return;
@@ -1100,7 +1100,7 @@ function calculateTotal_F() {
     });
     console.log('check first----:' + totalQty)
     // Footer totals
-    $("#TotalQty_F").val(totalQty.toFixed(2));
+    $("#TotalQty_F").val(formatIndianQty(totalQty));
 
 }
 //#endregion Calculate Total

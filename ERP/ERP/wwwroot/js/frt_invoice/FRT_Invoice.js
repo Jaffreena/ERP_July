@@ -300,34 +300,37 @@ function ResizeColumn(control) {
 }
 function LoadDefaultFormSetting() {
     $.ajax({
-        url: '/jobinward/transactions/jobwork-invoice/get',
+        url: '/jobinward/transactions/freight-invoice/get',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
             if (response && response.success && response.data) {
                 var data = response.data;
 
-                if (data.dfS_JIFTIH_JW_Customer_Number) {
-                    $('#Header_JIFTIH_JW_Customer_Number').val(data.dfS_JIFTIH_JW_Customer_Number);
+                if (data.jiftI_DFS_JW_Customer_Number) {
+                    $('#Header_JIFTIH_JW_Customer_Number').val(data.jiftI_DFS_JW_Customer_Number);
                     $('#Header_JIFTIH_JW_Customer_Name').val(data.cuS_Name);
                 }
-                if (data.dfS_JIFTIH_Currency_Number) {
-                    $('#Header_JIFTIH_Currency_Number').val(data.dfS_JIFTIH_Currency_Number).trigger('change');
+                if (data.jiftI_DFS_Currency_Number) {
+                    $('#Header_JIFTIH_Currency_Number').val(data.jiftI_DFS_Currency_Number).trigger('change');
                 }
-                if (data.dfS_JIFTIH_TCT_Number) {
-                    $('#Header_JIFTIH_TCT_Number').val(data.dfS_JIFTIH_TCT_Number).trigger('change');
+                if (data.jiftI_DFS_TCT_Number) {
+                    $('#Header_JIFTIH_TCT_Number').val(data.jiftI_DFS_TCT_Number).trigger('change');
                 }
-                if (data.dfS_JIFTIH_PaymentTerms) {
-                    $('#Header_JIFTIH_PaymentTerms').val(data.dfS_JIFTIH_PaymentTerms);
+                if (data.jiftI_DFS_PaymentTerms) {
+                    $('#Header_JIFTIH_PaymentTerms').val(data.jiftI_DFS_PaymentTerms);
                 }
-                if (data.dfS_JIFTIH_PaymentMethod) {
-                    $('#Header_JIFTIH_PaymentMethod').val(data.dfS_JIFTIH_PaymentMethod);
+                if (data.jiftI_DFS_PaymentMethod) {
+                    $('#Header_JIFTIH_PaymentMethod').val(data.jiftI_DFS_PaymentMethod);
                 }
-                if (data.dfS_JIFTIH_Remarks) {
-                    $('#Header_JIFTIH_Remarks').val(data.dfS_JIFTIH_Remarks);
+                if (data.jiftI_DFS_Remarks) {
+                    $('#Header_JIFTIH_Remarks').val(data.jiftI_DFS_Remarks);
                 }
-                if (data.dfS_JIFTIH_MS_Number) {
-                    $('#Header_JIFTIH_MS_Number').val(data.dfS_JIFTIH_MS_Number).trigger('change');
+                if (data.jiftI_DFS_MS_Number) {
+                    $('#Header_JIFTIH_MS_Number').val(data.jiftI_DFS_MS_Number).trigger('change');
+                }
+                if (data.jiftI_DFS_Category) {
+                    $('#Header_SourceCategory').val(data.jiftI_DFS_Category).trigger('change');
                 }
             }
         },
@@ -336,6 +339,7 @@ function LoadDefaultFormSetting() {
         }
     });
 }
+
 $(document).ready(function () {
     LoadDefaultFormSetting();
     //#region item grid alignment
@@ -482,7 +486,6 @@ $(document).ready(function () {
     $(document).on('click', '#RemoveItemRowButton', function () {
 
         //#region REMOVE CHECKED ROWS
-
         $("#TableBody tr.NewRow").each(function () {
 
             var isChecked = $(this)
@@ -493,12 +496,14 @@ $(document).ready(function () {
 
                 $(this).hide();
                 $(this).attr("data-deleted", "1");
+
                 CheckAndRemoveEmptyHeaders();
             }
-
         });
-
         //#endregion
+
+        // refresh footer totals after rows are hidden/removed
+        CalculateTotals();
 
     });
 
@@ -940,7 +945,7 @@ function GetJWInvoiceNumber() {
         data: { FRTIDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-                // alert("Please set numbering for this date range.");
+                 alert("Please set numbering for this date range.");
                 $("#Header_JIFTIH_InvoiceNo").val("");
 
                 return;
@@ -3075,8 +3080,8 @@ function InsertDeliveryNoteItems(selectedDNString, selectedRecoveredItems, selec
 
        
              <input
-               value="${deliveredQtyDisplay}"
-               class="form-control JIFTII_DeliveredQty" />
+                      value="${deliveredQtyDisplay}"
+               class="form-control JIFTII_DeliveredQty" readonly tabindex="-1" />
 
     </td>
 
@@ -3466,8 +3471,8 @@ function InsertReceiptNoteItems(selectedRNString, selectedRecoveredItems, select
 
 
              <input
-               value="${receivedQtyDisplay}"
-               class="form-control JIFTII_DeliveredQty" />
+                        value="${receivedQtyDisplay}"
+               class="form-control JIFTII_DeliveredQty" readonly tabindex="-1" />
 
     </td>
 
@@ -3481,7 +3486,7 @@ function InsertReceiptNoteItems(selectedRNString, selectedRecoveredItems, select
 
            <input  
                value="${prevInvoiceQtyDisplay}"
-               class="form-control JIFTII_PrevInvoiceQty" />
+                          class="form-control JIFTII_PrevInvoiceQty" readonly tabindex="-1" />
 
 
     </td>
@@ -3633,4 +3638,40 @@ function BindServiceOrder(customerId, prsNumber = null, itemNumber = null, uomNu
 //#endregion
 
 
+//#endregion
+
+//#region Freight grid input restriction (Create)
+const FRT_DECIMAL = /^\d*\.?\d{0,2}$/;   // 0, 12, 12., 12.5, 12.50
+
+// Current Invoice Qty - digits only
+$(document).on("keypress", "#TableBody .JIFTII_Qty_Kgs", function (e) {
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.key && e.key.length > 1) return;          // Enter, Backspace, arrows
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+});
+
+$(document).on("input", "#TableBody .JIFTII_Qty_Kgs", function () {
+    let cleaned = this.value.replace(/[^0-9,]/g, "");   // keeps comma from formatting
+    if (cleaned !== this.value) this.value = cleaned;
+});
+
+// Unit Price - decimal, max 2 places
+$(document).on("keypress", "#TableBody .JIFTII_Rate", function (e) {
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.key && e.key.length > 1) return;
+    let el = this;
+    let newVal = el.value.slice(0, el.selectionStart) + e.key + el.value.slice(el.selectionEnd);
+    if (!FRT_DECIMAL.test(removeCommas(newVal))) e.preventDefault();
+});
+
+$(document).on("input", "#TableBody .JIFTII_Rate", function () {
+    let raw = removeCommas(this.value);
+    if (!FRT_DECIMAL.test(raw)) {
+        raw = raw.replace(/[^0-9.]/g, "");
+        let parts = raw.split(".");
+        this.value = parts.length > 1
+            ? parts[0] + "." + parts.slice(1).join("").slice(0, 2)
+            : parts[0];
+    }
+});
 //#endregion

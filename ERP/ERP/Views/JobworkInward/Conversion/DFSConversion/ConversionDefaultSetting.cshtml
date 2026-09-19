@@ -134,28 +134,12 @@
                                 </div>
                             </div>
 
-                            <div class="col-auto left-menu text-black">
+                                                     <div class="col-auto left-menu text-black">
                                 <div class="row">
-                                    <div class="col-12 col-md-6 col-lg-3">
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_WC_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-4">
-                                                <select asp-for="JIDNH_WC_Number"
-                                                        class="form-select"
-                                                        asp-items="@ViewBag.WorkCentre"></select>
-                                            </div>
-                                        </div>
-
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_Shift_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-4">
-                                                <select asp-for="JIDNH_Shift_Number"
-                                                        class="form-select"
-                                                        asp-items="@ViewBag.Shift"></select>
-                                            </div>
-                                        </div>
-                                        <div class="row align-items-center gx-2">
+                                    <!-- COLUMN 1 -->
+                                    <div class="col-12 col-md-3">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIDNH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
                                                 <select asp-for="JIDNH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
@@ -163,25 +147,46 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-6 col-lg-3">
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-3">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIDNH_Shift_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JIDNH_Shift_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.Shift"></select>
+                                            </div>
+                                        </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_PRS_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-4">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIDNH_WC_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JIDNH_WC_Number"
+                                                        class="form-select"
+                                                        asp-items="@ViewBag.WorkCentre"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIDNH_PRS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
                                                 <select asp-for="JIDNH_PRS_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Process"></select>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_Operator_Number" class="col-sm-4 col-lg-4 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-4">
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIDNH_Operator_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
                                                 <input asp-for="JIDNH_Operator_Number" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
-
                                     </div>
+
                                 </div>
                             </div>
 

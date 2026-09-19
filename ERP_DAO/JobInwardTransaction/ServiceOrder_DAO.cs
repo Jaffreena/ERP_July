@@ -352,26 +352,128 @@ namespace ERP_DAO.JobInwardTransaction
             return json;
         }
 
-        public string JIJWI_GetServiceOrderJSON(long JIJWI_SVOH_Number)
+        public JIJWI_ServiceOrder_DTO JIJWI_GetServiceOrder(long JIJWI_SVOH_Number)
         {
             Database db = new SqlDatabase(DB.Connection());
             DbCommand cmd = db.GetStoredProcCommand("JIJWI_ServiceOrder_Get_JSON_SP");
-
             db.AddInParameter(cmd, "@JIJWI_SVOH_Number", DbType.Int64, JIJWI_SVOH_Number);
 
-            string json = db.ExecuteScalar(cmd)?.ToString();
-            return json;
+            DataSet ds = db.ExecuteDataSet(cmd);
+
+            var dto = new JIJWI_ServiceOrder_DTO
+            {
+                Header = new JIJWI_ServiceOrderHead_DTO(),
+                Items = new List<JIJWI_ServiceOrderItem_DTO>()
+            };
+
+            if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                DataRow r = ds.Tables[0].Rows[0];
+                dto.Header.JIJWI_SVOH_Number = Convert.ToInt64(r["JIJWI_SVOH_Number"]);
+                dto.Header.JIJWI_SVOH_RegNo = r["JIJWI_SVOH_RegNo"] as string;
+                dto.Header.JIJWI_SVOH_RegDate = Convert.ToDateTime(r["JIJWI_SVOH_RegDate"]);
+                dto.Header.JIJWI_SVOH_ServiceOrderNo = r["JIJWI_SVOH_ServiceOrderNo"] as string;
+                dto.Header.JIJWI_SVOH_ServiceOrderDate = Convert.ToDateTime(r["JIJWI_SVOH_ServiceOrderDate"]);
+                dto.Header.JIJWI_SVOH_MS_Number = r["JIJWI_SVOH_MS_Number"] == DBNull.Value ? (long?)null : Convert.ToInt64(r["JIJWI_SVOH_MS_Number"]);
+                dto.Header.JIJWI_SVOH_JW_Customer_Number = Convert.ToInt64(r["JIJWI_SVOH_JW_Customer_Number"]);
+                dto.Header.JIJWI_SVOH_Currency_Number = Convert.ToInt64(r["JIJWI_SVOH_Currency_Number"]);
+                dto.Header.JIJWI_SVOH_PaymentTerms = r["JIJWI_SVOH_PaymentTerms"] as string;
+                dto.Header.JIJWI_SVOH_DeliveryTerms = r["JIJWI_SVOH_DeliveryTerms"] as string;
+                dto.Header.JIJWI_SVOH_DeliveryMode = r["JIJWI_SVOH_DeliveryMode"] as string;
+                dto.Header.JIJWI_SVOH_Tax = r["JIJWI_SVOH_Tax"] as string;
+                dto.Header.JIJWI_SVOH_TDC = r["JIJWI_SVOH_TDC"] as string;
+                dto.Header.JIJWI_SVOH_Remarks = r["JIJWI_SVOH_Remarks"] as string;
+                dto.Header.JIJWI_SVOH_JW_Customer_Name = r["JW_Customer_Name"] as string;
+            }
+
+            if (ds.Tables.Count > 1)
+            {
+                foreach (DataRow r in ds.Tables[1].Rows)
+                {
+                    dto.Items.Add(new JIJWI_ServiceOrderItem_DTO
+                    {
+                        JIJWI_SVOI_Number = Convert.ToInt64(r["JIJWI_SVOI_Number"]),
+                        JIJWI_SVOI_PRS_Number = Convert.ToInt64(r["JIJWI_SVOI_PRS_Number"]),
+                        JIJWI_SVOI_Item_Number = Convert.ToInt64(r["JIJWI_SVOI_Item_Number"]),
+                        JIJWI_SVOI_WH_Number = r["JIJWI_SVOI_WH_Number"] == DBNull.Value ? (long?)null : Convert.ToInt64(r["JIJWI_SVOI_WH_Number"]),
+                        JIJWI_SVOI_UoM_Number = Convert.ToInt64(r["JIJWI_SVOI_UoM_Number"]),
+                        JIJWI_SVOI_Qty = Convert.ToDouble(r["JIJWI_SVOI_Qty"]),
+                        JIJWI_SVOI_UnitPrice = Convert.ToDouble(r["JIJWI_SVOI_UnitPrice"]),
+                        JIJWI_SVOI_Amount = Convert.ToDouble(r["JIJWI_SVOI_Amount"]),
+                        JIJWI_SVOI_DeliveryDate = r["JIJWI_SVOI_DeliveryDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(r["JIJWI_SVOI_DeliveryDate"]),
+                        JIJWI_SVOI_Category = r["JIJWI_SVOI_Category"] as string,
+                        AssignedQty = Convert.ToDouble(r["AssignedQty"]),
+                        InvoicedQty = Convert.ToDouble(r["InvoicedQty"]),
+                        InvoiceToBeRaised = Convert.ToDouble(r["InvoiceToBeRaised"]),
+                        JIJWI_SVOI_Item_Code = r["JIJWI_SVOI_Item_Code"] as string,
+                        Description = r["Description"] as string,
+                        OuterDia = r["OuterDia"]?.ToString(),
+                        Thickness = r["Thickness"]?.ToString(),
+                        Length = r["Length"]?.ToString(),
+                        Width = r["Width"]?.ToString(),
+                        MaterialGrade = r["MaterialGrade"] as string,
+                        ItemGroup = r["ItemGroup"] as string
+                    });
+                }
+            }
+
+            return dto;
         }
 
-        public string JIFRT_GetServiceOrderJSON(long JIFRT_SVOH_Number)
+        public JIFRT_ServiceOrder_DTO JIFRT_GetServiceOrder(long JIFRT_SVOH_Number)
         {
             Database db = new SqlDatabase(DB.Connection());
             DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrder_Get_JSON_SP");
-
             db.AddInParameter(cmd, "@JIFRT_SVOH_Number", DbType.Int64, JIFRT_SVOH_Number);
 
-            string json = db.ExecuteScalar(cmd)?.ToString();
-            return json;
+            DataSet ds = db.ExecuteDataSet(cmd);
+
+            var dto = new JIFRT_ServiceOrder_DTO
+            {
+                Header = new JIFRT_ServiceOrderHead_DTO(),
+                Items = new List<JIFRT_ServiceOrderItem_DTO>()
+            };
+
+            if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                DataRow r = ds.Tables[0].Rows[0];
+                dto.Header.JIFRT_SVOH_Number = Convert.ToInt64(r["JIFRT_SVOH_Number"]);
+                dto.Header.JIFRT_SVOH_RegNo = r["JIFRT_SVOH_RegNo"] as string;
+                dto.Header.JIFRT_SVOH_RegDate = Convert.ToDateTime(r["JIFRT_SVOH_RegDate"]);
+                dto.Header.JIFRT_SVOH_ServiceOrderNo = r["JIFRT_SVOH_ServiceOrderNo"] as string;
+                dto.Header.JIFRT_SVOH_ServiceOrderDate = Convert.ToDateTime(r["JIFRT_SVOH_ServiceOrderDate"]);
+                dto.Header.JIFRT_SVOH_Category = r["JIFRT_SVOH_Category"] as string;
+                dto.Header.JIFRT_SVOH_JW_Customer_Number = Convert.ToInt64(r["JIFRT_SVOH_JW_Customer_Number"]);
+                dto.Header.JIFRT_SVOH_Currency_Number = Convert.ToInt64(r["JIFRT_SVOH_Currency_Number"]);
+                dto.Header.JIFRT_SVOH_PaymentTerms = r["JIFRT_SVOH_PaymentTerms"] as string;
+                dto.Header.JIFRT_SVOH_DeliveryTerms = r["JIFRT_SVOH_DeliveryTerms"] as string;
+                dto.Header.JIFRT_SVOH_DeliveryMode = r["JIFRT_SVOH_DeliveryMode"] as string;
+                dto.Header.JIFRT_SVOH_Tax = r["JIFRT_SVOH_Tax"] as string;
+                dto.Header.JIFRT_SVOH_TDC = r["JIFRT_SVOH_TDC"] as string;
+                dto.Header.JIFRT_SVOH_Remarks = r["JIFRT_SVOH_Remarks"] as string;
+                dto.Header.JIFRT_SVOH_JW_Customer_Name = r["JW_Customer_Name"] as string;
+            }
+
+            if (ds.Tables.Count > 1)
+            {
+                foreach (DataRow r in ds.Tables[1].Rows)
+                {
+                    dto.Items.Add(new JIFRT_ServiceOrderItem_DTO
+                    {
+                        JIFRT_SVOI_Number = Convert.ToInt64(r["JIFRT_SVOI_Number"]),
+                        JIFRT_SVOI_Category = r["JIFRT_SVOI_Category"] as string,
+                        JIFRT_SVOI_PRS_Number = Convert.ToInt64(r["JIFRT_SVOI_PRS_Number"]),
+                        JIFRT_SVOI_FromWH_Number = r["JIFRT_SVOI_FromWH_Number"] == DBNull.Value ? (long?)null : Convert.ToInt64(r["JIFRT_SVOI_FromWH_Number"]),
+                        JIFRT_SVOI_ToWH_Number = r["JIFRT_SVOI_ToWH_Number"] == DBNull.Value ? (long?)null : Convert.ToInt64(r["JIFRT_SVOI_ToWH_Number"]),
+                        JIFRT_SVOI_UoM_Number = Convert.ToInt64(r["JIFRT_SVOI_UoM_Number"]),
+                        JIFRT_SVOI_Qty = Convert.ToDouble(r["JIFRT_SVOI_Qty"]),
+                        JIFRT_SVOI_Rate = Convert.ToDouble(r["JIFRT_SVOI_Rate"]),
+                        JIFRT_SVOI_Amount = Convert.ToDouble(r["JIFRT_SVOI_Amount"])
+                    });
+                }
+            }
+
+            return dto;
         }
         #endregion
 

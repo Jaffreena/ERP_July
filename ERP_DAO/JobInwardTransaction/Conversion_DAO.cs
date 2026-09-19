@@ -481,6 +481,7 @@ namespace ERP_DAO.JobInwardTransaction
                             INSERT INTO OUT_COMMON_BATCH
                             (
                                 OCB_TransType,
+                                OCB_TransDate,
                                 OCB_Header_Number,
                                 OCB_LineItem_Number,
                                 OCB_LineBatch_Number,
@@ -501,6 +502,7 @@ namespace ERP_DAO.JobInwardTransaction
                             VALUES
                             (
                                 @TransType,
+                                @TransDate,
                                 @Header_Number,
                                 @LineItem_Number,
                                 @LineBatch_Number,
@@ -518,6 +520,7 @@ namespace ERP_DAO.JobInwardTransaction
                             )", con, tr))
                                 {
                                     cmd.Parameters.AddWithValue("@TransType", "Conversion Consumption");
+                                    cmd.Parameters.AddWithValue("@TransDate", DN_DTO.Header.JIDNH_DN_Date);      // NEW: TransDate fix
                                     cmd.Parameters.AddWithValue("@Header_Number", DN_Number);
                                     cmd.Parameters.AddWithValue("@LineItem_Number", item.ItemNumber);
                                     cmd.Parameters.AddWithValue("@LineBatch_Number", batch.JIDNI_BCH_Number);

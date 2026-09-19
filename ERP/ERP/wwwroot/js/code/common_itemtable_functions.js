@@ -402,9 +402,9 @@ function ApplyConsumptionBatchFieldWidths(tbodySelector = "#DeliveryNoteBatchTab
         { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 20, align: "left" },
         { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
         { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
-        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "right" },
-        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "right" },
-        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "center" },
         { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
         { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
     ];

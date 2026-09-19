@@ -531,6 +531,11 @@ function LoadDefaultFormSetting() {
                 if (data.dfS_JIRNH_Remarks) {
                     $('#JIRNH_Remarks').val(data.dfS_JIRNH_Remarks);
                 }
+                if (data.dfS_JIRNH_IsFreightApplicable) {
+                    $('#Header_Freight_Applicable')
+                        .prop('checked', data.dfS_JIRNH_IsFreightApplicable === 'Yes')
+                        .trigger('change');
+                }
             }
         },
         error: function (xhr) {
@@ -604,7 +609,26 @@ $(document).ready(function () {
         ResizeColumns();
     });
 
-    // NEW: Qty to Kg conversion
+    // Restrict Qty input to digits only
+    $(document).on("keypress", ".JIRNI_Qty", function (e) {
+        let charCode = e.which ? e.which : e.keyCode;
+        let charStr = String.fromCharCode(charCode);
+
+        if (!/[0-9]/.test(charStr)) {
+            e.preventDefault();
+        }
+    });
+
+    // Strip any non-numeric characters that slip in via paste
+    $(document).on("input", ".JIRNI_Qty", function () {
+        let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+        if (cleaned !== $(this).val()) {
+            $(this).val(cleaned);
+        }
+    });
+
+    // Qty to Kg conversion
     $(document).on("input", ".JIRNI_Qty", function () {
         let row = $(this).closest("tr");
         CalculateQtyKg(row);
@@ -805,12 +829,11 @@ $(document).ready(function () {
             data: JSON.stringify(dto),
             success: function (res) {
 
-
+                showAlert('Record Inserted');
 
                 $('#ModelAlert').one('hidden.bs.modal', function () {
                     location.reload();
                 });
-                showAlert('Record Inserted');
 
                 //  window.location.href = res.redirectUrl;
 
@@ -1247,10 +1270,12 @@ function GetReceiptNoteNumber() {
         data: { RNDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-              //  alert("Please set numbering for this date range.");
+              
+            
                 $("#JIRNH_RN_No").val("");
-                DateBind();
-
+             
+                alert("Please set numbering for this date range.");
+               // DateBind();
                 return;
             }
 
@@ -1327,6 +1352,7 @@ function validateItemGrid_RN() {
 
     let hasValidRow = false;
     let isValid = true;
+    let hasFreightRow = false;
 
     $("#TableBody tr").each(function () {
 
@@ -1399,6 +1425,8 @@ function validateItemGrid_RN() {
         // NEW: Freight Applicable - From WH / To WH mandatory
         if (row.find(".JIRNI_IsFreightApplicable").is(":checked")) {
 
+            hasFreightRow = true;
+
             let fromWH = row.find(".JIRNI_FromWH").val();
             let toWH = row.find(".JIRNI_ToWH").val();
 
@@ -1422,6 +1450,13 @@ function validateItemGrid_RN() {
     if (!hasValidRow) {
 
         showAlert("Please enter at least one item.");
+
+        return false;
+    }
+
+    if ($("#Header_Freight_Applicable").is(":checked") && !hasFreightRow) {
+
+        showAlert("Freight is marked applicable — at least one item row must have Freight Applicable checked.");
 
         return false;
     }
@@ -1511,13 +1546,15 @@ function showAlert(message, focusSelector = null) {
     $('#AlertMessage').html(message);
 
     const modalElement = document.getElementById('ModelAlert');
-    const modal = new bootstrap.Modal(modalElement);
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
 
     modal.show();
 
+    $(modalElement).off('hidden.bs.modal');
+
     if (focusSelector) {
 
-        $(modalElement).off('hidden.bs.modal').on('hidden.bs.modal', function () {
+        $(modalElement).on('hidden.bs.modal', function () {
 
             $(focusSelector).focus();
 

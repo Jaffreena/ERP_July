@@ -316,37 +316,37 @@ function CalculateBatchFooter() {
     $("#DeliveryNoteBatchTableBody tr.DeliveryNoteBatchRow")
         .each(function () {
 
-            totalQty +=
+                     totalQty +=
                 parseFloat(
-                    $(this)
+                    removeCommas($(this)
                         .find(".JIDNI_BCH_QtyInvoice")
-                        .val()
+                        .val())
                 ) || 0;
             totalAvailableQty +=
                 parseFloat(
-                    $(this)
+                    removeCommas($(this)
                         .find(".JIDNI_BCH_QtyAvailable")
-                        .val()
+                        .val())
                 ) || 0;
 
             totalValue +=
                 parseFloat(
-                    $(this)
+                    removeCommas($(this)
                         .find(".JIDNI_BCH_BatchValue")
-                        .val()
+                        .val())
                 ) || 0;
-            totalReservedQty += parseFloat($(this).find(".JIDNI_BCH_QtyReserved").val()) || 0;
+            totalReservedQty += parseFloat(removeCommas($(this).find(".JIDNI_BCH_QtyReserved").val())) || 0;
 
         });
 
     $("#TotalBatchQty")
-        .val(totalQty.toFixed(2));
+        .val(QtyDecimalRupees(totalQty, 0));
 
     $("#TotalBatchValue")
-        .val(totalValue.toFixed(2));
+        .val(DecimalIndianRupees(totalValue));
     $("#TotalAvailableQty")
-        .val(totalAvailableQty.toFixed(2));
-    $("#TotalReservedQty").val(totalReservedQty.toFixed(2));
+        .val(QtyDecimalRupees(totalAvailableQty, 0));
+    $("#TotalReservedQty").val(QtyDecimalRupees(totalReservedQty, 0));
 }
 
 //#endregion
@@ -866,19 +866,19 @@ function BindDeliveryNoteBatchTable() {
                 .val(data.JIDNI_BCH_Number);
 
             row.find(".JIDNI_BCH_QtyAvailable")
-                .val(data.JIDNI_BCH_QtyAvailable);
+                .val(QtyDecimalRupees(data.JIDNI_BCH_QtyAvailable, 0));
 
             row.find(".JIDNI_BCH_QtyReserved")
-                .val(data.JIDNI_BCH_QtyReserved);
+                .val(QtyDecimalRupees(data.JIDNI_BCH_QtyReserved, 0));
 
             row.find(".JIDNI_BCH_QtyInvoice")
-                .val(data.JIDNI_BCH_QtyInvoice);
+                .val(QtyDecimalRupees(data.JIDNI_BCH_QtyInvoice, 0));
 
             row.find(".JIDNI_BCH_BatchUnitPrice")
-                .val(data.JIDNI_BCH_BatchUnitPrice);
+                .val(DecimalIndianRupees(data.JIDNI_BCH_BatchUnitPrice));
 
             row.find(".JIDNI_BCH_BatchValue")
-                .val(data.JIDNI_BCH_BatchValue);
+                .val(DecimalIndianRupees(data.JIDNI_BCH_BatchValue));
 
             $("#DeliveryNoteBatchTableBody").append(row);
 
@@ -1052,13 +1052,14 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
     if (QtyInvoice > BalanceQty) {
 
         alert(
-            "Invoice Qty (" + QtyInvoice +
+            "Consumed  Qty (" + QtyInvoice +
             ") cannot be greater than Available Qty - Reserved Qty (" + BalanceQty + ").\n" +
             "It will be reset to maximum allowed: " + BalanceQty
         );
 
-        QtyInvoiceInput.val(DecimalIndianRupees(BalanceQty));
-        QtyInvoice = BalanceQty;
+        var MaxQty = Math.max(0, Math.floor(BalanceQty));
+        QtyInvoiceInput.val(MaxQty);
+        QtyInvoice = MaxQty;
 
         QtyInvoiceInput.focus().select();
     }
@@ -1250,9 +1251,9 @@ function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
         { cls: ".JIDNI_BCH_WH_Name", min: 10, max: 25, align: "left" },
         { cls: ".JIDNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
         { cls: ".JIDNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
-        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "right" },
-        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "right" },
-        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "right" },
+        { cls: ".JIDNI_BCH_QtyAvailable", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyReserved", min: 10, max: 20, align: "center" },
+        { cls: ".JIDNI_BCH_QtyInvoice", min: 10, max: 20, align: "center" },
         { cls: ".JIDNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
         { cls: ".JIDNI_BCH_BatchValue", min: 13, max: 25, align: "right" }
     ];
@@ -1358,4 +1359,109 @@ function ApplyOtherBatchFieldWidths(container = "#DeliveryNoteOtherBatchList") {
         });
     });
 }
-//#endregion
+//#endregion 
+$(document).on("focusout", "#TableBody_F .JIDNI_Qty", function () {
+
+    let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
+
+    $(this)
+        .attr("data-value", value)
+        .val(value === 0 ? "" : formatIndianQty(value));
+});
+$(document).on("focusout", "#TableBody_P .JIDNI_Qty", function () {
+
+    let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
+
+    $(this)
+        .attr("data-value", value)
+        .val(value === 0 ? "" : formatIndianQty(value));
+});
+$(document).on("focusout", "#TableBody_S .JIDNI_Qty", function () {
+
+    let value = parseFloat(($(this).val() || "").replace(/,/g, "")) || 0;
+
+    $(this)
+        .attr("data-value", value)
+        .val(value === 0 ? "" : formatIndianQty(value));
+});
+
+// Add every class that should be digits-only here
+const NUMERIC_ONLY = "#DeliveryNoteBatchTableBody .JIDNI_BCH_QtyInvoice,#TableBody_F .JIDNI_Qty,#TableBody_P .JIDNI_Qty,#TableBody_S .JIDNI_Qty,#IBatTableBody_P .JIRNI_BCH_BatchQty,#IBatTableBody_S .JIRNI_BCH_BatchQty";
+
+// Restrict input to digits only
+$(document).on("keypress", NUMERIC_ONLY, function (e) {
+    // Let shortcuts like Ctrl+V / Ctrl+A / Ctrl+C through
+    if (e.ctrlKey || e.metaKey) return;
+
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+// Strip any non-numeric characters that slip in via paste or drag-drop
+$(document).on("input", NUMERIC_ONLY, function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+
+
+//#region batch amount unit price 3 grid
+
+const TABLES = ["#DeliveryNoteBatchTableBody", "#IBatTableBody_P", "#IBatTableBody_S"];
+const DECIMAL_CLASSES = [".JIRNI_BCH_UnitPrice", ".JIRNI_BCH_Amount"];
+
+// Builds: "#table1 .cls1, #table1 .cls2, #table2 .cls1, ..."
+const DECIMAL_ONLY = TABLES
+    .flatMap(t => DECIMAL_CLASSES.map(c => `${t} ${c}`))
+    .join(", ");
+
+const DECIMAL_PATTERN = /^\d*\.?\d{0,2}$/; // 0, 12, 12., 12.5, 12.50
+
+// Block a keystroke if the resulting value would break the pattern
+$(document).on("keypress", DECIMAL_ONLY, function (e) {
+    if (e.ctrlKey || e.metaKey) return; // allow Ctrl+V / Ctrl+A / Ctrl+C
+
+    let charStr = String.fromCharCode(e.which ? e.which : e.keyCode);
+    let el = this;
+    let start = el.selectionStart, end = el.selectionEnd;
+
+    // Value as it would be after this key is typed (respects caret / selection)
+    let newVal = el.value.slice(0, start) + charStr + el.value.slice(end);
+
+    if (!DECIMAL_PATTERN.test(newVal)) {
+        e.preventDefault();
+    }
+});
+
+// Clean up paste / drag-drop / autofill
+$(document).on("input", DECIMAL_ONLY, function () {
+    let v = $(this).val();
+
+    if (!DECIMAL_PATTERN.test(v)) {
+        v = v.replace(/[^0-9.]/g, "");              // remove invalid chars
+        let parts = v.split(".");
+        v = parts.length > 1
+            ? parts[0] + "." + parts.slice(1).join("").slice(0, 2)  // keep first dot, max 2 decimals
+            : parts[0];
+        $(this).val(v);
+    }
+});
+
+// Optional: format to exactly 2 decimals when leaving the field
+$(document).on("blur", DECIMAL_ONLY, function () {
+    let v = $(this).val();
+    if (v !== "" && v !== ".") {
+        $(this).val(parseFloat(v).toFixed(2));
+    } else {
+        $(this).val("");
+    }
+});
+
+
+//#endregion batch amount unit price 3 grid

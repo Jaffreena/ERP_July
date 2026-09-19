@@ -56,11 +56,13 @@ namespace ERP.Controllers.JobworkInward
                 SH_DTO.JIFTIH_PaymentTerms = Convert.ToString(row["JIFTI_DFS_PaymentTerms"]);
                 SH_DTO.JIFTIH_PaymentMethod = Convert.ToString(row["JIFTI_DFS_PaymentMethod"]);
                 SH_DTO.JIFTIH_Remarks = Convert.ToString(row["JIFTI_DFS_Remarks"]);
+                SH_DTO.JIFTIH_MS_Number = row["JIFTI_DFS_MS_Number"] != DBNull.Value ? Convert.ToInt64(row["JIFTI_DFS_MS_Number"]) : 0;
+                SH_DTO.JIFTIH_SourceCategory = Convert.ToString(row["JIFTI_DFS_Category"]);
             }
 
             ViewBag.Collapse = true;
 
-            return View(SH_DTO);
+            return View("~/Views/JobworkInward/FreightInvoice/JIFTI_DFS/FreightInvoiceDefaultSetting.cshtml", SH_DTO);
         }
 
         [HttpPost]
@@ -78,6 +80,8 @@ namespace ERP.Controllers.JobworkInward
                 SI_DTO.JIFTI_DFS_PaymentTerms = S_DTO.JIFTIH_PaymentTerms;
                 SI_DTO.JIFTI_DFS_PaymentMethod = S_DTO.JIFTIH_PaymentMethod;
                 SI_DTO.JIFTI_DFS_Remarks = S_DTO.JIFTIH_Remarks;
+                SI_DTO.JIFTI_DFS_MS_Number = S_DTO.JIFTIH_MS_Number;
+                SI_DTO.JIFTI_DFS_Category = S_DTO.JIFTIH_SourceCategory;
 
                 SI_DAO.JI_FreightInvoiceDB(SI_DTO);
 
@@ -119,7 +123,9 @@ namespace ERP.Controllers.JobworkInward
                         jiftI_DFS_TCT_Number = row["JIFTI_DFS_TCT_Number"],
                         jiftI_DFS_PaymentTerms = row["JIFTI_DFS_PaymentTerms"],
                         jiftI_DFS_PaymentMethod = row["JIFTI_DFS_PaymentMethod"],
-                        jiftI_DFS_Remarks = row["JIFTI_DFS_Remarks"]
+                        jiftI_DFS_Remarks = row["JIFTI_DFS_Remarks"],
+                        jiftI_DFS_MS_Number = row["JIFTI_DFS_MS_Number"],
+                        jiftI_DFS_Category = row["JIFTI_DFS_Category"]
                     }
                 });
             }

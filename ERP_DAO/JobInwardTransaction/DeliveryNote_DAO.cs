@@ -84,7 +84,11 @@ namespace ERP_DAO.JobInwardTransaction
             db.AddInParameter(cmd, "@DN_Id", DbType.Int32, DN_DTO.Header.DN_Id);
 
             //       DN_DTO.Header.JIDNH_DN_Date = DateTime.Now;
-            db.AddInParameter(cmd, "@JIDNH_DN_Date", DbType.Date, DN_DTO.Header.JIDNH_DN_Date);
+            // callers that do not set a date (e.g. address lookups) send 0001-01-01 -> SqlDateTime overflow
+            DateTime dnDate = DN_DTO.Header.JIDNH_DN_Date == DateTime.MinValue
+                ? DateTime.Now
+                : DN_DTO.Header.JIDNH_DN_Date;
+            db.AddInParameter(cmd, "@JIDNH_DN_Date", DbType.Date, dnDate);
             db.AddInParameter(cmd, "@JIDNI_Item_Code", DbType.String, DN_DTO.Header.JIDNI_Item_Code);
             db.AddInParameter(cmd, "@DN_CUS_Number", DbType.Int32, DN_DTO.Header.DN_CUS_Number);
             db.AddInParameter(cmd, "@DN_ADD_ADTP_Number", DbType.Int32, DN_DTO.Header.DN_ADD_ADTP_Number);
@@ -611,6 +615,7 @@ AND JIJWI_SVOI_JIJWI_SVOH_Number = @JISVOH_Number
                             INSERT INTO OUT_COMMON_BATCH
                             (
                                 OCB_TransType,
+                                OCB_TransDate,
                                 OCB_Header_Number,
                                 OCB_LineItem_Number,
                                 OCB_LineBatch_Number,
@@ -633,6 +638,7 @@ AND JIJWI_SVOI_JIJWI_SVOH_Number = @JISVOH_Number
                             VALUES
                             (
                                 @TransType,
+                                @TransDate,
                                 @Header_Number,
                                 @LineItem_Number,
                                 @LineBatch_Number,
@@ -652,6 +658,7 @@ AND JIJWI_SVOI_JIJWI_SVOH_Number = @JISVOH_Number
                             )", con, tr))
                                 {
                                     cmd.Parameters.AddWithValue("@TransType", "Delivery Note");
+                                    cmd.Parameters.AddWithValue("@TransDate", DN_DTO.Header.JIDNH_DN_Date);      // NEW: TransDate fix
                                     cmd.Parameters.AddWithValue("@Header_Number", DN_Number);
                                     cmd.Parameters.AddWithValue("@LineItem_Number", item.ItemNumber);
                                     cmd.Parameters.AddWithValue("@LineBatch_Number", batch.JIDNI_BCH_Number);
@@ -667,7 +674,6 @@ AND JIJWI_SVOI_JIJWI_SVOH_Number = @JISVOH_Number
                                     outcommon =
                                       Convert.ToInt64(cmd.ExecuteScalar());
                                 }
-
                                 balanceQty -= useQty;
                             }
                         }

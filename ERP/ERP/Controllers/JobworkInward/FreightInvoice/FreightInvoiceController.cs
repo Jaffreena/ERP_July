@@ -479,11 +479,11 @@ namespace ERP.Controllers.JobworkInward
         #region EDIT GET FREIGHT INVOICE JSON
 
         [HttpGet]
-        public JsonResult GetFreightInvoice(long FRTIH_Number)
+        public JsonResult GetFreightInvoice(long JIFTIH_Number)
         {
             FreightInvoice_DAO dao = new FreightInvoice_DAO();
 
-            string json = dao.GetFreightInvoiceJSON(FRTIH_Number);
+            string json = dao.GetFreightInvoiceJSON(JIFTIH_Number);
 
             if (string.IsNullOrEmpty(json))
             {

@@ -56,6 +56,7 @@ namespace ERP.Controllers.JobworkInward
                 SH_DTO.JIDNH_DespatchDocumentNo = Convert.ToString(row["JIDN_DFS_DespatchDocument"]);
                 SH_DTO.JIDNH_DespatchedThrough = Convert.ToString(row["JIDN_DFS_DespatchedThrough"]);
                 SH_DTO.JIDNH_Remarks = Convert.ToString(row["JIDN_DFS_Remarks"]);
+                SH_DTO.JIDNH_IsFreightApplicable = Convert.ToString(row["JIDN_DFS_IsFreightApplicable"]);
             }
 
             ViewBag.Collapse = true;
@@ -84,6 +85,7 @@ namespace ERP.Controllers.JobworkInward
                 SI_DTO.JIDNH_DespatchDocument = S_DTO.JIDNH_DespatchDocumentNo;
                 SI_DTO.JIDNH_DespatchedThrough = S_DTO.JIDNH_DespatchedThrough;
                 SI_DTO.JIDNH_Remarks = S_DTO.JIDNH_Remarks;
+                SI_DTO.JIDNH_IsFreightApplicable = S_DTO.JIDNH_IsFreightApplicable;
 
                 SI_DAO.JI_DeliveryNoteDB(SI_DTO);
 
@@ -128,7 +130,8 @@ namespace ERP.Controllers.JobworkInward
                         jidN_DFS_DeliveryMode = row["JIDN_DFS_DeliveryMode"],
                         jidN_DFS_DespatchDocument = row["JIDN_DFS_DespatchDocument"],
                         jidN_DFS_DespatchedThrough = row["JIDN_DFS_DespatchedThrough"],
-                        jidN_DFS_Remarks = row["JIDN_DFS_Remarks"]
+                        jidN_DFS_Remarks = row["JIDN_DFS_Remarks"],
+                        jidN_DFS_IsFreightApplicable = row["JIDN_DFS_IsFreightApplicable"]
                     }
                 });
             }

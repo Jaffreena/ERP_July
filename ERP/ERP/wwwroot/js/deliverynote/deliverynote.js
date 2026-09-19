@@ -563,6 +563,11 @@ function LoadDefaultFormSetting() {
                 if (data.jidN_DFS_DespatchDocument) {
                     $('#Header_JIDNH_DespatchDocumentNo').val(data.jidN_DFS_DespatchDocument);
                 }
+                if (data.jidN_DFS_IsFreightApplicable) {
+                    $('#Header_Freight_Applicable')
+                        .prop('checked', data.jidN_DFS_IsFreightApplicable === 'Yes')
+                        .trigger('change');
+                }
             }
         },
         error: function (xhr) {
@@ -742,18 +747,7 @@ $(document).ready(function () {
 
     //#endregion
 
-    //#region Unit Price Format
-
-    //#region comma format on focusout
-    $(document).on("focusout", ".JIDNI_Qty, .JIDNI_UnitPrice, .JIDNI_Amount", function () {
-
-        let type = $(this).hasClass("JIDNI_Qty") ? "q" : "c";
-
-        $(this).val(addComma($(this).val(), type));
-    });
-    //#endregion
-
-    //#endregion
+  
 
     //#region INPUT CLICK SELECT ALL
     $(document).on("click", "#DeliveryNoteBatchList input", function (e) {
@@ -1074,6 +1068,9 @@ $(document).ready(function () {
             type: "GET",
             url: "/jobinward/transactions/delivery-note/buyeraddress",
             data: { Buyer: Buyer, ADTPNumber: ADTPNumber },
+            error: function () {
+                alert("Unable to load Address IDs. Please try again.");
+            },
             dataType: "json",
             success: function (data) {
                 var AddressID = data.buyerAddressId;
@@ -1090,6 +1087,7 @@ $(document).ready(function () {
                 }));
 
                 AddressID.forEach(function (item) {
+                    if (!item.buY_ADD_AddressID) return;  
                     $AddressDropdown.append($('<option>', {
                         value: item.buY_ADD_AddressID,
                         text: item.buY_ADD_AddressID
@@ -1131,10 +1129,23 @@ $(document).ready(function () {
             type: "get",
             url: "/jobinward/transactions/delivery-note/buyeraddressid",
             data: { Buyer: Buyer, ADTPNumber: ADTPNumber, AddressID: AddressID },
+            error: function () {
+                alert("Unable to load Address details. Please try again.");
+            },
             datatype: "json",
             traditional: true,
             success: function (data) {
-                ADDAddress.text(data.buyerAddress.buY_ADD_Address || "");
+                var addr = data && data.buyerAddress;
+                if (!addr) {
+                    ADDAddress.text("");
+                    ADDCity.val("");
+                    ADDState.val("");
+                    ADDCountry.val("");
+                    ADDPin.val("");
+                    ADDGSTIN.val("");
+                    return;
+                }
+                ADDAddress.text(addr.buY_ADD_Address || "");
                 ADDCity.val(data.buyerAddress.buY_ADD_City);
                 ADDState.val(data.buyerAddress.buY_ADD_State);
                 ADDCountry.val(data.buyerAddress.buY_ADD_Country);
@@ -1652,9 +1663,10 @@ function GetDeliveryNoteNumber() {
         data: { DNDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-               // alert("Please set numbering for this date range.");
                 $("#Header_JIDNH_DN_No").val("");
-                DateBind();
+                alert("Please set numbering for this date range.");
+            
+              
 
                 return;
             }
@@ -1943,7 +1955,8 @@ function SearchBuyer(inputElement) {
                     $(inputElement).val(clickedCust.cuS_Name);
 
                     $("#Header_JIDNH_JW_Customer_Number")
-                        .val(clickedCust.cuS_Number);
+                        .val(clickedCust.cuS_Number)
+                        .trigger("change");
 
                     $("#Currency_Name")
                         .val(clickedCust.cuS_CUR_Name);
@@ -2238,7 +2251,7 @@ $(document).on("change", ".JIDNI_JIJWI_SVOH_Number", function () {
 
         } else if (jisvohNumber && jisvohNumber !== "0") {
             // NEW: valid selection, within limit — lock the dropdown
-            row.find(".JIDNI_JIJWI_SVOH_Number").prop("disabled", true);
+           // row.find(".JIDNI_JIJWI_SVOH_Number").prop("disabled", true);
         }
     });
 });
@@ -2267,13 +2280,19 @@ function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
 
     return total;
 }
+var bindServiceOrderReq = 0;
 function BindServiceOrder(customerId, prsNumber = null, itemNumber = null, uomNumber = null) {
     $(".JIDNI_JIJWI_SVOH_Number").html('<option value="0"></option>');
     if (!customerId) return;
 
+    let reqId = ++bindServiceOrderReq;   // only the latest response may fill the list
+    let addedSO = {};                    // each SO No. only once
     $.get("/DeliveryNote/GetServiceOrder",
         { customerId, prsNumber, itemNumber, uomNumber },
         data => $.each(data, (_, item) => {
+            if (reqId !== bindServiceOrderReq) return;
+            if (addedSO[item.value]) return;
+            addedSO[item.value] = true;
             // NEW: skip entries with no real value/text — server
 
             if (!item.value || item.value === "" || item.value === "0") return;
@@ -2315,13 +2334,15 @@ function CalculateQtyKgDN(row) {
         qtyKg = fromQty > 0 ? (qty * (toQty / fromQty)) : 0;
     }
 
-    row.find(".JIDNI_Qty_Kgs").val(qtyKg === 0 ? "" : qtyKg.toFixed(2));
+    row.find(".JIDNI_Qty_Kgs").val(qtyKg === 0 ? "" : addComma(qtyKg, "c"));
+    calculateTotal();
 }
 
 function calculateTotal() {
 
     let totalQty = 0;
     let totalAmount = 0;
+    let totalQtyKgs = 0;
 
     // Loop through each row (only active rows)
     $("#ItemTable tbody tr.NewRow").each(function () {
@@ -2349,12 +2370,16 @@ function calculateTotal() {
         // Add to totals
         totalQty += qty;
         totalAmount += amount;
+        totalQtyKgs += parseFloat(removeComma(row.find(".JIDNI_Qty_Kgs").val())) || 0;
     });
 
     // Footer totals
     $("#TotalQty").val(addComma(totalQty, "q"));
     $("#TotalAmount").val(addComma(totalAmount, "c"));
+    $("#TotalQtyKgs").val(addComma(totalQtyKgs, "c"));
 }
+
+
 //#endregion Calculate Total
 
 //#region item grid fetch item details
@@ -2767,6 +2792,8 @@ function validateHeaderById() {
 
 function validateItemGrid() {
 
+    let hasFreightRow = false;
+
     let hasValidRow = false;
 
     let isValid = true;
@@ -2818,7 +2845,7 @@ function validateItemGrid() {
         }
 
         // validate Qty
-        if (!qty || qty.trim() === "" || qty.trim() === "0") {
+        if (!qty || qty.trim() === "" || (parseFloat(removeComma(qty)) || 0) <= 0) {
             showAlert('Qty is required', row.find(".JIDNI_Qty"));
 
             isValid = false;
@@ -2826,7 +2853,7 @@ function validateItemGrid() {
         }
 
         // validate Unit Price
-        if (!unitPrice || unitPrice.trim() === "" || unitPrice.trim() === "0") {
+        if (!unitPrice || unitPrice.trim() === "" || (parseFloat(removeComma(unitPrice)) || 0) <= 0) {
             showAlert('Unit Price is required', row.find(".JIDNI_UnitPrice"));
 
             isValid = false;
@@ -2836,6 +2863,7 @@ function validateItemGrid() {
         // NEW: validate From WH / To WH when Freight Applicable is checked
         if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
 
+            hasFreightRow = true;
             let fromWH = row.find(".JIDNI_FromWH").val();
             let toWH = row.find(".JIDNI_ToWH").val();
 
@@ -2861,52 +2889,103 @@ function validateItemGrid() {
         return false;
     }
 
-    return isValid;
-}
-
-
-//#endregion VALIDATE ITEM GRID
-
-//#region VALIDATE DELIVERY NOTE BATCH LIST
-
-function validateDeliveryNoteBatchList() {
-
-    let batchRows =
-        $("#DeliveryNoteBatchList tbody tr")
-            .not("#DeliveryNoteBatchTemplateRow");
-
-    let hasValidQty = false;
-
-    batchRows.each(function () {
-
-        let row = $(this);
-
-        let qty =
-            row.find(".JIDNI_BCH_QtyInvoice").val();
-
-        qty = parseFloat(qty) || 0;
-
-        if (qty > 0) {
-
-            hasValidQty = true;
-
-            return false;
-        }
-
-    });
-
-    if (!hasValidQty) {
-
-        showAlert(
-            "Please enter Delivered Qty in batch details",
-            '#DeliveryNoteBatchList tbody tr:visible:first .JIDNI_BCH_QtyInvoice'
-        );
-
+    // a row already failed and showed its alert - do not show a second one
+    if (!isValid) {
         return false;
     }
 
-    return true;
+    // Header Freight Applicable ticked -> at least one row must be freight applicable
+    if ($("#Header_Freight_Applicable").is(":checked") && !hasFreightRow) {
+        showAlert(
+            "Freight is marked applicable — at least one item row must have Freight Applicable checked.",
+            "#ItemTable tbody tr.NewRow:first .JIDNI_IsFreightApplicable"
+        );
+        return false;
+    }
+
+    return isValid;
 }
+//#endregion VALIDATE ITEM GRID
+
+//#region VALIDATE DELIVERY NOTE BATCH LIST
+function validateDeliveryNoteBatchList() {
+
+    let isValid = true;
+    let itemRows = $("#ItemTable tbody tr.NewRow");
+
+    itemRows.each(function (index) {
+
+        let itemRow = $(this);
+
+        // skip deleted rows
+        if (itemRow.find(".JIDNI_IsDeleted").val() === "1" ||
+            itemRow.find(".JIDNI_IsDeleted").val() === "true") {
+            return;
+        }
+
+        // skip rows with no item selected (not a real data row)
+        let itemNumber = itemRow.find(".JIDNI_Item_Number").val();
+        if (!itemNumber || itemNumber === "0") {
+            return;
+        }
+
+        let rowID = itemRow.attr("data-rowid");
+
+        let batchEntry =
+            DeliveryNoteItemBatchList.find(x => x.RowID == rowID);
+
+        let rowNumber = index + 1;
+
+        // no batch saved at all for this item row
+        if (!batchEntry || !batchEntry.BatchList || batchEntry.BatchList.length === 0) {
+            $("#ModelAlert").off("hidden.bs.modal");
+            showAlert(
+                "Please enter Delivered Qty in batch details/Qty mismatch (Item Row " + rowNumber + ")"
+            );
+
+            isValid = false;
+            return false; // break loop
+        }
+
+        // at least ONE batch line for this item must have qty > 0
+        let hasAnyValidBatchQty = batchEntry.BatchList.some(function (b) {
+            let qty = parseFloat(removeComma(b.JIDNI_BCH_QtyInvoice)) || 0;
+            return qty > 0;
+        });
+
+        if (!hasAnyValidBatchQty) {
+            $("#ModelAlert").off("hidden.bs.modal");
+            showAlert(
+                "Please enter Delivered Qty in batch details/Qty mismatch (Item Row " + rowNumber + ")"
+            );
+
+            isValid = false;
+            return false; // break loop
+        }
+
+        // batch total must equal the item Qty
+        let itemQty = parseFloat(removeComma(itemRow.find(".JIDNI_Qty").val())) || 0;
+        let batchTotal = batchEntry.BatchList.reduce(function (sum, b) {
+            return sum + (parseFloat(removeComma(b.JIDNI_BCH_QtyInvoice)) || 0);
+        }, 0);
+
+        if (Math.abs(batchTotal - itemQty) > 0.0001) {
+            $("#ModelAlert").off("hidden.bs.modal");
+            showAlert(
+                "Please enter Delivered Qty in batch details/Qty mismatch (Item Row " + rowNumber + ")"
+                //"Qty mismatch: batch total (" + addComma(batchTotal, "q") +
+                //") does not match item Qty (" + addComma(itemQty, "q") +
+                //") (Item Row " + rowNumber + ")"
+            );
+
+            isValid = false;
+            return false; // break loop
+        }
+    });
+
+    return isValid;
+}
+
 //#endregion
 
 //#region TEMP DELIVERY BATCH MODEL
@@ -3047,3 +3126,103 @@ function LoadJWCAddress() {
         }
     });
 }
+
+ 
+//#region itemgrid-qty
+// Restrict Qty input to digits only
+$(document).on("keypress", ".JIDNI_Qty", function (e) {
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+// Strip any non-numeric characters that slip in via paste
+$(document).on("input", ".JIDNI_Qty", function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+//#endregion
+
+//#region itemgrid-unitprice Unit Price Format
+
+//#region Unit Price - decimal only (digits + one dot, max 2 decimals)
+const UNITPRICE_INPUT = "#ItemTable .JIDNI_UnitPrice";
+const UNITPRICE_PATTERN = /^\d*\.?\d{0,2}$/;
+
+// remove commas while editing (focusout adds them back)
+$(document).on("focusin", UNITPRICE_INPUT, function () {
+    $(this).val(($(this).val() || "").replace(/,/g, ""));
+});
+
+// block a keystroke if the resulting value breaks the pattern
+$(document).on("keypress", UNITPRICE_INPUT, function (e) {
+    if (e.ctrlKey || e.metaKey) return;   // Ctrl+V / Ctrl+A / Ctrl+C
+    if (e.which < 32) return;             // Enter, Backspace etc.
+
+    let el = this;
+    let newVal = el.value.slice(0, el.selectionStart)
+        + String.fromCharCode(e.which)
+        + el.value.slice(el.selectionEnd);
+
+    if (!UNITPRICE_PATTERN.test(newVal)) {
+        e.preventDefault();
+    }
+});
+
+// clean paste / drag-drop / autofill
+$(document).on("input", UNITPRICE_INPUT, function () {
+    let v = $(this).val();
+
+    if (!UNITPRICE_PATTERN.test(v)) {
+        v = v.replace(/[^0-9.]/g, "");
+        let parts = v.split(".");
+        v = parts.length > 1
+            ? parts[0] + "." + parts.slice(1).join("").slice(0, 2)
+            : parts[0];
+        $(this).val(v);
+    }
+});
+
+// a lone "." is not a number
+$(document).on("focusout", UNITPRICE_INPUT, function () {
+    if ($(this).val() === ".") $(this).val("");
+});
+//#endregion
+
+//#region comma format on focusout
+$(document).on("focusout", ".JIDNI_Qty, .JIDNI_UnitPrice, .JIDNI_Amount", function () {
+
+    let type = $(this).hasClass("JIDNI_Qty") ? "q" : "c";
+
+    $(this).val(addComma($(this).val(), type));
+});
+//#endregion
+
+//#endregion
+
+//#region batchgrid-qty
+// Restrict Qty input to digits only
+$(document).on("keypress", ".JIDNI_BCH_QtyInvoice", function (e) {
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+// Strip any non-numeric characters that slip in via paste
+$(document).on("input", ".JIDNI_BCH_QtyInvoice", function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+//#endregion

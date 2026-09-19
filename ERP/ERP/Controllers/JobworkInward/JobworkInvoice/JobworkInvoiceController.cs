@@ -33,7 +33,7 @@ namespace ERP.Controllers.JobworkInward
         {
             GetJobWorkInvoiceData();
             ViewBag.Collapse = true;
-            return View();
+            return View("~/Views/JobworkInward/JobworkInvoice/Edit.cshtml");
         }
         #endregion
 

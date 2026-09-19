@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.FreightServiceOrder_DTO;
 @{
-    ViewData["Title"] = "Freight Service Order Default Setting";
+    ViewData["Title"] = "Service Order - Freight Default Form Setting";
 }
 <style>
     .match-row td {
@@ -89,12 +89,63 @@
         min-height: 60px !important;
     }
 
+    /* Narrow-column label (Column 4) - stacked above its textarea,
+       needs to wrap normally instead of the global nowrap rule */
+    .narrow-col-label {
+        white-space: nowrap !important;
+        display: block;
+        width: auto;
+        max-width: none !important;
+        padding-bottom: 2px;
+    }
+
+    .narrow-col-field {
+        margin-bottom: 8px;
+    }
+
+    /* Responsive: stack columns cleanly on narrower viewports and
+       drop the fixed rem-based left offsets that assume a wide
+       desktop layout, matching Create.cshtml's responsive intent. */
+    @@media (max-width: 1199.98px) {
+        .col-12.col-md-3.col-lg-2[style*="padding-right"],
+        .col-12.col-md-3.ps-5,
+        .col-12.col-md-2[style*="margin-left"] {
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            padding-left: 0.75rem !important;
+        }
+
+        .col-12.col-md-3.ps-5 .row.ps-5,
+        .col-12.col-md-3.col-lg-2 .row[style*="padding-right"] {
+            padding-right: 0 !important;
+        }
+
+        .col-12.col-md-3.ps-5 .row.ps-5 > div[class*="col-"],
+        .col-12.col-md-3.col-lg-2 .row[style*="padding-right"] > div[class*="col-"] {
+            padding-right: 8px !important;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .row > .col-md-6.col-lg-5.col-form-label,
+        .row > .col-sm-5.col-form-label {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .row > .col-md-6.col-lg-7,
+        .row > .col-sm-7 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
 </style>
 <form>
     <div class="row align-items-center panel-header gx-2">
         <div class="col h-100 align-items-center">
             <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
-                Freight Service Order
+                Service Order - Freight
                 <a asp-controller="JobworkInwardMain" asp-action="Index" class="float-end btn p-0">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -139,40 +190,36 @@
 
                             <div class="col-auto left-menu text-black">
                                 <div class="row">
+                                    <!-- COLUMN 1 -->
                                     <div class="col-12 col-md-3 col-lg-3">
-
-                                        <div class="row align-items-center gx-2">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label class="col-md-6 col-lg-5 col-form-label ps-0">Service Order No</label>
                                             <div class="col-md-6 col-lg-7">
                                                 <input asp-for="JIFRT_SVOH_ServiceOrderNo" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                             </div>
                                         </div>
-
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Payment Terms</label>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Category</label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input asp-for="JIFRT_SVOH_PaymentTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                                <select asp-for="JIFRT_SVOH_Category" class="form-select">
+                                                    <option value="DN">Delivery Note</option>
+                                                    <option value="RN">Receipt Note</option>
+                                                </select>
                                             </div>
                                         </div>
-
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Delivery Terms</label>
+                                        <div class="row align-items-center gx-2 mb-0" style="display:none;">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Material Segregation</label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input asp-for="JIFRT_SVOH_DeliveryTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div class="col-12 col-md-3 col-lg-4">
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-md-6 col-lg-6 col-form-label ps-0">Material Segregation</label>
-                                            <div class="col-md-6 col-lg-6">
                                                 <select asp-for="JIFRT_SVOH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
                                             </div>
                                         </div>
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-md-6 col-lg-6 col-form-label ps-0">JW Customer</label>
-                                            <div class="col-md-6 col-lg-6">
+                                    </div>
+
+                                                                      <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-3 col-lg-2">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-5 col-form-label ps-0">JW Customer</label>
+                                            <div class="col-sm-7">
                                                 <input asp-for="JIFRT_SVOH_JW_Customer_Number" type="hidden" />
 
                                                 <input id="JIFRT_SVOH_JW_Customer_Name"
@@ -184,52 +231,60 @@
                                                        oninput="OnBuyerInput(this)" />
                                             </div>
                                         </div>
-
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-md-6 col-lg-6 col-form-label ps-0">Currency</label>
-                                            <div class="col-md-6 col-lg-6">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-5 col-form-label ps-0">Currency</label>
+                                            <div class="col-sm-7 position-relative">
                                                 <select asp-for="JIFRT_SVOH_Currency_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Currency"></select>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-md-6 col-lg-6 col-form-label ps-0">Delivery Mode</label>
-                                            <div class="col-md-6 col-lg-6">
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3" style="padding-left: 10rem;">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-5 col-form-label ps-0">Payment Terms</label>
+                                            <div class="col-sm-7">
+                                                <input asp-for="JIFRT_SVOH_PaymentTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-5 col-form-label ps-0">Delivery Terms</label>
+                                            <div class="col-sm-7">
+                                                <input asp-for="JIFRT_SVOH_DeliveryTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-5 col-form-label ps-0">Delivery Mode</label>
+                                            <div class="col-sm-7">
                                                 <input asp-for="JIFRT_SVOH_DeliveryMode" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
-
-                                    </div>
-                                    <div class="col-12 col-md-3 col-lg-3">
-
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-sm-4 col-lg-5 col-form-label ps-0">Tax</label>
-                                            <div class="col-md-6 col-lg-7">
-                                                <input asp-for="JIFRT_SVOH_Tax" class="form-control Key KeyDup" maxlength="250" autocomplete="off" />
-                                            </div>
-                                        </div>
-
-                                        <div class="row align-items-center gx-2">
-                                            <label class="col-sm-4 col-lg-5 col-form-label ps-0">
-                                                Technical delivery<br /> conditions
-                                            </label>
-                                            <div class="col-md-6 col-lg-7">
-                                                <input asp-for="JIFRT_SVOH_TDC" class="form-control Key KeyDup" maxlength="250" autocomplete="off" />
-                                            </div>
-                                        </div>
-
-                                        <div class="row align-items-start  gx-2">
-                                            <label class="col-sm-4 col-lg-5 col-form-label ps-0">Remarks</label>
-                                            <div class="col-md-6 col-lg-7">
-                                                <textarea asp-for="JIFRT_SVOH_Remarks" maxlength="250"
+                                        <div class="row align-items-start gx-2 mb-0">
+                                            <label class="col-sm-5 col-form-label ps-0">Tax</label>
+                                            <div class="col-sm-7">
+                                                <textarea asp-for="JIFRT_SVOH_Tax" maxlength="250"
                                                           class="form-control Key KeyDup"
                                                           autocomplete="off"></textarea>
                                             </div>
                                         </div>
-
                                     </div>
+
+                                    <!-- COLUMN 4 -->
+                                     <div class="col-12 col-md-2" style="padding-left: 10rem;">
+                                        <div class="narrow-col-field">
+                                            <label class="col-form-label narrow-col-label ps-0">Technical delivery conditions</label>
+                                            <input asp-for="JIFRT_SVOH_TDC" class="form-control Key KeyDup" maxlength="250" autocomplete="off" />
+                                        </div>
+                                        <div class="narrow-col-field">
+                                            <label class="col-form-label narrow-col-label ps-0">Remarks</label>
+                                            <textarea asp-for="JIFRT_SVOH_Remarks" maxlength="250"
+                                                      class="form-control Key KeyDup"
+                                                      autocomplete="off"></textarea>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
@@ -312,16 +367,52 @@
 
             HandleSearchSelection(input, rows, "#BuyerMessage", "#RightPane", "#RightPane .buyer-search-results");
         });
-
         $(document).on("keydown", "#JIFRT_SVOH_JW_Customer_Name", function (e) {
             if (e.key === "Escape" || e.key === "Tab") {
                 $("#RightPane").removeClass("show").find(".buyer-search-results").hide().empty();
                 $("#BuyerMessage").hide().text("");
                 return;
             }
-            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                HandleSearchKeyDown(e, this, "#RightPane", ".buyer-search-results", "#BuyerMessage");
+
+            if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+                return;
             }
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            // Enter, no record selected (empty textbox, full unfiltered
+            // list) -> auto-select first record + close popup.
+            if (e.key === "Enter" &&
+                $.trim(input.val()) === "" && rows.length > 0 &&
+                !rows.filter(".current-row, .match-row").length) {
+
+                e.preventDefault();
+
+                let firstCust = rows.first().data("customer");
+
+                isMouseSelectingBuyer = true;
+
+                if (firstCust) {
+                    SelectBuyerFRT(
+                        firstCust,
+                        "#JIFRT_SVOH_JW_Customer_Name",
+                        "#JIFRT_SVOH_JW_Customer_Number",
+                        "#JIFRT_SVOH_Currency_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                }
+
+                $("#RightPane").removeClass("show");
+                $("#RightPane .buyer-search-results").hide();
+
+                $("#JIFRT_SVOH_Currency_Number").focus();
+                isMouseSelectingBuyer = false;
+                return;
+            }
+
+            HandleSearchKeyDown(e, this, "#RightPane", ".buyer-search-results", "#BuyerMessage");
         });
     });
 
@@ -406,7 +497,7 @@
 
                         const clickedCust = $(this).data("customer");
                         isMouseSelectingBuyer = true;
-                        SelectBuyer(clickedCust, "#JIFRT_SVOH_JW_Customer_Name", "#JIFRT_SVOH_JW_Customer_Number", "#JIFRT_SVOH_Currency_Number", "#RightPane", ".buyer-search-results");
+                                             SelectBuyerFRT(clickedCust, "#JIFRT_SVOH_JW_Customer_Name", "#JIFRT_SVOH_JW_Customer_Number", "#JIFRT_SVOH_Currency_Number", "#RightPane", ".buyer-search-results");
 
                         $("#RightPane").removeClass("show");
                         $("#RightPane .buyer-search-results").hide();
@@ -452,8 +543,7 @@
             }
         });
     }
-
-    function SelectBuyer(cust, customerNameId, customerNumberId, currencyNumberId, rightPaneId, resultClass) {
+    function SelectBuyerFRT(cust, customerNameId, customerNumberId, currencyNumberId, rightPaneId, resultClass) {
         $(customerNameId).val(cust.cuS_Name);
         $(customerNumberId).val(cust.cuS_Number);
         $(currencyNumberId).val(cust.cuS_CUR_Number);
@@ -557,6 +647,7 @@
         return {
             JIFRT_SVOH_Number: $("input.Number").val() || 0,
             JIFRT_SVOH_ServiceOrderNo: $("#JIFRT_SVOH_ServiceOrderNo").val(),
+            JIFRT_SVOH_Category: $("#JIFRT_SVOH_Category").val(),
             JIFRT_SVOH_JW_Customer_Number: $("#JIFRT_SVOH_JW_Customer_Number").val() || 0,
             JIFRT_SVOH_Currency_Number: $("#JIFRT_SVOH_Currency_Number").val() || 0,
             JIFRT_SVOH_PaymentTerms: $("#JIFRT_SVOH_PaymentTerms").val(),
@@ -573,4 +664,5 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
+      <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
 }

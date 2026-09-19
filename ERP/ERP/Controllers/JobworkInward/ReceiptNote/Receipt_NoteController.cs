@@ -340,6 +340,7 @@ namespace ERP.Controllers.JobworkInward
                                     batchDTO.JIRNI_BCH_BatchValue = Convert.ToDouble(batch.JIRNI_BCH_BatchValue);             // RENAMED: was batch.RNI_BCH_Value
                                     batchDTO.JIRNI_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
                                     batchDTO.JIRNH_WH_Number = Convert.ToInt32(S_DTO.JIRNH_WH_Number);                        // RENAMED: was S_DTO.WH_Number
+                                    batchDTO.JIRNH_RN_Date = SI_DTO.JIRNH_RN_Date;                                             // NEW: TransDate fix - pass header date into batch insert
                                     batchDTO.JIRN_Id = 23;
 
                                     SI_DAO.JI_ReceiptNoteDB(batchDTO);

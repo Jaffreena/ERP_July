@@ -196,6 +196,7 @@ namespace ERP_DTO.JobInwardTransaction
     public class JIJWI_ServiceOrderHead_DTO
     {
         public long JIJWI_SVOH_Number { get; set; }
+        public string JIJWI_SVOH_JW_Customer_Name { get; set; }   // Display only
         public string JIJWI_SVOH_RegNo { get; set; }
         public DateTime JIJWI_SVOH_RegDate { get; set; }
         public string JIJWI_SVOH_ServiceOrderNo { get; set; }
@@ -223,6 +224,19 @@ namespace ERP_DTO.JobInwardTransaction
         public double JIJWI_SVOI_Amount { get; set; }
         public DateTime? JIJWI_SVOI_DeliveryDate { get; set; }
         public string JIJWI_SVOI_Category { get; set; }
+
+        // Joined/display-only columns from SP
+        public double AssignedQty { get; set; }
+        public double InvoicedQty { get; set; }
+        public double InvoiceToBeRaised { get; set; }
+        public string JIJWI_SVOI_Item_Code { get; set; }
+        public string Description { get; set; }
+        public string OuterDia { get; set; }
+        public string Thickness { get; set; }
+        public string Length { get; set; }
+        public string Width { get; set; }
+        public string MaterialGrade { get; set; }
+        public string ItemGroup { get; set; }
     }
     public class JIJWI_ServiceOrder_DTO
     {
@@ -232,6 +246,7 @@ namespace ERP_DTO.JobInwardTransaction
     public class JIFRT_ServiceOrderHead_DTO
     {
         public long JIFRT_SVOH_Number { get; set; }
+        public string JIFRT_SVOH_JW_Customer_Name { get; set; }   // Display only
         public string JIFRT_SVOH_RegNo { get; set; }
         public DateTime JIFRT_SVOH_RegDate { get; set; }
         public string JIFRT_SVOH_ServiceOrderNo { get; set; }

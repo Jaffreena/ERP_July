@@ -1182,17 +1182,17 @@ $(document).ready(function () {
 function ToggleFreightColumns_RN_Edit() {
     let isFreight = $("#Header_Freight_Applicable").is(":checked");
 
-    let freightCols = ".FreightApplicableHeader, .FreightApplicableCell, " +
-        ".FromWHHeader, .FromWHCell, " +
-        ".ToWHHeader, .ToWHCell, " +
-        ".FreightSOHeader, .FreightSOCell";
+    let freightCols = ".FreightApplicableHeader, .FreightApplicableCell, .FreightApplicableFooterCell, " +
+        ".FromWHHeader, .FromWHCell, .FromWHFooterCell, " +
+        ".ToWHHeader, .ToWHCell, .ToWHFooterCell, " +
+        ".FreightSOHeader, .FreightSOCell, .FreightSOFooterCell";
 
     if (isFreight) {
         $(freightCols).show();
     } else {
         $(freightCols).hide();
     }
-} 
+}
 
 $(window).on("load", function () {
     setTimeout(function () {
@@ -1551,13 +1551,13 @@ function ValidateAmendQtyGrid() {
     $("#TableBody tr.NewRow").each(function () {
 
         let originalQty =
-            parseFloat($(this).find(".OriginalQty").val()) || 0;
+            parseFloat(removeCommas($(this).find(".OriginalQty").val())) || 0;
 
         let usedQty =
-            parseFloat($(this).find(".UsedQty").val()) || 0;
+            parseFloat(removeCommas($(this).find(".UsedQty").val())) || 0;
 
         let amendQty =
-            parseFloat($(this).find(".AmendQty").val()) || 0;
+            parseFloat(removeCommas($(this).find(".AmendQty").val())) || 0;
 
         if (amendQty < usedQty) {
 

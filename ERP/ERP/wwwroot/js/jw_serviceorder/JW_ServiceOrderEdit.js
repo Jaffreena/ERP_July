@@ -389,6 +389,90 @@ $(document).ready(function () {
         });
     }
     DateBind();
+
+    //#region item grid - select full content on click/focus
+    $(document).on("click focusin", "#ItemTable input, #FreightItemTable input", function (e) {
+        e.stopPropagation();
+
+        let input = this;
+        input.focus();
+
+        setTimeout(function () {
+            input.select();
+        }, 10);
+    });
+    //#endregion
+
+    //#region restrict Qty to whole numbers only (no decimal point)
+    $(document).on("keydown", ".JISVOI_Qty, .JIFRT_SVOI_Qty", function (e) {
+
+        if ($.inArray(e.key, ["Backspace", "Delete", "Tab", "Escape", "Enter",
+            "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"]) !== -1) {
+            return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) &&
+            ["a", "c", "v", "x"].indexOf(e.key.toLowerCase()) !== -1) {
+            return;
+        }
+
+        if (e.key >= "0" && e.key <= "9") {
+            return;
+        }
+
+        e.preventDefault();
+    });
+
+    $(document).on("input", ".JISVOI_Qty, .JIFRT_SVOI_Qty", function () {
+
+        let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+        if (cleaned !== $(this).val()) {
+            $(this).val(cleaned);
+        }
+    });
+    //#endregion
+
+    //#region restrict UnitPrice/Rate to numbers + single decimal point
+    $(document).on("keydown", ".JISVOI_UnitPrice, .JIFRT_SVOI_Rate", function (e) {
+
+        if ($.inArray(e.key, ["Backspace", "Delete", "Tab", "Escape", "Enter",
+            "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"]) !== -1) {
+            return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) &&
+            ["a", "c", "v", "x"].indexOf(e.key.toLowerCase()) !== -1) {
+            return;
+        }
+
+        if (e.key >= "0" && e.key <= "9") {
+            return;
+        }
+
+        if (e.key === "." && this.value.indexOf(".") === -1) {
+            return;
+        }
+
+        e.preventDefault();
+    });
+
+    $(document).on("input", ".JISVOI_UnitPrice, .JIFRT_SVOI_Rate", function () {
+
+        let cleaned = $(this).val().replace(/[^0-9.]/g, "");
+
+        let firstDot = cleaned.indexOf(".");
+        if (firstDot !== -1) {
+            cleaned = cleaned.substring(0, firstDot + 1) +
+                cleaned.substring(firstDot + 1).replace(/\./g, "");
+        }
+
+        if (cleaned !== $(this).val()) {
+            $(this).val(cleaned);
+        }
+    });
+    //#endregion
+
     //#region onkeypress qty and unit
     $(document).on("blur", ".JISVOI_Qty", function () {
 
@@ -410,6 +494,11 @@ $(document).ready(function () {
     //#region comma format on focusout
     $(document).on("focusout", ".JISVOI_Qty, .JISVOI_UnitPrice, .JISVOI_Amount", function () {
         let type = $(this).hasClass("JISVOI_Qty") ? "q" : "c";
+        $(this).val(addComma($(this).val(), type));
+    });
+
+    $(document).on("focusout", ".JIFRT_SVOI_Qty, .JIFRT_SVOI_Rate, .JIFRT_SVOI_Amount", function () {
+        let type = $(this).hasClass("JIFRT_SVOI_Qty") ? "q" : "c";
         $(this).val(addComma($(this).val(), type));
     });
     //#endregion
@@ -579,6 +668,9 @@ $(document).ready(function () {
             success: function (response) {
 
                 if (response.success) {
+                    $('#ModelAlert').one('hidden.bs.modal', function () {
+                        location.reload();
+                    });
                     showAlert('Record Updated');
                     console.log(model);
                 }
@@ -682,9 +774,11 @@ $(document).ready(function () {
         if (orderType === "FREIGHT") {
             $("#ServiceType_Freight").prop("checked", true);
             $("#FreightHeader_JIFRT_SVOH_Number").val(siNo);
+            $("#ServiceType_JWI").closest(".form-check").hide();
         } else {
             $("#ServiceType_JWI").prop("checked", true);
             $("#Header_JIJWI_SVOH_Number").val(siNo);
+            $("#ServiceType_Freight").closest(".form-check").hide();
         }
 
         toggleServiceTypePanels();
@@ -1721,6 +1815,7 @@ function validateItemGrid() {
 
         let process = row.find(".JISVOI_PRS_Number").val();
         let itemCode = row.find(".JISVOI_Item_Code").val();
+        let uom = row.find(".JISVOI_UoM_Number").val();
         let qty = row.find(".JISVOI_Qty").val();
         let unitPrice = row.find(".JISVOI_UnitPrice").val();
 
@@ -1728,6 +1823,7 @@ function validateItemGrid() {
         let isRowStarted =
             (process && process.trim() !== "") ||
             (itemCode && itemCode.trim() !== "") ||
+            (uom && uom.trim() !== "") ||
             (qty && qty.trim() !== "") ||
             (unitPrice && unitPrice.trim() !== "");
 
@@ -1751,6 +1847,16 @@ function validateItemGrid() {
             showAlert(
                 'Item Code is required',
                 row.find(".JISVOI_Item_Code")
+            );
+            isValid = false;
+            return false;
+        }
+
+        // UOM
+        if (!uom || uom.trim() === "" || uom.trim() === "0") {
+            showAlert(
+                'UOM is required',
+                row.find(".JISVOI_UoM_Number")
             );
             isValid = false;
             return false;
@@ -1831,10 +1937,10 @@ function GetServiceOrder(serviceOrderNumber, orderType) {
             console.log(data)
 
             if (orderType === "FREIGHT") {
-                BindFreightHeader(data.Header[0]);
+                BindFreightHeader(data.Header);
                 BindFreightItems(data.Items);
             } else {
-                BindHeader(data.Header[0]);
+                BindHeader(data.Header);
                 BindItems(data.Items);
             }
         },
@@ -1871,7 +1977,7 @@ function BindHeader(header) {
     $("#Header_JIJWI_SVOH_JW_Customer_Number")
         .val(header.jijwi_SVOH_JW_Customer_Number ?? header.JIJWI_SVOH_JW_Customer_Number).trigger("change");
     $("#Header_JIJWI_SVOH_JW_Customer_Name")
-        .val(header.JW_Customer_Name);
+        .val(header.jijwi_SVOH_JW_Customer_Name ?? header.JIJWI_SVOH_JW_Customer_Name);
 
     $("#Header_JIJWI_SVOH_Currency_Number")
         .val(header.jijwi_SVOH_Currency_Number ?? header.JIJWI_SVOH_Currency_Number);
@@ -1924,7 +2030,7 @@ function BindFreightHeader(header) {
     $("#FreightHeader_JIFRT_SVOH_JW_Customer_Number")
         .val(header.jifrt_SVOH_JW_Customer_Number ?? header.JIFRT_SVOH_JW_Customer_Number).trigger("change");
     $("#FreightHeader_JIFRT_SVOH_JW_Customer_Name")
-        .val(header.JW_Customer_Name);
+        .val(header.jifrt_SVOH_JW_Customer_Name ?? header.JIFRT_SVOH_JW_Customer_Name);
 
     $("#FreightHeader_JIFRT_SVOH_Currency_Number")
         .val(header.jifrt_SVOH_Currency_Number ?? header.JIFRT_SVOH_Currency_Number);

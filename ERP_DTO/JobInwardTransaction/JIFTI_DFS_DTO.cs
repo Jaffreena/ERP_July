@@ -14,6 +14,8 @@ namespace ERP_DTO.JobInwardTransaction
         public string JIFTI_DFS_PaymentTerms { get; set; }
         public string JIFTI_DFS_PaymentMethod { get; set; }
         public string JIFTI_DFS_Remarks { get; set; }
+        public long? JIFTI_DFS_MS_Number { get; set; }
+        public string JIFTI_DFS_Category { get; set; }
 
         public int Result_Number { get; set; }
         public string Result_Message { get; set; }

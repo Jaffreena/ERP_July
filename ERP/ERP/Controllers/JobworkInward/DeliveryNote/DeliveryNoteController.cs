@@ -134,6 +134,7 @@ namespace ERP.Controllers
 
             DN_DTO.Header.DN_CUS_Number = Convert.ToInt32(Buyer);
             DN_DTO.Header.DN_ADD_ADTP_Number = Convert.ToInt32(ADTPNumber);
+            DN_DTO.Header.JIDNH_DN_Date = DateTime.Now;
             DN_DTO.Header.DN_Id = 13;
             DS = DN_DAO.DeliveryNoteDB(DN_DTO);
 
@@ -159,6 +160,7 @@ namespace ERP.Controllers
             DN_DTO.Header.DN_CUS_Number = Convert.ToInt32(Buyer);
             DN_DTO.Header.DN_ADD_ADTP_Number = Convert.ToInt32(ADTPNumber);
             DN_DTO.Header.DN_ADD_Addressid = Convert.ToString(AddressID);
+            DN_DTO.Header.JIDNH_DN_Date = DateTime.Now;
             DN_DTO.Header.DN_Id = 14;
             DS = DN_DAO.DeliveryNoteDB(DN_DTO);
 

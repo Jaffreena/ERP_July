@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.ReceiptNoteHead_DTO;
 @{
-    ViewData["Title"] = "Receipt Note Create";
+    ViewData["Title"] = "Receipt Note Default Form Setting";
 }
 <style>
     .match-row td {
@@ -137,6 +137,21 @@
         background-repeat: no-repeat;
         background-position: right 8px center;
     }
+
+    @@media (max-width: 767.98px) {
+        .row > .col-md-6.col-lg-5.col-form-label,
+        .row > .col-sm-5.col-form-label,
+        .row > .col-sm-4.col-form-label {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .row > .col-md-6.col-lg-7,
+        .row > .col-sm-7 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
 </style>
 
 <form>
@@ -190,27 +205,23 @@
 
                             <div class="col-auto left-menu text-black">
                                 <div class="row">
-                                    <div class="col-12 col-md-3 col-lg-3">
-
-                       
-                                        <div class="row align-items-center gx-2 ">
-                                            <label asp-for="JIRNH_JW_CustomerDC_No" class="col-md-6 col-lg-4 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-8">
+                                               <div class="col-12 col-md-3 col-lg-3">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIRNH_JW_CustomerDC_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
                                                 <input asp-for="JIRNH_JW_CustomerDC_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                             </div>
                                         </div>
-                        
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIRNH_MS_Number" class="col-md-6 col-lg-4 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-8">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIRNH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
                                                 <select asp-for="JIRNH_MS_Number" class="form-select JIRNH_MS_Number"
                                                         asp-items="@ViewBag.MaterialSegregation"></select>
                                             </div>
                                         </div>
-          
                                     </div>
-                                    <div class="col-12 col-md-3 col-lg-4">
-                                        <div class="row align-items-center gx-2">
+                                                                   <div class="col-12 col-md-3 col-lg-4">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIRNH_JWC_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-5">
                                                 <input asp-for="JIRNH_JWC_Number" type="hidden" />
@@ -223,7 +234,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIRNH_Currency_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-5">
                                                 <input asp-for="JIRNH_Currency_Number" class="form-control" type="hidden" />
@@ -233,26 +244,30 @@
                                                        readonly />
                                             </div>
                                         </div>
-                                        <div class="row align-items-center gx-2">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIRNH_WH_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-5">
                                                 <select asp-for="JIRNH_WH_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Warehouse"></select>
 
-                            
-
                                                 <div class="cluster-results dropdown-results search-results bg-primary p-2" style="display:none"></div>
-
                                             </div>
                                         </div>
 
-                  
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-lg-2 col-form-label ps-0">Freight Applicable</label>
+                                            <div class="col-sm-7 col-lg-5">
+                                                <input type="checkbox"
+                                                       id="Header_Freight_Applicable"
+                                                       class="form-check-input"
+                                                       checked="@(Model.JIRNH_IsFreightApplicable == "Yes")" />
+                                            </div>
+                                        </div>
                                     </div>
 
-                  
-                                    <div class="col-12 col-md-3 col-lg-4">
-                                        <div class="row align-items-start  gx-2">
+                                    <div class="col-12 col-md-3 col-lg-3">
+                                        <div class="row align-items-start gx-2 mb-0">
                                             <label asp-for="JIRNH_Remarks" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
                                                 <textarea asp-for="JIRNH_Remarks" maxlength="250"
@@ -260,8 +275,6 @@
                                                           autocomplete="off"></textarea>
                                             </div>
                                         </div>
-
-                      
                                     </div>
                                 </div>
                             </div>
@@ -296,7 +309,7 @@
     <partial name="_ValidationScriptsPartial" />
  
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
-
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
  
 
 }
@@ -389,7 +402,8 @@
                 "#RightPane .buyer-search-results"
             );
         });
-            $(document).on("keydown", "#JWC_Name", function (e) {
+                
+        $(document).on("keydown", "#JWC_Name", function (e) {
 
                  if (e.key === "Escape" || e.key === "Tab") {
 
@@ -404,8 +418,58 @@
                 return;
             }
 
+            if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+                return;
+            }
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            // Enter, no record selected (empty textbox, full unfiltered
+            // list) -> auto-select first record + close popup.
+            if (e.key === "Enter" &&
+                $.trim(input.val()) === "" && rows.length > 0 &&
+                !rows.filter(".current-row, .match-row").length) {
+
+                e.preventDefault();
+
+                let firstCust = rows.first().data("customer");
+
+                isMouseSelectingBuyer = true;
+
+                if (firstCust) {
+                    SelectBuyer(
+                        firstCust,
+                        "#JWC_Name",
+                        "#JIRNH_JWC_Number",
+                        "#Currency_Name",
+                        "#JIRNH_Currency_Number",
+                        "#JIRNH_WH_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                }
+
+                $("#RightPane").removeClass("show");
+                $("#RightPane .buyer-search-results").hide();
+
+                $("#Currency_Name").focus();
+                isMouseSelectingBuyer = false;
+                return;
+            }
+
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
 
+                HandleSearchKeyDown(
+                    e,
+                    this,
+                    "#RightPane",
+                    ".buyer-search-results",
+                    "#BuyerMessage"
+                );
+            }
+
+            if (e.key === "Enter") {
                 HandleSearchKeyDown(
                     e,
                     this,
@@ -848,8 +912,9 @@
                 JIRNH_MS_Number: $("#JIRNH_MS_Number").val(),
                 JIRNH_JWC_Number: $("#JIRNH_JWC_Number").val(),
                 JIRNH_Currency_Number: $("#JIRNH_Currency_Number").val(),
-                JIRNH_WH_Number: $("#JIRNH_WH_Number").val(),
-                JIRNH_Remarks: $("#JIRNH_Remarks").val()
+                              JIRNH_WH_Number: $("#JIRNH_WH_Number").val(),
+                JIRNH_Remarks: $("#JIRNH_Remarks").val(),
+                JIRNH_IsFreightApplicable: $("#Header_Freight_Applicable").is(":checked") ? "Yes" : "No"
             }
         };
     }

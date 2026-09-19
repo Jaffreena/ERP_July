@@ -189,7 +189,7 @@ namespace ERP.Controllers.JobworkInward
                 SON_DAO.JIJWI_SVO_NumberingDB(SON_DTO);
             }
             GetJIJWI_SVO_Number();
-            return View("~/Views/JobworkInward/ServiceOrder_JobWork/JIJWI_SVO_Numbering.cshtml", SON_DTO);
+            return View("~/Views/JobworkInward/ServiceOrder_JobWork/JIJWI_SVO_Number/JIJWI_SVO_Numbering.cshtml", SON_DTO);
         }
 
         [HttpPost]

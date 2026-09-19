@@ -405,8 +405,8 @@
 
                                             <td class="table-width-xl">
 
-                                                <input type="number" autocomplete="off" readonly
-                                                       class="form-control text-end JIDNI_BCH_AvailableQty">
+                                                <input type="text" autocomplete="off" readonly
+                                                       class="form-control text-center JIDNI_BCH_AvailableQty">
 
                                             </td>
 
@@ -443,7 +443,7 @@
 
                                             <td>
                                                 <input id="TotalBatchQtyOther"
-                                                       class="form-control text-end"
+                                                       class="form-control text-center"
                                                        readonly>
                                             </td>
 
@@ -530,7 +530,7 @@
                                     <div class="row align-items-center gx-2">
                                         <label asp-for="JIRNH_RN_No" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                         <div class="col-md-6 col-lg-7">
-                                            <input asp-for="JIRNH_RN_No" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
+                                            <input asp-for="JIRNH_RN_No" class="form-control Key KeyDup" readonly maxlength="25" autocomplete="off" />
                                         </div>
                                     </div>
                                     <div class="row align-items-center gx-2">
@@ -1037,10 +1037,11 @@
                                                                 <input id="TotalQty" class="form-control text-center" readonly />
                                                             </td>
                                                             <td></td>
+                                                            <td></td>
                                                             <td>
                                                                 <input id="TotalAmount" style="text-align:right" class="form-control text-end" readonly />
                                                             </td>
-                                                            <td></td>
+                                                           
                                                             <td class="FreightApplicableFooterCell"></td>
                                                             <td class="FromWHFooterCell"></td>
                                                             <td class="ToWHFooterCell"></td>

@@ -18,6 +18,7 @@ namespace ERP_DTO.JobInwardTransaction
         public string JIDNH_DespatchDocument { get; set; }
         public string JIDNH_DespatchedThrough { get; set; }
         public string JIDNH_Remarks { get; set; }
+        public string JIDNH_IsFreightApplicable { get; set; }
 
         public int Result_Number { get; set; }
         public string Result_Message { get; set; }
@@ -65,6 +66,7 @@ namespace ERP_DTO.JobInwardTransaction
         public string JIFRT_SVOH_Tax { get; set; }
         public string JIFRT_SVOH_TDC { get; set; }
         public string JIFRT_SVOH_Remarks { get; set; }
+        public string JIFRT_SVOH_Category { get; set; }
 
         public int Result_Number { get; set; }
         public string Result_Message { get; set; }
@@ -93,7 +95,7 @@ namespace ERP_DTO.JobInwardTransaction
         public long JICNVH_Number { get; set; }
         public long JICNVH_SFT_Number { get; set; }
         public long JICNVH_WC_Number { get; set; }
-        public long JICNVH_Operator { get; set; }
+        public string JICNVH_Operator { get; set; }
         public long JICNVH_PRS_Number { get; set; }
         public long JICNVH_MS_Number { get; set; }
 

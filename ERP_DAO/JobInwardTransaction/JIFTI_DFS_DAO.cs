@@ -28,6 +28,8 @@ namespace ERP_DAO.JobInwardTransaction
             Db.AddInParameter(DbC, "@JIFTI_DFS_PaymentTerms", DbType.String, DTO.JIFTI_DFS_PaymentTerms);
             Db.AddInParameter(DbC, "@JIFTI_DFS_PaymentMethod", DbType.String, DTO.JIFTI_DFS_PaymentMethod);
             Db.AddInParameter(DbC, "@JIFTI_DFS_Remarks", DbType.String, DTO.JIFTI_DFS_Remarks);
+            Db.AddInParameter(DbC, "@JIFTI_DFS_MS_Number", DbType.Int64, DTO.JIFTI_DFS_MS_Number);
+            Db.AddInParameter(DbC, "@JIFTI_DFS_Category", DbType.String, DTO.JIFTI_DFS_Category);
 
             // Output Parameters
             Db.AddOutParameter(DbC, "@Result_Number", DbType.Int32, 4);

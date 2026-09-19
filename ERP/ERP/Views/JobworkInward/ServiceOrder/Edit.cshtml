@@ -167,6 +167,40 @@
 
     textarea.form-control {
         min-height: 60px !important;
+        max-height: 60px !important;
+        resize: none;
+    }
+
+    /* Right-menu buttons vertically centered against header card height */
+    .right-menu {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Grid header cells vertically centered against dropdown/input rows below */
+    #ItemTable thead th,
+    #FreightItemTable thead th {
+        vertical-align: middle;
+    }
+
+    /* Consistent gap between header card and item grid tab strip */
+    #JWIItemTableWrap,
+    #FreightItemTableWrap {
+        margin-top: 12px;
+    }
+
+    /* Narrow-column label - stacked above its textarea, needs to
+           wrap normally instead of the global nowrap rule */
+    .narrow-col-label {
+        white-space: normal !important;
+        display: block;
+        width: 100%;
+        padding-bottom: 2px;
+    }
+
+    .narrow-col-field {
+        margin-bottom: 8px;
     }
 
    
@@ -370,7 +404,7 @@
                                     </div>
 
                                     <!-- COLUMN 2 -->
-                                    <div class="col-12 col-md-5 col-lg-3">
+                                    <div class="col-12 col-md-4 col-lg-3">
                                      
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label class="col-sm-3 col-form-label ps-0">JW Customer</label>
@@ -401,30 +435,30 @@
                                     <!-- COLUMN 3 -->
                                     <div class="col-12 col-md-3">
                                         <div class="row align-items-center gx-2 mb-0">
-                                            <label class="col-sm-5 col-form-label ps-0">Payment Terms</label>
-                                            <div class="col-sm-7">
+                                            <label class="col-sm-3 col-form-label ps-0">Payment Terms</label>
+                                            <div class="col-sm-6">
                                                 <input id="Header_JIJWI_SVOH_PaymentTerms" name="JWIHeader.JIJWI_SVOH_PaymentTerms" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
 
                                         <div class="row align-items-center gx-2 mb-0">
-                                            <label class="col-sm-5 col-form-label ps-0">Delivery Terms</label>
-                                            <div class="col-sm-7">
+                                            <label class="col-sm-3 col-form-label ps-0">Delivery Terms</label>
+                                            <div class="col-sm-6">
                                                 <input id="Header_JIJWI_SVOH_DeliveryTerms" name="JWIHeader.JIJWI_SVOH_DeliveryTerms" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
                                         <div class="row align-items-center gx-2 mb-0">
-                                            <label class="col-sm-5 col-form-label ps-0">Delivery Mode</label>
-                                            <div class="col-sm-7">
+                                            <label class="col-sm-3 col-form-label ps-0">Delivery Mode</label>
+                                            <div class="col-sm-6">
                                                 <input id="Header_JIJWI_SVOH_DeliveryMode" name="JWIHeader.JIJWI_SVOH_DeliveryMode"
                                                        class="form-control" />
                                             </div>
                                         </div>
                                         <div class="row align-items-center gx-2 mb-0">
-                                            <label class="col-sm-5 col-form-label ps-0">Tax</label>
-                                            <div class="col-sm-7">
+                                            <label class="col-sm-3 col-form-label ps-0">Tax</label>
+                                            <div class="col-sm-6">
                                                
                                                 <textarea id="Header_JIJWI_SVOH_Tax" name="JWIHeader.JIJWI_SVOH_Tax" maxlength="250"
                                                           class="form-control"
@@ -435,26 +469,20 @@
                                       
 
                                     </div>
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-12 col-md-3" >
 
-                                      
-                                        <div class="row align-items-center gx-2 mb-0">
-                                            <label class="col-sm-5 col-form-label ps-0">Technical delivery conditions</label>
-                                            <div class="col-sm-7">
-                                               
-                                                <textarea id="Header_JIJWI_SVOH_TDC" name="JWIHeader.JIJWI_SVOH_TDC" maxlength="250"
-                                                          class="form-control"
-                                                          rows="2"></textarea>
-                                            </div>
+                                        <div class="narrow-col-field">
+                                            <label class="col-form-label narrow-col-label ps-0">Technical delivery conditions</label>
+                                            <textarea id="Header_JIJWI_SVOH_TDC" name="JWIHeader.JIJWI_SVOH_TDC" maxlength="250"
+                                                      class="form-control"
+                                                      rows="2"></textarea>
                                         </div>
 
-                                        <div class="row align-items-start gx-2 mb-0">
-                                            <label class="col-sm-5 col-form-label ps-0">Remarks</label>
-                                            <div class="col-sm-7">
-                                                <textarea id="Header_JIJWI_SVOH_Remarks" name="JWIHeader.JIJWI_SVOH_Remarks" maxlength="250"
-                                                          class="form-control"
-                                                          rows="2"></textarea>
-                                            </div>
+                                        <div class="narrow-col-field">
+                                            <label class="col-form-label narrow-col-label ps-0">Remarks</label>
+                                            <textarea id="Header_JIJWI_SVOH_Remarks" name="JWIHeader.JIJWI_SVOH_Remarks" maxlength="250"
+                                                      class="form-control"
+                                                      rows="2"></textarea>
                                         </div>
                                     </div>
 

@@ -63,6 +63,25 @@ $(document).on("click", ".IBatRowRemove", function () {
 
     CalculateBatchFooter();
 });
+// Restrict Batch Qty input to digits only
+$(document).on("keypress", ".JIRNI_BCH_BatchQty", function (e) {
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+// Strip any non-numeric characters that slip in via paste
+$(document).on("input", ".JIRNI_BCH_BatchQty", function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+
 $(document).on("keyup", ".JIRNI_BCH_BatchQty, .JIRNI_BCH_BatchUnitPrice", function () {
 
     let row = $(this).closest("tr");
@@ -367,17 +386,21 @@ function ApplyBatchValues_RN(rowId) {
         row.find(".JIRNI_BCH_Number")
             .val(batch.JIRNI_BCH_Number);
 
+        let qtyVal = parseFloat(batch.JIRNI_BCH_BatchQty) || 0;
+        let unitPriceVal = parseFloat(batch.JIRNI_BCH_BatchUnitPrice) || 0;
+        let batchValueVal = parseFloat(batch.JIRNI_BCH_BatchValue) || 0;
+
         row.find(".JIRNI_BCH_BatchQty")
-            .val(batch.JIRNI_BCH_BatchQty)
-            .attr("data-value", batch.JIRNI_BCH_BatchQty);
+            .val(qtyVal === 0 ? "" : formatIndianQty(qtyVal))
+            .attr("data-value", qtyVal);
 
         row.find(".JIRNI_BCH_BatchUnitPrice")
-            .val(batch.JIRNI_BCH_BatchUnitPrice)
-            .attr("data-value", batch.JIRNI_BCH_BatchUnitPrice);
+            .val(unitPriceVal === 0 ? "" : formatIndianCurrency(unitPriceVal))
+            .attr("data-value", unitPriceVal);
 
         row.find(".JIRNI_BCH_BatchValue")
-            .val(batch.JIRNI_BCH_BatchValue)
-            .attr("data-value", batch.JIRNI_BCH_BatchValue);
+            .val(batchValueVal === 0 ? "" : formatIndianCurrency(batchValueVal))
+            .attr("data-value", batchValueVal);
 
         row.find(".RNI_BCH_Item_WH")
             .val(batch.RNI_BCH_Item_WH);
@@ -638,7 +661,43 @@ $(document).ready(function () {
 
         CalculateBatchFooter();
     });
+    function ValidateBatchNumberOnRows() {
+
+        let isValid = true;
+
+        $("#IBatTableBody tr.IBatNewRow").each(function () {
+
+            let row = $(this);
+
+            let qty = parseFloat((row.find(".JIRNI_BCH_BatchQty").val() || "").replace(/,/g, "")) || 0;
+            let batchNo = row.find(".JIRNI_BCH_Number").val();
+            let batchDate = row.find(".JIRNI_BCH_BatchDate").val();
+
+            if (qty > 0 && (!batchNo || batchNo.trim() === "")) {
+
+                alert("Please enter Batch Number.");
+                row.find(".JIRNI_BCH_Number").focus();
+                isValid = false;
+                return false;
+            }
+
+            if (qty > 0 && (!batchDate || batchDate.trim() === "")) {
+
+                alert("Please enter Batch Date.");
+                row.find(".JIRNI_BCH_BatchDate").focus();
+                isValid = false;
+                return false;
+            }
+        });
+
+        return isValid;
+    }
+
     $("#IBatCloseButton").click(function () {
+
+        if (!ValidateBatchNumberOnRows()) {
+            return false;
+        }
 
         if (!ValidateBatchQty()) {
 
@@ -674,6 +733,15 @@ $(document).ready(function () {
 
         let unitPrice =
             selectedRow.find(".JIRNI_UnitPrice").val();
+
+        let unitPriceCheck = parseFloat((unitPrice || "").toString().replace(/,/g, "")) || 0;
+
+        if (unitPriceCheck === 0) {
+
+            showAlert("Please fill Unit Price before opening the batch.", selectedRow.find(".JIRNI_UnitPrice"));
+            return;
+        }
+
         CurrentBatchItemRow =
             selectedRow;
 
@@ -854,14 +922,19 @@ function BindDeliveryNoteOtherBatchTable(response) {
         row.find(".JIDNI_BCH_BatchNo")
             .val(data.batchNo);
 
+        let availableQty = parseFloat(data.availableQty) || 0;
+        let batchUnitPrice = parseFloat(data.batchUnitPrice) || 0;
+        let batchValue = parseFloat(data.batchValue) || 0;
+
         row.find(".JIDNI_BCH_AvailableQty")
-            .val(data.availableQty);
+            .val(availableQty === 0 ? "" : formatIndianQty(Math.round(availableQty)))
+            .css("text-align", "center");
 
         row.find(".JIDNI_BCH_BatchUnitPrice")
-            .val(data.batchUnitPrice);
+            .val(batchUnitPrice === 0 ? "" : formatIndianCurrency(batchUnitPrice));
 
         row.find(".JIDNI_BCH_BatchValue")
-            .val(data.batchValue);
+            .val(batchValue === 0 ? "" : formatIndianCurrency(batchValue));
 
         tbody.append(row);
 
@@ -889,15 +962,18 @@ function CalculateOtherBatchFooter() {
 
     $("#DeliveryNoteOtherBatchTableBody .DeliveryNoteOtherBatchRow").each(function () {
 
-        totalQty += parseFloat($(this)
-            .find(".JIDNI_BCH_AvailableQty").val()) || 0;
+        totalQty += parseFloat(removeCommas($(this)
+            .find(".JIDNI_BCH_AvailableQty").val())) || 0;
 
-        totalValue += parseFloat($(this)
-            .find(".JIDNI_BCH_BatchValue").val()) || 0;
+        totalValue += parseFloat(removeCommas($(this)
+            .find(".JIDNI_BCH_BatchValue").val())) || 0;
     });
 
-    $("#TotalBatchQtyOther").val(totalQty.toFixed(2));
-    $("#TotalBatchValueOther").val(totalValue.toFixed(2));
+    $("#TotalBatchQtyOther")
+        .val(totalQty === 0 ? "" : formatIndianQty(Math.round(totalQty)))
+        .css("text-align", "center");
+
+    $("#TotalBatchValueOther").val(totalValue === 0 ? "" : formatIndianCurrency(totalValue));
 
     if ($("#DeliveryNoteOtherBatchTableBody .DeliveryNoteOtherBatchRow").length > 0)
         $("#DeliveryNoteOtherBatchList tfoot").show();

@@ -29,7 +29,7 @@ namespace ERP.Controllers.JobworkInward
         public IActionResult JINumbering()
         {
             GetJINumber();
-            return View(JON_DTO);
+            return View("~/Views/JobworkInward/JobworkInvoice/JWInvoiceNumber/JINumbering.cshtml", JON_DTO);
         }
         void GetJINumber()
         {
@@ -188,7 +188,7 @@ namespace ERP.Controllers.JobworkInward
                 JON_DAO.JIJWI_NumberingDB(JON_DTO);
             }
             GetJINumber();
-            return View(JON_DTO);
+            return View("~/Views/JobworkInward/JobworkInvoice/JWInvoiceNumber/JINumbering.cshtml", JON_DTO);
         }
 
         [HttpPost]

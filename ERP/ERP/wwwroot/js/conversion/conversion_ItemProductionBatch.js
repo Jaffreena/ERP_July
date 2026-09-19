@@ -172,7 +172,7 @@ function SaveTempBatch_P() {
             ) || 0;
 
         let wh =
-            row.find(".RNI_BCH_WH_Number").val();
+            row.find(".JIRNI_BCH_WH_Number").val();
 
         if (batchNo) {
 
@@ -335,7 +335,7 @@ $(document).ready(function () {
                 newRow.find(".JIRNI_BCH_BatchValue")
                     .val(batch.Amount);
 
-                newRow.find(".RNI_BCH_WH_Number")
+                newRow.find(".JIRNI_BCH_WH_Number")
                     .val(batch.Warehouse);
             });
         }

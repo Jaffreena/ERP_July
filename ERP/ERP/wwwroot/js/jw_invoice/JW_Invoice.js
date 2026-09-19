@@ -487,6 +487,9 @@ $(document).ready(function () {
 
         });
 
+        // refresh footer totals after rows are hidden / removed
+        CalculateTotals();
+
         //#endregion
 
     });
@@ -584,7 +587,18 @@ $(document).ready(function () {
 
             currentQty = balanceQty;
 
-        } else {
+        }
+        /* TEMP-DISABLED (test flow, [date]) — this SO-level "remaining
+           to deliver" check uses the wrong formula for the invoice
+           screen (checks delivered-vs-SO-qty, not invoiced-vs-SO-qty),
+           and always blocks a normal full-qty invoice once the SO is
+           fully delivered. Row-level Check 1 (balanceQty) above still
+           runs and is correct for Delivery-Note-sourced rows. Re-enable
+           only after confirming whether manually-added SO-dropdown rows
+           (no Delivery Note) are actually used on this page — if so,
+           this needs a corrected formula, not just re-enabling as-is.
+
+        else {
 
             let jisvohNumber = row.find(".JIJWII_ServiceOrderHidden").val() || 0;
             console.log('---if value is there in so:' + jisvohNumber)
@@ -596,18 +610,12 @@ $(document).ready(function () {
                     row.find(".JIJWII_UoM_Number").val() || 0,
                     function (allowedQty) {
 
-                        // CHANGED: subtract qty already used by OTHER
-                        // rows in this form for the same SO, so the
-                        // limit is respected across the whole grid,
-                        // not just per DB call.
                         let otherRowsQty = GetOtherRowsQtyForSO(jisvohNumber, row);
                         let realAllowedQty = allowedQty - otherRowsQty;
 
                         console.log("Allowed Qty:", realAllowedQty);
 
                         if (currentQty > realAllowedQty) {
-                            // CHANGED: field now shows the allowed qty,
-                            // not the exceeded value the user typed
                             row.find(".JIJWII_Qty").val(addComma(realAllowedQty, "q"));
                             alert("Qty Allowed: " + realAllowedQty);
                         }
@@ -615,6 +623,7 @@ $(document).ready(function () {
                 );
             }
         }
+        */
 
         // Prevent negative values
         if (currentQty < 0) {
@@ -694,6 +703,7 @@ function GetAllowedQty(jisvohNumber, prsNumber, itemNumber, uomNumber, callback)
     });
 }
 
+// REPLACE
 function DateBind() {
     var today = new Date();
 
@@ -704,7 +714,7 @@ function DateBind() {
     var formattedDate = day + "-" + months[today.getMonth()] + "-" + today.getFullYear();
 
     var fp = document.getElementById("Header_JIJWIH_InvoiceDate")._flatpickr;
-    if (fp) fp.setDate(formattedDate, true, "d-M-Y");
+    if (fp) fp.setDate(formattedDate, false, "d-M-Y"); // false = don't re-trigger change (avoid recursive loop)
     GetJWInvoiceNumber();
 }
 function ClearAll() {
@@ -918,7 +928,7 @@ function GetJWInvoiceNumber() {
         data: { JWIDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-               // alert("Please set numbering for this date range.");
+                alert("Please set numbering for this date range.");
                 $("#Header_JIJWIH_InvoiceNo").val("");
                 DateBind();
 

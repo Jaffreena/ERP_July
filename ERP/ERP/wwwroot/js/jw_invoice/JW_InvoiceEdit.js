@@ -748,6 +748,17 @@ $(document).ready(function () {
         // With Service Order
         if (jisvohNumber > 0) {
 
+            /* TEMP-DISABLED (test flow, [date]) — same SO-level
+               "remaining to deliver" formula bug as the Create page's
+               else-block: checks delivered-vs-SO-qty instead of
+               invoiced-vs-SO-qty, so it always returns 0 once the SO
+               is fully delivered, blocking a normal full-qty invoice
+               edit. Balance validation above (deliveredQty -
+               prevInvoiceQty) already ran and is the correct check for
+               DN-sourced rows. Re-enable with a corrected formula once
+               confirmed whether manually-selected-SO rows (no DN
+               behind them) actually need this as a separate guard.
+
             $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
                 jisvohNumber: jisvohNumber,
                 prsNumber: row.find(".JIJWII_PRS_Number").val() || 0,
@@ -760,11 +771,9 @@ $(document).ready(function () {
                     let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
                     let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
 
-                    // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(SO)
                     let otherRowsQty = GetOtherRowsQtyForSO(jisvohNumber, row);
                     let realDeliveredQty = deliveredQty + otherRowsQty;
 
-                    // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
                     let allowedQty = jisvoiQty - realDeliveredQty;
 
                     console.log("Allowed Qty:", allowedQty);
@@ -787,6 +796,18 @@ $(document).ready(function () {
 
                 CalculateTotals();
             });
+            */
+
+            var unitPrice = parseFloat(
+                removeCommas(row.find(".JIJWII_UnitPrice").val())
+            ) || 0;
+
+            var amount = currentQty * unitPrice;
+
+            row.find(".JIJWII_Amount")
+                .val(addComma(amount, "c"));
+
+            CalculateTotals();
 
         }
         // Without Service Order
@@ -2046,9 +2067,7 @@ $("#btnSave").on("click", function (e) {
                 if (response.success) {
 
                     showAlert('Record Updated');
-                    ClearAll();
-                    DateBind();
-                    //window.location.href = response.redirectUrl;
+                    window.location.href = response.redirectUrl;
 
                     //    console.log(JSON.stringify(model));
                 }
@@ -2174,7 +2193,7 @@ function CreateJobWorkInvoiceItemModel() {
                 parseFloat(row.find(".JIJWII_PRS_Number").val()) || 0,
             JIJWII_JIDNH_Number:
                 parseFloat(row.find(".JIJWII_JIDNH_Number").val()) || 0,
-            JIDNI_Number:
+            JIJWII_JIDNI_Number:
                 parseFloat(row.find(".JIDNI_Number").val()) || 0
         };
 

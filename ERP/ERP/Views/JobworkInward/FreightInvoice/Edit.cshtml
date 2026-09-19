@@ -784,6 +784,8 @@
                                                                 <th>Material Grade</th>
                                                                 <th>Item Group</th>
                                                                 <th class="table-width-md text-center">UOM</th>
+                                                                <th class="table-width-md text-center">From WH</th>
+                                                                <th class="table-width-md text-center">To WH</th>
                                                                 <th class="table-width-xl text-end">
                                                                     Delivery Note Qty
                                                                 </th>
@@ -876,16 +878,24 @@
                                                                 <td class="table-width-md">
                                                                     <select class="form-select JIFTII_UoM text-center" asp-items="@ViewBag.UOM"></select>
                                                                 </td>
+                                                                <!-- FROM WH -->
+                                                                <td class="table-width-md">
+                                                                    <select class="form-select JIFTII_FromWH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
+                                                                <!-- TO WH -->
+                                                                <td class="table-width-md">
+                                                                    <select class="form-select JIFTII_ToWH_Number" asp-items="@ViewBag.Warehouse"></select>
+                                                                </td>
                                                                 <!-- DELIVERED QTY -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control DeliveredQty text-end"
+                                                                    <input class="form-control JIFTII_DeliveredQty text-end"
                                                                            autocomplete="off"
                                                                            readonly />
                                                                 </td>
 
                                                                 <!-- PREVIOUSLY INVOICED QTY -->
                                                                 <td class="table-width-xl">
-                                                                    <input class="form-control PreviouslyInvoicedQty text-end"
+                                                                    <input class="form-control JIFTII_PrevInvoiceQty text-end"
                                                                            autocomplete="off"
                                                                            readonly />
                                                                 </td>
@@ -926,7 +936,7 @@
 
                                                             <tr class="table-info">
 
-                                                                <td colspan="12" class="text-end py-2">
+                                                                <td colspan="14" class="text-end py-2">
                                                                     <span class="float-end pe-3">Total</span>
                                                                 </td>
                                                                 <td></td>
@@ -1017,6 +1027,7 @@
     <script>
         var sonList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.SON));
         console.log("sonList from cshtml:", sonList);
+        var warehouseList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Warehouse));
     </script>
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>

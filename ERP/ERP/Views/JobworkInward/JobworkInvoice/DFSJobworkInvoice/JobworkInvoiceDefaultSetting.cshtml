@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.JobWorkInvoiceHead_DTO;
 @{
-    ViewData["Title"] = "Jobwork Invoice Create";
+    ViewData["Title"] = "Invoice - Jobwork Default Form Setting";
 }
 <style>
     .match-row td {
@@ -108,7 +108,8 @@
     <div class="row align-items-center panel-header gx-2">
         <div class="col h-100 align-items-center">
             <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
-                Jobwork Invoice
+               Invoice - Jobwork
+
                 <a asp-controller="JobworkInwardMain" asp-action="Index" class="float-end btn p-0">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -153,6 +154,17 @@
 
                             <div class="col-auto left-menu text-black">
                                 <div class="row">
+                             
+
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JIJWIH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JIJWIH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                     <div class="col-12 col-md-4 col-lg-4">
 
                                         <div class="row align-items-center gx-2">
@@ -187,15 +199,8 @@
                                         </div>
 
                                     </div>
-
                                     <div class="col-12 col-md-4 col-lg-4">
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIJWIH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-7">
-                                                <select asp-for="JIJWIH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
-                                            </div>
-                                        </div>
-
+                                        
                                         <div class="row align-items-center gx-2">
                                             <label asp-for="JIJWIH_PaymentTerms" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
@@ -209,10 +214,6 @@
                                                 <input asp-for="JIJWIH_PaymentMethod" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
-
-                                    </div>
-
-                                    <div class="col-12 col-md-4 col-lg-4">
 
                                         <div class="row align-items-start gx-2">
                                             <label asp-for="JIJWIH_Remarks" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
@@ -253,7 +254,7 @@
     <partial name="_ValidationScriptsPartial" />
  
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
-
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
  
 
 }
@@ -353,6 +354,44 @@
                 return;
             }
 
+            if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+                return;
+            }
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            // Enter, no record selected (empty textbox, full unfiltered
+            // list) -> auto-select first record + close popup.
+            if (e.key === "Enter" &&
+                $.trim(input.val()) === "" && rows.length > 0 &&
+                !rows.filter(".current-row, .match-row").length) {
+
+                e.preventDefault();
+
+                let firstCust = rows.first().data("customer");
+
+                isMouseSelectingBuyer = true;
+
+                if (firstCust) {
+                    SelectBuyerJWI(
+                        firstCust,
+                        "#JIJWIH_JW_Customer_Name",
+                        "#JIJWIH_JW_Customer_Number",
+                        "#JIJWIH_Currency_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                }
+
+                $("#RightPane").removeClass("show");
+                $("#RightPane .buyer-search-results").hide();
+
+                $("#JIJWIH_Currency_Number").focus();
+                isMouseSelectingBuyer = false;
+                return;
+            }
+
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
 
                 HandleSearchKeyDown(
@@ -363,9 +402,19 @@
                     "#BuyerMessage"
                 );
             }
-        });
 
-     });
+            if (e.key === "Enter") {
+                HandleSearchKeyDown(
+                    e,
+                    this,
+                    "#RightPane",
+                    ".buyer-search-results",
+                    "#BuyerMessage"
+                );
+            }
+        });
+    
+    });
 
 
         function ShowCustomerPane() {
@@ -486,9 +535,9 @@
                               $("#BuyerMessage").hide().text("");
                             e.preventDefault();
 
-                            const clickedCust = $(this).data("customer");
+                                                    const clickedCust = $(this).data("customer");
                             isMouseSelectingBuyer = true;
-                            SelectBuyer(
+                            SelectBuyerJWI(
                                 clickedCust,
                                 "#JIJWIH_JW_Customer_Name",
                                 "#JIJWIH_JW_Customer_Number",
@@ -582,7 +631,7 @@
             });
         }
 
-    function SelectBuyer(
+      function SelectBuyerJWI(
         cust,
         customerNameId,
         customerNumberId,
@@ -610,7 +659,6 @@
         }, 100);
 
     }
-
 
     function HandleSearchSelection(input, rows, messageSelector, rightPane, resultsSelector) {
 

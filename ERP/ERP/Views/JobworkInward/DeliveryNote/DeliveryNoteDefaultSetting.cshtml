@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.DeliveryNoteHeader_DTO;
 @{
-    ViewData["Title"] = "Delivery Note Create";
+    ViewData["Title"] = "Delivery Note Default Form Setting";
 }
 <style>
     .match-row td {
@@ -74,7 +74,6 @@
         font-weight: 400 !important;
         border: none !important;
         text-decoration: none !important;
-        max-width: 30% !important;
     }
 
     .form-control,
@@ -83,6 +82,9 @@
     textarea.form-control {
         height: 25px !important;
         min-height: 25px !important;
+        max-width: 100% !important;
+        width: 100%;
+        box-sizing: border-box;
         border-radius: 4px !important;
         font-size: 13px !important;
         font-family: Arial, sans-serif;
@@ -103,6 +105,9 @@
         background-position: right 8px center;
     }
 
+    #test123 > .row > [class*="col-"] {
+        border: 1px solid #ccc;
+    }
 </style>
 
 <form>
@@ -155,21 +160,23 @@
 
                             <div class="col-auto left-menu text-black">
                                 <div class="row">
-                                    <div class="col-12 col-md-3" style="flex: 0 0 19%; max-width: 19%;">
 
-                                        <div class="row align-items-center gx-2">
-                                            <label  class="col-md-6 col-lg-4 col-form-label ps-0">Material<br/>Segregation</label>
-                                            <div class="col-md-6 col-lg-8">
+                                    <!-- COLUMN 1 -->
+                                    <div class="col-12 col-md-3">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-4 col-form-label ps-0">Material Segregation</label>
+                                            <div class="col-md-6">
                                                 <select asp-for="JIDNH_MS_Number" class="form-select MS_Number"
                                                         asp-items="@ViewBag.MaterialSegregation"></select>
                                             </div>
                                         </div>
-
                                     </div>
-                                    <div class="col-12 col-md-3 col-lg-3">
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_JW_Customer_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-5">
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-3">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIDNH_JW_Customer_Number" class="col-md-3 col-form-label ps-0"></label>
+                                            <div class="col-sm-8">
                                                 <input asp-for="JIDNH_JW_Customer_Number" type="hidden" />
 
                                                 <input asp-for="JIDNH_JW_Customer_Name"
@@ -180,9 +187,9 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_Currency_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-5">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIDNH_Currency_Number" class="col-md-3 col-form-label ps-0"></label>
+                                            <div class="col-sm-7">
                                                 <input asp-for="JIDNH_Currency_Number" class="form-control" type="hidden" />
                                                 <input asp-for="JIDNH_CurrencyCode"
                                                        class="form-control Key KeyDup"
@@ -191,71 +198,77 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_WH_Number" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-5">
+                                        <div id="ExchangeRate" class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIDNH_WH_Number" class="col-md-3 col-form-label ps-0"></label>
+                                            <div class="col-sm-7">
                                                 <select asp-for="JIDNH_WH_Number"
                                                         class="form-select"
                                                         asp-items="@ViewBag.Warehouse"></select>
 
                                                 <div class="cluster-results dropdown-results search-results bg-primary p-2" style="display:none"></div>
-
                                             </div>
                                         </div>
 
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-3 col-form-label ps-0">Freight Applicable</label>
+                                            <div class="col-sm-7">
+                                                <input type="checkbox"
+                                                       id="Header_Freight_Applicable"
+                                                       class="form-check-input"
+                                                       checked="@(Model.JIDNH_IsFreightApplicable == "Yes")" />
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="col-12 col-md-3" style="flex: 0 0 31%; max-width: 31%;">
-
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_PaymentTerms" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-7">
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-3">
+                                        <div class="row align-items-center gx-2 mb-0 ps-0">
+                                            <label asp-for="JIDNH_PaymentTerms" class="col-md-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-6">
                                                 <input asp-for="JIDNH_PaymentTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_DeliveryTerms" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-7">
+                                        <div class="row align-items-center gx-2 mb-0 ps-0">
+                                            <label asp-for="JIDNH_DeliveryTerms" class="col-md-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-6">
                                                 <input asp-for="JIDNH_DeliveryTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_DeliveryMode" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
-                                            <div class="col-sm-7 col-lg-7">
+                                        <div class="row align-items-center gx-2 mb-0 ps-0">
+                                            <label asp-for="JIDNH_DeliveryMode" class="col-md-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-6">
                                                 <input asp-for="JIDNH_DeliveryMode" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_DespatchDocumentNo" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-7">
+                                        <div class="row align-items-center gx-2 mb-0 ps-0">
+                                            <label asp-for="JIDNH_DespatchDocumentNo" class="col-md-4 col-form-label ps-0"></label>
+                                            <div class="col-sm-6">
                                                 <input asp-for="JIDNH_DespatchDocumentNo" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIDNH_DespatchedThrough" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-7">
+                                        <div class="row align-items-center gx-2 mb-0 ps-0">
+                                            <label asp-for="JIDNH_DespatchedThrough" class="col-md-4 col-form-label ps-0"></label>
+                                            <div class="col-md-6">
                                                 <input asp-for="JIDNH_DespatchedThrough" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
-
                                     </div>
-
-                                    <div class="col-12 col-md-3 col-lg-3">
-
-                                        <div class="row align-items-start gx-2">
-                                            <label asp-for="JIDNH_Remarks" class="col-sm-4 col-lg-2 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-9">
+                                    <!-- COLUMN 4 -->
+                                    <div class="col-12 col-md-3">
+                                        <div class="row align-items-start gx-2 mb-0" style="padding-right:200px;">
+                                            <label asp-for="JIDNH_Remarks" class="col-sm-5 col-lg-3 col-form-label ps-0"></label>
+                                            <div class="col-sm-7 col-lg-5">
                                                 <textarea asp-for="JIDNH_Remarks" maxlength="250"
                                                           class="form-control Key KeyDup"
                                                           autocomplete="off"></textarea>
                                             </div>
                                         </div>
-
                                     </div>
+
                                 </div>
                             </div>
 
@@ -285,10 +298,10 @@
 
     <partial name="_ValidationScriptsPartial" />
  
-    <script src="~/js/code/Header.js" asp-append-version="true"></script>   
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
  
 
- 
 }
 <script>
     
@@ -384,7 +397,8 @@
                 "#RightPane .buyer-search-results"
             );
         });
-            $(document).on("keydown", "#JIDNH_JW_Customer_Name", function (e) {
+
+                     $(document).on("keydown", "#JIDNH_JW_Customer_Name", function (e) {
 
                  if (e.key === "Escape" || e.key === "Tab") {
 
@@ -399,8 +413,58 @@
                 return;
             }
 
+            if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+                return;
+            }
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            // Enter, no record selected (empty textbox, full unfiltered
+            // list) -> auto-select first record + close popup.
+            if (e.key === "Enter" &&
+                $.trim(input.val()) === "" && rows.length > 0 &&
+                !rows.filter(".current-row, .match-row").length) {
+
+                e.preventDefault();
+
+                let firstCust = rows.first().data("customer");
+
+                isMouseSelectingBuyer = true;
+
+                if (firstCust) {
+                    SelectBuyer(
+                        firstCust,
+                        "#JIDNH_JW_Customer_Name",
+                        "#JIDNH_JW_Customer_Number",
+                        "#JIDNH_CurrencyCode",
+                        "#JIDNH_Currency_Number",
+                        "#JIDNH_WH_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                }
+
+                $("#RightPane").removeClass("show");
+                $("#RightPane .buyer-search-results").hide();
+
+                $("#JIDNH_CurrencyCode").focus();
+                isMouseSelectingBuyer = false;
+                return;
+            }
+
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
 
+                HandleSearchKeyDown(
+                    e,
+                    this,
+                    "#RightPane",
+                    ".buyer-search-results",
+                    "#BuyerMessage"
+                );
+            }
+
+            if (e.key === "Enter") {
                 HandleSearchKeyDown(
                     e,
                     this,
@@ -771,7 +835,7 @@
             }
         });
 
-    }); 
+    });
     $(document).on("click", "input[name='Mode'][value='Clear All']", function (e) {
         e.preventDefault();
         location.reload();
@@ -795,7 +859,8 @@
                 JIDNH_DeliveryMode: $("#JIDNH_DeliveryMode").val(),
                 JIDNH_DespatchDocumentNo: $("#JIDNH_DespatchDocumentNo").val(),
                 JIDNH_DespatchedThrough: $("#JIDNH_DespatchedThrough").val(),
-                JIDNH_Remarks: $("#JIDNH_Remarks").val()
+                               JIDNH_Remarks: $("#JIDNH_Remarks").val(),
+                JIDNH_IsFreightApplicable: $("#Header_Freight_Applicable").is(":checked") ? "Yes" : "No"
             }
         };
     }

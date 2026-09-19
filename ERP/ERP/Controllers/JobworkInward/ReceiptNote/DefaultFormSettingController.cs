@@ -40,6 +40,7 @@ namespace ERP.Controllers.JobworkInward
                 SH_DTO.Currency_Name = Convert.ToString(row["Currency_Name"]);
                 SH_DTO.JIRNH_WH_Number = Convert.ToString(row["JIRN_DFS_WH_Number"]);
                 SH_DTO.JIRNH_Remarks = Convert.ToString(row["JIRN_DFS_Remarks"]);
+                SH_DTO.JIRNH_IsFreightApplicable = Convert.ToString(row["JIRN_DFS_IsFreightApplicable"]);
             }
 
             SH_DTO.JIRNH_JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");
@@ -82,6 +83,7 @@ namespace ERP.Controllers.JobworkInward
                 SI_DTO.JIRNH_Currency_Number = long.TryParse(S_DTO.JIRNH_Currency_Number, out var cur) ? cur : 0;
                 SI_DTO.JIRNH_WH_Number = long.TryParse(S_DTO.JIRNH_WH_Number, out var wh) ? wh : 0;
                 SI_DTO.JIRNH_Remarks = Convert.ToString(S_DTO.JIRNH_Remarks);
+                SI_DTO.JIRNH_IsFreightApplicable = Convert.ToString(S_DTO.JIRNH_IsFreightApplicable);
 
                 // Save
                 SI_DAO.JI_ReceiptNoteDB(SI_DTO);
@@ -135,7 +137,8 @@ namespace ERP.Controllers.JobworkInward
                         dfS_JIRNH_Currency_Number = row["JIRN_DFS_Currency_Number"],
                         currency_Name = row["Currency_Name"],
                         dfS_JIRNH_WH_Number = row["JIRN_DFS_WH_Number"],
-                        dfS_JIRNH_Remarks = row["JIRN_DFS_Remarks"]
+                        dfS_JIRNH_Remarks = row["JIRN_DFS_Remarks"],
+                        dfS_JIRNH_IsFreightApplicable = row["JIRN_DFS_IsFreightApplicable"]
                     }
                 });
             }

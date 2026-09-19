@@ -98,7 +98,7 @@ namespace ERP.Controllers.JobworkInward
         {
             try
             {
-                if (OrderType == "FREIGHT")
+                if (OrderType == "FREIGHT") 
                 {
                     var dto = new JIFRT_SVO_NextNumber_DTO { JIFRT_SVO_Date = JSODate, Id = 101, CreatorCode = 0 };
                     dto = new JIFRT_SVO_NextNumber_DAO().JIFRT_SVO_NextNumberDB(dto);
@@ -807,28 +807,16 @@ namespace ERP.Controllers.JobworkInward
         {
             ServiceOrder_DAO dao = new ServiceOrder_DAO();
 
-            string json = OrderType == "FREIGHT"
-                ? dao.JIFRT_GetServiceOrderJSON(Number)
-                : dao.JIJWI_GetServiceOrderJSON(Number);
-
-            if (string.IsNullOrEmpty(json))
-            {
-                return new JsonResult(new
-                {
-                    Header = new object(),
-                    Items = new object[] { }
-                });
-            }
-
-            var obj = JsonSerializer.Deserialize<object>(json);
+            object result = OrderType == "FREIGHT"
+                ? dao.JIFRT_GetServiceOrder(Number)
+                : (object)dao.JIJWI_GetServiceOrder(Number);
 
             return new JsonResult(
-                obj,
-                new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    WriteIndented = true
-                });
+                 result,
+                 new JsonSerializerOptions
+                 {
+                     PropertyNamingPolicy = null
+                 });
         }
 
         #endregion

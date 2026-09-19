@@ -350,6 +350,10 @@ $(document).on(
         // VALIDATE BATCH ROWS
         let valid =
             ValidateExistingBatchRows();
+        if (!ValidateBatchDate()) {
+            e.preventDefault();
+            return false;
+        }
         if (!ValidateBatchQty()) {
             e.preventDefault();
             return false;
@@ -534,22 +538,36 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
 
         //#region GET VALUES
 
-        let fromWarehouse =
-            selectedRow.find(".JIDNI_WH_Number").val();
+    let fromWarehouse =
+        selectedRow.find(".JIDNI_WH_Number").val();
 
-        let lineItemNumber =
-            selectedRow.find(".JIDNI_Item_Number").val();
+    let lineItemNumber =
+        selectedRow.find(".JIDNI_Item_Number").val();
 
-        let invoiceQty =
-            selectedRow.find(".JIDNI_Qty").val();
+    let invoiceQty =
+        selectedRow.find(".JIDNI_Qty").val();
 
-        $("#BatchPopupQty").text(invoiceQty);
+    // NEW: guard against opening the batch popup for a row with
+    // no item selected or zero Qty — this previously caused an
+    // empty batch table, which collapses ApplyBatchFieldWidths'
+    // computed widths to near-zero and squeezes the modal.
+    if (!lineItemNumber || lineItemNumber === "0") {
+        alert("Please select an Item Code for this row before opening Batch.");
+        return false;
+    }
 
-        //#endregion
+    if (!invoiceQty || parseFloat(removeCommas(invoiceQty)) <= 0) {
+        alert("Please enter Qty for this row before opening Batch.");
+        return false;
+    }
+
+    $("#BatchPopupQty").text(invoiceQty);
+
+    //#endregion
 
 
-        // CLEAR TEMP ARRAY
-        DeliveryNoteBatchList = [];
+    // CLEAR TEMP ARRAY
+    DeliveryNoteBatchList = [];
 
         // CLEAR OLD ROWS
         $("#DeliveryNoteBatchTableBody")
@@ -907,6 +925,18 @@ function BindDeliveryNoteBatchTable() {
 
     CalculateBatchFooter();
    
+    // always open on Batch WH tab (a hidden Batch table measures 0 width)
+    $("#Batch-tab").addClass("active").attr("aria-selected", "true");
+    $("#Other-tab").removeClass("active").attr("aria-selected", "false");
+    $("#Batch-tab-pane").addClass("show active");
+    $("#Other-tab-pane").removeClass("show active");
+
+    const dialogEl = document.querySelector("#DeliveryNoteBatchModal .modal-dialog");
+    if (dialogEl) {
+        dialogEl.style.removeProperty("width");
+        dialogEl.style.removeProperty("max-width");
+    }
+
     $("#DeliveryNoteBatchModal")
         .one("shown.bs.modal", function () {
 
@@ -914,7 +944,8 @@ function BindDeliveryNoteBatchTable() {
 
             $("#DeliveryNoteBatchList").css({
                 width: "max-content",
-                "max-width": "none"
+                "max-width": "none",
+                "min-width": $("#DeliveryNoteBatchTableBody tr.DeliveryNoteBatchRow .JIDNI_BCH_QtyInvoice").length ? "" : "900px"
             });
 
             ResizeBatchPopup("#DeliveryNoteBatchList", "#DeliveryNoteBatchModal");
@@ -1071,6 +1102,33 @@ function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
 
 
 
+//#endregion
+
+//#region BATCH DATE VALIDATION
+function ValidateBatchDate() {
+
+    let isValid = true;
+
+    $("#DeliveryNoteBatchTableBody tr.DeliveryNoteBatchRow").each(function () {
+
+        let row = $(this);
+
+        let qty = parseFloat(removeComma(row.find(".JIDNI_BCH_QtyInvoice").val())) || 0;
+
+        if (qty <= 0)
+            return;
+
+        let date = (row.find(".JIDNI_BCH_BatchDate").first().val() || "").trim();
+
+        if (date === "") {
+            alert("Batch Date is required");
+            isValid = false;
+            return false;
+        }
+    });
+
+    return isValid;
+}
 //#endregion
 
 //#region QTY INVOICE VALIDATION
@@ -1315,6 +1373,9 @@ function ResizeBatchPopup(tableSelector, modalSelector) {
 
     // Full table width including overflow
     const tableWidth = table.scrollWidth;
+
+    // table hidden (0 width) -> do not shrink the popup
+    if (!tableWidth) return;
 
     // Extra space for modal padding/borders
     const popupWidth = tableWidth + 40;

@@ -516,7 +516,7 @@ function calculateTotal_S() {
     });
 
     // Footer totals
-    $("#TotalQty_S").val(totalQty.toFixed(2));
+    $("#TotalQty_S").val(formatIndianQty(totalQty));
 
 }
 //#endregion Calculate Total

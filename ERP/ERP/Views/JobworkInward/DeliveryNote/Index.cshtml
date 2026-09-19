@@ -169,6 +169,16 @@
         margin: 5px !important;
     }
 </style>
+<style>
+    /* item grid: keep parent within screen so the grid box scrolls horizontally */
+    #CardBody > .card-body > .row { flex-wrap: nowrap; }
+    #CardBody .left-menu { flex: 1 1 0; width: auto; min-width: 0; }
+    #CardBody .right-menu { flex: 0 0 auto; }
+    #CardBody .table-body-f { overflow-x: auto; overflow-y: auto; }
+
+    /* table keeps its natural (JS calculated) width, never squeezed */
+    #ItemTable { width: max-content; min-width: 100%; }
+</style>
 <form asp-action="SaveDeliveryNote"
       method="post"
       id="DeliveryNoteForm">
@@ -782,7 +792,7 @@
                                         <label asp-for="Header.JIDNH_DN_No" class="col-md-4 col-form-label ps-0"></label>
                                         <div class="col-md-6">
                                             <input asp-for="Header.JIDNH_DN_No"
-                                                   class="form-control Key KeyDup"
+                                                   class="form-control Key KeyDup" readonly
                                                    maxlength="25"
                                                    autocomplete="off" />
                                         </div>
@@ -1549,7 +1559,8 @@
 
                                                             </td>
 
-                                                            <td>
+                                                                                                                       <td>
+                                                                <input id="TotalQtyKgs" class="form-control text-end" readonly>
                                                             </td>
 
                                                             <td>
@@ -1557,7 +1568,7 @@
 
                                                             <td>
 
-                                                                <input id="TotalAmount" class="form-control text-end" readonly="">
+                                                                <input id="TotalAmount" class="form-control text-end" readonly>
 
                                                             </td>
 

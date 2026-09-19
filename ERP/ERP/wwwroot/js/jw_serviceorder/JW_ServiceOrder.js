@@ -308,50 +308,98 @@ function AutoFit() {
     fitInputWidth($('[name="FreightHeader.JIFRT_SVOH_Remarks"]')[0], 40, 40);
 }
 function LoadDefaultFormSetting() {
+
+    // JWI panel defaults
     $.ajax({
-        url: '/jobinward/transactions/service-order/get',
+        url: '/jobinward/transactions/jobwork-invoice-service-order/get',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
             if (response && response.success && response.data) {
                 var data = response.data;
 
-                // JWI panel defaults
-                if (data.dfS_JISVOH_ServiceOrderNo) {
-                    $('[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]').val(data.dfS_JISVOH_ServiceOrderNo);
+                if (data.dfS_JIJWI_SVOH_ServiceOrderNo) {
+                    $('[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]').val(data.dfS_JIJWI_SVOH_ServiceOrderNo);
                 }
-                if (data.dfS_JISVOH_JW_Customer_Number) {
-                    $('#JWIHeaderPanel .JW_Customer_Number').val(data.dfS_JISVOH_JW_Customer_Number);
+                if (data.dfS_JIJWI_SVOH_JW_Customer_Number) {
+                    $('#JWIHeaderPanel .JW_Customer_Number').val(data.dfS_JIJWI_SVOH_JW_Customer_Number);
                     $('[name="JWIHeader.JW_Customer_Name"]').val(data.cuS_Name);
                 }
-                if (data.dfS_JISVOH_Currency_Number) {
-                    $('#JWIHeaderPanel .Currency_Number').val(data.dfS_JISVOH_Currency_Number).trigger('change');
+                if (data.dfS_JIJWI_SVOH_Currency_Number) {
+                    $('#JWIHeaderPanel .Currency_Number').val(data.dfS_JIJWI_SVOH_Currency_Number).trigger('change');
                 }
-                if (data.dfS_JISVOH_PaymentTerms) {
-                    $('[name="JWIHeader.JIJWI_SVOH_PaymentTerms"]').val(data.dfS_JISVOH_PaymentTerms);
+                if (data.dfS_JIJWI_SVOH_PaymentTerms) {
+                    $('[name="JWIHeader.JIJWI_SVOH_PaymentTerms"]').val(data.dfS_JIJWI_SVOH_PaymentTerms);
                 }
-                if (data.dfS_JISVOH_DeliveryTerms) {
-                    $('[name="JWIHeader.JIJWI_SVOH_DeliveryTerms"]').val(data.dfS_JISVOH_DeliveryTerms);
+                if (data.dfS_JIJWI_SVOH_DeliveryTerms) {
+                    $('[name="JWIHeader.JIJWI_SVOH_DeliveryTerms"]').val(data.dfS_JIJWI_SVOH_DeliveryTerms);
                 }
-                if (data.dfS_JISVOH_DeliveryMode) {
-                    $('[name="JWIHeader.JIJWI_SVOH_DeliveryMode"]').val(data.dfS_JISVOH_DeliveryMode);
+                if (data.dfS_JIJWI_SVOH_DeliveryMode) {
+                    $('[name="JWIHeader.JIJWI_SVOH_DeliveryMode"]').val(data.dfS_JIJWI_SVOH_DeliveryMode);
                 }
-                if (data.dfS_JISVOH_Tax) {
-                    $('[name="JWIHeader.JIJWI_SVOH_Tax"]').val(data.dfS_JISVOH_Tax);
+                if (data.dfS_JIJWI_SVOH_Tax) {
+                    $('[name="JWIHeader.JIJWI_SVOH_Tax"]').val(data.dfS_JIJWI_SVOH_Tax);
                 }
-                if (data.dfS_JISVOH_TDC) {
-                    $('[name="JWIHeader.JIJWI_SVOH_TDC"]').val(data.dfS_JISVOH_TDC);
+                if (data.dfS_JIJWI_SVOH_TDC) {
+                    $('[name="JWIHeader.JIJWI_SVOH_TDC"]').val(data.dfS_JIJWI_SVOH_TDC);
                 }
-                if (data.dfS_JISVOH_Remarks) {
-                    $('[name="JWIHeader.JIJWI_SVOH_Remarks"]').val(data.dfS_JISVOH_Remarks);
+                if (data.dfS_JIJWI_SVOH_Remarks) {
+                    $('[name="JWIHeader.JIJWI_SVOH_Remarks"]').val(data.dfS_JIJWI_SVOH_Remarks);
                 }
-                if (data.dfS_JISVOH_MS_Number) {
-                    $('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val(data.dfS_JISVOH_MS_Number).trigger('change');
+                if (data.dfS_JIJWI_SVOH_MS_Number) {
+                    $('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val(data.dfS_JIJWI_SVOH_MS_Number).trigger('change');
                 }
             }
         },
         error: function (xhr) {
-            console.error('Failed to load default form setting', xhr);
+            console.error('Failed to load JWI default form setting', xhr);
+        }
+    });
+
+    // Freight panel defaults (no MS_Number field on this panel — skipped)
+    $.ajax({
+        url: '/jobinward/transactions/freight-service-order/get',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response && response.success && response.data) {
+                var data = response.data;
+
+                if (data.dfS_JIFRT_SVOH_ServiceOrderNo) {
+                    $('[name="FreightHeader.JIFRT_SVOH_ServiceOrderNo"]').val(data.dfS_JIFRT_SVOH_ServiceOrderNo);
+                }
+                if (data.dfS_JIFRT_SVOH_Category) {
+                    $('[name="FreightHeader.JIFRT_SVOH_Category"]').val(data.dfS_JIFRT_SVOH_Category);
+                }
+                if (data.dfS_JIFRT_SVOH_JW_Customer_Number) {
+                    $('#FreightHeaderPanel .JW_Customer_Number').val(data.dfS_JIFRT_SVOH_JW_Customer_Number);
+                    $('[name="FreightHeader.JW_Customer_Name"]').val(data.cuS_Name);
+                }
+                if (data.dfS_JIFRT_SVOH_Currency_Number) {
+                    $('#FreightHeaderPanel .Currency_Number').val(data.dfS_JIFRT_SVOH_Currency_Number).trigger('change');
+                }
+                if (data.dfS_JIFRT_SVOH_PaymentTerms) {
+                    $('[name="FreightHeader.JIFRT_SVOH_PaymentTerms"]').val(data.dfS_JIFRT_SVOH_PaymentTerms);
+                }
+                if (data.dfS_JIFRT_SVOH_DeliveryTerms) {
+                    $('[name="FreightHeader.JIFRT_SVOH_DeliveryTerms"]').val(data.dfS_JIFRT_SVOH_DeliveryTerms);
+                }
+                if (data.dfS_JIFRT_SVOH_DeliveryMode) {
+                    $('[name="FreightHeader.JIFRT_SVOH_DeliveryMode"]').val(data.dfS_JIFRT_SVOH_DeliveryMode);
+                }
+                if (data.dfS_JIFRT_SVOH_Tax) {
+                    $('[name="FreightHeader.JIFRT_SVOH_Tax"]').val(data.dfS_JIFRT_SVOH_Tax);
+                }
+                if (data.dfS_JIFRT_SVOH_TDC) {
+                    $('[name="FreightHeader.JIFRT_SVOH_TDC"]').val(data.dfS_JIFRT_SVOH_TDC);
+                }
+                if (data.dfS_JIFRT_SVOH_Remarks) {
+                    $('[name="FreightHeader.JIFRT_SVOH_Remarks"]').val(data.dfS_JIFRT_SVOH_Remarks);
+                }
+            }
+        },
+        error: function (xhr) {
+            console.error('Failed to load Freight default form setting', xhr);
         }
     });
 }
@@ -512,8 +560,91 @@ $(document).ready(function () {
     //#region Initialize Flatpickr
     InitializeGstFlatpickrs();
 
- 
     DateBind();
+
+    //#region item grid - select full content on click/focus
+    $(document).on("click focusin", "#JWIItemTable input, #FreightItemTable input", function (e) {
+        e.stopPropagation();
+
+        let input = this;
+        input.focus();
+
+        setTimeout(function () {
+            input.select();
+        }, 10);
+    });
+    //#endregion
+
+    //#region restrict Qty to whole numbers only (no decimal point)
+    $(document).on("keydown", ".JIJWI_SVOI_Qty, .JIFRT_SVOI_Qty", function (e) {
+
+        if ($.inArray(e.key, ["Backspace", "Delete", "Tab", "Escape", "Enter",
+            "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"]) !== -1) {
+            return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) &&
+            ["a", "c", "v", "x"].indexOf(e.key.toLowerCase()) !== -1) {
+            return;
+        }
+
+        if (e.key >= "0" && e.key <= "9") {
+            return;
+        }
+
+        e.preventDefault();
+    });
+
+    $(document).on("input", ".JIJWI_SVOI_Qty, .JIFRT_SVOI_Qty", function () {
+
+        let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+        if (cleaned !== $(this).val()) {
+            $(this).val(cleaned);
+        }
+    });
+    //#endregion
+
+    //#region restrict UnitPrice/Rate to numbers + single decimal point
+    $(document).on("keydown", ".JIJWI_SVOI_UnitPrice, .JIFRT_SVOI_Rate", function (e) {
+
+        if ($.inArray(e.key, ["Backspace", "Delete", "Tab", "Escape", "Enter",
+            "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"]) !== -1) {
+            return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) &&
+            ["a", "c", "v", "x"].indexOf(e.key.toLowerCase()) !== -1) {
+            return;
+        }
+
+        if (e.key >= "0" && e.key <= "9") {
+            return;
+        }
+
+        if (e.key === "." && this.value.indexOf(".") === -1) {
+            return;
+        }
+
+        e.preventDefault();
+    });
+
+    $(document).on("input", ".JIJWI_SVOI_UnitPrice, .JIFRT_SVOI_Rate", function () {
+
+        let cleaned = $(this).val().replace(/[^0-9.]/g, "");
+
+        let firstDot = cleaned.indexOf(".");
+        if (firstDot !== -1) {
+            cleaned = cleaned.substring(0, firstDot + 1) +
+                cleaned.substring(firstDot + 1).replace(/\./g, "");
+        }
+
+        if (cleaned !== $(this).val()) {
+            $(this).val(cleaned);
+        }
+    });
+    //#endregion
+
     //#region onkeypress qty and unit
     $(document).on("keyup change", ".JIJWI_SVOI_Qty, .JIJWI_SVOI_UnitPrice", function () {
 
@@ -1305,7 +1436,10 @@ function ValidateJWIHeader() {
         showAlert('Service Order No. is required', '[name="JWIHeader.JIJWI_SVOH_ServiceOrderNo"]');
         return false;
     }
-
+    if ($('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val().trim() === "") {
+        showAlert('Material Segregation is required', '[name="JWIHeader.JIJWI_SVOH_MS_Number"]');
+        return false;
+    }
     if ($('[name="JWIHeader.JIJWI_SVOH_ServiceOrderDate"]').val().trim() === "") {
         showAlert('Service Order Date is required', '[name="JWIHeader.JIJWI_SVOH_ServiceOrderDate"]');
         return false;
@@ -1577,6 +1711,16 @@ function OnFocusItem(inputElement) {
         return;
     }
 
+    let material = $('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val();
+
+    if (!material) {
+        $("#RightPane_Item").removeClass("show");
+        $("#RightPane_Item .search-results").hide();
+
+        showAlert('Please select Material Segregation before searching for an item.', '[name="JWIHeader.JIJWI_SVOH_MS_Number"]');
+        return;
+    }
+
     // Always re-bind search to the currently focused row,
     // even if the panel is already open from a different row's search.
     SearchServiceOrderItem(inputElement);
@@ -1588,7 +1732,10 @@ function SearchServiceOrderItem(inputElement) {
     let resultsDiv = $("#RightPane_Item").find(".search-results");
     let material = $('[name="JWIHeader.JIJWI_SVOH_MS_Number"]').val();
 
-    if (!material) return;
+    if (!material) {
+        showAlert('Please select Material Segregation before searching for an item.', '[name="JWIHeader.JIJWI_SVOH_MS_Number"]');
+        return;
+    }
 
     if (itemSearchXHR) {
         itemSearchXHR.abort();
@@ -1826,15 +1973,18 @@ function JWIValidateItemGrid() {
 
         if (row.attr("id") === "JWITempRow") return;
         if (row.find(".JIJWI_SVOI_IsDeleted").val() === "1") return;
-
         let process = row.find(".JIJWI_SVOI_PRS_Number").val();
         let itemCode = row.find(".JIJWI_SVOI_Item_Code").val();
+        let warehouse = row.find(".JIJWI_SVOI_WH_Number").val();
+        let uom = row.find(".JIJWI_SVOI_UoM_Number").val();
         let qty = row.find(".JIJWI_SVOI_Qty").val();
         let unitPrice = row.find(".JIJWI_SVOI_UnitPrice").val();
 
         let isRowStarted =
             (process && process.trim() !== "") ||
             (itemCode && itemCode.trim() !== "") ||
+            (warehouse && warehouse.trim() !== "") ||
+            (uom && uom.trim() !== "") ||
             (qty && qty.trim() !== "") ||
             (unitPrice && unitPrice.trim() !== "");
 
@@ -1851,6 +2001,18 @@ function JWIValidateItemGrid() {
 
         if (!itemCode || itemCode.trim() === "") {
             showAlert('Item Code is required', row.find(".JIJWI_SVOI_Item_Code"));
+            isValid = false;
+            return false;
+        }
+
+        if (!warehouse || warehouse.trim() === "" || warehouse.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': Warehouse is required', row.find(".JIJWI_SVOI_WH_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!uom || uom.trim() === "" || uom.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': UOM is required', row.find(".JIJWI_SVOI_UoM_Number"));
             isValid = false;
             return false;
         }
@@ -1892,6 +2054,7 @@ function FreightValidateItemGrid() {
         let process = row.find(".JIFRT_SVOI_PRS_Number").val();
         let fromWH = row.find(".JIFRT_SVOI_FromWH_Number").val();
         let toWH = row.find(".JIFRT_SVOI_ToWH_Number").val();
+        let uom = row.find(".JIFRT_SVOI_UoM_Number").val();
         let qty = row.find(".JIFRT_SVOI_Qty").val();
         let rate = row.find(".JIFRT_SVOI_Rate").val();
 
@@ -1899,6 +2062,7 @@ function FreightValidateItemGrid() {
             (process && process.trim() !== "") ||
             (fromWH && fromWH.trim() !== "") ||
             (toWH && toWH.trim() !== "") ||
+            (uom && uom.trim() !== "") ||
             (qty && qty.trim() !== "") ||
             (rate && rate.trim() !== "");
 
@@ -1921,6 +2085,12 @@ function FreightValidateItemGrid() {
 
         if (!toWH || toWH.trim() === "" || toWH.trim() === "0") {
             showAlert('Row ' + rowNumber + ': To WH is required', row.find(".JIFRT_SVOI_ToWH_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!uom || uom.trim() === "" || uom.trim() === "0") {
+            showAlert('Row ' + rowNumber + ': UOM is required', row.find(".JIFRT_SVOI_UoM_Number"));
             isValid = false;
             return false;
         }

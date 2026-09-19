@@ -68,7 +68,7 @@ namespace ERP.Controllers.JobworkInward
                 SI_DTO.JICNVH_SFT_Number = S_DTO.JIDNH_Shift_Number;
                 SI_DTO.JICNVH_MS_Number = S_DTO.JIDNH_MS_Number;
                 SI_DTO.JICNVH_WC_Number = S_DTO.JIDNH_WC_Number;
-                SI_DTO.JICNVH_Operator = long.TryParse(S_DTO.JIDNH_Operator_Number, out var op) ? op : 0;
+                SI_DTO.JICNVH_Operator = S_DTO.JIDNH_Operator_Number;
                 SI_DTO.JICNVH_PRS_Number = S_DTO.JIDNH_PRS_Number;
 
                 SI_DAO.JI_ConversionDB(SI_DTO);

@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.FreightInvoiceHead_DTO;
 @{
-    ViewData["Title"] = "Freight Invoice Create";
+    ViewData["Title"] = "Invoice - Freight Default Form Setting";
 }
 <style>
     .match-row td {
@@ -108,7 +108,7 @@
     <div class="row align-items-center panel-header gx-2">
         <div class="col h-100 align-items-center">
             <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
-                Freight Invoice
+              Invoice - Freight
                 <a asp-controller="JobworkInwardMain" asp-action="Index" class="float-end btn p-0">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                         <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
@@ -153,9 +153,30 @@
 
                             <div class="col-auto left-menu text-black">
                                 <div class="row">
-                                    <div class="col-12 col-md-4 col-lg-4">
 
-                                        <div class="row align-items-center gx-2">
+                                    <!-- COLUMN 1 -->
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label asp-for="JIFTIH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JIFTIH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-6 col-lg-5 col-form-label ps-0">Category</label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JIFTIH_SourceCategory" class="form-select">
+                                                    <option value="DN">Delivery Note</option>
+                                                    <option value="RN">Receipt Note</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIFTIH_JW_Customer_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-6">
                                                 <input asp-for="JIFTIH_JW_Customer_Number" type="hidden" />
@@ -168,7 +189,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIFTIH_Currency_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-6">
                                                 <select asp-for="JIFTIH_Currency_Number"
@@ -177,7 +198,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIFTIH_TCT_Number" class="col-sm-4 col-lg-3 col-form-label ps-0"></label>
                                             <div class="col-sm-7 col-lg-6">
                                                 <select asp-for="JIFTIH_TCT_Number"
@@ -185,36 +206,25 @@
                                                         asp-items="@ViewBag.TaxCluster"></select>
                                             </div>
                                         </div>
-
                                     </div>
 
+                                    <!-- COLUMN 3 -->
                                     <div class="col-12 col-md-4 col-lg-4">
-                                        <div class="row align-items-center gx-2">
-                                            <label asp-for="JIFTIH_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
-                                            <div class="col-md-6 col-lg-7">
-                                                <select asp-for="JIFTIH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
-                                            </div>
-                                        </div>
-
-                                        <div class="row align-items-center gx-2">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIFTIH_PaymentTerms" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
                                                 <input asp-for="JIFTIH_PaymentTerms" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
-                                        <div class="row align-items-center gx-2">
+                                        <div class="row align-items-center gx-2 mb-0">
                                             <label asp-for="JIFTIH_PaymentMethod" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
                                                 <input asp-for="JIFTIH_PaymentMethod" class="form-control Key KeyDup" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
 
-                                    </div>
-
-                                    <div class="col-12 col-md-4 col-lg-4">
-
-                                        <div class="row align-items-start gx-2">
+                                        <div class="row align-items-start gx-2 mb-0">
                                             <label asp-for="JIFTIH_Remarks" class="col-sm-4 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
                                                 <textarea asp-for="JIFTIH_Remarks" maxlength="250"
@@ -222,8 +232,8 @@
                                                           autocomplete="off"></textarea>
                                             </div>
                                         </div>
-
                                     </div>
+
                                 </div>
                             </div>
 
@@ -254,7 +264,7 @@
  
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
 
- 
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
 
 }
 <script>
@@ -264,6 +274,8 @@
     function AutoFit() {
         fitInputWidth("JIFTIH_InvoiceNo", 20, 25);
         fitInputWidth("JIFTIH_MS_Number", 20, 30);
+           fitInputWidth("JIFTIH_SourceCategory", 20, 30);
+        
         fitInputWidth("JIFTIH_JW_Customer_Name", 40, 50);
         fitInputWidth("JIFTIH_Currency_Number", 10, 10);
         fitInputWidth("JIFTIH_TCT_Number", 20, 25);
@@ -277,12 +289,13 @@
 
     //#region Header AutoFit - KeyUp
     $(document).on("keyup change input",
-        "#JIFTIH_MS_Number, #JIFTIH_JW_Customer_Name, #JIFTIH_Currency_Number, #JIFTIH_TCT_Number, #JIFTIH_PaymentTerms, #JIFTIH_PaymentMethod, #JIFTIH_Remarks",
+        "#JIFTIH_MS_Number,#JIFTIH_SourceCategory, #JIFTIH_JW_Customer_Name, #JIFTIH_Currency_Number, #JIFTIH_TCT_Number, #JIFTIH_PaymentTerms, #JIFTIH_PaymentMethod, #JIFTIH_Remarks",
         function () {
 
             const widths = {
-              
+             
                 JIFTIH_MS_Number: [20, 30],
+                 JIFTIH_SourceCategory:[20,30],
                 JIFTIH_JW_Customer_Name: [40, 50],
                 JIFTIH_Currency_Number: [10, 10],
                 JIFTIH_TCT_Number: [20, 25],
@@ -338,7 +351,9 @@
                 "#RightPane .buyer-search-results"
             );
         });
-            $(document).on("keydown", "#JIFTIH_JW_Customer_Name", function (e) {
+              
+        
+        $(document).on("keydown", "#JIFTIH_JW_Customer_Name", function (e) {
 
                  if (e.key === "Escape" || e.key === "Tab") {
 
@@ -353,6 +368,43 @@
                 return;
             }
 
+            if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Enter") {
+                return;
+            }
+
+            let input = $(this);
+            let rows = $("#RightPane .buyer-search-results tbody tr");
+
+            // Enter, no record selected (empty textbox, full unfiltered
+            // list) -> auto-select first record + close popup.
+            if (e.key === "Enter" &&
+                $.trim(input.val()) === "" && rows.length > 0 &&
+                !rows.filter(".current-row, .match-row").length) {
+
+                e.preventDefault();
+
+                let firstCust = rows.first().data("customer");
+
+                isMouseSelectingBuyer = true;
+                if (firstCust) {
+                    SelectBuyerFTI(
+                        firstCust,
+                        "#JIFTIH_JW_Customer_Name",
+                        "#JIFTIH_JW_Customer_Number",
+                        "#JIFTIH_Currency_Number",
+                        "#RightPane",
+                        ".buyer-search-results"
+                    );
+                }
+
+                $("#RightPane").removeClass("show");
+                $("#RightPane .buyer-search-results").hide();
+
+                $("#JIFTIH_Currency_Number").focus();
+                isMouseSelectingBuyer = false;
+                return;
+            }
+
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
 
                 HandleSearchKeyDown(
@@ -363,9 +415,20 @@
                     "#BuyerMessage"
                 );
             }
-        });
 
-     });
+            if (e.key === "Enter") {
+                HandleSearchKeyDown(
+                    e,
+                    this,
+                    "#RightPane",
+                    ".buyer-search-results",
+                    "#BuyerMessage"
+                );
+            }
+        });
+   
+    
+    });
 
 
         function ShowCustomerPane() {
@@ -485,10 +548,9 @@
                             console.log("buyer row clicked");
                               $("#BuyerMessage").hide().text("");
                             e.preventDefault();
-
                             const clickedCust = $(this).data("customer");
                             isMouseSelectingBuyer = true;
-                            SelectBuyer(
+                            SelectBuyerFTI(
                                 clickedCust,
                                 "#JIFTIH_JW_Customer_Name",
                                 "#JIFTIH_JW_Customer_Number",
@@ -581,7 +643,7 @@
             });
         }
 
-    function SelectBuyer(
+     function SelectBuyerFTI(
         cust,
         customerNameId,
         customerNumberId,
@@ -713,7 +775,8 @@
             JIFTIH_TCT_Number: $("#JIFTIH_TCT_Number").val() || 0,
             JIFTIH_PaymentTerms: $("#JIFTIH_PaymentTerms").val(),
             JIFTIH_PaymentMethod: $("#JIFTIH_PaymentMethod").val(),
-            JIFTIH_Remarks: $("#JIFTIH_Remarks").val(),
+                   JIFTIH_Remarks: $("#JIFTIH_Remarks").val(),
+            JIFTIH_SourceCategory: $("#JIFTIH_SourceCategory").val(),
              JIFTIH_MS_Number: $("#JIFTIH_MS_Number").val() || 0
         };
     }

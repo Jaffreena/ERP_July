@@ -147,10 +147,11 @@
     -moz-appearance: textfield;
 }
 
-<!--batch popup width-->
-.custom-modal-width{
-    max-width:60%;
-}
+    /* batch popup width */
+    #DeliveryNoteBatchModal .modal-dialog {
+        width: fit-content;
+        max-width: 95vw;
+    }
 .jwcustomer-search-results,
 .buyer-search-results {
     position: absolute;
@@ -424,28 +425,28 @@
 
                                         </td>
 
-                                        <td class="table-width-xl">
+                                    <td class="table-width-xl">
 
-                                            <input type="text"
-                                                   class="form-control text-end JIDNI_BCH_QtyAvailable"
-                                                   readonly>
+                                        <input type="text"
+                                               class="form-control text-center JIDNI_BCH_QtyAvailable"
+                                               readonly>
 
-                                        </td>
+                                    </td>
 
-                                        <td class="table-width-xl">
+                                    <td class="table-width-xl">
 
-                                            <input type="text"
-                                                   class="form-control text-end JIDNI_BCH_QtyReserved"
-                                                   readonly>
+                                        <input type="text"
+                                               class="form-control text-center JIDNI_BCH_QtyReserved"
+                                               readonly>
 
-                                        </td>
+                                    </td>
 
-                                        <td class="table-width-xxl">
+                                    <td class="table-width-xxl">
 
-                                                <input type="number" autocomplete="off"
-                                                   class="form-control text-end JIDNI_BCH_QtyInvoice">
+                                        <input type="text" autocomplete="off"
+                                               class="form-control text-center JIDNI_BCH_QtyInvoice">
 
-                                        </td>
+                                    </td>
 
                                         <td class="table-width-xl">
 
@@ -480,29 +481,29 @@
                                             Total
                                         </td>
 
-                                        <td>
+                                    <td>
 
-                                            <input id="TotalAvailableQty"
-                                                   class="form-control text-end"
-                                                   readonly>
+                                        <input id="TotalAvailableQty"
+                                               class="form-control text-center"
+                                               readonly>
 
-                                        </td>
+                                    </td>
 
-                                        <td>
+                                    <td>
 
-                                            <input id="TotalReservedQty"
-                                                   class="form-control text-end"
-                                                   readonly>
+                                        <input id="TotalReservedQty"
+                                               class="form-control text-center"
+                                               readonly>
 
-                                        </td>
+                                    </td>
 
-                                        <td>
+                                    <td>
 
-                                            <input id="TotalBatchQty"
-                                                   class="form-control text-end"
-                                                   readonly>
+                                        <input id="TotalBatchQty"
+                                               class="form-control text-center"
+                                               readonly>
 
-                                        </td>
+                                    </td>
 
                                         <td></td>
 
@@ -758,10 +759,10 @@
 
                                             <div class="col-md-6 col-lg-7">
 
-                                                <input asp-for="Header.JIDNH_DN_No"
-                                                       class="form-control Key KeyDup" maxlength="25"
-                                                       autocomplete="off"
-                                                        />
+                                            <input asp-for="Header.JIDNH_DN_No"
+                                                   class="form-control Key KeyDup" maxlength="25"
+                                                   autocomplete="off"
+                                                   readonly />
 
                                             </div>
 
