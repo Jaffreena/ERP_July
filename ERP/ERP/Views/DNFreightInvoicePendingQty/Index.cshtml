@@ -1,0 +1,119 @@
+﻿@{
+    ViewData["Title"] = "DN Freight Invoice Pending Qty";
+}
+
+<div class="row align-items-center panel-header h-auto">
+    <div class="col">
+        <div class="card rounded-0 mt-3">
+            <div class="card-body px-2 py-2">
+                <h1 class="h6 fw-light">
+                    DN Freight Invoice Pending Qty
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row panel-body">
+    <div class="col-12 panel-card-fixed" id="BodyHeight">
+        <div class="w-100 rounded-0 border border-primary bg-transparent px-3" id="CardBody">
+
+            <div class="card rounded-0 mt-3 mb-3 bg-transparent">
+                <div class="card-header bg-secondary rounded-0">
+                    <p class="mb-0">Filters</p>
+                </div>
+                <div class="card-body bg-transparent text-dark">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-auto">
+                            <label class="form-label">From Date</label>
+                            <input type="date" id="FromDate" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">To Date</label>
+                            <input type="date" id="ToDate" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">Delivery Note No.</label>
+                            <select id="DN_No" class="form-select form-select-sm">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">Freight Service Order</label>
+                            <select id="Freight_SO_No" class="form-select form-select-sm">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label">JW Customer</label>
+                            <select id="JW_Customer_Number" class="form-select form-select-sm">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button id="btnSearch" class="btn btn-primary btn-sm">Search</button>
+                            <button id="btnClear" class="btn btn-secondary btn-sm">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-0 mb-3 bg-transparent">
+                <div class="card-header bg-secondary rounded-0">
+                    <p class="mb-0">Pending Items</p>
+                </div>
+                <div class="card-body bg-transparent text-dark p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm mb-0" id="PendingQtyTable">
+                            <thead class="table-info">
+                                <tr>
+                                    <th colspan="2" class="text-center">Delivery Note</th>
+                                    <th colspan="2" class="text-center">Freight Service Order</th>
+                                    <th rowspan="2" class="align-middle">JW Customer name</th>
+                                    <th colspan="2" class="text-center">Warehouse</th>
+                                    <th colspan="3" class="text-center">Qty Details</th>
+                                </tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Date</th>
+                                    <th>Number</th>
+                                    <th>Date</th>
+                                    <th>From WH</th>
+                                    <th>To WH</th>
+                                    <th class="text-end">Delivered</th>
+                                    <th class="text-end">Invoiced</th>
+                                    <th class="text-end">Pending Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody id="PendingQtyTableBody">
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold table-light">
+                                    <td colspan="7" class="text-end">Grand Total</td>
+                                    <td id="TotalDeliveredQty" class="text-end">0</td>
+                                    <td id="TotalInvoicedQty" class="text-end">0</td>
+                                    <td id="TotalPendingQty" class="text-end">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $('.navbar-nav > .nav-item.jobworkinward > a').addClass("active");
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const MainDiv = document.getElementById('BodyHeight');
+        const BodyDiv = document.getElementById('CardBody');
+
+        const MainHeight = MainDiv.offsetHeight;
+        BodyDiv.style.height = (MainHeight - 10) + 'px';
+    });
+</script>
+
+<script src="~/js/jobworkinvoice_report/DNFreightInvoicePendingQty.js"></script>

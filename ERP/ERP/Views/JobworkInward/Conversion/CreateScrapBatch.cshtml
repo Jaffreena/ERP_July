@@ -6,7 +6,7 @@
             <tr class="table-info">
                 <th class="datetype text-center">@Html.DisplayNameFor(M => M.First().JIRNI_BCH_BatchDate)</th>
                 <th>@Html.DisplayNameFor(M => M.First().JIRNI_BCH_Number)</th>
-                <th class="table-width-xl text-end">@Html.DisplayNameFor(M => M.First().JIRNI_BCH_BatchQty)</th>
+                <th class="table-width-xl text-center">@Html.DisplayNameFor(M => M.First().JIRNI_BCH_BatchQty)</th>
                 <th class="table-width-xl text-end">@Html.DisplayNameFor(M => M.First().JIRNI_BCH_BatchUnitPrice)</th>
                 <th class="table-width-3xl text-end">@Html.DisplayNameFor(M => M.First().JIRNI_BCH_BatchValue)</th>
                 <th class="action text-center">Action</th>
@@ -24,7 +24,7 @@
                     <input id="JIRNI_BCH_Number" class="form-control JIRNI_BCH_Number" autocomplete="off" />
                 </td>
                 <td class="table-width-xl">
-                    <input id="JIRNI_BCH_BatchQty" class="form-control JIRNI_BCH_BatchQty  text-end decimal" value="0" autocomplete="off" />
+                    <input id="JIRNI_BCH_BatchQty" class="form-control JIRNI_BCH_BatchQty  text-center decimal" value="0" autocomplete="off" />
                 </td>
                 <td class="table-width-xl">
                     <input id="JIRNI_BCH_BatchUnitPrice" class="form-control JIRNI_BCH_BatchUnitPrice decimal text-end" value="0" autocomplete="off" />
@@ -56,7 +56,7 @@
                             <input id="JIRNI_BCH_Number" name="ItemBatch[@i].JIRNI_BCH_Number" class="form-control JIRNI_BCH_Number" autocomplete="off" value="@Model[i].JIRNI_BCH_Number" />
                         </td>
                         <td class="table-width-xl">
-                            <input id="JIRNI_BCH_BatchQty" name="ItemBatch[@i].JIRNI_BCH_BatchQty" class="form-control JIRNI_BCH_BatchQty text-end" autocomplete="off" value="@Model[i].JIRNI_BCH_BatchQty" />
+                            <input id="JIRNI_BCH_BatchQty" name="ItemBatch[@i].JIRNI_BCH_BatchQty" class="form-control JIRNI_BCH_BatchQty text-center" autocomplete="off" value="@Model[i].JIRNI_BCH_BatchQty" />
                         </td>
                         <td class="table-width-xl">
                             <input id="JIRNI_BCH_BatchUnitPrice" name="ItemBatch[@i].JIRNI_BCH_BatchUnitPrice" class="form-control JIRNI_BCH_BatchUnitPrice decimal text-end" autocomplete="off" value="@Model[i].JIRNI_BCH_BatchUnitPrice" />
@@ -84,7 +84,7 @@
             <tr class="table-info">
                 <td class="text-end" colspan="2">Total</td>
                 <td class="table-width-xl">
-                    <input id="BatchTotalQty_S" class="form-control text-end" readonly />
+                    <input id="BatchTotalQty_S" class="form-control text-center" readonly />
                 </td>
                 <td></td>
                 <td class="table-width-3xl">

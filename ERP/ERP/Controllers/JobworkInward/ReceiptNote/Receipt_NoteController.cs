@@ -31,6 +31,17 @@ namespace ERP.Controllers.JobworkInward
             ViewBag.Collapse = true;
             return View("~/Views/JobworkInward/Receipt_Note/Edit.cshtml", SH_DTO);
         }
+        // READ-ONLY view of a saved Receipt Note: same page and same data load as Edit, with view mode switched on
+        public IActionResult ViewNote()
+        {
+            ReceiptNoteHead_DTO SH_DTO = new ReceiptNoteHead_DTO();
+            SH_DTO.JIRNH_JW_CustomerDC_Date = DateTime.Now.ToString("dd-MMM-yy");
+            ReceiptGetData();
+            ViewBag.Collapse = true;
+            ViewBag.IsViewMode = true;
+            return View("~/Views/JobworkInward/Receipt_Note/Edit.cshtml", SH_DTO);
+        }
+
         public IActionResult Index()
         {
             ReceiptNoteHead_DTO SH_DTO = new ReceiptNoteHead_DTO();
@@ -332,7 +343,7 @@ namespace ERP.Controllers.JobworkInward
                                     batchDTO.JIRNH_Number = headerId;
                                     batchDTO.JIRNI_Number = itemIdMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
                                     batchDTO.JIRNI_Item_Number = itemNumberMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
-                                    batchDTO.JIRNI_BCH_BatchDate = DateTime.Now;
+                                    batchDTO.JIRNI_BCH_BatchDate = Convert.ToDateTime(batch.JIRNI_BCH_BatchDate);          // FIX: was DateTime.Now - use the date entered in the batch popup
                                     batchDTO.JIRNI_BCH_BatchNo = batch.JIRNI_BCH_BatchNo;                                     // RENAMED: was batch.RNI_BCH_Number
                                     batchDTO.JIRNI_BCH_WH_Number = itemWHMap[Convert.ToInt32(batch.RNI_BCH_Item_Index) - 1];
                                     batchDTO.JIRNI_BCH_BatchQty = Convert.ToDouble(batch.JIRNI_BCH_BatchQty);                 // RENAMED: was batch.RNI_BCH_Qty
@@ -355,12 +366,13 @@ namespace ERP.Controllers.JobworkInward
                                 ITM_DTO = null;
                                 S_DTO.Reset();
                                 Original_DTO = Help.JsonClone(S_DTO);
-
                                 if (SIHOrderNoOld != SIHOrderNoNew)
                                 {
                                     ViewBag.ErrorCode = 2;
                                     ViewBag.ErrorMessage = "Receipt Note number " + SIHOrderNoOld + " changed to " + SIHOrderNoNew;
                                 }
+
+                                return Json(new { success = true, message = "Record Inserted" });      // FIX: was falling through to "Invalid request."
                             }
                             catch (Exception ex)
                             {
@@ -551,10 +563,10 @@ namespace ERP.Controllers.JobworkInward
         #region Check Delivered Qty Exceeded - Freight
         [HttpGet]
         [Route("receiptnote/transactions/receiptnote/check-received-qty-exceeded-freight")]
-        public JsonResult CheckReceivedQtyExceededFreight(long jisvohNumber, long? fromWHNumber = null, long? toWHNumber = null)
+        public JsonResult CheckReceivedQtyExceededFreight(long jisvohNumber, long? fromWHNumber = null, long? toWHNumber = null, long? excludeRNNumber = null)
         {
             var dt = SI_DAO
-                .CheckReceivedQtyExceededFreightDB(jisvohNumber, fromWHNumber, toWHNumber)
+             .CheckReceivedQtyExceededFreightDB(jisvohNumber, fromWHNumber, toWHNumber, excludeRNNumber)
                 .Tables[0];
 
             var result = dt.AsEnumerable().Select(r => new

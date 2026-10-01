@@ -834,11 +834,11 @@ function BindDeliveryNoteOtherBatchTable(response) {
     `);
         return;
     }
-    $("#DeliveryNoteOtherBatchList").show();
-    $("#Other-tab-pane").show();
+    // (removed) Create does not force the Other WH list visible
+    // (removed) Create does not force the Other WH pane visible
     $(".tab-scroll").css({
-        height: "300px",
-        overflowY: "auto"
+       
+     
     });
     console.log($("#Other-tab-pane").css("display"));
     console.log($("#Other-tab-pane").height());
@@ -915,6 +915,26 @@ function BindOtherBatch(fromWarehouse, lineItemNumber, ItemGridindex) {
     //#endregion
 }
 //#endregion
+// Restrict Batch Amend Qty input to digits only (same rule as the Create page)
+$(document).on("keypress", ".RNI_BCH_AmendQty", function (e) {
+    if (e.ctrlKey || e.metaKey) return;          // allow Ctrl+V / Ctrl+A / Ctrl+C
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+// Strip any non-numeric characters that slip in via paste or drag-drop
+$(document).on("input", ".RNI_BCH_AmendQty", function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+
 function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
 
     if (rowBatches.length === 0) {
@@ -949,8 +969,13 @@ function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
                 .val(batch.RNI_BCH_No);
 
             // Qty
-            newRow.find(".JIRNI_BCH_BatchQty")
-                .val(batch.RNI_BCH_Qty ? formatIndianQty(batch.RNI_BCH_Qty) : "0");
+            let amendVal = (batch.RNI_BCH_AmendQty !== undefined &&
+                batch.RNI_BCH_AmendQty !== null &&
+                batch.RNI_BCH_AmendQty !== "")
+                ? batch.RNI_BCH_AmendQty
+                : batch.RNI_BCH_Qty;
+            newRow.find(".RNI_BCH_AmendQty")
+                .val(amendVal ? formatIndianQty(amendVal) : "0");
 
             // Unit Price
             newRow.find(".JIRNI_BCH_BatchUnitPrice")
@@ -982,6 +1007,10 @@ function BindBatchPopup(rowBatches, itemNumber, unitPrice, selectedRow) {
                 .val(batch.RNI_BCH_UsedQty ? formatIndianQty(batch.RNI_BCH_UsedQty) : "0");
 
             newRow.find(".RNI_BCH_AmendQty")
+                .val(amendVal ? formatIndianQty(amendVal) : "0");
+
+            // Original Qty
+            newRow.find(".JIRNI_BCH_BatchQty")
                 .val(batch.RNI_BCH_Qty ? formatIndianQty(batch.RNI_BCH_Qty) : "0");
 
 

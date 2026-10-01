@@ -1,0 +1,105 @@
+﻿@model List<ERP_DTO.JobOutwardTransaction.JW_VendorContact_DTO>
+
+<div class="w-100 table-fixed h-100">
+    <div class="w-100 table-responsive table-body table-body-f">
+        <table class="table table-bordered align-middle table-hover mb-0 table-grid">
+            <thead>
+                <tr class="table-info">
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_CNT_ContactName)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_CNT_Department)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_CNT_Mobile)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_CNT_Telephone)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_CNT_Email)</th>
+                    <th class="action text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody id="ContactTableBody">
+                <tr id="ContactTempRow" style="display:none;">
+                    <td><input class="form-control JWV_CNT_ContactName" maxlength="25" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_CNT_Department" maxlength="25" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_CNT_Mobile" maxlength="50" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_CNT_Telephone" maxlength="50" autocomplete="off" /></td>
+                    <td><input type="email" class="form-control JWV_CNT_Email" maxlength="100" autocomplete="off" /></td>
+                    <td class="action text-center">
+                        <input type="hidden" class="JWV_CNT_IsDeleted" value="0" />
+                        <a class="ContactRowRemove btn text-danger p-0 icon-link shadow-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model != null)
+                {
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="ContactNewRow" style="@(Model[i].JWV_CNT_IsDeleted == 1 ? "display:none;" : "")">
+                            <td><input name="JWV_Contact_List[@i].JWV_CNT_ContactName" value="@Model[i].JWV_CNT_ContactName" class="form-control JWV_CNT_ContactName" maxlength="25" autocomplete="off" /></td>
+                            <td><input name="JWV_Contact_List[@i].JWV_CNT_Department" value="@Model[i].JWV_CNT_Department" class="form-control JWV_CNT_Department" maxlength="25" autocomplete="off" /></td>
+                            <td><input name="JWV_Contact_List[@i].JWV_CNT_Mobile" value="@Model[i].JWV_CNT_Mobile" class="form-control JWV_CNT_Mobile" maxlength="50" autocomplete="off" /></td>
+                            <td><input name="JWV_Contact_List[@i].JWV_CNT_Telephone" value="@Model[i].JWV_CNT_Telephone" class="form-control JWV_CNT_Telephone" maxlength="50" autocomplete="off" /></td>
+                            <td><input type="email" name="JWV_Contact_List[@i].JWV_CNT_Email" value="@Model[i].JWV_CNT_Email" class="form-control JWV_CNT_Email" maxlength="100" autocomplete="off" /></td>
+                            <td class="action text-center">
+                                <input type="hidden" name="JWV_Contact_List[@i].JWV_CNT_Number" value="@Model[i].JWV_CNT_Number" />
+                                <input type="hidden" name="JWV_Contact_List[@i].JWV_CNT_IsDeleted" class="JWV_CNT_IsDeleted" value="@Model[i].JWV_CNT_IsDeleted" />
+                                <a class="ContactRowRemove btn text-danger p-0 icon-link shadow-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="w-100 table-footer">
+        <a id="ContactAddRowButton" class="btn btn-primary">Add Row</a>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var rowCount = @(Model != null ? Model.Count : 0);
+
+        function activeRows() {
+            return $("#ContactTableBody tr.ContactNewRow").filter(function () {
+                return $(this).find(".JWV_CNT_IsDeleted").val() !== "1";
+            });
+        }
+        function rowEmpty(row) {
+            var empty = true;
+            row.find("input[type='text'], input[type='email']").each(function () {
+                if ($.trim($(this).val()) !== "") { empty = false; return false; }
+            });
+            return empty;
+        }
+
+        function addRow() {
+            var r = $("#ContactTempRow").clone().removeAttr("id").removeAttr("style").addClass("ContactNewRow");
+            var n = "JWV_Contact_List[" + rowCount + "].";
+            r.find(".JWV_CNT_ContactName").attr("name", n + "JWV_CNT_ContactName");
+            r.find(".JWV_CNT_Department").attr("name", n + "JWV_CNT_Department");
+            r.find(".JWV_CNT_Mobile").attr("name", n + "JWV_CNT_Mobile");
+            r.find(".JWV_CNT_Telephone").attr("name", n + "JWV_CNT_Telephone");
+            r.find(".JWV_CNT_Email").attr("name", n + "JWV_CNT_Email");
+            r.find(".JWV_CNT_IsDeleted").attr("name", n + "JWV_CNT_IsDeleted").val(0);
+            $("#ContactTableBody").append(r);
+            rowCount++;
+        }
+
+        if (activeRows().length === 0) addRow();
+
+        $(document).on("click", ".ContactRowRemove", function () {
+            var r = $(this).closest("tr");
+            r.find(".JWV_CNT_IsDeleted").val(1);
+            r.hide();
+            if (activeRows().length === 0) addRow();
+        });
+
+        $("#ContactAddRowButton").click(function () {
+            var last = activeRows().last();
+            if (!last.length || !rowEmpty(last)) addRow();
+        });
+    });
+</script>

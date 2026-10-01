@@ -1,0 +1,28 @@
+﻿@model ERP_DTO.JobOutwardTransaction.JO_Shift_DTO
+
+
+@if (Model != null)
+{
+    <input asp-for="JSFT_Number" type="hidden" class="Number" />
+}
+<div class="mb-3">
+    <label asp-for="JSFT_ShiftName" class="control-label"></label>
+    <input asp-for="JSFT_ShiftName" class="form-control Key KeyDup" autofocus="true" autocomplete="off" />
+</div>
+<div class="mb-3">
+    <label asp-for="JSFT_Description" class="control-label"></label>
+    <textarea asp-for="JSFT_Description" class="form-control Key" autocomplete="off"></textarea>
+</div>
+
+<div>
+    @if (Model != null)
+    {
+        <input type="submit" name="Mode" value="Update" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+    else
+    {
+        <input type="submit" name="Mode" value="Save" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+</div>

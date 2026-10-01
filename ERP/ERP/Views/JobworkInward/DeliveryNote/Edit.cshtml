@@ -190,6 +190,7 @@
 
 
 <form asp-action="SaveDeliveryNote" method="post" id="DeliveryNoteForm">
+    <input type="hidden" id="IsViewMode" value="@(ViewBag.IsViewMode == true ? "1" : "0")" />
     <!-- Alert Popup -->
     <div class="modal modal-sm fade" id="ModelAlert" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -389,7 +390,7 @@
 
                                         <td class="table-width-xl">
                                                 
-                                            <input type="number" autocomplete="off"
+                                            <input type="number" autocomplete="off" 
                                                    class="form-control text-end JIDNI_BCH_QtyInvoice">
 
                                         </td>
@@ -430,7 +431,7 @@
                                         <td>
 
                                             <input id="TotalAvailableQty"
-                                                   class="form-control text-end"
+                                                   class="form-control text-center"
                                                    readonly>
 
                                         </td>
@@ -438,7 +439,7 @@
                                         <td>
 
                                             <input id="TotalReservedQty"
-                                                   class="form-control text-end"
+                                                   class="form-control text-center"
                                                    readonly>
 
                                         </td>
@@ -446,7 +447,7 @@
                                         <td>
 
                                             <input id="TotalBatchQty"
-                                                   class="form-control text-end"
+                                                   class="form-control text-center"
                                                    readonly>
 
                                         </td>
@@ -1293,7 +1294,7 @@
                                                                 <td>
 
                                                                     <input type="text"
-                                                                           value="@Model.Items[i].JIDNI_Qty"
+                                                                           value="@Model.Items[i].JIDNI_InvoicedQty"
                                                                            autocomplete="off" readonly
                                                                            class="form-control JIDNI_InvoicedQty text-end" />
 
@@ -1380,7 +1381,8 @@
                                                                 <!-- FREIGHT NO -->
                                                                 <td class="FreightSOCell">
                                                                     <select asp-for="Items[i].JIDNI_JIFRT_SVOH_Number"
-                                                                            class="form-select JIDNI_JIFRT_SVOH_Number">
+                                                                            class="form-select JIDNI_JIFRT_SVOH_Number"
+                                                                            data-saved-value="@Model.Items[i].JIDNI_JIFRT_SVOH_Number">
                                                                         <option value="0"></option>
                                                                     </select>
                                                                     <input type="hidden" asp-for="Items[i].JIDNI_JIFRT_SVOI_Number" class="JIDNI_JIFRT_SVOI_Number_Row" />
@@ -1393,7 +1395,12 @@
                                                     <tfoot>
                                                         <tr class="table-info">
                                                             <td colspan="12" class="text-end">Total</td>
-                                                            <td></td>
+                                                            <td>
+                                                                <input id="TotalOriginalQty" class="form-control text-center" readonly />
+                                                            </td>
+                                                            <td>
+                                                                <input id="TotalInvoicedQty" class="form-control text-center" readonly />
+                                                            </td>
                                                             <td>
                                                                 <input id="TotalQty" class="form-control text-center" readonly />
                                                             </td>
@@ -1401,15 +1408,12 @@
                                                             <td>
                                                                 <input id="TotalAmount" class="form-control text-end" readonly />
                                                             </td>
-                                                            
-                                                            <td></td>
                                                             <td></td>
                                                             <td></td>
                                                             <td class="FreightApplicableFooterCell" style="display: none;"></td>
                                                             <td class="FromWHFooterCell" style="display: none;"></td>
                                                             <td class="ToWHFooterCell" style="display: none;"></td>
                                                             <td class="FreightSOFooterCell" style="display: none;"></td>
-
                                                         </tr>
                                                     </tfoot>
                                                 </table>

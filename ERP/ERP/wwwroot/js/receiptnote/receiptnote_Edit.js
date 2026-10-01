@@ -491,13 +491,26 @@ function ApplyBatchFieldWidths(container = "#BatchTable") {
 //#endregion
 
  
+function SetFlatpickrDate(id, value) {
+    let el = document.getElementById(id);
+    if (!el) return;
+    if (el._flatpickr && value) {
+        let d = new Date(value);
+        if (!isNaN(d.getTime())) {
+            el._flatpickr.setDate(d, false);
+            return;
+        }
+    }
+    $(el).val(value || "");
+}
+
 function BindHeader(h) {
 
     $("#RN_No").val(h.JIRNH_RN_No);
-    $("#RN_Date").val(h.JIRNH_RN_Date);
+    SetFlatpickrDate("RN_Date", h.JIRNH_RN_Date);
 
     $("#JW_CustomerDC_No").val(h.JIRNH_JW_CustomerDC_No);
-    $("#JW_CustomerDC_Date").val(h.JIRNH_JW_CustomerDC_Date);
+    SetFlatpickrDate("JW_CustomerDC_Date", h.JIRNH_JW_CustomerDC_Date);
 
     $("#MS_Number").val(h.JIRNH_MS_Number).trigger("change");
 
@@ -554,7 +567,7 @@ function BindItems_Edit(items) {
         row.find(".JIRNI_UoM_Number").val(item.JIRNI_UoM_Number);
 
         row.find(".OriginalQty").val(formatIndianQty(item.JIRNI_Qty));
-        row.find(".UsedQty").val(formatIndianQty(item.UsedQty));
+        row.find(".UsedQty").val(formatIndianQty(removeCommas(item.UsedQty)));
 
         let amendQty = (parseFloat(item.JIRNI_Qty) || 0) - (parseFloat(item.UsedQty) || 0);
 
@@ -572,6 +585,11 @@ function BindItems_Edit(items) {
 
         // NEW: Qty (Kgs) / From WH / To WH
         row.find(".JIRNI_Qty_Kgs").val(item.JIRNI_Qty_Kgs);
+
+        // OPTIONAL business rule: consumed rows keep item / warehouse / UoM fixed
+        if ((parseFloat(item.UsedQty) || 0) > 0) {
+            row.find(".Item_Code, .JIRNI_WH_Number, .JIRNI_UoM_Number").prop("disabled", true);
+        }
         row.find(".JIRNI_FromWH").val(item.JIRNI_FromWH);
         row.find(".JIRNI_ToWH").val(item.JIRNI_ToWH);
 
@@ -643,6 +661,81 @@ function ResizeColumn(control) {
         searchTable: "#tblsearch"
     });
 }
+// ===== VIEW MODE: Receipt_Note/ViewNote uses this same page, read-only =====
+// ===== VIEW MODE: Receipt_Note/ViewNote uses this same page, READ-ONLY only (no colour / font / layout change) =====
+function ApplyViewMode() {
+    if (!window.RN_VIEW_MODE) return;
+
+    // 1) every header / grid field: no typing, no click, no focus, not reachable with Tab
+    $("form.h-100").find("input, select, textarea")
+        .not(".CheckItem")            // row tick boxes still work: they choose the row for Batch
+        .not("#IBatch *")             // the batch popup is locked separately below
+        .prop("readonly", true)
+        .css("pointer-events", "none")
+        .attr("tabindex", "-1");
+
+    // checkboxes cannot be toggled, not even through their label
+    $("form.h-100").find("input[type=checkbox]")
+        .not(".CheckItem")
+        .not("#IBatch *")
+        .off("click.rnview")
+        .on("click.rnview", function (e) { e.preventDefault(); });
+
+    // 2) buttons that change data
+    $("#btnSave, #AddRowButton, #RemoveItemRowButton").hide();
+    $(".right-menu a:contains('Clear All')").hide();
+
+    // 3) batch popup: layout, height and styles are left EXACTLY as on the Edit page (nothing hidden, nothing styled).
+    //    Editing is only blocked through events; Ok just closes the popup.
+    $("#IBatNewRowButton").off("click");                                    // Add Row does nothing
+    $("#IBatCloseButton").off("click").on("click", function () {            // Ok only closes
+        CloseIBatchModal();
+    });
+    $("#IBatch").off(".rnview")
+        .on("keypress.rnview paste.rnview cut.rnview drop.rnview", "#IBatTableBody input", function (e) {
+            if (e.type === "keypress" && (e.ctrlKey || e.metaKey)) return;  // allow Ctrl+C / Ctrl+A
+            e.preventDefault();
+        })
+        .on("keydown.rnview", "#IBatTableBody input", function (e) {
+            if (e.key === "Backspace" || e.key === "Delete") e.preventDefault();
+        })
+        .on("click.rnview", ".IBatRowRemove", function (e) {               // delete icon does nothing
+            e.preventDefault();
+            e.stopPropagation();
+        })
+        .on("shown.bs.modal.rnview", function () {                          // date pickers do not open
+            $("#IBatTableBody .JIRNI_BCH_BatchDate").each(function () {
+                if (this._flatpickr) this._flatpickr.set("clickOpens", false);
+            });
+        });
+    return;   // the older popup lines below are no longer used
+    $("#IBatch").off("shown.bs.modal.rnviewfit").on("shown.bs.modal.rnviewfit", function () {
+        // empty rows carry no information in view mode: remove them so the popup is only as tall as its batches
+        $("#IBatTableBody tr.IBatNewRow").filter(function () {
+            return $.trim($(this).find(".form-control.JIRNI_BCH_Number").val()) === "";
+        }).remove();
+
+        // the popup height follows its content
+        $("#IBatch .modal-body, #IBatch .tab-body, #IBatch .tab-pane")
+            .css({ "height": "auto", "min-height": "0", "max-height": "none" });
+
+        if (typeof CalculateBatchFooter_Edit === "function") CalculateBatchFooter_Edit();   // footer totals stay correct
+        var inst = bootstrap.Modal.getInstance(document.getElementById("IBatch"));
+        if (inst) inst.handleUpdate();
+    });
+    $("#IBatNewRowButton").hide();
+    $("#IBatCloseButton").off("click").on("click", function () {
+        CloseIBatchModal();
+    });
+    $("#IBatch").off("shown.bs.modal.rnview").on("shown.bs.modal.rnview", function () {
+        $("#IBatTableBody").find("input, select, textarea")
+            .prop("readonly", true)
+            .css("pointer-events", "none")
+            .attr("tabindex", "-1");
+        $("#IBatTableBody .IBatRowRemove").hide();
+    });
+}
+ 
 function LoadReceiptNote(receiptNo) {
 
     $.ajax({
@@ -675,6 +768,7 @@ function LoadReceiptNote(receiptNo) {
             // Bind Header
             //==========================
             BindHeader(response.header[0]);
+            if (window.RN_VIEW_MODE) setTimeout(ApplyViewMode, 300);   // View page: lock everything once the rows are drawn
 
             //==========================
             // Bind Items
@@ -740,8 +834,7 @@ function BindItemBatches_RN(itemBatches) {
 
                 RNI_BCH_UsedQty: parseFloat(batch.UsedQty) || 0,
                 RNI_BCH_AmendQty:
-                    (parseFloat(batch.JIRNI_BCH_BatchQty) || 0) -
-                    (parseFloat(batch.UsedQty) || 0)
+                    (parseFloat(batch.JIRNI_BCH_BatchQty) || 0)
             }));
 
         batchMismatchData_RN.push({
@@ -830,17 +923,46 @@ $("#RemoveItemRowButton").on("click", function () {
         return;
     }
 
+    // Rows already consumed downstream cannot be deleted
+    let usedRowBlocked = false;
+    checkedRows.each(function () {
+        let used = parseFloat(removeCommas($(this).find(".UsedQty").val())) || 0;
+        if (used > 0) { usedRowBlocked = true; return false; }
+    });
+    if (usedRowBlocked) {
+        alert("Row cannot be deleted - Used Qty exists for this item.");
+        return;
+    }
+
     // Confirmation
     if (!confirm("Are you sure you want to delete the selected row(s)?")) {
         return;
     }
 
-    checkedRows.remove();
+    // collect 1-based row ids BEFORE removing
+    let deletedIds = [];
+    let allRows = $("#TableBody tr.NewRow:visible");
+    checkedRows.each(function () { deletedIds.push(allRows.index(this) + 1); });
 
+    checkedRows.remove();
+    ReindexBatchData_AfterRowDelete(deletedIds);
     calculateTotal_rn();
 
 });
 //#endregion remove checked rows
+
+function ReindexBatchData_AfterRowDelete(deletedIds) {
+    function fix(arr) {
+        return arr
+            .filter(x => !deletedIds.includes(parseInt(x.rowId)))
+            .map(x => {
+                let shift = deletedIds.filter(d => d < parseInt(x.rowId)).length;
+                return { ...x, rowId: parseInt(x.rowId) - shift };
+            });
+    }
+    batchMismatchData_RN = fix(batchMismatchData_RN);
+    batchWrongMismatchData_RN = fix(batchWrongMismatchData_RN);
+}
 
 function HighlightRow(rows, index) {
 
@@ -897,6 +1019,11 @@ $(document).ready(function () {
 
    
     AutoFitHeader();
+
+    // Enter in any text box must not trigger implicit form submit (= Update)
+    $(document).on("keydown", "form input[type='text'], form input:not([type])", function (e) {
+        if (e.key === "Enter") e.preventDefault();
+    });
     //#region Header AutoFit - KeyUp
 
     $(document).on("keyup change input", "#RN_No, #JW_CustomerDC_No, #MS_Number, #JWC_Name, #Currency_Name, #WH_Number, #Remarks", function () {
@@ -1015,7 +1142,10 @@ $(document).ready(function () {
             return false;
         }
 
-        var dto = GetReceiptNoteDTO_Edit();   // We'll create this function next
+        if ($("#btnSave").data("busy")) return false;
+        $("#btnSave").data("busy", true);
+
+        var dto = GetReceiptNoteDTO_Edit();
         //console.log(dto);                     // Object
         console.log('111111111111----' + JSON.stringify(dto));
       
@@ -1028,6 +1158,12 @@ $(document).ready(function () {
             data: JSON.stringify(dto),
             success: function (res) {
 
+                if (res && res.success === false) {
+                    $("#btnSave").data("busy", false);
+                    showAlert(res.message || 'Update failed');
+                    return;
+                }
+
                 showAlert('Record Updated');
 
                 $('#ModelAlert').one('hidden.bs.modal', function () {
@@ -1036,6 +1172,7 @@ $(document).ready(function () {
 
             },
             error: function (xhr) {
+                $("#btnSave").data("busy", false);
                 alert(xhr.responseText);
             }
         });
@@ -1214,6 +1351,57 @@ $(window).on("load", function () {
 
     }, 400);
 });
+// Restrict Amend Qty input to digits only (same rule as the Create page)
+$(document).on("keypress", ".AmendQty", function (e) {
+    if (e.ctrlKey || e.metaKey) return;          // allow Ctrl+V / Ctrl+A / Ctrl+C
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+// Strip any non-numeric characters that slip in via paste or drag-drop
+$(document).on("input", ".AmendQty", function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+
+// Unit Price / Amount: whole numbers and decimals allowed (digits + one dot, limited decimals)
+const RN_PRICE_DECIMALS = 2;                       // change to 3 or 4 if your unit price needs more decimals
+const RN_DECIMAL_ONLY = ".JIRNI_UnitPrice, .JIRNI_Amount";
+const RN_DECIMAL_PATTERN = new RegExp("^\\d*\\.?\\d{0," + RN_PRICE_DECIMALS + "}$");
+
+// Block a keystroke if the value after typing it would break the pattern
+$(document).on("keypress", RN_DECIMAL_ONLY, function (e) {
+    if (e.ctrlKey || e.metaKey) return;            // allow Ctrl+V / Ctrl+A / Ctrl+C
+
+    let charStr = String.fromCharCode(e.which ? e.which : e.keyCode);
+    let el = this;
+    let newVal = el.value.slice(0, el.selectionStart) + charStr + el.value.slice(el.selectionEnd);
+
+    if (!RN_DECIMAL_PATTERN.test(newVal.replace(/,/g, ""))) {
+        e.preventDefault();
+    }
+});
+
+// Clean up paste / drag-drop: keep digits, the first dot, and the allowed decimals
+$(document).on("input", RN_DECIMAL_ONLY, function () {
+    let v = $(this).val().replace(/,/g, "");
+    if (RN_DECIMAL_PATTERN.test(v)) return;        // valid: leave the comma display untouched
+
+    v = v.replace(/[^0-9.]/g, "");
+    let parts = v.split(".");
+    v = parts.length > 1
+        ? parts[0] + "." + parts.slice(1).join("").slice(0, RN_PRICE_DECIMALS)
+        : parts[0];
+    $(this).val(v);
+});
+
 var JIRNH_Number_Global;
 function GetReceiptNoteDTO_Edit() {
 
@@ -1443,6 +1631,7 @@ function CheckFreightQtyExceeded(row) {
 
     $.get("/receiptnote/transactions/receiptnote/check-received-qty-exceeded-freight", {
         jisvohNumber: freightSO,
+        excludeRNNumber: JIRNH_Number_Global,
         fromWHNumber,
         toWHNumber,
         prsNumber: FREIGHT_PRS_NUMBER,
@@ -1538,12 +1727,41 @@ function validateHeaderById_RN() {
     if (!ValidateItemBatches_RN()) {
         return false;
     }
+    if (!ValidateBatchTotals_RN()) {
+        return false;
+    }
     if (!ValidateAmendQtyGrid()) {
         return false;
     }
 
     return true;
 }
+function ValidateBatchTotals_RN() {
+    let rows = $("#TableBody tr.NewRow:visible");
+    for (let i = 0; i < rows.length; i++) {
+        let row = $(rows[i]);
+        if (!row.find(".JIRNI_Item_Number").val()) continue;   // blank row
+
+        let rowId = i + 1;
+        let itemQty = parseFloat(removeCommas(row.find(".AmendQty").val())) || 0;
+        let data = batchMismatchData_RN.find(x => x.rowId == rowId);
+        let batchQty = 0;
+
+        if (data && data.batchValues) {
+            data.batchValues.forEach(function (b) {
+                if (b.RNI_BCH_IsDeleted === "true") return;
+                batchQty += parseFloat(removeCommas(b.RNI_BCH_AmendQty)) || 0;
+            });
+        }
+
+        if (Math.abs(itemQty - batchQty) > 0.0001) {
+            showAlert("Batch Qty (" + batchQty + ") does not match Item Qty (" + itemQty + ") for Item " + rowId + ".");
+            return false;
+        }
+    }
+    return true;
+}
+
 function ValidateAmendQtyGrid() {
 
     let isValid = true;
@@ -1583,6 +1801,9 @@ function ValidateItemBatchMapping() {
     for (let i = 0; i < itemRows.length; i++) {
 
         let rowId = i + 1;
+
+        // skip blank rows (no item selected)
+        if (!$(itemRows[i]).find(".JIRNI_Item_Number").val()) continue;
 
         let item = batchMismatchData_RN.find(x => x.rowId == rowId);
 
@@ -2150,6 +2371,7 @@ function searchItemJIDNI(inputElement) {
                         $("#ItemMessage").hide().text("");
 
                         row.find(".Item_Code").val(item.itemCode);
+                        let previousItemNumber = row.find(".JIRNI_Item_Number").val();
                         row.find(".JIRNI_Item_Number").val(item.itemNumber);
 
                         $(inputElement).data("oldItemCode", item.itemCode);
@@ -2166,6 +2388,28 @@ function searchItemJIDNI(inputElement) {
                         row.find(".JIRNI_UoM_Number").val(item.uoM);
                         row.find(".JIRNI_WH_Number").val(item.saleWarehouse);
 
+                        // item changed on this row -> old batches are no longer valid
+                        let isItemChanged = previousItemNumber && previousItemNumber != item.itemNumber;
+
+                        if (isItemChanged) {
+                            let changedRowId = $("#TableBody tr.NewRow").index(row) + 1;
+                            batchMismatchData_RN = batchMismatchData_RN.filter(x => x.rowId != changedRowId);
+                            batchWrongMismatchData_RN = batchWrongMismatchData_RN.filter(x => x.rowId != changedRowId);
+
+                            // reload unit conversion / Qty (Kgs) — only when it is
+                            //  a different item. .
+                            $.ajax({
+                                url: '/receiptnote/transactions/receiptnote/get-item-unit-conversion',
+                                type: 'GET',
+                                data: { itemNumber: item.itemNumber, fromUnit: item.uoM },
+                                success: function (res) {
+                                    row.find(".FromQty").val(res.fromQty);
+                                    row.find(".ToQty").val(res.toQty);
+                                    CalculateQtyKg_Edit(row);
+                                }
+                            });
+                        }
+
                         let qtyInput = row.find(".AmendQty");
                         let qtyUnitprice = row.find(".JIRNI_UnitPrice");
 
@@ -2176,8 +2420,8 @@ function searchItemJIDNI(inputElement) {
                             isSelectingItem = false;
                         }, 100);
 
-                        qtyInput.val(formatIndianQty(qtyInput.val()));
-                        qtyUnitprice.val(formatIndianCurrency(qtyUnitprice.val()));
+                        qtyInput.val(formatIndianQty(removeCommas(qtyInput.val())));
+                        qtyUnitprice.val(formatIndianCurrency(removeCommas(qtyUnitprice.val())));
 
                         resultsDiv.hide();
                         $("#RightPane_Item").removeClass("show");

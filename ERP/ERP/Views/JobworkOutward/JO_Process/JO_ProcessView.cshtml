@@ -1,0 +1,48 @@
+﻿@model ERP_DTO.JobOutwardTransaction.JO_Process_DTO
+
+
+@if (Model != null)
+{
+    <input asp-for="JPRS_Number" type="hidden" class="Number" />
+}
+<div class="mb-3">
+    <label asp-for="JPRS_ProcessName" class="control-label"></label>
+    <input asp-for="JPRS_ProcessName" class="form-control Key KeyDup" autofocus="true" autocomplete="off" />
+</div>
+<div class="mb-3">
+    <label asp-for="JPRS_Description" class="control-label"></label>
+    <textarea asp-for="JPRS_Description" class="form-control Key" autocomplete="off"></textarea>
+</div>
+<div class="mb-3">
+    <label asp-for="JPRS_Cons_UoM_Number" class="control-label"></label>
+    <select asp-for="JPRS_Cons_UoM_Number" class="form-select form-search" asp-items="@ViewBag.ConsUoM"></select>
+</div>
+<div class="mb-3">
+    <label asp-for="JPRS_Prod_UoM_Number" class="control-label"></label>
+    <select asp-for="JPRS_Prod_UoM_Number" class="form-select form-search" asp-items="@ViewBag.ProdUoM"></select>
+</div>
+<div class="mb-3">
+    <label asp-for="JPRS_Scrap_UoM_Number" class="control-label"></label>
+    <select asp-for="JPRS_Scrap_UoM_Number" class="form-select form-search" asp-items="@ViewBag.ScrapUoM"></select>
+</div>
+<div class="mb-3">
+    <label asp-for="JPRS_Item_Number" class="control-label"></label>
+    <select asp-for="JPRS_Item_Number" class="form-select form-search" asp-items="@ViewBag.ScrapItem"></select>
+</div>
+<div class="mb-3">
+    <label asp-for="JPRS_SAC_Number" class="control-label"></label>
+    <select asp-for="JPRS_SAC_Number" class="form-select form-search" asp-items="@ViewBag.SAC"></select>
+</div>
+
+<div>
+    @if (Model != null)
+    {
+        <input type="submit" name="Mode" value="Update" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+    else
+    {
+        <input type="submit" name="Mode" value="Save" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+</div>

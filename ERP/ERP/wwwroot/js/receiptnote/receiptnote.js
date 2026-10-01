@@ -57,6 +57,7 @@
                     "#RightPane",
                     ".buyer-search-results"
                 );
+          
             }
 
             $("#RightPane").removeClass("show");
@@ -105,6 +106,7 @@
                     "#RightPane",
                     ".buyer-search-results"
                 );
+           
             }
 
             $("#RightPane").removeClass("show");
@@ -677,14 +679,39 @@ $(document).ready(function () {
 
     $(document).on(
         "change",
-        ".JIRNI_IsFreightApplicable, .JIRNI_FromWH, .JIRNI_ToWH",
+        ".JIRNI_IsFreightApplicable, .JIRNI_FromWH, .JIRNI_ToWH, #JIRNH_JWC_Number",
         function () {
+
+            // NEW: JW Customer changed at header — re-bind Freight SVO for every row that
+            // still has Freight checked (reflects the new customer), blank the rest
+            if (this.id === "JIRNH_JWC_Number") {
+                let newCustomerId = $(this).val();
+
+                $("#TableBody tr.NewRow").each(function () {
+                    let freightRow = $(this);
+
+                    if (freightRow.find(".JIRNI_IsFreightApplicable").is(":checked")) {
+                        BindFreightServiceOrder(
+                            freightRow,
+                            newCustomerId,
+                            freightRow.find(".JIRNI_FromWH").val(),
+                            freightRow.find(".JIRNI_ToWH").val()
+                        );
+                    } else {
+                        freightRow.find(".JIRNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
+                        freightRow.find(".JISVOI_Number_FRT_Row").val("0");
+                    }
+                });
+
+                return;
+            }
 
             let row = $(this).closest("tr");
 
             if (row.find(".JIRNI_IsFreightApplicable").is(":checked")) {
 
                 BindFreightServiceOrder(
+                    row,
                     $("#JIRNH_JWC_Number").val(),
                     row.find(".JIRNI_FromWH").val(),
                     row.find(".JIRNI_ToWH").val()
@@ -1163,8 +1190,39 @@ function DateBind() {
     if (fp) fp.setDate(formattedDate, true, "d-M-Y");
 }
 
+function ClearAllRowFreightSVO_RN() {
+    $("#TableBody tr.NewRow").each(function () {
+        let row = $(this);
+        row.find(".JIRNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
+        row.find(".JISVOI_Number_FRT_Row").val("0");
+    });
+}
+
+
 // NEW: Freight logic
-function BindFreightServiceOrder(customerId, fromWHNumber = null, toWHNumber = null) {
+function BindFreightServiceOrder(row, customerId, fromWHNumber = null, toWHNumber = null) {
+    let dropdown = row.find(".JIRNI_JIFRT_SVOH_Number");     // ONLY this row's dropdown
+    let selectedValue = dropdown.val();                       // what this row already had
+    dropdown.html('<option value="0"></option>');
+    if (!customerId) return;
+    $.get("/receiptnote/transactions/receiptnote/get-freight-service-order",
+        { customerId, fromWHNumber, toWHNumber },
+        function (data) {
+            $.each(data, function (_, item) {
+                if (!item.value || item.value === "" || item.value === "0") return;
+                dropdown.append(
+                    `<option value="${item.value}" data-jisvoi="${item.jisvoiNumber || 0}">${item.text}</option>`
+                );
+            });
+            // keep this row's earlier choice if it is still valid for the chosen From/To WH
+            if (selectedValue && selectedValue !== "0" &&
+                dropdown.find(`option[value="${selectedValue}"]`).length)
+                dropdown.val(selectedValue);
+        }
+    );
+}
+
+function BindFreightServiceOrder_Old(customerId, fromWHNumber = null, toWHNumber = null) {
     $(".JIRNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
     if (!customerId) return;
     $.get("/receiptnote/transactions/receiptnote/get-freight-service-order",
@@ -1966,9 +2024,8 @@ function searchItemJIDNI(inputElement) {
                             qtyInput.select();
                             isSelectingItem = false;
                         }, 100);
-
-                        qtyInput.val(formatIndianQty(qtyInput.val()));
-                        qtyUnitprice.val(formatIndianCurrency(qtyUnitprice.val()));
+                        qtyInput.val(formatIndianQty(removeCommas(qtyInput.val())));
+                        qtyUnitprice.val(formatIndianCurrency(removeCommas(qtyUnitprice.val())));
 
                         resultsDiv.hide();
                         $("#RightPane_Item").removeClass("show");
@@ -2164,6 +2221,7 @@ function SearchBuyer(inputElement) {
                         "#RightPane",
                         ".buyer-search-results"
                     );
+                    $("#JIRNH_JWC_Number").trigger("change");
 
                     $("#RightPane").removeClass("show");
                     $("#RightPane .buyer-search-results").hide();

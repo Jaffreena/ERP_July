@@ -505,7 +505,7 @@ function calculateTotal_P() {
         }
 
         // Get Qty
-        let qty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+        let qty = parseFloat(removeCommas(row.find(".JIDNI_Qty").val())) || 0;
 
 
 

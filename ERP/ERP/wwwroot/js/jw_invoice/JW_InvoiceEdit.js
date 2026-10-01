@@ -610,6 +610,7 @@ $(document).ready(function () {
                 $(this).hide();
                 $(this).attr("data-deleted", "1");
                 CheckAndRemoveEmptyHeaders();
+                CalculateTotals(); 
             }
 
         });
@@ -690,6 +691,24 @@ $(document).ready(function () {
             $this.val(num);
         }
     });
+
+    //#region Unit Price / Amount - digits and one decimal point only (whole numbers and decimals)
+    var PRICE_DECIMALS = 2;   // max digits after the decimal point
+    $(document).on("input", ".JIJWII_UnitPrice, .JIJWII_Amount", function (e) {
+        // only real typing / paste / drop - values set by code (Service Order price) are left alone
+        if (!e.originalEvent || this.readOnly) return;
+
+        var v = $(this).val().replace(/[^0-9.]/g, "");      // drop letters, minus, commas, symbols
+        var dot = v.indexOf(".");
+        if (dot !== -1) {
+            v = v.substring(0, dot + 1) +
+                v.substring(dot + 1).replace(/\./g, "").substring(0, PRICE_DECIMALS);   // keep the first dot only
+        }
+        if (v !== $(this).val()) {
+            $(this).val(v);
+        }
+    });
+    //#endregion
 
     $(document).on("keyup change", ".JIJWII_AmendQty, .JIJWII_UnitPrice", function () {
 
@@ -1124,6 +1143,74 @@ function ClusterTaxView(data) {
     return table;
 }
 
+//#region VIEW MODE - Jobwork Invoice View = this Edit page, locked (IsViewMode is set by Edit.cshtml)
+// shows the SAVED invoice date (DateBind() puts today's date in the picker on load)
+function ShowSavedInvoiceDate(v) {
+    if (!v) return;
+    var d;
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v);
+    if (m) { d = new Date(+m[1], +m[2] - 1, +m[3]); }      // yyyy-MM-dd[Thh:mm:ss] - no time-zone shift
+    else { d = new Date(v); }
+    var el = document.getElementById("Header_JIJWIH_InvoiceDate");
+    if (el && el._flatpickr && !isNaN(d.getTime())) el._flatpickr.setDate(d, false);
+}
+
+// loadTaxCluster empties the list - put the SAVED cluster back
+function RestoreSavedTaxCluster() {
+    var saved = window.SavedTct;
+    if (!saved || String(saved) === "0") return;
+    var ddl = $("#Header_JIJWIH_TCT_Number");
+    if (ddl.find("option[value='" + saved + "']").length === 0) {
+        if (typeof IsViewMode === "undefined" || !IsViewMode) return;     // Edit: keep the list as loaded
+        ddl.append($('<option>', { value: saved, text: saved }));         // View: still show the saved cluster
+    }
+    ddl.val(saved);
+}
+
+function ApplyViewMode() {
+    if (typeof IsViewMode === "undefined" || !IsViewMode) return;
+
+    // 1) fields: everything except hidden fields and the row tick boxes (the GST button needs a ticked row)
+    $("input, textarea").not("[type=hidden], :checkbox").prop("readonly", true);
+    $("select").prop("disabled", true);
+
+    // 2) the customer search must not open (inline onfocus / oninput)
+    $("#Header_JIJWIH_JW_Customer_Name").removeAttr("onfocus").removeAttr("oninput");
+
+    // 3) date picker
+    var dateEl = document.getElementById("Header_JIJWIH_InvoiceDate");
+    if (dateEl && dateEl._flatpickr) {
+        dateEl._flatpickr.set("clickOpens", false);
+        $(dateEl._flatpickr.altInput).prop("readonly", true);
+    }
+
+    // 4) hide Update, Clear All, Delivery Note, Delete Row and the address Add / delete controls
+    if ($("#ViewModeStyle").length === 0) {
+        $("<style id='ViewModeStyle'>" +
+            "#btnSave, #LoadDeliveryNote, #RemoveItemRowButton, #AddressAddButton, .AddRowRemove, .right-menu a.btn" +
+            "{ display: none !important; }</style>").appendTo("head");
+    }
+
+    // 5) address popup: OK -> Close
+    $("#BuyerAddress .modal-footer button[data-bs-dismiss='modal']").text("Close");
+
+    // 6) badge
+    if ($("#ViewOnlyBadge").length === 0) {
+        $(".panel-header .h6").first().append('<span id="ViewOnlyBadge" class="badge bg-warning text-dark ms-2">VIEW ONLY</span>');
+    }
+
+    // 7) nothing may be recalculated: Edit recalculates Amount on keyup of Amend Qty / Unit Price
+    if (!window.__viewKeyGuard) {
+        window.__viewKeyGuard = true;
+        document.addEventListener("keyup", function (e) {
+            if (e.target.closest && e.target.closest(".JIJWII_AmendQty, .JIJWII_UnitPrice")) e.stopImmediatePropagation();
+        }, true);
+    }
+}
+$(document).ajaxStop(function () { ApplyViewMode(); });   // rows, addresses and dropdowns are drawn by ajax after load
+$(function () { ApplyViewMode(); });
+//#endregion
+
 function loadTaxCluster() {
 
     var customerNumber = $("#Header_JIJWIH_JW_Customer_Number").val();
@@ -1146,6 +1233,7 @@ function loadTaxCluster() {
             var ddl = $("#Header_JIJWIH_TCT_Number");
 
             ddl.empty();
+            setTimeout(RestoreSavedTaxCluster, 0);      // runs after the options below are added
 
 
             $.each(data, function (i, item) {
@@ -2756,6 +2844,7 @@ function BindHeader(header) {
 
     $("#Header_JIJWIH_InvoiceDate")
         .val(header.JIJWIH_InvoiceDate);
+    ShowSavedInvoiceDate(header.JIJWIH_InvoiceDate);
 
     $("#Header_JIJWIH_JW_Customer_Number")
         .val(header.JIJWIH_JW_Customer_Number).trigger("change");
@@ -2768,6 +2857,7 @@ function BindHeader(header) {
 
     $("#Header_JIJWIH_TCT_Number")
         .val(header.JIJWIH_TCT_Number);
+    window.SavedTct = header.JIJWIH_TCT_Number;
 
     $("#Header_JIJWIH_PaymentTerms")
         .val(header.JIJWIH_PaymentTerms);

@@ -130,8 +130,11 @@
 
   <ItemGroup>
     <Folder Include="Views\JobworkInward\ReceiptNote\" />
+    <Folder Include="Views\JobworkInward\Reports\DNFreightInvoicePendingQty\" />
     <Folder Include="Views\JobworkInward\ServiceOrder_JobWork\" />
     <Folder Include="Views\JobworkInward\ServiceOrder_Freight\" />
+    <Folder Include="Views\JobworkOutward\NewFolder\" />
+    <Folder Include="Views\JWInvoicePendingQty\" />
   </ItemGroup>
 
 </Project>

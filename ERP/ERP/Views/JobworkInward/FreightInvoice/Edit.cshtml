@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.FreightInvoiceCreate_DTO
 @{
-    ViewData["Title"] = "Freight Invoice Edit";
+       ViewData["Title"] = (ViewBag.IsViewMode == true) ? "Freight Invoice View" : "Freight Invoice Edit";
 }
 <style>
     #RightPane {
@@ -1025,6 +1025,7 @@
 
     <partial name="_ValidationScriptsPartial" />
     <script>
+              var IsViewMode = @((ViewBag.IsViewMode == true) ? "true" : "false");
         var sonList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.SON));
         console.log("sonList from cshtml:", sonList);
         var warehouseList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Warehouse));

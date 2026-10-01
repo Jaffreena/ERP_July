@@ -1,0 +1,31 @@
+﻿@model ERP_DTO.JobOutwardTransaction.JW_VendorCategory_DTO
+
+
+@if (Model != null)
+{
+    <input asp-for="JVC_Number" type="hidden" class="Number" />
+}
+<div class="mb-3">
+    <label asp-for="JVC_JW_VendorCategory" class="control-label"></label>
+    <input asp-for="JVC_JW_VendorCategory" class="form-control Key KeyDup" autofocus="true" autocomplete="off" />
+</div>
+<div class="mb-3">
+    <label asp-for="JVC_Description" class="control-label"></label>
+    <textarea asp-for="JVC_Description" class="form-control Key" autocomplete="off"></textarea>
+</div>
+<div class="mb-3">
+    <label asp-for="JVC_Under_JVC_Number" class="control-label"></label>
+    <select asp-for="JVC_Under_JVC_Number" class="form-select" asp-items="@ViewBag.Under" data-live-search="true"></select>
+</div>
+<div>
+    @if (Model != null)
+    {
+        <input type="submit" name="Mode" value="Update" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+    else
+    {
+        <input type="submit" name="Mode" value="Save" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+</div>

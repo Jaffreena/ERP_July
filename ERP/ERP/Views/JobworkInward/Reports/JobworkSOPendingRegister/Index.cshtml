@@ -1,0 +1,267 @@
+﻿@{
+    ViewData["Title"] = "Jobwork SO Pending Register";
+}
+
+<style>
+    #PendingQtyTable tbody td { height: 30px; padding: 2px 12px; vertical-align: middle; white-space: nowrap; }
+    #PendingQtyTable thead th, #PendingQtyTable tfoot td { height: 32px; padding-top: 2px; padding-bottom: 2px; vertical-align: middle; white-space: nowrap; }
+    #PendingQtyTable th.qty, #PendingQtyTable td.qty { text-align: right; font-variant-numeric: tabular-nums; }
+    #PendingQtyTable tbody td:nth-child(9) { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+
+    .sm-filter .input-group-text { font-size: .75rem; font-weight: 600; padding: 0 10px; background: #2c3e50; color: #fff; border-color: #2c3e50; }
+    .sm-filter .form-control, .sm-filter .form-select { font-size: .85rem; }
+    .sm-filter .sm-date { width: 170px; }
+    .sm-filter .sm-sel { width: 190px; }
+</style>
+
+<div class="row align-items-center panel-header h-auto">
+    <div class="col">
+        <div class="card rounded-0 mt-3">
+            <div class="card-body px-2 py-2">
+                <h1 class="h6 fw-light">
+                    Jobwork SO Pending Register
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row panel-body">
+    <div class="col-12 panel-card-fixed" id="BodyHeight">
+        <div class="w-100 rounded-0 border border-primary bg-transparent px-3" id="CardBody">
+
+            <div class="card rounded-0 mt-3 mb-3 bg-transparent">
+                <div class="card-header bg-secondary rounded-0">
+                    <p class="mb-0">Filters</p>
+                </div>
+                <div class="card-body bg-transparent text-dark">
+                    <div class="row gx-1 gy-1 align-items-center sm-filter">
+                        <div class="col-auto">
+                            <select id="PSize" class="form-select form-select-sm w-auto">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100" selected>100</option>
+                            </select>
+                        </div>
+                        <div class="col-auto p-0">
+                            <input id="Search" class="form-control form-control-sm" autocomplete="off" placeholder="Search in results..." />
+                        </div>
+                        <div class="col-auto p-0 me-2">
+                            <button type="button" id="btnClientSearch" class="btn btn-primary btn-sm">Search</button>
+                        </div>
+
+                        <div class="col-auto">
+                            <div class="input-group input-group-sm sm-date">
+                                <span class="input-group-text">From Date</span>
+                                <input type="date" id="FromDate" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group input-group-sm sm-date">
+                                <span class="input-group-text">To Date</span>
+                                <input type="date" id="ToDate" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group input-group-sm sm-sel">
+                                <span class="input-group-text">SO No.</span>
+                                <select id="SO_No" class="form-select">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group input-group-sm sm-sel">
+                                <span class="input-group-text">JW Customer</span>
+                                <select id="JW_Customer_Number" class="form-select">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group input-group-sm sm-sel">
+                                <span class="input-group-text">Process</span>
+                                <select id="PRS_Number" class="form-select">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group input-group-sm sm-sel">
+                                <span class="input-group-text">Item Group</span>
+                                <select id="ItemGroup_Number" class="form-select">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group input-group-sm sm-sel">
+                                <span class="input-group-text">Item Number</span>
+                                <select id="Item_Number" class="form-select">
+                                    <option value="">All</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-auto">
+                            <button id="btnGet" class="btn btn-primary btn-sm px-3">Get</button>
+                            <button id="btnClear" class="btn btn-secondary btn-sm">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-0 mb-3 bg-transparent">
+                <div class="card-header bg-secondary rounded-0">
+                    <p class="mb-0">Pending Items</p>
+                </div>
+                <div class="card-body bg-transparent text-dark p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm mb-0" id="PendingQtyTable">
+                            <thead class="table-info">
+                                <tr>
+                                    <th colspan="2" class="text-center">Register</th>
+                                    <th colspan="2" class="text-center">JW Service Order</th>
+                                    <th rowspan="2" class="align-middle">JW Customer name</th>
+                                    <th colspan="9" class="text-center">Item Details</th>
+                                    <th colspan="4" class="text-center">Qty Details</th>
+                                </tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Date</th>
+                                    <th>Number</th>
+                                    <th>Date</th>
+                                    <th>Process</th>
+                                    <th>Item Group</th>
+                                    <th>Item Number</th>
+                                    <th>Description</th>
+                                    <th>Outer Dia</th>
+                                    <th>Thickness</th>
+                                    <th>Length</th>
+                                    <th>Material Grade</th>
+                                    <th>UoM</th>
+                                    <th class="qty">Ordered</th>
+                                    <th class="qty">DN assigned</th>
+                                    <th class="qty">Directly Invoiced</th>
+                                    <th class="qty">Pending</th>
+                                </tr>
+                            </thead>
+                            <tbody id="PendingQtyTableBody">
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold table-light">
+                                    <td colspan="14" class="text-end">Grand Total</td>
+                                    <td id="TotalOrderedQty" class="qty">0</td>
+                                    <td id="TotalDNAssignedQty" class="qty">0</td>
+                                    <td id="TotalDirectlyInvoicedQty" class="qty">0</td>
+                                    <td id="TotalPendingQty" class="qty">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="row table-cal align-items-center px-2 py-2">
+                        <div class="col align-items-center">
+                            <div class="row align-items-center">
+                                <div class="col py-1">
+                                    Showing <span id="pgStart">0</span> to <span id="pgEnd">0</span>
+                                </div>
+                                <div class="col text-center py-1">
+                                    Total records <span id="pgTotal">0</span>
+                                </div>
+                                <div class="col">
+                                    <nav>
+                                        <ul class="pagination float-end mb-0">
+                                            <li class="page-item"><a href="javascript:void(0)" id="pgFirst" class="page-link">&laquo;&laquo;</a></li>
+                                            <li class="page-item"><a href="javascript:void(0)" id="pgPrev" class="page-link">&laquo;</a></li>
+                                            <li><a class="page-link" id="pgCurrent">1</a></li>
+                                            <li class="page-item"><a href="javascript:void(0)" id="pgNext" class="page-link">&raquo;</a></li>
+                                            <li class="page-item"><a href="javascript:void(0)" id="pgLast" class="page-link">&raquo;&raquo;</a></li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $('.navbar-nav > .nav-item.jobworkinward > a').addClass("active");
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const MainDiv = document.getElementById('BodyHeight');
+        const BodyDiv = document.getElementById('CardBody');
+        const MainHeight = MainDiv.offsetHeight;
+        BodyDiv.style.height = (MainHeight - 10) + 'px';
+    });
+</script>
+
+<script src="~/js/jobworkinvoice_report/JobworkSOPendingRegister.js"></script>
+
+<script>
+    (function () {
+        var tbody = document.getElementById('PendingQtyTableBody');
+        var state = { page: 1, size: 100, term: '' };
+        var scheduled = false;
+
+        function render() {
+            var rows = Array.prototype.slice.call(tbody.children);
+            var term = state.term.toLowerCase();
+            var matched = rows.filter(function (r) {
+                return !term || r.textContent.toLowerCase().indexOf(term) > -1;
+            });
+            rows.forEach(function (r) { r.style.display = 'none'; });
+
+            var total = matched.length;
+            var pages = Math.max(1, Math.ceil(total / state.size));
+            if (state.page > pages) state.page = pages;
+            if (state.page < 1) state.page = 1;
+
+            var startIdx = (state.page - 1) * state.size;
+            matched.slice(startIdx, startIdx + state.size).forEach(function (r) { r.style.display = ''; });
+
+            var start = total === 0 ? 0 : startIdx + 1;
+            var end = Math.min(startIdx + state.size, total);
+
+            document.getElementById('pgStart').textContent = start;
+            document.getElementById('pgEnd').textContent = end;
+            document.getElementById('pgTotal').textContent = total;
+            document.getElementById('pgCurrent').textContent = state.page;
+
+            var atFirst = state.page <= 1;
+            var atLast = state.page >= pages;
+            document.getElementById('pgFirst').classList.toggle('disabled', atFirst);
+            document.getElementById('pgPrev').classList.toggle('disabled', atFirst);
+            document.getElementById('pgNext').classList.toggle('disabled', atLast);
+            document.getElementById('pgLast').classList.toggle('disabled', atLast);
+            state.pages = pages;
+        }
+
+        new MutationObserver(function () {
+            if (scheduled) return;
+            scheduled = true;
+            setTimeout(function () { scheduled = false; state.page = 1; render(); }, 0);
+        }).observe(tbody, { childList: true });
+
+        document.getElementById('PSize').addEventListener('change', function () {
+            state.size = parseInt(this.value, 10) || 100; state.page = 1; render();
+        });
+        function doSearch() { state.term = document.getElementById('Search').value.trim(); state.page = 1; render(); }
+        document.getElementById('btnClientSearch').addEventListener('click', doSearch);
+        document.getElementById('Search').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+        });
+
+        document.getElementById('pgFirst').addEventListener('click', function () { state.page = 1; render(); });
+        document.getElementById('pgPrev').addEventListener('click', function () { state.page--; render(); });
+        document.getElementById('pgNext').addEventListener('click', function () { state.page++; render(); });
+        document.getElementById('pgLast').addEventListener('click', function () { state.page = state.pages; render(); });
+
+        render();
+    })();
+</script>

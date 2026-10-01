@@ -138,12 +138,17 @@ namespace ERP.Controllers.JobworkInward
                     if (model.FreightHeader.JIFRT_SVOH_Number <= 0)
                         return Json(new { success = false, message = "Invalid Service Order Number" });
 
+                    string freightError = ValidateFreightUpdate(model, serviceOrderDAO);
+                    if (freightError != null)
+                        return Json(new { success = false, message = freightError });
+
                     var freightDto = new JIFRT_ServiceOrder_DTO
                     {
                         Header = model.FreightHeader,
                         Items = model.FreightItems
                     };
 
+                    NormalizeDates(model.FreightHeader);
                     serviceOrderDAO.JIFRT_ServiceOrderUpdateDB(freightDto);
                 }
                 else // "JWI"
@@ -154,12 +159,17 @@ namespace ERP.Controllers.JobworkInward
                     if (model.JWIHeader.JIJWI_SVOH_Number <= 0)
                         return Json(new { success = false, message = "Invalid Service Order Number" });
 
+                    string jwiError = ValidateJWIUpdate(model, serviceOrderDAO);
+                    if (jwiError != null)
+                        return Json(new { success = false, message = jwiError });
+
                     var jwiDto = new JIJWI_ServiceOrder_DTO
                     {
                         Header = model.JWIHeader,
                         Items = model.JWIItems
                     };
 
+                    NormalizeDates(model.JWIHeader, model.JWIItems);
                     serviceOrderDAO.JIJWI_ServiceOrderUpdateDB(jwiDto);
                 }
 
@@ -211,6 +221,7 @@ namespace ERP.Controllers.JobworkInward
                         Items = model.FreightItems
                     };
 
+                    NormalizeDates(model.FreightHeader);
                     serviceOrderDAO.JIFRT_ServiceOrderInsertDB(freightDto);
                     regDate = model.FreightHeader.JIFRT_SVOH_RegDate;
                 }
@@ -226,7 +237,7 @@ namespace ERP.Controllers.JobworkInward
                         Header = model.JWIHeader,
                         Items = model.JWIItems
                     };
-
+                    NormalizeDates(model.JWIHeader, model.JWIItems);
                     serviceOrderDAO.JIJWI_ServiceOrderInsertDB(jwiDto);
                     regDate = model.JWIHeader.JIJWI_SVOH_RegDate;
                 }
@@ -248,6 +259,158 @@ namespace ERP.Controllers.JobworkInward
             }
         }
 
+
+        #region client date normalisation
+        // The browser may send a picked date as a UTC time (toISOString): 20-Sep-2026 in IST arrives as 19-Sep 18:30Z.
+        // A value that carries a kind (Utc / Local) is converted back to the IST calendar date; a plain date is left as it is.
+        private static DateTime FromClientDate(DateTime d)
+        {
+            if (d.Kind == DateTimeKind.Unspecified) return d;
+            return DateTime.SpecifyKind(d.ToUniversalTime().AddMinutes(330), DateTimeKind.Unspecified);   // IST = UTC + 5:30
+        }
+
+        private static DateTime? FromClientDate(DateTime? d) => d.HasValue ? FromClientDate(d.Value) : (DateTime?)null;
+
+        private static void NormalizeDates(JIJWI_ServiceOrderHead_DTO h, List<JIJWI_ServiceOrderItem_DTO> items)
+        {
+            if (h != null)
+            {
+                h.JIJWI_SVOH_RegDate = FromClientDate(h.JIJWI_SVOH_RegDate);
+                h.JIJWI_SVOH_ServiceOrderDate = FromClientDate(h.JIJWI_SVOH_ServiceOrderDate);
+            }
+            if (items != null)
+                foreach (var i in items)
+                    i.JIJWI_SVOI_DeliveryDate = FromClientDate(i.JIJWI_SVOI_DeliveryDate);
+        }
+
+        private static void NormalizeDates(JIFRT_ServiceOrderHead_DTO h)
+        {
+            if (h == null) return;
+            h.JIFRT_SVOH_RegDate = FromClientDate(h.JIFRT_SVOH_RegDate);
+            h.JIFRT_SVOH_ServiceOrderDate = FromClientDate(h.JIFRT_SVOH_ServiceOrderDate);
+        }
+        #endregion
+
+        #region update validation (server-side)
+        private string ValidateJWIUpdate(ServiceOrderUpdatePage_DTO model, ServiceOrder_DAO dao)
+        {
+            var h = model.JWIHeader;
+
+            if (string.IsNullOrWhiteSpace(h.JIJWI_SVOH_RegNo))
+                return "Register No. is required";
+            if (h.JIJWI_SVOH_RegDate == default)
+                return "Register Date is required";
+            if (string.IsNullOrWhiteSpace(h.JIJWI_SVOH_ServiceOrderNo))
+                return "Service Order No. is required";
+            if (h.JIJWI_SVOH_ServiceOrderDate == default)
+                return "Service Order Date is required";
+            if (h.JIJWI_SVOH_JW_Customer_Number <= 0)
+                return "JW Customer is required";
+            if (h.JIJWI_SVOH_Currency_Number <= 0)
+                return "Currency is required";
+
+            if ((h.JIJWI_SVOH_RegNo ?? "").Length > 100) return "Register No. cannot exceed 100 characters";
+            if ((h.JIJWI_SVOH_ServiceOrderNo ?? "").Length > 100) return "Service Order No. cannot exceed 100 characters";
+            if ((h.JIJWI_SVOH_PaymentTerms ?? "").Length > 50) return "Payment Terms cannot exceed 50 characters";
+            if ((h.JIJWI_SVOH_DeliveryTerms ?? "").Length > 50) return "Delivery Terms cannot exceed 50 characters";
+            if ((h.JIJWI_SVOH_DeliveryMode ?? "").Length > 50) return "Delivery Mode cannot exceed 50 characters";
+            if ((h.JIJWI_SVOH_Tax ?? "").Length > 250) return "Tax cannot exceed 250 characters";
+            if ((h.JIJWI_SVOH_TDC ?? "").Length > 250) return "Technical delivery conditions cannot exceed 250 characters";
+            if ((h.JIJWI_SVOH_Remarks ?? "").Length > 250) return "Remarks cannot exceed 250 characters";
+
+            var items = model.JWIItems;
+            if (items == null || items.Count == 0)
+                return "Please add at least one item";
+
+            foreach (var i in items)
+            {
+                if (i.JIJWI_SVOI_PRS_Number <= 0) return "Process is required";
+                if (i.JIJWI_SVOI_Item_Number <= 0) return "Item Code is required";
+                if (i.JIJWI_SVOI_UoM_Number <= 0) return "UOM is required";
+                if (i.JIJWI_SVOI_Qty <= 0) return "Qty is required";
+                if (i.JIJWI_SVOI_UnitPrice <= 0) return "Unit Price is required";
+
+                // Amount is always Qty x Unit Price (client value is not trusted)
+                i.JIJWI_SVOI_Amount = Math.Round(
+                    i.JIJWI_SVOI_Qty * i.JIJWI_SVOI_UnitPrice, 2, MidpointRounding.AwayFromZero);
+            }
+
+            // compare against the saved order
+            var saved = dao.JIJWI_GetServiceOrder(h.JIJWI_SVOH_Number);
+            if (saved.Header == null || saved.Header.JIJWI_SVOH_Number <= 0)
+                return "Service Order not found";
+
+            foreach (var s in saved.Items)
+            {
+                double usedQty = s.InvoicedQty + s.InvoiceToBeRaised;
+                var posted = items.FirstOrDefault(x => x.JIJWI_SVOI_Number == s.JIJWI_SVOI_Number);
+
+                if (posted == null)
+                {
+                    if (usedQty > 0)
+                        return "Item " + s.JIJWI_SVOI_Item_Code + " has invoiced / pending invoice qty and cannot be deleted";
+                    continue;
+                }
+
+                if (posted.JIJWI_SVOI_Qty < usedQty)
+                    return "Amend Qty for item " + s.JIJWI_SVOI_Item_Code + " cannot be less than " + usedQty;
+            }
+
+
+            return null;
+        }
+
+        private string ValidateFreightUpdate(ServiceOrderUpdatePage_DTO model, ServiceOrder_DAO dao)
+        {
+            var h = model.FreightHeader;
+
+            if (string.IsNullOrWhiteSpace(h.JIFRT_SVOH_RegNo))
+                return "Register No. is required";
+            if (h.JIFRT_SVOH_RegDate == default)
+                return "Register Date is required";
+            if (string.IsNullOrWhiteSpace(h.JIFRT_SVOH_ServiceOrderNo))
+                return "Service Order No. is required";
+            if (h.JIFRT_SVOH_ServiceOrderDate == default)
+                return "Service Order Date is required";
+            if (h.JIFRT_SVOH_JW_Customer_Number <= 0)
+                return "JW Customer is required";
+            if (h.JIFRT_SVOH_Currency_Number <= 0)
+                return "Currency is required";
+
+            if ((h.JIFRT_SVOH_RegNo ?? "").Length > 100) return "Register No. cannot exceed 100 characters";
+            if ((h.JIFRT_SVOH_ServiceOrderNo ?? "").Length > 100) return "Service Order No. cannot exceed 100 characters";
+            if ((h.JIFRT_SVOH_PaymentTerms ?? "").Length > 50) return "Payment Terms cannot exceed 50 characters";
+            if ((h.JIFRT_SVOH_DeliveryTerms ?? "").Length > 50) return "Delivery Terms cannot exceed 50 characters";
+            if ((h.JIFRT_SVOH_DeliveryMode ?? "").Length > 50) return "Delivery Mode cannot exceed 50 characters";
+            if ((h.JIFRT_SVOH_Tax ?? "").Length > 250) return "Tax cannot exceed 250 characters";
+            if ((h.JIFRT_SVOH_TDC ?? "").Length > 250) return "Technical delivery conditions cannot exceed 250 characters";
+            if ((h.JIFRT_SVOH_Remarks ?? "").Length > 250) return "Remarks cannot exceed 250 characters";
+
+            var items = model.FreightItems;
+            if (items == null || items.Count == 0)
+                return "Please add at least one item";
+
+            foreach (var i in items)
+            {
+                if (i.JIFRT_SVOI_PRS_Number <= 0) return "Process is required";
+                if (!i.JIFRT_SVOI_FromWH_Number.HasValue || i.JIFRT_SVOI_FromWH_Number.Value <= 0) return "From WH is required";
+                if (!i.JIFRT_SVOI_ToWH_Number.HasValue || i.JIFRT_SVOI_ToWH_Number.Value <= 0) return "To WH is required";
+                if (i.JIFRT_SVOI_UoM_Number <= 0) return "UOM is required";
+                if (i.JIFRT_SVOI_Qty <= 0) return "Qty is required";
+                if (i.JIFRT_SVOI_Rate <= 0) return "Rate is required";
+
+                // Amount is always Qty x Rate (client value is not trusted)
+                i.JIFRT_SVOI_Amount = Math.Round(
+                    i.JIFRT_SVOI_Qty * i.JIFRT_SVOI_Rate, 2, MidpointRounding.AwayFromZero);
+            }
+
+            var saved = dao.JIFRT_GetServiceOrder(h.JIFRT_SVOH_Number);
+            if (saved.Header == null || saved.Header.JIFRT_SVOH_Number <= 0)
+                return "Service Order not found";
+
+            return null;
+        }
+        #endregion
 
         public void GetServiceOrderData()
         {
@@ -295,6 +458,29 @@ namespace ERP.Controllers.JobworkInward
             ViewBag.Collapse = true;
             return View("~/Views/JobworkInward/ServiceOrder/Create.cshtml");
 
+        }
+
+        // read-only view of a saved order: renders the Edit page in view mode
+        public IActionResult ViewOrder(long SI_No, string OrderType)
+        {
+            GetServiceOrderData();
+            ViewBag.Collapse = true;
+            ViewBag.SI_No = SI_No;
+            ViewBag.OrderType = OrderType;
+            ViewBag.IsViewMode = true;
+
+            return View("~/Views/JobworkInward/ServiceOrder/Edit.cshtml");
+        }
+
+        // targets of the "View" button in the Job Work / Freight summaries (their POST actions already redirect here)
+        public IActionResult JIJWIServiceOrderView(long JIJWISVOH_Number)
+        {
+            return RedirectToAction("ViewOrder", new { SI_No = JIJWISVOH_Number, OrderType = "JWI" });
+        }
+
+        public IActionResult JIFRTServiceOrderView(long JIFRTSVOH_Number)
+        {
+            return RedirectToAction("ViewOrder", new { SI_No = JIFRTSVOH_Number, OrderType = "FREIGHT" });
         }
 
         public IActionResult Edit(long SI_No, string OrderType)

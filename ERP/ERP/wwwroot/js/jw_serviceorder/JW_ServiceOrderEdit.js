@@ -384,11 +384,11 @@ $(document).ready(function () {
             dateFormat: "d-M-Y",   // 30-Apr-2026
             altInput: true,        // shows formatted date
             altFormat: "d-M-Y",   // display format
-            allowInput: true,     // user can type manually
-            defaultDate: new Date() // optional: today default
+            allowInput: true     // user can type manually
+     
         });
     }
-    DateBind();
+
 
     //#region item grid - select full content on click/focus
     $(document).on("click focusin", "#ItemTable input, #FreightItemTable input", function (e) {
@@ -639,7 +639,11 @@ $(document).ready(function () {
 
     //#region Save Function
     //#region Update Function
+    let isUpdating = false;
+
     $("#btnUpdate, #btnUpdateFreight").on("click", function (e) {
+
+        if (isUpdating || window.IsViewMode) return false;
 
         let serviceType = $('input[name="ServiceType"]:checked').val();
 
@@ -660,6 +664,8 @@ $(document).ready(function () {
         console.log(JSON.stringify(model));
 
         $.ajax({
+            beforeSend: function () { isUpdating = true; },
+            complete: function () { isUpdating = false; },
             url: '/ServiceOrder/UpdateServiceOrder',
             type: 'POST',
             contentType: 'application/json',
@@ -674,10 +680,14 @@ $(document).ready(function () {
                     showAlert('Record Updated');
                     console.log(model);
                 }
+                else {
+                    showAlert(response.message || 'Update failed');
+                }
             },
 
             error: function (xhr) {
                 console.log(xhr.responseText);
+                showAlert('Update failed. Please try again.');
             }
         });
 
@@ -687,21 +697,47 @@ $(document).ready(function () {
 
     //#region freight header validation (basic stub - mirrors validateHeaderById)
     function validateFreightHeaderById() {
-        var isValid = true;
 
-        $("#FreightHeaderPanel [required], #FreightHeaderPanel .Key").each(function () {
-            if (!$(this).val()) {
-                isValid = false;
-                $(this).focus();
-                return false;
-            }
-        });
-
-        if (!isValid) {
-            showAlert("Please fill required Freight header fields.");
+        if (($("#FreightHeader_JIFRT_SVOH_RegNo").val() || "").trim() === "") {
+            showAlert('Register No. is required', '#FreightHeader_JIFRT_SVOH_RegNo');
+            return false;
         }
 
-        return isValid;
+        if (($("#FreightHeader_JIFRT_SVOH_RegDate").val() || "").trim() === "") {
+            showAlert('Register Date is required', '#FreightHeader_JIFRT_SVOH_RegDate');
+            return false;
+        }
+
+        if (($("#FreightHeader_JIFRT_SVOH_ServiceOrderNo").val() || "").trim() === "") {
+            showAlert('Service Order No. is required', '#FreightHeader_JIFRT_SVOH_ServiceOrderNo');
+            return false;
+        }
+
+        if (($("#FreightHeader_JIFRT_SVOH_ServiceOrderDate").val() || "").trim() === "") {
+            showAlert('Service Order Date is required', '#FreightHeader_JIFRT_SVOH_ServiceOrderDate');
+            return false;
+        }
+
+        if (
+            ($("#FreightHeader_JIFRT_SVOH_JW_Customer_Number").val() || "").trim() === "" ||
+            ($("#FreightHeader_JIFRT_SVOH_JW_Customer_Name").val() || "").trim() === ""
+        ) {
+            showAlert('JW Customer is required', '#FreightHeader_JIFRT_SVOH_JW_Customer_Name');
+            return false;
+        }
+
+        let currency = $("#FreightHeader_JIFRT_SVOH_Currency_Number").val();
+        if (!currency || currency === "0") {
+            showAlert('Currency is required', '#FreightHeader_JIFRT_SVOH_Currency_Number');
+            return false;
+        }
+
+        // Grid Validation
+        if (!validateFreightGrid()) {
+            return false;
+        }
+
+        return true;
     }
     //#endregion
 
@@ -736,6 +772,16 @@ $(document).ready(function () {
 
             let itemNumber =
                 currentRow.find(".JISVOI_Number").val();
+
+            // saved row with invoiced / pending-invoice qty cannot be deleted
+            let usedQty =
+                (parseFloat(removeComma(currentRow.find(".InvoicedQty").val())) || 0) +
+                (parseFloat(removeComma(currentRow.find(".InvoiceToBeRaised").val())) || 0);
+
+            if (itemNumber && itemNumber !== "0" && usedQty > 0) {
+                alert("This item already has invoiced / pending invoice qty and cannot be deleted.");
+                return false;
+            }
 
             // already saved row → soft delete
             if (itemNumber && itemNumber !== "0") {
@@ -789,7 +835,45 @@ $(document).ready(function () {
     }
 
     $('input[name="ServiceType"]').on('change', toggleServiceTypePanels);
+
+    // view mode: lock what is on the page now, and lock again once the loaded rows have been built
+    if (window.IsViewMode) {
+        ApplyViewMode();
+
+        $(document).ajaxComplete(function (event, xhr, settings) {
+            if (settings.url && settings.url.indexOf("/ServiceOrder/GetServiceOrder") === 0) {
+                ApplyViewMode();
+            }
+        });
+    }
 });
+
+//#region VIEW MODE (read-only view of a saved order - same page, same load as Edit)
+function ApplyViewMode() {
+
+    // every field off: nothing on the page can be changed, and no search panel can open
+    $("#ServiceOrderForm input:not([type=hidden]), #ServiceOrderForm select, #ServiceOrderForm textarea")
+        .prop("disabled", true);
+
+    // date pickers: show the date, never open the calendar
+    $(".datepicker").each(function () {
+        if (this._flatpickr) {
+            this._flatpickr.set("clickOpens", false);
+            if (this._flatpickr.altInput) this._flatpickr.altInput.disabled = true;
+        }
+    });
+
+    // edit actions: Update / Clear All (right menus) and Add Row / Delete Row
+    $("#JWIHeaderPanel .right-menu, #FreightHeaderPanel .right-menu").hide();
+    $("#AddRowButton, #RemoveItemRowButton, #AddRowButtonFreight, #RemoveItemRowButtonFreight").hide();
+
+    // badge
+    if ($(".view-only-badge").length === 0) {
+        $(".panel-header .h6 a.float-end")
+            .before('<span class="badge bg-warning text-dark ms-2 view-only-badge">VIEW ONLY</span>');
+    }
+}
+//#endregion
 
 function toggleServiceTypePanels() {
     var type = $('input[name="ServiceType"]:checked').val();
@@ -1182,41 +1266,7 @@ function validateHeaderById() {
         return false;
     }
 
-    //// 7. Payment Terms
-    //if ($("#Header_JISVOH_PaymentTerms").val().trim() === "") {
-    //    showAlert('Payment Terms is required', '#Header_JISVOH_PaymentTerms');
-    //    return false;
-    //}
-
-    //// 8. Delivery Terms
-    //if ($("#Header_JISVOH_DeliveryTerms").val().trim() === "") {
-    //    showAlert('Delivery Terms is required', '#Header_JISVOH_DeliveryTerms');
-    //    return false;
-    //}
-
-    //// 9. Delivery Mode
-    //if ($("#Header_JISVOH_DeliveryMode").val().trim() === "") {
-    //    showAlert('Delivery Mode is required', '#Header_JISVOH_DeliveryMode');
-    //    return false;
-    //}
-
-    //// 10. Tax
-    //if ($("#Header_JISVOH_Tax").val().trim() === "") {
-    //    showAlert('Tax is required', '#Header_JISVOH_Tax');
-    //    return false;
-    //}
-
-    //// 11. TDC
-    //if ($("#Header_JISVOH_TDC").val().trim() === "") {
-    //    showAlert('TDC is required', '#Header_JISVOH_TDC');
-    //    return false;
-    //}
-
-    //// 12. Remarks
-    //if ($("#Header_JISVOH_Remarks").val().trim() === "") {
-    //    showAlert('Remarks is required', '#Header_JISVOH_Remarks');
-    //    return false;
-    //}
+   
 
     // Grid Validation
     if (!validateItemGrid()) {
@@ -1500,8 +1550,7 @@ function SearchServiceOrderItem(inputElement) {
 
                         row.find(".JISVOI_Item_Code").val(item.itemCode);
                         row.find(".JISVOI_Item_Number").val(item.itemNumber);
-                        row.find(".JISVOI_Number").val(item.itemNumber);
-
+                    
                         row.find(".Description").val(item.itemDescription);
                         row.find(".OuterDia").val(item.outerDia);
                         row.find(".Thickness").val(item.thickness);
@@ -1863,7 +1912,7 @@ function validateItemGrid() {
         }
 
         // Qty
-        if (!qty || qty.trim() === "" || qty.trim() === "0") {
+        if (!qty || qty.trim() === "" || (parseFloat(removeComma(qty)) || 0) <= 0) {
             showAlert(
                 'Qty is required',
                 row.find(".JISVOI_Qty")
@@ -1876,7 +1925,7 @@ function validateItemGrid() {
         if (
             !unitPrice ||
             unitPrice.trim() === "" ||
-            unitPrice.trim() === "0"
+            (parseFloat(removeComma(unitPrice)) || 0) <= 0
         ) {
             showAlert(
                 'Unit Price is required',
@@ -1902,6 +1951,87 @@ function validateItemGrid() {
 
 //#endregion
 
+
+//#region VALIDATE FREIGHT ITEM GRID
+function validateFreightGrid() {
+
+    let hasValidRow = false;
+    let isValid = true;
+
+    $("#FreightItemTable tbody tr.FreightNewRow").each(function () {
+
+        let row = $(this);
+
+        // skip deleted row
+        if (row.find(".JIFRT_SVOI_IsDeleted").val() === "1") return;
+
+        let process = row.find(".JIFRT_SVOI_PRS_Number").val();
+        let fromWH = row.find(".JIFRT_SVOI_FromWH_Number").val();
+        let toWH = row.find(".JIFRT_SVOI_ToWH_Number").val();
+        let uom = row.find(".JIFRT_SVOI_UoM_Number").val();
+        let qty = parseFloat(removeComma(row.find(".JIFRT_SVOI_Qty").val())) || 0;
+        let rate = parseFloat(removeComma(row.find(".JIFRT_SVOI_Rate").val())) || 0;
+
+        // check if row has any data
+        let isRowStarted =
+            (process && process !== "0") ||
+            (fromWH && fromWH !== "0") ||
+            (toWH && toWH !== "0") ||
+            (uom && uom !== "0") ||
+            qty > 0 ||
+            rate > 0;
+
+        // empty row -> skip
+        if (!isRowStarted) return;
+
+        hasValidRow = true;
+
+        if (!process || process === "0") {
+            showAlert('Process is required', row.find(".JIFRT_SVOI_PRS_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!fromWH || fromWH === "0") {
+            showAlert('From WH is required', row.find(".JIFRT_SVOI_FromWH_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!toWH || toWH === "0") {
+            showAlert('To WH is required', row.find(".JIFRT_SVOI_ToWH_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (!uom || uom === "0") {
+            showAlert('UOM is required', row.find(".JIFRT_SVOI_UoM_Number"));
+            isValid = false;
+            return false;
+        }
+
+        if (qty <= 0) {
+            showAlert('Qty is required', row.find(".JIFRT_SVOI_Qty"));
+            isValid = false;
+            return false;
+        }
+
+        if (rate <= 0) {
+            showAlert('Rate is required', row.find(".JIFRT_SVOI_Rate"));
+            isValid = false;
+            return false;
+        }
+    });
+
+    // no rows
+    if (!hasValidRow) {
+        showAlert('Please add at least one item in grid');
+        return false;
+    }
+
+    return isValid;
+}
+//#endregion
 
 //#region ALERT MESSAGE
 function showAlert(message, focusSelector = null) {
@@ -1936,6 +2066,15 @@ function GetServiceOrder(serviceOrderNumber, orderType) {
         success: function (data) {
             console.log(data)
 
+            let headerNo = data && data.Header
+                ? (data.Header.JIFRT_SVOH_Number ?? data.Header.JIJWI_SVOH_Number ?? 0)
+                : 0;
+
+            if (!headerNo) {
+                showAlert('Service Order not found');
+                return;
+            }
+
             if (orderType === "FREIGHT") {
                 BindFreightHeader(data.Header);
                 BindFreightItems(data.Items);
@@ -1947,10 +2086,24 @@ function GetServiceOrder(serviceOrderNumber, orderType) {
 
         error: function (xhr) {
             console.log("Error:", xhr);
+            showAlert('Unable to load Service Order');
         }
     });
 }
 
+//#endregion
+
+//#region SET PICKER DATE
+function SetPickerDate(selector, value) {
+    var el = document.querySelector(selector);
+    if (!el || !value) return;
+
+    if (el._flatpickr) {
+        el._flatpickr.setDate(new Date(value), false, "d-M-Y");
+    } else {
+        $(el).val(value);
+    }
+}
 //#endregion
 
 //#region BIND HEADER EDIT
@@ -1965,14 +2118,14 @@ function BindHeader(header) {
     $("#Header_JIJWI_SVOH_RegNo")
         .val(header.jijwi_SVOH_RegNo ?? header.JIJWI_SVOH_RegNo);
 
-    $("#Header_JIJWI_SVOH_RegDate")
-        .val(header.jijwi_SVOH_RegDate ?? header.JIJWI_SVOH_RegDate);
+    SetPickerDate("#Header_JIJWI_SVOH_RegDate",
+        header.jijwi_SVOH_RegDate ?? header.JIJWI_SVOH_RegDate);
 
     $("#Header_JIJWI_SVOH_ServiceOrderNo")
         .val(header.jijwi_SVOH_ServiceOrderNo ?? header.JIJWI_SVOH_ServiceOrderNo);
 
-    $("#Header_JIJWI_SVOH_ServiceOrderDate")
-        .val(header.jijwi_SVOH_ServiceOrderDate ?? header.JIJWI_SVOH_ServiceOrderDate);
+    SetPickerDate("#Header_JIJWI_SVOH_ServiceOrderDate",
+        header.jijwi_SVOH_ServiceOrderDate ?? header.JIJWI_SVOH_ServiceOrderDate);
 
     $("#Header_JIJWI_SVOH_JW_Customer_Number")
         .val(header.jijwi_SVOH_JW_Customer_Number ?? header.JIJWI_SVOH_JW_Customer_Number).trigger("change");
@@ -2241,8 +2394,6 @@ function BindItems(items) {
         if (item.JIJWI_SVOI_DeliveryDate) {
             fp.setDate(new Date(item.JIJWI_SVOI_DeliveryDate), true, "d-M-Y");
         }
-
-        DateBind();
     });
     isBindingItems = false;
     calculateTotal();

@@ -1,0 +1,195 @@
+﻿@model List<ERP_DTO.JobOutwardTransaction.JW_VendorWHT_DTO>
+
+<div class="w-100 table-responsive">
+    <table class="table table-bordered align-middle table-hover mb-0 table-grid">
+        <thead>
+            <tr class="table-info">
+                <th>@Html.DisplayNameFor(model => model.First().JWV_WHT_WHTC_Number)</th>
+                <th>@Html.DisplayNameFor(model => model.First().JWV_WHT_WHTT_Number)</th>
+                <th>@Html.DisplayNameFor(model => model.First().JWV_WHT_WHT_Number)</th>
+                <th>@Html.DisplayNameFor(model => model.First().JWV_WHT_WHT_Description)</th>
+                <th class="datetype text-center">@Html.DisplayNameFor(model => model.First().JWV_WHT_FromDate)</th>
+                <th class="datetype text-center">@Html.DisplayNameFor(model => model.First().JWV_WHT_ToDate)</th>
+                <th class="action text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody id="WHTTableBody">
+            <tr id="WHTTempRow" style="display: none;">
+                <td><select class="form-select JWV_WHT_WHTC_Number" asp-items="@ViewBag.WHT_Category"></select></td>
+                <td><select class="form-select JWV_WHT_WHTT_Number" asp-items="@ViewBag.WHT_Type"></select></td>
+                <td><select class="form-select JWV_WHT_WHT_Number" asp-items="@ViewBag.WHT_Tax"></select></td>
+                <td><input class="form-control JWV_WHT_WHT_Description" readonly /></td>
+                <td class="datetype"><input class="form-control text-center JWV_WHT_FromDate datepicker" autocomplete="off" /></td>
+                <td class="datetype"><input class="form-control text-center JWV_WHT_ToDate datepicker" autocomplete="off" /></td>
+                <td class="action text-center">
+                    <input type="hidden" class="JWV_WHT_IsDeleted" value="0" />
+                    <a class="WHTRowRemove btn text-danger p-0 icon-link shadow-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                        </svg>
+                    </a>
+                </td>
+            </tr>
+            @if (Model != null)
+            {
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    <tr class="WHTNewRow" style="@(Model[i].JWV_WHT_IsDeleted == 1 ? "display: none;" : "")">
+                        <td>
+                            <select name="JWV_WHT_List[@i].JWV_WHT_WHTC_Number" class="form-select JWV_WHT_WHTC_Number">
+                                @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.WHT_Category)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model[i].JWV_WHT_WHTC_Number)">@item.Text</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <select name="JWV_WHT_List[@i].JWV_WHT_WHTT_Number" class="form-select JWV_WHT_WHTT_Number">
+                                @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.WHT_Type)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model[i].JWV_WHT_WHTT_Number)">@item.Text</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <select name="JWV_WHT_List[@i].JWV_WHT_WHT_Number" class="form-select JWV_WHT_WHT_Number">
+                                @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.WHT_Tax)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model[i].JWV_WHT_WHT_Number)">@item.Text</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <input name="JWV_WHT_List[@i].JWV_WHT_WHT_Description" class="form-control JWV_WHT_WHT_Description" readonly value="@Model[i].JWV_WHT_WHT_Description" />
+                        </td>
+                        <td class="datetype">
+                            <input name="JWV_WHT_List[@i].JWV_WHT_FromDate" class="form-control text-center JWV_WHT_FromDate datepicker" autocomplete="off" value="@Model[i].JWV_WHT_FromDate" />
+                        </td>
+                        <td class="datetype">
+                            <input name="JWV_WHT_List[@i].JWV_WHT_ToDate" class="form-control text-center JWV_WHT_ToDate datepicker" autocomplete="off" value="@Model[i].JWV_WHT_ToDate" />
+                        </td>
+                        <td class="action text-center">
+                            <input name="JWV_WHT_List[@i].JWV_WHT_Number" type="hidden" value="@Model[i].JWV_WHT_Number" />
+                            <input type="hidden" name="JWV_WHT_List[@i].JWV_WHT_IsDeleted" class="JWV_WHT_IsDeleted" value="@Model[i].JWV_WHT_IsDeleted" />
+                            <a class="WHTRowRemove btn text-danger p-0 icon-link shadow-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+        var rowCount = @(Model != null ? Model.Count : 0);
+
+        function initPickers() {
+            $("tr.WHTNewRow .datepicker").each(function () {
+                if (!this._flatpickr) flatpickr(this, { dateFormat: "d-M-Y", altInput: false });
+            });
+        }
+        function isFilled(v) { v = (v === null || v === undefined) ? "" : String(v).trim(); return v !== "" && v !== "0"; }
+        function activeRows() { return $("tr.WHTNewRow").filter(function () { return $(this).find("input.JWV_WHT_IsDeleted").val() !== "1"; }); }
+        function rowValues(row) {
+            return [row.find("select.JWV_WHT_WHTC_Number").val(), row.find("select.JWV_WHT_WHTT_Number").val(),
+                    row.find("select.JWV_WHT_WHT_Number").val(), row.find("input.JWV_WHT_FromDate").val(), row.find("input.JWV_WHT_ToDate").val()];
+        }
+        function rowEmpty(row) { return rowValues(row).every(function (v) { return !isFilled(v); }); }
+        function rowComplete(row) { return rowValues(row).every(function (v) { return isFilled(v); }); }
+
+        function addRow() {
+            var r = $("#WHTTempRow").clone().removeAttr("style").removeAttr("id").addClass("WHTNewRow");
+            r.find("select.JWV_WHT_WHTC_Number").attr("name", "JWV_WHT_List[" + rowCount + "].JWV_WHT_WHTC_Number");
+            r.find("select.JWV_WHT_WHTT_Number").attr("name", "JWV_WHT_List[" + rowCount + "].JWV_WHT_WHTT_Number");
+            r.find("select.JWV_WHT_WHT_Number").attr("name", "JWV_WHT_List[" + rowCount + "].JWV_WHT_WHT_Number");
+            r.find("input.JWV_WHT_WHT_Description").attr("name", "JWV_WHT_List[" + rowCount + "].JWV_WHT_WHT_Description");
+            r.find("input.JWV_WHT_FromDate").attr("name", "JWV_WHT_List[" + rowCount + "].JWV_WHT_FromDate");
+            r.find("input.JWV_WHT_ToDate").attr("name", "JWV_WHT_List[" + rowCount + "].JWV_WHT_ToDate");
+            r.find("input.JWV_WHT_IsDeleted").attr("name", "JWV_WHT_List[" + rowCount + "].JWV_WHT_IsDeleted").val(0);
+            $("#WHTTableBody").append(r);
+            rowCount++;
+            initPickers();
+        }
+
+        initPickers();
+        if (activeRows().length === 0) addRow();
+
+        // remove row
+        $(document).on("click", ".WHTRowRemove", function () {
+            var r = $(this).closest("tr");
+            r.find("input.JWV_WHT_IsDeleted").val(1);
+            r.hide();
+        });
+
+        // to date must be >= from date
+        $(document).on("change", "tr.WHTNewRow input.JWV_WHT_FromDate, tr.WHTNewRow input.JWV_WHT_ToDate", function () {
+            var r = $(this).closest("tr");
+            var f = r.find("input.JWV_WHT_FromDate").val(), t = r.find("input.JWV_WHT_ToDate").val();
+            if (f && t && flatpickr.parseDate(t, "d-M-Y") < flatpickr.parseDate(f, "d-M-Y")) {
+                alert("'To Date' must be greater than or equal to 'From Date'");
+                $(this).val("");
+            }
+        });
+
+        // auto add a new row when the last row is complete
+        $(document).on("change", "tr.WHTNewRow select, tr.WHTNewRow input.datepicker", function () {
+            var last = activeRows().last();
+            if (last.length && rowComplete(last)) addRow();
+        });
+
+        // category + type -> load tax codes
+        $(document).on("change", "tr.WHTNewRow .JWV_WHT_WHTC_Number, tr.WHTNewRow .JWV_WHT_WHTT_Number", function () {
+            var row = $(this).closest("tr");
+            var categoryId = row.find(".JWV_WHT_WHTC_Number").val();
+            var typeId = row.find(".JWV_WHT_WHTT_Number").val();
+            var taxDropdown = row.find(".JWV_WHT_WHT_Number");
+            taxDropdown.html('<option value=""></option>');
+            row.find(".JWV_WHT_WHT_Description").val("");
+            if (!categoryId || !typeId) return;
+            $.ajax({
+                url: '/jobwork/master/jw-vendor/whtgrid',
+                type: 'GET',
+                data: { categoryId: categoryId, typeId: typeId },
+                success: function (data) {
+                    $.each(data, function (i, item) {
+                        taxDropdown.append($('<option></option>').val(item.wH_Number).attr("data-desc", item.wH_TaxDescription).text(item.wH_TaxCode));
+                    });
+                }
+            });
+        });
+
+        // tax code -> description
+        $(document).on("change", "tr.WHTNewRow .JWV_WHT_WHT_Number", function () {
+            var desc = $(this).find(":selected").attr("data-desc") || "";
+            $(this).closest("tr").find(".JWV_WHT_WHT_Description").val(desc);
+        });
+
+        $("#WHTAddRowButton").click(function () {
+            var last = activeRows().last();
+            if (!last.length || rowComplete(last)) { addRow(); }
+            else if (!rowEmpty(last)) { alert("Please complete all fields !"); }
+        });
+
+        function gridValidation() {
+            // remove completely empty rows
+            activeRows().each(function () {
+                if (rowEmpty($(this))) { $(this).find("input.JWV_WHT_IsDeleted").val(1); $(this).hide(); }
+            });
+            // any half filled row?
+            var bad = activeRows().filter(function () { return !rowComplete($(this)); }).first();
+            if (bad.length) {
+                alert("Please complete all fields !");
+                bad.find("select, input.datepicker").filter(function () { return !isFilled($(this).val()); }).first().focus();
+                return;
+            }
+            if (activeRows().length === 0) addRow();
+            hideModal("WHTModal");
+        }
+        $("#WHTOkayButton").click(gridValidation);
+        $("#WHTCloseButton").click(gridValidation);
+    });
+</script>

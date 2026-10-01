@@ -960,6 +960,20 @@ SqlTransaction tr)
 
             return db.ExecuteDataSet(cmd);
         }
+
+        public DataSet JWCustomerList()
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JI_JobWorkInvoice_SP");
+
+            db.AddInParameter(cmd, "@JW_Inv_Id", DbType.Int32, 5);
+            db.AddInParameter(cmd, "@JIJWIH_InvoiceDate", DbType.Date, DateTime.Now);
+            db.AddInParameter(cmd, "@JIDNI_Item_Code", DbType.String, "");
+
+            return db.ExecuteDataSet(cmd);
+        }
         #endregion
+
+
     }
 }

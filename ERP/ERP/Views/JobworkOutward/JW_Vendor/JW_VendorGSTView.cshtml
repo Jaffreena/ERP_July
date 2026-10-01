@@ -1,0 +1,190 @@
+﻿@model List<ERP_DTO.JobOutwardTransaction.JW_VendorGST_DTO>
+
+<div class="w-100 table-responsive">
+    <table class="table table-bordered align-middle table-hover mb-0 table-grid">
+        <thead>
+            <tr class="table-info">
+                <th>@Html.DisplayNameFor(model => model.First().JWV_GST_GSTC_Number)</th>
+                <th>@Html.DisplayNameFor(model => model.First().JWV_GST_GSTT_Number)</th>
+                <th>@Html.DisplayNameFor(model => model.First().JWV_GST_TCT_Number)</th>
+                <th>@Html.DisplayNameFor(model => model.First().JWV_GST_TCT_Description)</th>
+                <th class="datetype text-center">@Html.DisplayNameFor(model => model.First().JWV_GST_FromDate)</th>
+                <th class="datetype text-center">@Html.DisplayNameFor(model => model.First().JWV_GST_ToDate)</th>
+                <th class="action text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody id="GSTTableBody">
+            <tr id="GSTTempRow" style="display: none;">
+                <td><select class="form-select JWV_GST_GSTC_Number" asp-items="@ViewBag.GST_Category"></select></td>
+                <td><select class="form-select JWV_GST_GSTT_Number" asp-items="@ViewBag.GST_Type"></select></td>
+                <td><select class="form-select JWV_GST_TCT_Number" asp-items="@ViewBag.GST_TaxCluster"></select></td>
+                <td><input class="form-control JWV_GST_TCT_Description" readonly /></td>
+                <td class="datetype"><input class="form-control text-center JWV_GST_FromDate datepicker" autocomplete="off" /></td>
+                <td class="datetype"><input class="form-control text-center JWV_GST_ToDate datepicker" autocomplete="off" /></td>
+                <td class="action text-center">
+                    <input type="hidden" class="JWV_GST_IsDeleted" value="0" />
+                    <a class="GSTRowRemove btn text-danger p-0 icon-link shadow-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                        </svg>
+                    </a>
+                </td>
+            </tr>
+            @if (Model != null)
+            {
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    <tr class="GSTNewRow" style="@(Model[i].JWV_GST_IsDeleted == 1 ? "display: none;" : "")">
+                        <td>
+                            <select name="JWV_GST_List[@i].JWV_GST_GSTC_Number" class="form-select JWV_GST_GSTC_Number">
+                                @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.GST_Category)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model[i].JWV_GST_GSTC_Number)">@item.Text</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <select name="JWV_GST_List[@i].JWV_GST_GSTT_Number" class="form-select JWV_GST_GSTT_Number">
+                                @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.GST_Type)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model[i].JWV_GST_GSTT_Number)">@item.Text</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <select name="JWV_GST_List[@i].JWV_GST_TCT_Number" class="form-select JWV_GST_TCT_Number">
+                                @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.GST_TaxCluster)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model[i].JWV_GST_TCT_Number)">@item.Text</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <input name="JWV_GST_List[@i].JWV_GST_TCT_Description" class="form-control JWV_GST_TCT_Description" readonly value="@Model[i].JWV_GST_TCT_Description" />
+                        </td>
+                        <td class="datetype">
+                            <input name="JWV_GST_List[@i].JWV_GST_FromDate" class="form-control text-center JWV_GST_FromDate datepicker" autocomplete="off" value="@Model[i].JWV_GST_FromDate" />
+                        </td>
+                        <td class="datetype">
+                            <input name="JWV_GST_List[@i].JWV_GST_ToDate" class="form-control text-center JWV_GST_ToDate datepicker" autocomplete="off" value="@Model[i].JWV_GST_ToDate" />
+                        </td>
+                        <td class="action text-center">
+                            <input name="JWV_GST_List[@i].JWV_GST_Number" type="hidden" value="@Model[i].JWV_GST_Number" />
+                            <input type="hidden" name="JWV_GST_List[@i].JWV_GST_IsDeleted" class="JWV_GST_IsDeleted" value="@Model[i].JWV_GST_IsDeleted" />
+                            <a class="GSTRowRemove btn text-danger p-0 icon-link shadow-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+        var rowCount = @(Model != null ? Model.Count : 0);
+
+        function initPickers() {
+            $("tr.GSTNewRow .datepicker").each(function () {
+                if (!this._flatpickr) flatpickr(this, { dateFormat: "d-M-Y", altInput: false });
+            });
+        }
+        function isFilled(v) { v = (v === null || v === undefined) ? "" : String(v).trim(); return v !== "" && v !== "0"; }
+        function activeRows() { return $("tr.GSTNewRow").filter(function () { return $(this).find("input.JWV_GST_IsDeleted").val() !== "1"; }); }
+        function rowValues(row) {
+            return [row.find("select.JWV_GST_GSTC_Number").val(), row.find("select.JWV_GST_GSTT_Number").val(),
+                    row.find("select.JWV_GST_TCT_Number").val(), row.find("input.JWV_GST_FromDate").val(), row.find("input.JWV_GST_ToDate").val()];
+        }
+        function rowEmpty(row) { return rowValues(row).every(function (v) { return !isFilled(v); }); }
+        function rowComplete(row) { return rowValues(row).every(function (v) { return isFilled(v); }); }
+
+        function addRow() {
+            var r = $("#GSTTempRow").clone().removeAttr("style").removeAttr("id").addClass("GSTNewRow");
+            r.find("select.JWV_GST_GSTC_Number").attr("name", "JWV_GST_List[" + rowCount + "].JWV_GST_GSTC_Number");
+            r.find("select.JWV_GST_GSTT_Number").attr("name", "JWV_GST_List[" + rowCount + "].JWV_GST_GSTT_Number");
+            r.find("select.JWV_GST_TCT_Number").attr("name", "JWV_GST_List[" + rowCount + "].JWV_GST_TCT_Number");
+            r.find("input.JWV_GST_TCT_Description").attr("name", "JWV_GST_List[" + rowCount + "].JWV_GST_TCT_Description");
+            r.find("input.JWV_GST_FromDate").attr("name", "JWV_GST_List[" + rowCount + "].JWV_GST_FromDate");
+            r.find("input.JWV_GST_ToDate").attr("name", "JWV_GST_List[" + rowCount + "].JWV_GST_ToDate");
+            r.find("input.JWV_GST_IsDeleted").attr("name", "JWV_GST_List[" + rowCount + "].JWV_GST_IsDeleted").val(0);
+            $("#GSTTableBody").append(r);
+            rowCount++;
+            initPickers();
+        }
+
+        initPickers();
+        if (activeRows().length === 0) addRow();
+
+        $(document).on("click", ".GSTRowRemove", function () {
+            var r = $(this).closest("tr");
+            r.find("input.JWV_GST_IsDeleted").val(1);
+            r.hide();
+        });
+
+        $(document).on("change", "tr.GSTNewRow input.JWV_GST_FromDate, tr.GSTNewRow input.JWV_GST_ToDate", function () {
+            var r = $(this).closest("tr");
+            var f = r.find("input.JWV_GST_FromDate").val(), t = r.find("input.JWV_GST_ToDate").val();
+            if (f && t && flatpickr.parseDate(t, "d-M-Y") < flatpickr.parseDate(f, "d-M-Y")) {
+                alert("'To Date' must be greater than or equal to 'From Date'");
+                $(this).val("");
+            }
+        });
+
+        $(document).on("change", "tr.GSTNewRow select, tr.GSTNewRow input.datepicker", function () {
+            var last = activeRows().last();
+            if (last.length && rowComplete(last)) addRow();
+        });
+
+        // category + type -> load tax clusters
+        $(document).on("change", "tr.GSTNewRow .JWV_GST_GSTC_Number, tr.GSTNewRow .JWV_GST_GSTT_Number", function () {
+            var row = $(this).closest("tr");
+            var categoryId = row.find(".JWV_GST_GSTC_Number").val();
+            var typeId = row.find(".JWV_GST_GSTT_Number").val();
+            var taxDropdown = row.find(".JWV_GST_TCT_Number");
+            taxDropdown.html('<option value=""></option>');
+            row.find(".JWV_GST_TCT_Description").val("");
+            if (!categoryId || !typeId) return;
+            $.ajax({
+                url: '/jobwork/master/jw-vendor/gstgrid',
+                type: 'GET',
+                data: { categoryId: categoryId, typeId: typeId },
+                success: function (data) {
+                    $.each(data, function (i, item) {
+                        taxDropdown.append($('<option></option>').val(item.tcT_Number).attr("data-desc", item.tcT_Description).text(item.tcT_Name));
+                    });
+                }
+            });
+        });
+
+        // cluster -> description
+        $(document).on("change", "tr.GSTNewRow .JWV_GST_TCT_Number", function () {
+            var desc = $(this).find(":selected").attr("data-desc") || "";
+            $(this).closest("tr").find(".JWV_GST_TCT_Description").val(desc);
+        });
+
+        $("#GSTAddRowButton").click(function () {
+            var last = activeRows().last();
+            if (!last.length || rowComplete(last)) { addRow(); }
+            else if (!rowEmpty(last)) { alert("Please complete all fields !"); }
+        });
+
+        function gridValidation() {
+            activeRows().each(function () {
+                if (rowEmpty($(this))) { $(this).find("input.JWV_GST_IsDeleted").val(1); $(this).hide(); }
+            });
+            var bad = activeRows().filter(function () { return !rowComplete($(this)); }).first();
+            if (bad.length) {
+                alert("Please complete all fields !");
+                bad.find("select, input.datepicker").filter(function () { return !isFilled($(this).val()); }).first().focus();
+                return;
+            }
+            if (activeRows().length === 0) addRow();
+            hideModal("GSTModal");
+        }
+        $("#GSTOkayButton").click(gridValidation);
+        $("#GSTCloseButton").click(gridValidation);
+    });
+</script>

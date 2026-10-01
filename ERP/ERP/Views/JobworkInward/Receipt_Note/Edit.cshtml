@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.ReceiptNoteHead_DTO;
 @{
-    ViewData["Title"] = "Receipt Note Edit";
+    ViewData["Title"] = ViewBag.IsViewMode == true ? "Receipt Note View" : "Receipt Note Edit";
 }
 <style>
     #ItemTable {
@@ -1069,6 +1069,7 @@
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
+    <script>window.RN_VIEW_MODE = @(ViewBag.IsViewMode == true ? "true" : "false");</script>
     <script src="~/js/receiptnote/receiptnote_Edit.js" asp-append-version="true"></script>
     <script src="~/js/receiptnote/receiptnote_batchEdit.js" asp-append-version="true"></script>
     <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>

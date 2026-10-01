@@ -2128,77 +2128,102 @@ $(document).on("change", ".JIDNI_JIFRT_SVOH_Number", function () {
 });
 //#region Delivered Qty Validation
 
+// FORMULA: Messages = [JWI_Msg if exceeded] + [Freight_Msg if exceeded] -> one alert, clear both, one focus
 $(document).on("focusout", ".JIDNI_Qty", function () {
 
     let row = $(this).closest("tr");
+    let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
     let jisvohNumber = row.find(".JIDNI_JIJWI_SVOH_Number").val();
-    if (!jisvohNumber) return;
-    let prsNumber = row.find(".JIDNI_PRS_Number").val();
-    let itemNumber = row.find(".JIDNI_Item_Number").val();
-    let uomNumber = row.find(".JIDNI_UoM_Number").val();
-    let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
-    let rowIndex = row.index();
-    $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
-        jisvohNumber,
-        prsNumber,
-        itemNumber,
-        uomNumber
-    }, function (res) {
-        if (!res || res.length === 0) return;
-        let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
-        let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
-
-        // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(SO)
-        let otherRowsQty = GetOtherRowsQtyForSO(jisvohNumber, row);
-        let realDeliveredQty = deliveredQty + otherRowsQty;
-
-        // FORMULA: IsExceeded  <=>  (RealDeliveredQty + CurrentQty) > SVO_Qty
-        if ((realDeliveredQty + originalQty) > jisvoiQty) {
-
-            // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
-            alert("Qty Allowed: " + (jisvoiQty - realDeliveredQty));
-            setTimeout(function () {
-                row.find(".JIDNI_Qty")
-                    .focus()
-                    .select();
-                row.find(".JIDNI_JIJWI_SVOH_Number").val("0");
-            }, 300);
-        }
-    });
-});
-
-// NEW: same Qty Allowed check, but for the Freight No's Service Order
-$(document).on("focusout", ".JIDNI_Qty", function () {
-
-    let row = $(this).closest("tr");
     let freightSO = row.find(".JIDNI_JIFRT_SVOH_Number").val();
-    if (!freightSO || freightSO === "0") return;
 
-    let uomNumber = row.find(".JIDNI_UoM_Number").val();
-    let fromWHNumber = row.find(".JIDNI_FromWH").val();
-    let toWHNumber = row.find(".JIDNI_ToWH").val();
-    let originalQty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
+    let jwiDeferred = $.Deferred();
+    let freightDeferred = $.Deferred();
 
-    $.get("/deliverynote/transactions/deliverynote/check-delivered-qty-exceeded-freight-new", {
-        jisvohNumber: freightSO,
-        uomNumber,
-        fromWHNumber,
-        toWHNumber
-    }, function (res) {
-        if (!res || res.length === 0) return;
-        let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
-        let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
+    // JWI check
+    if (!jisvohNumber || jisvohNumber === "0") {
+        jwiDeferred.resolve(null);
+    } else {
+        let prsNumber = row.find(".JIDNI_PRS_Number").val();
+        let itemNumber = row.find(".JIDNI_Item_Number").val();
+        let uomNumber = row.find(".JIDNI_UoM_Number").val();
 
-        let otherRowsQty = GetOtherRowsQtyForSO(freightSO, row);
-        let realDeliveredQty = deliveredQty + otherRowsQty;
+        $.get("/DeliveryNote/CheckDeliveredQtyExceeded", {
+            jisvohNumber,
+            prsNumber,
+            itemNumber,
+            uomNumber
+        }, function (res) {
+            if (!res || res.length === 0) { jwiDeferred.resolve(null); return; }
 
-        if ((realDeliveredQty + originalQty) > jisvoiQty) {
-            alert("Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty));
+            let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+            let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
+
+            // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(SO)
+            let otherRowsQty = GetOtherRowsQtyForSO(jisvohNumber, row);
+            let realDeliveredQty = deliveredQty + otherRowsQty;
+
+            // FORMULA: IsExceeded <=> (RealDeliveredQty + CurrentQty) > SVO_Qty
+            if ((realDeliveredQty + originalQty) > jisvoiQty) {
+                jwiDeferred.resolve({
+                    // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
+                    message: "Qty Allowed: " + (jisvoiQty - realDeliveredQty),
+                    clear: function () { row.find(".JIDNI_JIJWI_SVOH_Number").val("0"); }
+                });
+            } else {
+                jwiDeferred.resolve(null);
+            }
+        }).fail(function () { jwiDeferred.resolve(null); });
+    }
+
+    // Freight check
+    if (!freightSO || freightSO === "0") {
+        freightDeferred.resolve(null);
+    } else {
+        let uomNumber = row.find(".JIDNI_UoM_Number").val();
+        let fromWHNumber = row.find(".JIDNI_FromWH").val();
+        let toWHNumber = row.find(".JIDNI_ToWH").val();
+
+        $.get("/deliverynote/transactions/deliverynote/check-delivered-qty-exceeded-freight-new", {
+            jisvohNumber: freightSO,
+            uomNumber,
+            fromWHNumber,
+            toWHNumber
+        }, function (res) {
+            if (!res || res.length === 0) { freightDeferred.resolve(null); return; }
+
+            let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+            let jisvoiQty = parseFloat(res[0].jisvoiQty) || 0;
+
+            // FORMULA: RealDeliveredQty = DB_DeliveredQty + OtherRowsQty(Freight SO)
+            let otherRowsQty = GetOtherRowsQtyForSO(freightSO, row);
+            let realDeliveredQty = deliveredQty + otherRowsQty;
+
+            // FORMULA: IsExceeded <=> (RealDeliveredQty + CurrentQty) > SVO_Qty
+            if ((realDeliveredQty + originalQty) > jisvoiQty) {
+                freightDeferred.resolve({
+                    // FORMULA: AllowedQty = SVO_Qty − RealDeliveredQty
+                    message: "Freight Qty Allowed: " + (jisvoiQty - realDeliveredQty),
+                    clear: function () { row.find(".JIDNI_JIFRT_SVOH_Number").val("0"); }
+                });
+            } else {
+                freightDeferred.resolve(null);
+            }
+        }).fail(function () { freightDeferred.resolve(null); });
+    }
+
+    // Combine
+    $.when(jwiDeferred, freightDeferred).done(function (jwiResult, freightResult) {
+        let messages = [];
+
+        if (jwiResult) { messages.push(jwiResult.message); jwiResult.clear(); }
+        if (freightResult) { messages.push(freightResult.message); freightResult.clear(); }
+
+        if (messages.length > 0) {
+            alert(messages.join("\n"));
             setTimeout(function () {
                 row.find(".JIDNI_Qty")
                     .focus()
                     .select();
-                row.find(".JIDNI_JIFRT_SVOH_Number").val("0");
             }, 300);
         }
     });
@@ -2507,11 +2532,12 @@ function searchItemJIDNI(inputElement) {
                         // ✔ Decimal format (if needed)
                         let decimalPlaces = item.decimalPlaces || 2;
 
-                        let qtyVal = qtyInput.val();
-                        let qtyUnitpriceVal = qtyUnitprice.val();
-                        qtyInput.val(formatIndianQty(qtyVal));
-                        qtyUnitprice.val(formatIndianCurrency(qtyUnitpriceVal));
+                        qtyInput.val(formatIndianQty(removeComma(qtyInput.val())));
+                        qtyUnitprice.val(formatIndianCurrency(removeComma(qtyUnitprice.val())));
 
+                         
+                        // on screen when tabbing/entering into the next line.
+                        resultsDiv.empty();
                         resultsDiv.hide();
                         $("#RightPane_Item").removeClass("show");
                     });

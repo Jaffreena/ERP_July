@@ -1003,6 +1003,10 @@ namespace ERP.Controllers.JobworkInward
             //        SI_No = SI_No
             //    });
             //}
+            if (Mode == "View")
+            {
+                return RedirectToAction("JWInvoiceView", new { SI_No = SI_No });
+            }
             if (Mode == "Edit")
             {
 
@@ -1336,12 +1340,14 @@ namespace ERP.Controllers.JobworkInward
         #endregion
 
         #region View
-        public ActionResult JWInvoiceView()
+        public IActionResult JWInvoiceView(long SI_No)
         {
 
-            JobWorkInvoiceCreate_DTO obj = new JobWorkInvoiceCreate_DTO();
+            GetJobWorkInvoiceData();          // same dropdown lists as Edit
+            ViewBag.Collapse = true;
+            ViewBag.IsViewMode = true;        // same page as Edit, locked by ApplyViewMode()
 
-            return View(obj);
+            return View("~/Views/JobworkInward/JobworkInvoice/Edit.cshtml");
         }
         #endregion
         #region EDIT GET JOBWORK INVOICE JSON

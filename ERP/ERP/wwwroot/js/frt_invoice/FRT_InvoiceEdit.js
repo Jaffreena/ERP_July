@@ -21,6 +21,43 @@ function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
 
     return total;
 }
+
+//#region Freight grid input restriction (Edit)
+const FRT_DECIMAL = /^\d*\.?\d{0,2}$/;   // 0, 12, 12., 12.5, 12.50
+
+// Amend Qty - digits only
+$(document).on("keypress", ".JIFTII_AmendQty", function (e) {
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.key && e.key.length > 1) return;          // Enter, Backspace, arrows
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+});
+
+$(document).on("input", ".JIFTII_AmendQty", function () {
+    let cleaned = this.value.replace(/[^0-9,]/g, "");   // keeps comma from formatting
+    if (cleaned !== this.value) this.value = cleaned;
+});
+
+// Unit Price - decimal, max 2 places
+$(document).on("keypress", ".JIFTII_Rate", function (e) {
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.key && e.key.length > 1) return;
+    let el = this;
+    let newVal = el.value.slice(0, el.selectionStart) + e.key + el.value.slice(el.selectionEnd);
+    if (!FRT_DECIMAL.test(removeCommas(newVal))) e.preventDefault();
+});
+
+$(document).on("input", ".JIFTII_Rate", function () {
+    let raw = removeCommas(this.value);
+    if (!FRT_DECIMAL.test(raw)) {
+        raw = raw.replace(/[^0-9.]/g, "");
+        let parts = raw.split(".");
+        this.value = parts.length > 1
+            ? parts[0] + "." + parts.slice(1).join("").slice(0, 2)
+            : parts[0];
+    }
+});
+//#endregion
+
 $(document).ready(function () {
     //#region JW_Customer – Focus In
     // Handled via inline onfocus (ShowCustomerPane/OnBuyerSelectCall
@@ -363,20 +400,20 @@ $(document).ready(function () {
         let row = $(dropdown).closest("tr");
 
         let customerId = $("#Header_JIFTIH_JW_Customer_Number").val();
-        let prsNumber = row.find(".JIFTII_PRS_Number").val();
-        let itemNumber = row.find(".JIFTII_Item_Number").val();
-        let uomNumber = row.find(".JIFTII_UoM_Number").val();
-        console.log(row.find(".JIFTII_PRS_Number").length);
-        console.log(row.find(".JIFTII_Item_Number").length);
-        console.log(row.find(".JIFTII_UoM_Number").length);
+        let category = row.attr("data-source") === "RN" ? "RECEIPT NOTE" : "DELIVERY NOTE";
+        let uomNumber = row.find(".JIFTII_UoM_Number").val() || 0;
+        let fromWHNumber = row.find(".JIFTII_FromWH_Number").val() || 0;
+        let toWHNumber = row.find(".JIFTII_ToWH_Number").val() || 0;
+
         $.ajax({
-            url: "/DeliveryNote/GetServiceOrder",
+            url: "/FreightInvoice/GetFreightServiceOrder",
             type: "GET",
             data: {
                 customerId: customerId,
-                prsNumber: prsNumber,
-                itemNumber: itemNumber,
-                uomNumber: uomNumber
+                category: category,
+                uomNumber: uomNumber,
+                fromWHNumber: fromWHNumber,
+                toWHNumber: toWHNumber
             },
             success: function (response) {
                 console.log('--what is response---' + JSON.stringify(response));
@@ -384,13 +421,19 @@ $(document).ready(function () {
                 let options = '<option value="0"></option>';
 
                 $.each(response, function (_, item) {
+                    if (!item.value || item.value === "" || item.value === "0") return;
                     options += `<option value="${item.value}">
                             ${item.text}
                         </option>`;
                 });
 
+                let previousValue = row.find(".JIFTII_ServiceOrderHidden").val() || "0";
+
                 $(dropdown).html(options);
+                $(dropdown).val(previousValue);
             }, error: function (xhr, status, error) {
+
+                if (status === "abort") return;
 
                 console.log("AJAX Error");
                 console.log("Status:", status);
@@ -399,8 +442,6 @@ $(document).ready(function () {
 
                 // alert("Failed to load Service Orders.");
             }
-        });
-    }
     //#endregion
 
 
@@ -417,11 +458,13 @@ $(document).ready(function () {
         row.find(".Freight_ServiceOrder_Number").val(jisvohNumber);
         row.find(".JIFTII_SVO_AssignFlag").val("INVOICE"); // NEW: manual pick = direct SO invoice
 
-        $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+        $.get("/FreightInvoice/CheckAllowedQtyFreight", {
             jisvohNumber: jisvohNumber,
             prsNumber: row.find(".JIFTII_PRS_Number").val(),
-            itemNumber: row.find(".JIFTII_Item_Number").val(),
-            uomNumber: row.find(".JIFTII_UoM_Number").val()
+            fromWH: row.find(".JIFTII_FromWH_Number").val() || 0,
+            toWH: row.find(".JIFTII_ToWH_Number").val() || 0,
+            uomNumber: row.find(".JIFTII_UoM_Number").val(),
+            frtihNumber: $("#Header_JIFTIH_Number").val() || 0
         }, function (res) {
 
             if (res && res.length > 0) {
@@ -569,7 +612,6 @@ $(document).ready(function () {
 
     //#endregion
 
-
     $(document).on('click', '#RemoveItemRowButton', function () {
 
         //#region REMOVE CHECKED ROWS
@@ -590,6 +632,9 @@ $(document).ready(function () {
         });
 
         //#endregion
+
+        // refresh footer totals after rows are hidden/removed
+        CalculateTotals();
 
     });
 
@@ -712,11 +757,13 @@ $(document).ready(function () {
         // With Service Order
         if (jisvohNumber > 0) {
 
-            $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+            $.get("/FreightInvoice/CheckAllowedQtyFreight", {
                 jisvohNumber: jisvohNumber,
-                prsNumber: row.find(".JIFTII_PRS_Number").val() || 0,
-                itemNumber: row.find(".JIFTII_Item_Number").val() || 0,
-                uomNumber: row.find(".JIFTII_UoM_Number").val() || 0
+                prsNumber: row.find(".JIFTII_PRS_Number").val(),
+                fromWH: row.find(".JIFTII_FromWH_Number").val(),
+                toWH: row.find(".JIFTII_ToWH_Number").val(),
+                uomNumber: row.find(".JIFTII_UoM_Number").val(),
+                frtihNumber: $("#Header_JIFTIH_Number").val()
             }, function (res) {
 
                 if (res && res.length > 0) {
@@ -905,6 +952,49 @@ async function GetGSTAmount(cluster, invoiceDate, sacNumber, baseAmount) {
 
     return response;
 }
+//#region VIEW MODE (read-only) - same page as Edit, locked after data loads
+var _viewModeTimer = null;
+
+function ApplyViewMode() {
+    if (!window.IsViewMode) return;
+
+    var $form = $("#FreightInvoiceCreateForm");
+
+    // disable every field except row tick boxes (needed for GST / Address view)
+    $form.find("input, select, textarea")
+        .not(".CheckItem, .IndexAllCheckItem")
+        .prop("disabled", true);
+
+    // hide every action that changes data
+    $("#btnSave, #LoadDeliveryNote, #RemoveItemRowButton, #AddressAddButton, .AddRowRemove").hide();
+    $(".right-menu a:contains('Clear All')").hide();
+
+    // keep disabled values readable
+    if (!$("#ViewModeStyle").length) {
+        $("<style id='ViewModeStyle'>input:disabled, select:disabled, textarea:disabled { color:#212529 !important; opacity:1 !important; }</style>").appendTo("head");
+    }
+
+    // VIEW ONLY badge
+    if (!$("#ViewOnlyBadge").length) {
+        $(".panel-header .h6 a.float-end").first()
+            .before('<span id="ViewOnlyBadge" class="badge bg-warning text-dark ms-2">VIEW ONLY</span>');
+    }
+}
+
+function StartViewMode() {
+    if (!window.IsViewMode) return;
+    ApplyViewMode();
+
+    // rows, dropdown options and address rows load later (AJAX) - lock them as they appear
+    new MutationObserver(function () {
+        clearTimeout(_viewModeTimer);
+        _viewModeTimer = setTimeout(ApplyViewMode, 50);
+    }).observe(document.body, { childList: true, subtree: true });
+}
+
+$(function () { StartViewMode(); });
+//#endregion
+
 function CalculateTotals() {
 
     var totalDeliveredQty = 0;
@@ -2743,16 +2833,27 @@ function BindHeader(header) {
 
 }
 
-function GetSONOptions(selectedValue = 0) {
+function GetSONOptions(selectedValue = 0, selectedText = null) {
     let options = '<option value="0"></option>';
+    let found = false;
 
     $.each(sonList, function (_, item) {
+        if (item.Value == selectedValue) found = true;
         options += `
             <option value="${item.Value}" 
                 ${item.Value == selectedValue ? 'selected' : ''}>
                 ${item.Text}
             </option>`;
     });
+
+    // CHANGED: sonList is the generic (non-Freight) SO reference list,
+    // so a Freight-specific JIFRT_ServiceOrderHead number (selectedValue)
+    // is usually not in it — inject it directly, using the real SO text
+    // (selectedText, from JIFRT_ServiceOrderHead) when we have it, so the
+    // saved value shows its friendly number instead of just the raw ID.
+    if (!found && selectedValue && selectedValue != "0") {
+        options += `<option value="${selectedValue}" selected>${selectedText ?? selectedValue}</option>`;
+    }
 
     return options;
 }
@@ -2773,11 +2874,11 @@ function BindItems(items) {
         // the SO Item ID (JISVOI_Number) hidden fields on every row.
         let serviceOrderCell =
             (item.JIFTII_SVO_Assign === 'DELIVERY NOTE'
-                ? `<label class="form-control JIFTII_ServiceOrderLabel">${item.JIFTII_JISVOH_Number ?? ''}</label>
+                ? `<label class="form-control JIFTII_ServiceOrderLabel">${item.ServiceOrderNo ?? item.JIFTII_JISVOH_Number ?? ''}</label>
                    <input name="Items[${index}].JIFTII_JISVOH_Number" type="hidden" value="${item.JIFTII_JISVOH_Number ?? 0}" class="JIFTII_ServiceOrderHidden" />`
                 : `<select name="Items[${index}].JIFTII_JISVOH_Number"
                           class="form-select JIFTII_JISVOH_Number">
-                        ${GetSONOptions(item.JIFTII_JISVOH_Number)}
+                        ${GetSONOptions(item.JIFTII_JISVOH_Number, item.ServiceOrderNo)}
                    </select>
                    <input type="hidden" value="${item.JIFTII_JISVOH_Number ?? 0}" class="JIFTII_ServiceOrderHidden" />`)
             +
@@ -2908,6 +3009,19 @@ function BindItems(items) {
 </tr>`;
 
         $("#TableBody").append(row);
+
+        // NEW: BindItems writes raw numbers with no formatting — apply
+        // the same comma/decimal formatting the focusout handlers use,
+        // so qty/rate/amount look right immediately on load instead of
+        // only after the user clicks into each field.
+        var $newRow = $("#TableBody tr.NewRow").last();
+        $newRow.find(".JIFTII_DeliveredQty").text(addComma($newRow.find(".JIFTII_DeliveredQty").text().trim(), "q"));
+        $newRow.find(".JIFTII_PrevInvoiceQty, .JIFTII_AmendQty").each(function () {
+            $(this).val(addComma($(this).val(), "q"));
+        });
+        $newRow.find(".JIFTII_Rate, .JIFTII_Amount, .JIFTII_GST_Amount").each(function () {
+            $(this).val(addComma($(this).val(), "c"));
+        });
         //row.find(".JIFTII_AmendQty").trigger("change");
         //row.find(".JIFTII_Rate").trigger("change");
     });

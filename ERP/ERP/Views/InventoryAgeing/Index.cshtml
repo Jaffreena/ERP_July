@@ -1,0 +1,301 @@
+﻿@model ERP_DTO.JobInwardTransaction.StockMovementReport_DTO
+@{
+    ViewData["Title"] = "Inventory Ageing Report";
+}
+
+<style>
+    #MyTable tbody td { height: 30px; padding: 2px 12px; vertical-align: middle; white-space: nowrap; }
+    #MyTable thead th, #MyTable tfoot td { height: 32px; padding-top: 2px; padding-bottom: 2px; vertical-align: middle; white-space: nowrap; }
+
+       #MyTable th.qty, #MyTable td.qty { text-align: center !important; font-variant-numeric: tabular-nums; }
+
+    #MyTable tbody td:nth-child(3) { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+
+    .sm-filter .input-group-text { font-size: .75rem; font-weight: 600; padding: 0 10px; background: #2c3e50; color: #fff; border-color: #2c3e50; }
+    .sm-filter .form-control, .sm-filter .form-select { font-size: .85rem; }
+    .sm-filter .sm-date { width: 170px; }
+    .sm-filter .sm-sel { width: 190px; }
+    .sm-filter .sm-txt { width: 220px; }
+
+    /* ageing bucket popover */
+    #AgeingBucketPopover {
+        display: none;
+        position: absolute;
+        z-index: 1050;
+        background: #fff;
+        border: 1px solid #2c3e50;
+        border-radius: 4px;
+        padding: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        min-width: 300px;
+    }
+    .bucket-pair input[type=number] { text-align: right; }
+</style>
+
+<div class="h-100">
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Inventory Ageing Report
+                <a asp-controller="JobworkInwardMain" asp-action="Index" class="float-end btn p-0 shadow-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row panel-body gx-2">
+        <div class="col-12 panel-card-fixed" id="BodyHeight">
+            <div class="w-100 rounded-0 border border-primary bg-transparent h-100" id="BodyHeight">
+                <div class="w-100 h-100" id="BodyCardHeader">
+                    <div class="card rounded-0 bg-transparent shadow-none h-100">
+                        <div class="card-body text-black nav-tab-fix h-100">
+                            <ul class="nav nav-tabs tab-header">
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page">Inventory Ageing</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content tab-body">
+                                <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100 table-fixed" tabindex="0">
+
+                                    <!-- Page size + Search + filters -->
+                                    <div class="row table-header">
+                                        <div class="col">
+                                            <div class="row gx-1 gy-1 align-items-center sm-filter">
+                                                <div class="col-auto">
+                                                    <select id="PSize" class="form-select w-auto py-1 pe-4">
+                                                        <option value="10">10</option>
+                                                        <option value="25">25</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-auto p-0">
+                                                    <input id="Search" class="form-control search-control p-1" autocomplete="off" />
+                                                </div>
+                                                <div class="col-auto p-0 me-2">
+                                                    <button type="button" id="btnSearch" class="btn btn-primary btn-sm">Search</button>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <div class="input-group input-group-sm sm-date">
+                                                        <span class="input-group-text">Closing Date</span>
+                                                        <input type="date" id="ClosingDate" class="form-control" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="input-group input-group-sm sm-sel">
+                                                        <span class="input-group-text">Group</span>
+                                                        <select id="ItemGroupNumber" class="form-select" asp-items="@ViewBag.ItemGroup">
+                                                            <option value="">All</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="input-group input-group-sm sm-sel">
+                                                        <span class="input-group-text">Warehouse</span>
+                                                        <select id="WarehouseNumber" class="form-select" asp-items="@ViewBag.Warehouse">
+                                                            <option value="">All</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="input-group input-group-sm sm-sel">
+                                                        <span class="input-group-text">Item</span>
+                                                        <select id="ItemNumber" class="form-select" asp-items="@ViewBag.Item">
+                                                            <option value="">All</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="input-group input-group-sm sm-txt">
+                                                        <span class="input-group-text">Batch No</span>
+                                                        <input type="text" id="BatchNumber" class="form-control" autocomplete="off" placeholder="All" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-auto position-relative">
+                                                    <button type="button" id="btnAgeingBucket" class="btn btn-outline-secondary btn-sm">Ageing Bucket</button>
+
+                                                    <div id="AgeingBucketPopover">
+                                                        <div id="BucketPairsList"></div>
+                                                        <div class="d-flex justify-content-between mt-2">
+                                                            <button type="button" id="btnAddBucketPair" class="btn btn-sm btn-outline-primary">+ Add</button>
+                                                            <button type="button" id="btnBucketOk" class="btn btn-sm btn-primary">OK</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <button type="button" id="btnGet" class="btn btn-primary btn-sm px-3">Get</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Table -->
+                                    <div class="table-body-h-c w-100 border p-2 ">
+                                        <div class="col-12 table-body table-responsive h-100">
+                                            <table class="table table-bordered table-hover align-middle mb-0 table-grid" id="MyTable">
+                                                <thead class="thead table-first-header">
+                                                    <tr class="table-info" id="MainHeaderRow">
+                                                        <th>Item Group</th>
+                                                        <th>Item Number</th>
+                                                        <th>Description</th>
+                                                        <th>Outer Dia</th>
+                                                        <th>Thickness</th>
+                                                        <th>Length</th>
+                                                        <th>Material Grade</th>
+                                                        <th>Batch Date</th>
+                                                        <th>Batch Number</th>
+                                                        <th class="qty">Closing Qty</th>
+                                                        <th class="qty">Days</th>
+                                                        <!-- dynamic bucket <th> columns (class="bucket-col-th qty") appended here by JS -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="MyTableBody"></tbody>
+                                                <tfoot>
+                                                    <tr class="table-info fw-bold" id="MainFooterRow">
+                                                        <td colspan="9" class="text-end">Grand Total</td>
+                                                        <td class="qty" id="TotalClosing">-</td>
+                                                        <td class="qty">-</td>
+                                                        <!-- dynamic bucket total <td> columns (class="bucket-col-td qty") appended here by JS -->
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Paging footer -->
+                                    <div class="row table-cal align-items-center">
+                                        <div class="col align-items-center">
+                                            <div class="row align-items-center">
+                                                <div class="col py-1">
+                                                    Showing <span id="pgStart">0</span> to <span id="pgEnd">0</span>
+                                                </div>
+                                                <div class="col text-center py-1">
+                                                    Total records <span id="pgTotal">0</span>
+                                                </div>
+                                                <div class="col">
+                                                    <nav>
+                                                        <ul class="pagination float-end mb-0">
+                                                            <li class="page-item">
+                                                                <a href="javascript:void(0)" id="pgFirst" class="page-link">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                                                        <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+                                                                        <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+                                                                    </svg>
+                                                                </a>
+                                                            </li>
+                                                            <li class="page-item">
+                                                                <a href="javascript:void(0)" id="pgPrev" class="page-link">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                                                                        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+                                                                    </svg>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="page-link" id="pgCurrent">1</a>
+                                                            </li>
+                                                            <li class="page-item">
+                                                                <a href="javascript:void(0)" id="pgNext" class="page-link">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                                                                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
+                                                                    </svg>
+                                                                </a>
+                                                            </li>
+                                                            <li class="page-item">
+                                                                <a href="javascript:void(0)" id="pgLast" class="page-link">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                                                                        <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708" />
+                                                                        <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708" />
+                                                                    </svg>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </nav>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/inventoryageing/InventoryAgeing.js" asp-append-version="true"></script>
+}
+
+<script>
+    (function () {
+        var tbody = document.getElementById('MyTableBody');
+        var state = { page: 1, size: 10, term: '' };
+        var scheduled = false;
+
+        function render() {
+            var rows = Array.prototype.slice.call(tbody.children);
+            var term = state.term.toLowerCase();
+            var matched = rows.filter(function (r) {
+                return !term || r.textContent.toLowerCase().indexOf(term) > -1;
+            });
+
+            rows.forEach(function (r) { r.style.display = 'none'; });
+
+            var total = matched.length;
+            var pages = Math.max(1, Math.ceil(total / state.size));
+            if (state.page > pages) state.page = pages;
+            if (state.page < 1) state.page = 1;
+
+            var startIdx = (state.page - 1) * state.size;
+            matched.slice(startIdx, startIdx + state.size).forEach(function (r) { r.style.display = ''; });
+
+            var start = total === 0 ? 0 : startIdx + 1;
+            var end = Math.min(startIdx + state.size, total);
+
+            document.getElementById('pgStart').textContent = start;
+            document.getElementById('pgEnd').textContent = end;
+            document.getElementById('pgTotal').textContent = total;
+            document.getElementById('pgCurrent').textContent = state.page;
+
+            var atFirst = state.page <= 1;
+            var atLast = state.page >= pages;
+            document.getElementById('pgFirst').classList.toggle('disabled', atFirst);
+            document.getElementById('pgPrev').classList.toggle('disabled', atFirst);
+            document.getElementById('pgNext').classList.toggle('disabled', atLast);
+            document.getElementById('pgLast').classList.toggle('disabled', atLast);
+            state.pages = pages;
+        }
+
+        new MutationObserver(function () {
+            if (scheduled) return;
+            scheduled = true;
+            setTimeout(function () { scheduled = false; state.page = 1; render(); }, 0);
+        }).observe(tbody, { childList: true });
+
+        document.getElementById('PSize').addEventListener('change', function () {
+            state.size = parseInt(this.value, 10) || 10; state.page = 1; render();
+        });
+        function doSearch() { state.term = document.getElementById('Search').value.trim(); state.page = 1; render(); }
+        document.getElementById('btnSearch').addEventListener('click', doSearch);
+        document.getElementById('Search').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+        });
+
+        document.getElementById('pgFirst').addEventListener('click', function () { state.page = 1; render(); });
+        document.getElementById('pgPrev').addEventListener('click', function () { state.page--; render(); });
+        document.getElementById('pgNext').addEventListener('click', function () { state.page++; render(); });
+        document.getElementById('pgLast').addEventListener('click', function () { state.page = state.pages; render(); });
+
+        render();
+    })();
+
+    $('.navbar-nav > .nav-item.sale > a').addClass("active");
+</script>

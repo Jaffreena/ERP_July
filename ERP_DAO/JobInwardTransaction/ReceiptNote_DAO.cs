@@ -426,9 +426,10 @@ namespace ERP_DAO.JobInwardTransaction
         }
 
         public DataSet CheckReceivedQtyExceededFreightDB(
-long jisvohNumber,
-long? fromWHNumber = null,
-long? toWHNumber = null)
+        long jisvohNumber,
+        long? fromWHNumber = null,
+        long? toWHNumber = null,
+        long? excludeRNNumber = null)
         {
             try
             {
@@ -437,6 +438,7 @@ long? toWHNumber = null)
                 db.AddInParameter(cmd, "@JIFRT_SVOH_Number", DbType.Int64, jisvohNumber);
                 db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64, fromWHNumber.HasValue ? (object)fromWHNumber.Value : DBNull.Value);
                 db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64, toWHNumber.HasValue ? (object)toWHNumber.Value : DBNull.Value);
+                db.AddInParameter(cmd, "@Exclude_RN_Number", DbType.Int64, excludeRNNumber.HasValue ? (object)excludeRNNumber.Value : DBNull.Value);
                 return db.ExecuteDataSet(cmd);
             }
             catch (SqlException ex)

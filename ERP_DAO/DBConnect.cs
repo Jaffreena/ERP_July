@@ -11,7 +11,7 @@ namespace ERP_DAO
         public String Connection()
         {
             string constring = "";
-            constring = "Server=localhost;Initial Catalog=Job_Inward; Integrated Security=True;TrustServerCertificate=True;";
+            constring = "Server=localhost;Initial Catalog=Job_Inward_2809; Integrated Security=True;TrustServerCertificate=True;";
             //constring = "Server=MRSOFT;Initial Catalog=MRS_ERP; User ID=sa; Password=Mind@123";
             return constring;
         }

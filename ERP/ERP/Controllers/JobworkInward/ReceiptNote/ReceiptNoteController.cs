@@ -859,6 +859,13 @@ namespace ERP.Controllers.JobworkInward
         //  [Route("receipt-note/transactions/receipt-note/{SI_No}/view")]
         public IActionResult PreviewReceiptNote(String? SI_No)
         {
+            // the Receipt Note View page now lives in Receipt_NoteController (Edit layout, read-only)
+            return RedirectToAction("ViewNote", "Receipt_Note", new { SI_No = SI_No });
+        }
+
+        [NonAction]
+        public IActionResult PreviewReceiptNote_Old(String? SI_No)
+        {
             ReceiptNoteHead_DTO SH_DTO = new ReceiptNoteHead_DTO();
             if (TempData["SH_DTO_Json"] is string SHto)
             {

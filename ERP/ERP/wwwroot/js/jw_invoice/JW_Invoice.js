@@ -1909,14 +1909,24 @@ function LoadJWCAddress() {
         url: '/JobWorkInvoice/GetJWCAddress',
         type: 'GET',
         data: { JWCNumber: jwcNumber },
+        error: function () {
+            // request failed - still open the popup (it was silent before)
+            ShowBuyerAddressPopup();
+        },
         success: function (response) {
             console.log(JSON.stringify(response));
-            if (!response || !response.length) return;
+            if (!response || !response.length) {
+                // no address data for this customer - still open the popup so an address can be added in it
+                ShowBuyerAddressPopup();
+                return;
+            }
 
+            // no default flagged: fall back to the customer's first address instead of an empty popup
+            var hasDefault = response.some(function (a) { return a.jwC_ADD_Default == 1; });
             var rowCount = 0;
 
-            response.forEach(function (addr) {
-                if (addr.jwC_ADD_Default != 1) return;
+            response.forEach(function (addr, idx) {
+                if (hasDefault ? addr.jwC_ADD_Default != 1 : idx > 0) return;
 
                 addAddressRow(); // always create new row
                 var row = $("#AddTableBody tr.AddNewRow:last");
@@ -2390,7 +2400,7 @@ function OnServiceOrderChange(ele) {
             serviceOrderItemBox.val(response.jisvoI_Number || 0);
 
             // Previously Invoiced Qty
-            row.find(".JIJWII_PrevInvoiceQty").val(response.prevInvoiceQty || 0);
+       //     row.find(".JIJWII_PrevInvoiceQty").val(response.prevInvoiceQty || 0);
 
             // Unit Price
             if (response.unitPrice == null || response.unitPrice === "") {

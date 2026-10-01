@@ -262,11 +262,11 @@ namespace ERP_DAO.JobInwardTransaction
                     item.JIDNI_Qty,
                     item.JIDNI_UnitPrice,
                     item.JIDNI_Amount
-                    //item.JIDNI_JW_InvoiceTracking,
+                //item.JIDNI_JW_InvoiceTracking,
 
-                    //// NEW
-                    //item.JISVOH_Number,
-                    //item.JISVOI_Number
+                //// NEW
+                //item.JISVOH_Number,
+                //item.JISVOI_Number
                 );
             }
 
@@ -396,6 +396,7 @@ namespace ERP_DAO.JobInwardTransaction
                         //-------------------------------------------------
 
                         int batchIndex = 0;
+                        long firstConsBatchNumber = 0;   // JICNV_ConsBatch PK -> IN_COMMON_BATCH RefBatch (Production/Scrap)
 
                         foreach (var item in insertedItems)
                         {
@@ -472,6 +473,9 @@ namespace ERP_DAO.JobInwardTransaction
                                     batchNumber =
                                         Convert.ToInt64(cmd.ExecuteScalar());
                                 }
+
+                                if (firstConsBatchNumber == 0)
+                                    firstConsBatchNumber = batchNumber;
 
                                 //-------------------------------------------------
                                 // OUT COMMON BATCH
@@ -553,6 +557,7 @@ namespace ERP_DAO.JobInwardTransaction
                             cmd.CommandType = CommandType.StoredProcedure;
 
                             cmd.Parameters.AddWithValue("@JICNVH_Number", DN_Number);
+                            cmd.Parameters.AddWithValue("@ConsumptionBatchNumber", firstConsBatchNumber);
 
                             DataTable dtProductionItems = CreateProductionItemTable(DN_DTO.Items_Production);
                             SqlParameter p1 = cmd.Parameters.AddWithValue("@ProductionItems", dtProductionItems);
@@ -575,6 +580,7 @@ namespace ERP_DAO.JobInwardTransaction
                             cmd.CommandType = CommandType.StoredProcedure;
 
                             cmd.Parameters.AddWithValue("@JICNVH_Number", DN_Number);
+                            cmd.Parameters.AddWithValue("@ConsumptionBatchNumber", firstConsBatchNumber);
 
                             DataTable dtScrapItems = CreateScrapItemTable(DN_DTO.Items_Scrap);
                             SqlParameter p1 = cmd.Parameters.AddWithValue("@ScrapItems", dtScrapItems);

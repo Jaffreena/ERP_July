@@ -1,0 +1,209 @@
+﻿@model ERP_DTO.JobOutwardTransaction.JW_VendorHead_DTO
+
+@if (Model.JWV_Number != 0)
+{
+    <input asp-for="JWV_Number" type="hidden" class="Number" />
+}
+
+<!-- Warning modal (used by the grids) -->
+<div class="modal modal-sm fade" id="AlertModal" tabindex="-1" aria-labelledby="AlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header draggable-modal-header">
+                <p class="modal-title" id="AlertModalLabel">Warning</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 text-dark fs-6 text-center icon-link justify-content-center">
+                <img src="~/img/danger.png" class="img-fluid" />
+                <div>
+                    <label id="AlertMessage"></label>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary px-4" id="AlertOkay" autofocus data-bs-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <label asp-for="JWV_JW_VendorName" class="col-md-4 col-lg-3 col-xl-2 col-xxl-1 control-label"></label>
+    <div class="col-md-5 col-lg-4 col-xl-4">
+        <input asp-for="JWV_JW_VendorName" class="form-control Key KeyDup" maxlength="100" autofocus="true" autocomplete="off" />
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="Address-tab" data-bs-toggle="tab" data-bs-target="#Address-tab-pane" type="button" role="tab" aria-controls="Address-tab-pane" aria-selected="true">Address</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Contact-tab" data-bs-toggle="tab" data-bs-target="#Contact-tab-pane" type="button" role="tab" aria-controls="Contact-tab-pane" aria-selected="false">Contact</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Grouping-tab" data-bs-toggle="tab" data-bs-target="#Grouping-tab-pane" type="button" role="tab" aria-controls="Grouping-tab-pane" aria-selected="false">Group</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Payment-tab" data-bs-toggle="tab" data-bs-target="#Payment-tab-pane" type="button" role="tab" aria-controls="Payment-tab-pane" aria-selected="false">Payment</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Bank-tab" data-bs-toggle="tab" data-bs-target="#Bank-tab-pane" type="button" role="tab" aria-controls="Bank-tab-pane" aria-selected="false">Bank</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Tax-tab" data-bs-toggle="tab" data-bs-target="#Tax-tab-pane" type="button" role="tab" aria-controls="Tax-tab-pane" aria-selected="false">GST</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Transport-tab" data-bs-toggle="tab" data-bs-target="#Transport-tab-pane" type="button" role="tab" aria-controls="Transport-tab-pane" aria-selected="false">Transport</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Statutory-tab" data-bs-toggle="tab" data-bs-target="#Statutory-tab-pane" type="button" role="tab" aria-controls="Statutory-tab-pane" aria-selected="false">Statutory</button>
+                </li>
+            </ul>
+            <div class="tab-content" style="height:200px">
+
+                <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" id="Address-tab-pane" role="tabpanel" aria-labelledby="Address-tab" tabindex="0">
+                    <partial name="~/Views/JobworkOutward/JW_Vendor/JW_VendorAddView.cshtml" model="@Model.JWV_Add_List" />
+                </div>
+
+                <div class="tab-pane fade p-2 pb-0 border border-top-0 h-100" id="Contact-tab-pane" role="tabpanel" aria-labelledby="Contact-tab" tabindex="0">
+                    <partial name="~/Views/JobworkOutward/JW_Vendor/JW_VendorContactView.cshtml" model="@Model.JWV_Contact_List" />
+                </div>
+
+                <div class="tab-pane fade p-3 pb-0 border border-top-0" id="Grouping-tab-pane" role="tabpanel" aria-labelledby="Grouping-tab" tabindex="0">
+                    <div class="row">
+                        <div class="col-12 col-md-4 col-xl-2 mb-3">
+                            <label asp-for="JWV_JVG_Number" class="control-label"></label>
+                            <select asp-for="JWV_JVG_Number" class="form-select" asp-items="@ViewBag.VendorGroup"></select>
+                        </div>
+                        <div class="col-12 col-md-4 col-xl-2 mb-3">
+                            <label asp-for="JWV_JVC_Number" class="control-label"></label>
+                            <select asp-for="JWV_JVC_Number" class="form-select" asp-items="@ViewBag.VendorCategory"></select>
+                        </div>
+                        <div class="col-12 col-md-4 col-xl-2 mb-3">
+                            <label asp-for="JWV_WH_Number" class="control-label"></label>
+                            <select asp-for="JWV_WH_Number" class="form-select" asp-items="@ViewBag.Warehouse"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3 pb-0 border border-top-0" id="Payment-tab-pane" role="tabpanel" aria-labelledby="Payment-tab" tabindex="0">
+                    <div class="row">
+                        <div class="col-12 col-md-4 col-xl-3 mb-3">
+                            <label asp-for="JWV_PaymentTerms" class="control-label"></label>
+                            <textarea asp-for="JWV_PaymentTerms" class="form-control Key" maxlength="250" autocomplete="off"></textarea>
+                        </div>
+                        <div class="col-12 col-md-8 col-xl-9">
+                            <div class="row">
+                                <div class="col-12 col-md-4 col-xl-3 mb-3">
+                                    <label asp-for="JWV_PaymentMode" class="control-label"></label>
+                                    <input asp-for="JWV_PaymentMode" class="form-control Key" maxlength="50" autocomplete="off" />
+                                </div>
+                                <div class="col-12 col-md-4 col-xl-3 mb-3">
+                                    <label asp-for="JWV_CreditDays" class="control-label"></label>
+                                    <input asp-for="JWV_CreditDays" class="form-control number-only" maxlength="3" placeholder="0" autocomplete="off" />
+                                </div>
+                                <div class="col-12 col-md-4 col-xl-3 mb-3">
+                                    <label asp-for="JWV_Currency_Number" class="control-label"></label>
+                                    <select asp-for="JWV_Currency_Number" class="form-select" asp-items="@ViewBag.Currency"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3 pb-0 border border-top-0" id="Bank-tab-pane" role="tabpanel" aria-labelledby="Bank-tab" tabindex="0">
+                    <div class="row">
+                        <div class="col-12 col-md-4 col-xl-3 mb-3">
+                            <label asp-for="JWV_AccountName" class="control-label"></label>
+                            <input asp-for="JWV_AccountName" class="form-control Key" maxlength="100" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-md-4 col-xl-3 mb-3">
+                            <label asp-for="JWV_AccountNumber" class="control-label"></label>
+                            <input asp-for="JWV_AccountNumber" class="form-control Key" maxlength="25" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-md-4 col-xl-3 mb-3">
+                            <label asp-for="JWV_IFSC" class="control-label"></label>
+                            <input asp-for="JWV_IFSC" class="form-control Key" maxlength="25" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-md-4 col-xl-3 mb-3">
+                            <label asp-for="JWV_BankName" class="control-label"></label>
+                            <input asp-for="JWV_BankName" class="form-control Key" maxlength="100" autocomplete="off" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3 pb-0 border border-top-0" id="Tax-tab-pane" role="tabpanel" aria-labelledby="Tax-tab" tabindex="0">
+                    <div class="row">
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_RT_Number" class="control-label"></label>
+                            <select asp-for="JWV_RT_Number" class="form-select" asp-items="@ViewBag.Registration"></select>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_GSTIN" class="control-label"></label>
+                            <input asp-for="JWV_GSTIN" class="form-control Key" maxlength="15" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_AT_Number" class="control-label"></label>
+                            <select asp-for="JWV_AT_Number" class="form-select" asp-items="@ViewBag.AssesseeTerritory"></select>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label class="control-label">&nbsp;</label>
+                            <button type="button" class="btn btn-primary d-block" data-bs-toggle="modal" data-bs-target="#GSTModal">GST</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3 pb-0 border border-top-0" id="Transport-tab-pane" role="tabpanel" aria-labelledby="Transport-tab" tabindex="0">
+                    <div class="row">
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_TransportAgency" class="control-label"></label>
+                            <select asp-for="JWV_TransportAgency" class="form-select" asp-items="@ViewBag.YesNo"></select>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_TransporterID" class="control-label"></label>
+                            <input asp-for="JWV_TransporterID" class="form-control Key" maxlength="15" autocomplete="off" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3 pb-0 border border-top-0" id="Statutory-tab-pane" role="tabpanel" aria-labelledby="Statutory-tab" tabindex="0">
+                    <div class="row">
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_PAN" class="control-label"></label>
+                            <input asp-for="JWV_PAN" class="form-control Key" maxlength="10" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_AN_Number" class="control-label"></label>
+                            <select asp-for="JWV_AN_Number" class="form-select" asp-items="@ViewBag.NatureOfAssessee"></select>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label asp-for="JWV_WithholdTax" class="control-label"></label>
+                            <select asp-for="JWV_WithholdTax" class="form-select" asp-items="@ViewBag.YesNo"></select>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-2 mb-3">
+                            <label class="control-label">&nbsp;</label>
+                            <button type="button" id="WHTButton" class="btn btn-primary d-block">Withhold Tax</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="w-100 pt-2">
+    @if (Model.JWV_Number != 0)
+    {
+        <input type="submit" name="Mode" value="Update" id="btnUpdate" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+    else
+    {
+        <input type="submit" name="Mode" value="Save" id="btnSave" class="btn btn-primary me-3" />
+        <input type="submit" name="Mode" value="Clear" class="btn btn-primary" />
+    }
+</div>

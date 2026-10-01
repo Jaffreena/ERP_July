@@ -1,4 +1,21 @@
-﻿//#region Item_Code – Keydown / Focus Out (JIDNI_Item_Code) — Conversion only
+﻿// Converts "dd-MMM-yyyy" / any parsable date to a LOCAL "yyyy-MM-ddT00:00:00" string (no UTC shift)
+function ToLocalDateString(str) {
+    if (!str) return null;
+    var m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(String(str).trim());
+    var d;
+    if (m) {
+        var mon = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(m[2].toLowerCase());
+        d = new Date(+m[3], mon, +m[1]);
+    } else {
+        d = new Date(str);
+    }
+    if (isNaN(d.getTime())) return null;
+    var p = function (n) { return String(n).padStart(2, "0"); };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T00:00:00";
+}
+
+
+//#region Item_Code – Keydown / Focus Out (JIDNI_Item_Code) — Conversion only
 // Item_Code – Keydown
 // 1. Tab/Enter – auto-select or "Too many choices"
 // 2. Arrow Up – highlight + move to top match
@@ -60,6 +77,47 @@ $(document).on("focusout", ".JIDNI_Item_Code", function () {
         "#RightPane_Item",
         "#RightPane_Item .search-results"
     );
+});
+//#endregion
+
+//#region Preserve Qty when Item Code is overwritten on an existing row
+// Item selection (mouse-click OR keyboard Enter) re-fills the row's
+// Description/Dia/Thickness/... from the item master (ItemGrid.js),
+// which also blanks Qty since Qty isn't part of the item master.
+// Only the ITEM should change on re-select — Qty already entered by
+// the user must stay untouched. Works for Consumption/Production/
+// Scrap since .JIDNI_Item_Code and #RightPane_Item are shared.
+let ItemCodeFocusRow = null;
+
+$(document).on("focusin", ".JIDNI_Item_Code", function () {
+
+    ItemCodeFocusRow = $(this).closest("tr");
+
+    ItemCodeFocusRow.data(
+        "preserve-qty",
+        ItemCodeFocusRow.find(".JIDNI_Qty").val()
+    );
+});
+
+$(document).on("mousedown", "#RightPane_Item .search-results tbody tr", function () {
+
+    let row = ItemCodeFocusRow;
+
+    if (!row || !row.length)
+        return;
+
+    // setTimeout defers this to run after the item-fill handler
+    // finishes (same mousedown event), so our restore isn't overwritten.
+    setTimeout(function () {
+
+        let preservedQty = row.data("preserve-qty");
+
+        if (preservedQty !== undefined) {
+            row.find(".JIDNI_Qty").val(preservedQty);
+            row.removeData("preserve-qty");
+        }
+
+    }, 0);
 });
 //#endregion
 var addressIndex = 0;
@@ -534,19 +592,7 @@ $(document).ready(function () {
 
                 //#region FORMAT DATE
 
-                let formattedBatchDate = null;
-
-                if (batch.JIDNI_BCH_BatchDate) {
-
-                    let date =
-                        new Date(batch.JIDNI_BCH_BatchDate);
-
-                    if (!isNaN(date.getTime())) {
-
-                        formattedBatchDate =
-                            date.toISOString();
-                    }
-                }
+                let formattedBatchDate = ToLocalDateString(batch.JIDNI_BCH_BatchDate);
 
                 //#endregion
 
@@ -604,9 +650,7 @@ $(document).ready(function () {
             JIDNH_DN_No:
                 $("#Header_JIDNH_DN_No").val(),
 
-            JIDNH_DN_Date:
-                new Date($("#Header_JIDNH_DN_Date").val())
-                    .toISOString(),
+            JIDNH_DN_Date: ToLocalDateString($("#Header_JIDNH_DN_Date").val()),
 
             JIDNH_MS_Number:
                 parseInt($("#Header_JIDNH_MS_Number").val()) || 0,
@@ -728,11 +772,10 @@ $(document).ready(function () {
                 JIRNI_BCH_BatchNo:
                     row.find(".JIRNI_BCH_Number").val(),
 
-                JIRNI_BCH_BatchDate:
-                    row.find(".JIRNI_BCH_BatchDate").val(),
+                JIRNI_BCH_BatchDate: ToLocalDateString(row.find(".JIRNI_BCH_BatchDate").val()),
 
                 JIRNI_BCH_WH_Number:
-                    row.find(".RNI_BCH_WH_Number").val(),
+                    row.find(".JIRNI_BCH_WH_Number").val(),
 
                 JIRNI_BCH_BatchQty:
                     parseFloat(removeCommas(row.find(".JIRNI_BCH_BatchQty").val())) || 0,
@@ -747,7 +790,7 @@ $(document).ready(function () {
                     row.find(".RNI_BCH_IsDeleted").val(),
 
                 RNI_BCH_Item_Number:
-                    row.find(".RNI_BCH_Item_Number").val(),
+                    row.find(".RNI_BCH_Item_Number").val() || "",
 
                 RNI_BCH_Item_Index:
                     parseInt(row.find(".RNI_BCH_Item_Index").val()) || 0
@@ -778,10 +821,10 @@ $(document).ready(function () {
                     row.find(".JIRNI_BCH_Number").val(),
 
                 JIRNI_BCH_BatchDate:
-                    row.find(".JIRNI_BCH_BatchDate").val(),
+                    new Date(row.find(".JIRNI_BCH_BatchDate").val()).toISOString(),
 
                 JIRNI_BCH_WH_Number:
-                    row.find(".RNI_BCH_WH_Number").val(),
+                    row.find(".JIRNI_BCH_WH_Number").val(),
 
                 JIRNI_BCH_BatchQty:
                     parseFloat(removeCommas(row.find(".JIRNI_BCH_BatchQty").val())) || 0,
@@ -796,7 +839,7 @@ $(document).ready(function () {
                     row.find(".RNI_BCH_IsDeleted").val(),
 
                 RNI_BCH_Item_Number:
-                    row.find(".RNI_BCH_Item_Number").val(),
+                    row.find(".RNI_BCH_Item_Number").val() || "",
 
                 RNI_BCH_Item_Index:
                     parseInt(row.find(".RNI_BCH_Item_Index").val()) || 0
@@ -822,29 +865,23 @@ $(document).ready(function () {
 
             items.push({
 
-                JIRNI_Number:
-                    parseInt(row.find(".JIDNI_Number").val()) || 0,
-
-                JIRNI_PRS_Number:
-                    row.find(".JIDNI_PRS_Number").val(),
-
                 JIRNI_Item_Number:
-                    row.find(".JIDNI_Item_Number").val(),
+                    row.find(".JIDNI_Item_Number").val() || "0",
 
                 JIRNI_WH_Number:
-                    row.find(".JIDNI_WH_Number").val(),
+                    row.find(".JIDNI_WH_Number").val() || "0",
 
                 JIRNI_UoM_Number:
-                    row.find(".JIDNI_UoM_Number").val(),
+                    row.find(".JIDNI_UoM_Number").val() || "0",
 
                 JIRNI_Qty:
-                    removeCommas(row.find(".JIDNI_Qty").val()),
+                    removeCommas(row.find(".JIDNI_Qty").val()) || "0",
 
                 JIRNI_UnitPrice:
-                    removeCommas(row.find(".JIDNI_UnitPrice").val()),
+                    removeCommas(row.find(".JIDNI_UnitPrice").val()) || "0",
 
                 JIRNI_Amount:
-                    removeCommas(row.find(".JIDNI_Amount").val()),
+                    removeCommas(row.find(".JIDNI_Amount").val()) || "0",
 
                 IsDeleted:
                     row.find(".JIDNI_IsDeleted").val()
@@ -878,22 +915,22 @@ $(document).ready(function () {
                     row.find(".JIDNI_PRS_Number").val(),
 
                 JIRNI_Item_Number:
-                    row.find(".JIDNI_Item_Number").val(),
+                    row.find(".JIDNI_Item_Number").val() || "0",
 
                 JIRNI_WH_Number:
-                    row.find(".JIDNI_WH_Number").val(),
+                    row.find(".JIDNI_WH_Number").val() || "0",
 
                 JIRNI_UoM_Number:
-                    row.find(".JIDNI_UoM_Number").val(),
+                    row.find(".JIDNI_UoM_Number").val() || "0",
 
                 JIRNI_Qty:
-                    row.find(".JIDNI_Qty").val(),
+                    removeCommas(row.find(".JIDNI_Qty").val()) || "0",
 
                 JIRNI_UnitPrice:
-                    row.find(".JIDNI_UnitPrice").val(),
+                    removeCommas(row.find(".JIDNI_UnitPrice").val()) || "0",
 
                 JIRNI_Amount:
-                    row.find(".JIDNI_Amount").val(),
+                    removeCommas(row.find(".JIDNI_Amount").val()) || "0",
 
                 IsDeleted:
                     row.find(".JIDNI_IsDeleted").val()
@@ -996,7 +1033,7 @@ function GetConversionNumber() {
         data: { CNVDate: date },
         success: function (response) {
             if (!response || response.trim() === "") {
-                     alert("Please set numbering for this date range.");
+                alert("Please set numbering for this date range.");
                 $("#Header_JIDNH_DN_No").val("");
 
                 return;
@@ -1090,7 +1127,7 @@ function calculateTotal_F() {
         }
 
         // Get Qty
-        let qty = parseFloat(row.find(".JIDNI_Qty").val()) || 0;
+        let qty = parseFloat(removeCommas(row.find(".JIDNI_Qty").val())) || 0;
 
 
 
@@ -1618,12 +1655,12 @@ function CreateTempDeliveryBatchModel(row) {
 
         DBCH_UnitPrice:
             parseFloat(
-                row.find(".JIDNI_BCH_BatchUnitPrice").val()
+                removeCommas(row.find(".JIDNI_BCH_BatchUnitPrice").val())
             ) || 0,
 
         DBCH_Value:
             parseFloat(
-                row.find(".JIDNI_BCH_BatchValue").val()
+                removeCommas(row.find(".JIDNI_BCH_BatchValue").val())
             ) || 0,
 
         Mode: 1,

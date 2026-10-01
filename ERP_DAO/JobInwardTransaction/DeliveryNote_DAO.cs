@@ -669,7 +669,8 @@ AND JIJWI_SVOI_JIJWI_SVOH_Number = @JISVOH_Number
                                     cmd.Parameters.AddWithValue("@BatchQty", useQty);
                                     cmd.Parameters.AddWithValue("@BatchUnitPrice", batch.JIDNI_BCH_BatchUnitPrice);
                                     cmd.Parameters.AddWithValue("@BatchValue", batch.JIDNI_BCH_BatchValue);
-                                    cmd.Parameters.AddWithValue("@RefBatchNumber", 0);
+                                   // cmd.Parameters.AddWithValue("@RefBatchNumber", 0);
+                                    cmd.Parameters.AddWithValue("@RefBatchNumber", batch.JIDNI_BCH_Number);
                                     cmd.Parameters.AddWithValue("@Item_Number", item.ItemMasterNumber);
                                     outcommon =
                                       Convert.ToInt64(cmd.ExecuteScalar());
@@ -1587,6 +1588,21 @@ WHERE
                         foreach (var item in deletedRows)
                         {
                             // =========================
+                            // DELETE STOCK-OUT (OUT_COMMON_BATCH) of this row - otherwise the stock stays reduced
+                            // =========================
+                            using (SqlCommand cmd = new SqlCommand(@"
+                        DELETE FROM OUT_COMMON_BATCH
+                        WHERE OCB_TransType = 'Delivery Note'
+                          AND OCB_Header_Number = @JIDNH_Number
+                          AND OCB_LineItem_Number = @JIDNI_Number
+                          AND @JIDNI_Number > 0;
+                    ", con, tr))
+                            {
+                                cmd.Parameters.AddWithValue("@JIDNI_Number", item.JIDNI_Number);
+                                cmd.Parameters.AddWithValue("@JIDNH_Number", item.JIDNH_Number);
+                                cmd.ExecuteNonQuery();
+                            }
+                            // =========================
                             // DELETE BATCH
                             // =========================
                             using (SqlCommand cmd = new SqlCommand(@"
@@ -1669,6 +1685,40 @@ INNER JOIN BatchTotal B
             }
         }
 
+        // View page: the batches SAVED on one Delivery Note item (read-only - no temp table, no stock query)
+        public DataTable GetSavedBatchDetails(long JIDNH_Number, long JIDNI_Number)
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection con = new SqlConnection(DB.Connection()))
+            {
+                using (SqlCommand cmd = new SqlCommand(@"
+        SELECT
+            B.JIDNI_BCH_Number          AS LineBatch_Number,
+            W.WarehouseCode             AS WareHouseCode,
+            B.JIDNI_BCH_BatchDate       AS BatchDate,
+            B.JIDNI_BCH_BatchNo         AS BatchNo,
+            B.JIDNI_BCH_BatchQty        AS BatchQty,
+            B.JIDNI_BCH_BatchUnitPrice  AS BatchUnitPrice,
+            B.JIDNI_BCH_BatchValue      AS BatchValue
+        FROM JI_DeliveryNoteBatch B
+        LEFT JOIN Warehouse W ON W.WarehouseNumber = B.JIDNI_BCH_WH_Number
+        WHERE B.JIDNI_BCH_JIDNH_Number = @JIDNH_Number
+          AND B.JIDNI_BCH_JIDNI_Number = @JIDNI_Number
+        ORDER BY B.JIDNI_BCH_Number
+        ", con))
+                {
+                    cmd.Parameters.AddWithValue("@JIDNH_Number", JIDNH_Number);
+                    cmd.Parameters.AddWithValue("@JIDNI_Number", JIDNI_Number);
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        da.Fill(dt);
+                    }
+                }
+            }
+            return dt;
+        }
+
         public DataTable GetBatchStockDetails(
        long Item_Number,
        long Warehouse,
@@ -1705,9 +1755,9 @@ INNER JOIN BatchTotal B
     --    - ISNULL(R.ReservedQty,0)
     --    + ISNULL(D.DeliveredQty,0) AS AvailableQty,
 
-    ISNULL(D.BatchUnitPrice,0) AS BatchUnitPrice,
-    ISNULL(D.BatchValue,0) AS BatchValue,
-    ISNULL(D.JIDNI_BCH_Ref_Batch,0) AS RefBatch_Number,
+ISNULL(I.ICB_BatchUnitPrice,0) AS BatchUnitPrice,
+ ISNULL(temp.DBCH_Qty,0) * ISNULL(I.ICB_BatchUnitPrice,0) AS BatchValue,
+I.ICB_LineBatch_Number AS RefBatch_Number,
 
     W.WarehouseCode
 
@@ -1759,7 +1809,7 @@ LEFT JOIN
    AND R.DBCH_Index = @ItemGridIndex
 
 LEFT JOIN Warehouse W
-    ON W.WarehouseNumber = D.Warehouse
+  ON W.WarehouseNumber = I.ICB_Warehouse_Number
 left join (
 
     select DBCH_Qty,refbatch_number  from Temp_DeliveryNoteBatch where DBCH_Index=@ItemGridIndex

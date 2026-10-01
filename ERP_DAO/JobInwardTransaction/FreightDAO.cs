@@ -828,6 +828,32 @@ namespace ERP_DAO.JobInwardTransaction
         #endregion
 
         #region Source: Freight Service Order dropdown
+        public DataSet CheckAllowedQtyFreightDB(long jisvohNumber, long prsNumber, long fromWH, long toWH, long uomNumber, long frtihNumber)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrder_CheckAllowedQty_SP");
+
+            db.AddInParameter(cmd, "@JIFRT_SVOH_Number", DbType.Int64, jisvohNumber);
+            db.AddInParameter(cmd, "@PRS_Number", DbType.Int64, prsNumber);
+            db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64, fromWH);
+            db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64, toWH);
+            db.AddInParameter(cmd, "@UoM_Number", DbType.Int64, uomNumber);
+            db.AddInParameter(cmd, "@FRTIH_Number", DbType.Int64, frtihNumber);
+
+            return db.ExecuteDataSet(cmd);
+        }
+        public DataSet GetFreightServiceOrderItemInfoDB(long serviceOrderNo, long fromWH, long toWH, long uomNumber)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JIFRT_ServiceOrderItem_Info_SP");
+
+            db.AddInParameter(cmd, "@JIFRT_SVOH_Number", DbType.Int64, serviceOrderNo);
+            db.AddInParameter(cmd, "@FromWH_Number", DbType.Int64, fromWH);
+            db.AddInParameter(cmd, "@ToWH_Number", DbType.Int64, toWH);
+            db.AddInParameter(cmd, "@UoM_Number", DbType.Int64, uomNumber);
+
+            return db.ExecuteDataSet(cmd);
+        }
 
         public DataSet GetFreightServiceOrderDB(long customerId, string category, long? uomNumber = null, long? fromWH = null, long? toWH = null)
         {

@@ -4,6 +4,33 @@ let BatchMap_P = {};
 let CurrentBatchItemRow_P = null; 
 let batchMismatchData_P = [];
 
+function ValidateBatchNumberRequired_P() {
+
+    let missing = false;
+
+    $("#IBatTableBody_P tr.IBatNewRow").each(function () {
+
+        let row = $(this);
+
+        if (row.find(".RNI_BCH_IsDeleted").val() == "true")
+            return;
+
+        let qty = parseFloat(removeCommas(row.find(".JIRNI_BCH_BatchQty").val())) || 0;
+        let batchNo = row.find(".JIRNI_BCH_Number").val();
+
+        if (qty > 0 && !batchNo) {
+            missing = true;
+            return false;
+        }
+    });
+
+    if (missing) {
+        alert("Please enter Batch Number");
+        return false;
+    }
+
+    return true;
+}
 
 function ValidateBatchQty_P() {
 
@@ -97,6 +124,9 @@ function StoreBatchMismatch_P(rowId) {
 
     let batchValues = $("#IBatTableBody_P tr")
         .not("#IBatTempRow")
+        .filter(function () {
+            return $(this).find(".RNI_BCH_IsDeleted").val() !== "true";
+        })
         .map(function () {
 
             return {
@@ -153,22 +183,25 @@ function SaveTempBatch_P() {
         let row =
             $(this);
 
+        if (row.find(".RNI_BCH_IsDeleted").val() == "true")
+            return;
+
         let batchNo =
             row.find(".JIRNI_BCH_Number").val();
 
         let qty =
             parseFloat(
-                row.find(".JIRNI_BCH_BatchQty").val()
+                removeCommas(row.find(".JIRNI_BCH_BatchQty").val())
             ) || 0;
 
         let unitPrice =
             parseFloat(
-                row.find(".JIRNI_BCH_BatchUnitPrice").val()
+                removeCommas(row.find(".JIRNI_BCH_BatchUnitPrice").val())
             ) || 0;
 
         let amount =
             parseFloat(
-                row.find(".JIRNI_BCH_BatchValue").val()
+                removeCommas(row.find(".JIRNI_BCH_BatchValue").val())
             ) || 0;
 
         let wh =
@@ -327,13 +360,11 @@ $(document).ready(function () {
                     .val(batch.BatchNo);
 
                 newRow.find(".JIRNI_BCH_BatchQty")
-                    .val(batch.Qty);
-
+                    .val(formatIndianQty(batch.Qty));
                 newRow.find(".JIRNI_BCH_BatchUnitPrice")
-                    .val(batch.UnitPrice);
-
+                    .val(DecimalIndianRupees(batch.UnitPrice));
                 newRow.find(".JIRNI_BCH_BatchValue")
-                    .val(batch.Amount);
+                    .val(DecimalIndianRupees(batch.Amount));
 
                 newRow.find(".JIRNI_BCH_WH_Number")
                     .val(batch.Warehouse);
@@ -420,8 +451,15 @@ $(document).ready(function () {
         if (!batchValues || batchValues.length === 0)
             return;
 
+        // Ensure enough rows exist in the DOM to hold every stored mismatch row
+        // (previously only 1 row existed after mismatch, so extra rows were silently dropped)
         let rows = $("#IBatTableBody_P tr")
             .not("#IBatTempRow");
+
+        while (rows.length < batchValues.length) {
+            IBatNewRow();
+            rows = $("#IBatTableBody_P tr").not("#IBatTempRow");
+        }
 
         rows.each(function (index) {
 
@@ -429,9 +467,9 @@ $(document).ready(function () {
             if (!batch) return;
 
             $(this).find(".JIRNI_BCH_Number").val(batch.JIRNI_BCH_Number);
-            $(this).find(".JIRNI_BCH_BatchQty").val(batch.JIRNI_BCH_BatchQty);
-            $(this).find(".JIRNI_BCH_BatchUnitPrice").val(batch.JIRNI_BCH_BatchUnitPrice);
-            $(this).find(".JIRNI_BCH_BatchValue").val(batch.JIRNI_BCH_BatchValue);
+            $(this).find(".JIRNI_BCH_BatchQty").val(formatIndianQty(batch.JIRNI_BCH_BatchQty));
+            $(this).find(".JIRNI_BCH_BatchUnitPrice").val(DecimalIndianRupees(batch.JIRNI_BCH_BatchUnitPrice));
+            $(this).find(".JIRNI_BCH_BatchValue").val(DecimalIndianRupees(batch.JIRNI_BCH_BatchValue));
         });
 
         CalculateBatchFooter_P();
@@ -540,12 +578,15 @@ $(document).ready(function () {
     }
 
     $("#IBatCloseButton").click(function () {
+        if (!ValidateBatchNumberRequired_P()) {
+            return false;
+        }
         if (!ValidateBatchQty_P()) {
             bootstrap.Modal
                 .getInstance(document.getElementById("IBatch"))
                 ?.hide();
             return false;
-        
+
         }
         SaveTempBatch_P();
     });

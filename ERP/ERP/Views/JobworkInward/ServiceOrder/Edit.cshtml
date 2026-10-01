@@ -1,7 +1,8 @@
 ﻿@model ERP_DTO.JobInwardTransaction.ServiceOrderUpdatePage_DTO
 
-@{
-    ViewData["Title"] = "Service Order";
+@{   
+ bool IsViewMode = ViewBag.IsViewMode == true;
+    ViewData["Title"] = IsViewMode ? "Service Order - View" : "Service Order";
 }
 <style>
     #RightPane {
@@ -206,8 +207,6 @@
    
 
     /* Registration Date */
-    #Header_JISVOH_RegDate,
-    #Header_JISVOH_RegDate + input,
     input.flatpickr-input.form-control {
         width: 15ch !important;
         max-width: 15ch !important;
@@ -222,8 +221,8 @@
    
 
     /* Service Order Date */
-    #Header_JISVOH_ServiceOrderDate,
-    #Header_JISVOH_ServiceOrderDate + input {
+    #Header_JIJWI_SVOH_ServiceOrderDate,
+    #Header_JIJWI_SVOH_ServiceOrderDate + input {
         width: 15ch !important;
         max-width: 15ch !important;
         padding-right: 30px !important;
@@ -237,7 +236,7 @@
    
 
     /* Job Work Customer */
-    #Header_JISVOH_JW_Customer_Name {
+    .JW_Customer_Name {
         
         padding-right: 24px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23000'/%3E%3C/svg%3E");
@@ -246,7 +245,7 @@
     }
 
     /* Hide Customer Number */
-    #Header_JISVOH_JW_Customer_Number {
+    #Header_JIJWI_SVOH_JW_Customer_Number {
         display: none;
     }
 
@@ -361,7 +360,7 @@
                                             <input type="hidden" id="Header_JIJWI_SVOH_Number" name="JWIHeader.JIJWI_SVOH_Number" value="0" />
                                             <label class="col-md-6 col-lg-5 col-form-label ps-0">Reg No</label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input id="Header_JIJWI_SVOH_RegNo" name="JWIHeader.JIJWI_SVOH_RegNo" maxlength="25"
+                                                <input id="Header_JIJWI_SVOH_RegNo" name="JWIHeader.JIJWI_SVOH_RegNo" maxlength="25" readonly
                                                        class="form-control Key KeyDup"
                                                        autocomplete="off" />
                                             </div>
@@ -452,7 +451,7 @@
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label class="col-sm-3 col-form-label ps-0">Delivery Mode</label>
                                             <div class="col-sm-6">
-                                                <input id="Header_JIJWI_SVOH_DeliveryMode" name="JWIHeader.JIJWI_SVOH_DeliveryMode"
+                                                <input id="Header_JIJWI_SVOH_DeliveryMode" name="JWIHeader.JIJWI_SVOH_DeliveryMode" maxlength="50"
                                                        class="form-control" />
                                             </div>
                                         </div>
@@ -500,6 +499,7 @@
                                 <a asp-controller="ServiceOrder"
                                        asp-action="Edit"
                                        asp-route-SI_No="@Context.Request.Query["SI_No"]"
+                                       asp-route-OrderType="@Context.Request.Query["OrderType"]"
                                        class="btn btn-primary btn-sm px-2 w-100 mb-1">
                                     Clear All
                                 </a>
@@ -523,7 +523,7 @@
                                         <div class="row align-items-center gx-2 mb-0">
                                             <label class="col-md-6 col-lg-5 col-form-label ps-0">Reg No</label>
                                             <div class="col-md-6 col-lg-7">
-                                                <input id="FreightHeader_JIFRT_SVOH_RegNo" name="FreightHeader.JIFRT_SVOH_RegNo" class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
+                                                <input id="FreightHeader_JIFRT_SVOH_RegNo" name="FreightHeader.JIFRT_SVOH_RegNo" readonly class="form-control Key KeyDup" maxlength="25" autocomplete="off" />
                                             </div>
                                         </div>
                                         <div class="row align-items-center gx-2 mb-0">
@@ -582,25 +582,25 @@
                                         <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label class="col-sm-5 col-form-label ps-0">Payment Terms</label>
                                             <div class="col-sm-7 ps-5">
-                                                <input id="FreightHeader_JIFRT_SVOH_PaymentTerms" name="FreightHeader.JIFRT_SVOH_PaymentTerms" maxlength="100" class="form-control" />
+                                                <input id="FreightHeader_JIFRT_SVOH_PaymentTerms" name="FreightHeader.JIFRT_SVOH_PaymentTerms" maxlength="50" class="form-control" />
                                             </div>
                                         </div>
                                         <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label class="col-sm-5 col-form-label ps-0">Delivery Terms</label>
                                             <div class="col-sm-7 ps-5">
-                                                <input id="FreightHeader_JIFRT_SVOH_DeliveryTerms" name="FreightHeader.JIFRT_SVOH_DeliveryTerms" maxlength="100" class="form-control" />
+                                                <input id="FreightHeader_JIFRT_SVOH_DeliveryTerms" name="FreightHeader.JIFRT_SVOH_DeliveryTerms" maxlength="50" class="form-control" />
                                             </div>
                                         </div>
                                         <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label class="col-sm-5 col-form-label ps-0">Delivery Mode</label>
                                             <div class="col-sm-7 ps-5">
-                                                <input id="FreightHeader_JIFRT_SVOH_DeliveryMode" name="FreightHeader.JIFRT_SVOH_DeliveryMode" maxlength="100" class="form-control" />
+                                                <input id="FreightHeader_JIFRT_SVOH_DeliveryMode" name="FreightHeader.JIFRT_SVOH_DeliveryMode" maxlength="50" class="form-control" />
                                             </div>
                                         </div>
                                         <div class="row align-items-center gx-2 mb-0 ps-5">
                                             <label class="col-sm-5 col-form-label ps-0">Tax</label>
                                             <div class="col-sm-7 ps-5">
-                                                <textarea id="FreightHeader_JIFRT_SVOH_Tax" name="FreightHeader.JIFRT_SVOH_Tax" class="form-control" maxlength="500" rows="2"></textarea>
+                                                <textarea id="FreightHeader_JIFRT_SVOH_Tax" name="FreightHeader.JIFRT_SVOH_Tax" class="form-control" maxlength="250" rows="2"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -610,13 +610,13 @@
                                         <div class="row align-items-center gx-2 mb-0" style="padding-left: 6rem;">
                                             <label class="col-sm-1 col-form-label">Technical <br />delivery conditions</label>
                                             <div class="col-sm-2" style="padding-left: 6rem;">
-                                                <textarea id="FreightHeader_JIFRT_SVOH_TDC" name="FreightHeader.JIFRT_SVOH_TDC" class="form-control" maxlength="500" rows="2"></textarea>
+                                                <textarea id="FreightHeader_JIFRT_SVOH_TDC" name="FreightHeader.JIFRT_SVOH_TDC" class="form-control" maxlength="250" rows="2"></textarea>
                                             </div>
                                         </div>
                                         <div class="row align-items-start gx-2 mb-0" style="padding-left: 6rem;">
                                             <label class="col-sm-1 col-form-label ps-0">Remarks</label>
                                             <div class="col-sm-2" style="padding-left: 6rem;">
-                                                <textarea id="FreightHeader_JIFRT_SVOH_Remarks" name="FreightHeader.JIFRT_SVOH_Remarks" class="form-control" maxlength="500" rows="2"></textarea>
+                                                <textarea id="FreightHeader_JIFRT_SVOH_Remarks" name="FreightHeader.JIFRT_SVOH_Remarks" class="form-control" maxlength="250" rows="2"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -627,7 +627,11 @@
                             <!-- RIGHT MENU -->
                             <div class="col-auto right-menu text-center border-start">
                                 <input id="btnUpdateFreight" name="Mode" value="Update" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
-                                <a asp-controller="ServiceOrder" asp-action="Edit" asp-route-SI_No="@Context.Request.Query["SI_No"]" class="btn btn-primary btn-sm px-2 w-100 mb-1">Clear All</a>
+                                <a asp-controller="ServiceOrder" asp-action="Edit"
+                                   asp-route-SI_No="@Context.Request.Query["SI_No"]"
+                                   asp-route-OrderType="@Context.Request.Query["OrderType"]"
+                                
+                                class="btn btn-primary btn-sm px-2 w-100 mb-1">Clear All</a>
                             </div>
                         </div>
                     </div>
@@ -949,6 +953,7 @@
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
+    <script>window.IsViewMode = @(IsViewMode ? "true" : "false");</script>
     <script src="~/js/jw_serviceorder/JW_ServiceOrderEdit.js" asp-append-version="true"></script>
     <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
 

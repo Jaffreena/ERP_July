@@ -1,6 +1,6 @@
 ﻿@model ERP_DTO.JobInwardTransaction.JobWorkInvoiceCreate_DTO
 @{
-    ViewData["Title"] = "Jobwork Invoice Edit";
+    ViewData["Title"] = ViewBag.IsViewMode == true ? "Jobwork Invoice View" : "Jobwork Invoice Edit";
 }
 <style>
     #RightPane {
@@ -1017,6 +1017,7 @@
     <script>
         var sonList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.SON));
         console.log("sonList from cshtml:", sonList);
+         var IsViewMode = @((ViewBag.IsViewMode == true) ? "true" : "false");
     </script>
     <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
     <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>

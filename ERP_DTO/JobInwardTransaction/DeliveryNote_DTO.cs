@@ -134,6 +134,9 @@ namespace ERP_DTO.JobInwardTransaction
         [Display(Name = "Quantity (Kgs)")]
         public double JIDNI_Qty_Kgs { get; set; }
 
+        [Display(Name = "Invoiced Qty")]
+        public double JIDNI_InvoicedQty { get; set; }
+
         [Display(Name = "Unit Price")]
         public double JIDNI_UnitPrice { get; set; }
 

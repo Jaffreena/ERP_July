@@ -193,6 +193,222 @@ let isMouseSelectingBuyer = false;
 
 
 let buyerSearchXHR = null;
+//#region numeric-only typing (same rules as Create in deliverynote.js)
+
+// ---- Amend Qty: digits only
+$(document).on("keypress", ".JIDNI_Qty", function (e) {
+    if (e.ctrlKey || e.metaKey) return;   // Ctrl+V / Ctrl+A / Ctrl+C
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+// strip anything that slips in via paste / drag-drop / autofill (also removes the commas of the formatted value)
+$(document).on("input", ".JIDNI_Qty", function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+
+// ---- Unit Price: digits + one dot, max 2 decimals
+const EDIT_UNITPRICE_INPUT = "#ItemTable .JIDNI_UnitPrice";
+const EDIT_UNITPRICE_PATTERN = /^\d*\.?\d{0,2}$/;
+
+// remove commas while editing (focusout adds them back)
+$(document).on("focusin", EDIT_UNITPRICE_INPUT, function () {
+    $(this).val(($(this).val() || "").replace(/,/g, ""));
+});
+
+// block a keystroke if the resulting value breaks the pattern
+$(document).on("keypress", EDIT_UNITPRICE_INPUT, function (e) {
+    if (e.ctrlKey || e.metaKey) return;   // Ctrl+V / Ctrl+A / Ctrl+C
+    if (e.which < 32) return;             // Enter, Backspace etc.
+
+    let el = this;
+    let newVal = el.value.slice(0, el.selectionStart)
+        + String.fromCharCode(e.which)
+        + el.value.slice(el.selectionEnd);
+
+    if (!EDIT_UNITPRICE_PATTERN.test(newVal)) {
+        e.preventDefault();
+    }
+});
+
+// clean paste / drag-drop / autofill
+$(document).on("input", EDIT_UNITPRICE_INPUT, function () {
+    let v = $(this).val();
+
+    if (!EDIT_UNITPRICE_PATTERN.test(v)) {
+        v = v.replace(/[^0-9.]/g, "");
+        let parts = v.split(".");
+        v = parts.length > 1
+            ? parts[0] + "." + parts.slice(1).join("").slice(0, 2)
+            : parts[0];
+        $(this).val(v);
+    }
+});
+
+// a lone "." is not a number
+$(document).on("focusout", EDIT_UNITPRICE_INPUT, function () {
+    if ($(this).val() === ".") $(this).val("");
+});
+
+// ---- Batch popup Delivered Qty: digits only
+$(document).on("keypress", ".JIDNI_BCH_QtyInvoice", function (e) {
+    if (e.ctrlKey || e.metaKey) return;
+    let charCode = e.which ? e.which : e.keyCode;
+    let charStr = String.fromCharCode(charCode);
+
+    if (!/[0-9]/.test(charStr)) {
+        e.preventDefault();
+    }
+});
+
+$(document).on("input", ".JIDNI_BCH_QtyInvoice", function () {
+    let cleaned = $(this).val().replace(/[^0-9]/g, "");
+
+    if (cleaned !== $(this).val()) {
+        $(this).val(cleaned);
+    }
+});
+//#endregion
+
+//#region VIEW MODE - same page as Edit, read-only (the hidden IsViewMode field is set by /DeliveryNote/ViewNote)
+function isViewModePage() {
+    return $("#IsViewMode").val() === "1";
+}
+
+function ApplyViewMode() {
+    if (!isViewModePage()) return;
+
+    // 1) badge
+    $(".panel-header .h6").first().append('<span class="badge bg-warning text-dark ms-2">VIEW ONLY</span>');
+
+    // 2) remove every button that changes data (removed, not hidden: a hidden button can still be clicked by code)
+    $("#btnUpdate, #EditAddRowButton, #RemoveItemRowButton_Edit, #AddressAddButton").remove();
+    $(".right-menu a.btn").filter(function () {
+        return $.trim($(this).text()) === "Clear All";
+    }).remove();
+
+    // 3) fields: text boxes read-only, drop-downs and check boxes disabled.
+    //    Row tick boxes stay live (the Batch button needs them).
+    $("#DeliveryNoteForm input, #DeliveryNoteForm textarea, #DeliveryNoteForm select").each(function () {
+        let el = $(this);
+        let type = (el.attr("type") || "").toLowerCase();
+
+        if (type === "hidden") return;
+        if (el.is(".CheckItem, .IndexAllCheckItem, #IndexAllCheckItem")) return;
+
+        if (el.is("select") || type === "checkbox") {
+            el.prop("disabled", true);
+        } else {
+            el.prop("readonly", true).attr("tabindex", "-1");
+        }
+    });
+
+    // boxes that open a search or run a check on focus cannot be clicked at all
+    $(".JIDNI_Item_Code, .JIDNI_Qty, .JIDNI_UnitPrice, #Header_JIDNH_JW_Customer_Name")
+        .css("pointer-events", "none");
+
+    // date picker: no calendar
+    let dn = document.getElementById("Header_JIDNH_DN_Date");
+    if (dn && dn._flatpickr) {
+        dn._flatpickr.set("clickOpens", false);
+        if (dn._flatpickr.altInput) {
+            dn._flatpickr.altInput.readOnly = true;
+            dn._flatpickr.altInput.tabIndex = -1;
+            dn._flatpickr.altInput.style.pointerEvents = "none";
+        }
+    }
+
+    // keep disabled drop-downs looking like normal ones; no delete icons in the address popup
+    $("<style>").text(
+        "#DeliveryNoteForm select:disabled { background-color:#fff; color:#212529; opacity:1; }" +
+        "#BuyerAddress .AddRowRemove { display:none; }"
+    ).appendTo("head");
+
+    // 4) Batch popup: shows the SAVED batches, read-only, with a Close button
+    $(document).off("click", ".OpenBatchPopup").on("click", ".OpenBatchPopup", function (e) {
+        e.preventDefault();
+
+        let checked = $(".CheckItem:checked");
+        if (checked.length <= 0) {
+            alert("Please select at least one row");
+            return false;
+        }
+        if (checked.length > 1) {
+            alert("Please select only one row");
+            return false;
+        }
+
+        let row = checked.closest("tr");
+        $("#BatchPopupQty").text(row.find(".JIDNI_Qty").val());
+
+        $.ajax({
+            url: "/DeliveryNote/GetSavedBatchDetails",
+            type: "GET",
+            data: {
+                JIDNH_Number: $("#Header_JIDNH_Number").val(),
+                JIDNI_Number: row.find(".JIDNI_Number").val()
+            },
+            success: function (response) {
+                DeliveryNoteBatchList_Edit = [];
+
+                if (response && response.length > 0) {
+                    $.each(response, function (i, b) {
+                        DeliveryNoteBatchList_Edit.push({
+                            JIDNI_BCH_WH_Number: 0,
+                            JIDNI_BCH_JIDNI_Number: row.find(".JIDNI_Item_Number").val(),
+                            JIDNI_BCH_WH_Name: b.wareHouseCode,
+                            JIDNI_BCH_BatchDate: b.batchDate,
+                            JIDNI_BCH_BatchNo: b.batchNo,
+                            JIDNI_BCH_QtyAvailable: 0,
+                            JIDNI_BCH_QtyReserved: 0,
+                            JIDNI_BCH_QtyInvoice: b.batchQty,
+                            JIDNI_BCH_BatchUnitPrice: b.batchUnitPrice,
+                            JIDNI_BCH_BatchValue: b.batchValue,
+                            JIDNI_BCH_Number: b.lineBatch_Number,
+                            JIDNI_Number: row.find(".JIDNI_Number").val(),
+                            JIDNH_Number: $("#Header_JIDNH_Number").val(),
+                            RefBatch_Number: 0
+                        });
+                    });
+                } else {
+                    DeliveryNoteBatchList_Edit.push({});
+                }
+
+                BindDeliveryNoteBatchTable();
+
+                // stock columns mean nothing on a saved note; nothing in the popup is editable
+                $("#DeliveryNoteBatchTableBody .JIDNI_BCH_QtyAvailable, #DeliveryNoteBatchTableBody .JIDNI_BCH_QtyReserved").val("");
+                $("#TotalAvailableQty, #TotalReservedQty").val("");
+                $("#DeliveryNoteBatchTableBody input").prop("readonly", true);
+                ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+
+                $("#DeliveryNoteBatchModal").modal("show");
+            },
+            error: function () {
+                alert("Error loading batch details");
+            }
+        });
+    });
+
+    $(document).off("click", "#SaveBatchButton");
+    $("#SaveBatchButton").text("Close").attr("data-bs-dismiss", "modal");
+    $("#Other-tab").closest("li").hide();      // other-warehouse stock is not part of a saved note
+}
+
+$(document).ready(function () {
+    // run after every other ready handler and after the top-level handlers are bound
+    setTimeout(ApplyViewMode, 0);
+});
+//#endregion
+
 let deletedRows = [];
 var G_JINI_Number = 0;
 var G_JINH_Number = 0;
@@ -336,7 +552,7 @@ function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
 
         const controls = $container.find(
             "#DeliveryNoteBatchTableBody > #DeliveryNoteBatchTemplateRow " + f.cls +
-            ", #DeliveryNoteBatchTableBody > tr.DeliveryNoteBatchNewRow " + f.cls
+            ", #DeliveryNoteBatchTableBody > tr.DeliveryNoteBatchRow " + f.cls
         );
 
         if (!controls.length) return;
@@ -679,6 +895,25 @@ $(document).ready(function () {
         $("#Header_Freight_Applicable").prop("checked", true);
     }
 
+    // Footer Total Qty / Total Amount on page load
+    calculateTotal();
+
+    // Same look as Create after typing: Unit Price with 2 decimals, quantities with Indian grouping
+    $("#ItemTable tbody tr.NewRow").each(function () {
+        let row = $(this);
+
+        let price = row.find(".JIDNI_UnitPrice");
+        if ($.trim(price.val()) !== "") {
+            price.val(addComma(price.val(), "c"));
+        }
+
+        row.find(".JIDNI_Qty, .JIDNI_OriginalQty, .JIDNI_InvoicedQty").each(function () {
+            if ($.trim($(this).val()) !== "") {
+                $(this).val(addComma($(this).val(), "q"));
+            }
+        });
+    });
+
     // Freight columns show/hide on load, based on header checkbox
     ToggleFreightColumns_DN();
 
@@ -699,6 +934,7 @@ $(document).ready(function () {
         let row = $(this);
         if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
             BindFreightServiceOrder_DN(
+                row,
                 $("#Header_JIDNH_JW_Customer_Number").val(),
                 row.find(".JIDNI_UoM_Number").val(),
                 row.find(".JIDNI_FromWH").val(),
@@ -837,6 +1073,7 @@ $(document).ready(function () {
 
             if (row.find(".JIDNI_IsFreightApplicable").is(":checked")) {
                 BindFreightServiceOrder_DN(
+                    row,
                     $("#Header_JIDNH_JW_Customer_Number").val(),
                     row.find(".JIDNI_UoM_Number").val(),
                     row.find(".JIDNI_FromWH").val(),
@@ -850,8 +1087,16 @@ $(document).ready(function () {
 
     // Renamed vs Create's BindFreightServiceOrder to avoid clashing with
     // BindServiceOrder below (different signature, different endpoint)
-    function BindFreightServiceOrder_DN(customerId, uomNumber = null, fromWHNumber = null, toWHNumber = null) {
-        $(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
+    function BindFreightServiceOrder_DN(row, customerId, uomNumber = null, fromWHNumber = null, toWHNumber = null) {
+
+        let dropdown = row.find(".JIDNI_JIFRT_SVOH_Number");
+        // Same pattern as BindServiceOrder: the select only ever renders a
+        // bare "0" option server-side, so capture the saved value from the
+        // data attribute BEFORE clearing — this restore step was missing,
+        // which is why the dropdown went blank after Update.
+        let selectedValue = dropdown.attr("data-saved-value") || dropdown.val();
+
+        dropdown.html('<option value="0"></option>');
         if (!customerId) return;
 
         $.get("/deliverynote/transactions/deliverynote/get-freight-service-order",
@@ -859,15 +1104,17 @@ $(document).ready(function () {
             data => {
                 // Reset again right here, immediately before appending —
                 // guards against duplicate options from overlapping calls
-                $(".JIDNI_JIFRT_SVOH_Number").html('<option value="0"></option>');
+                dropdown.html('<option value="0"></option>');
 
                 $.each(data, (_, item) => {
                     if (!item.value || item.value === "" || item.value === "0") return;
 
-                    $(".JIDNI_JIFRT_SVOH_Number").append(
+                    dropdown.append(
                         `<option value="${item.value}" data-jisvoi="${item.jisvoiNumber || 0}">${item.text}</option>`
                     )
                 });
+
+                dropdown.val(selectedValue); // restore selection
             }
         );
     }
@@ -1494,6 +1741,8 @@ function calculateTotal() {
 
     let totalQty = 0;
     let totalAmount = 0;
+    let totalOriginalQty = 0;
+    let totalInvoicedQty = 0;
 
     // Loop through each row (only active rows)
     $("#ItemTable tbody tr.NewRow").each(function () {
@@ -1507,6 +1756,9 @@ function calculateTotal() {
         }
 
 
+        // Original / Invoiced Qty (read-only columns)
+        let originalQty = parseFloat(removeComma(row.find(".JIDNI_OriginalQty").val())) || 0;
+        let invoicedQty = parseFloat(removeComma(row.find(".JIDNI_InvoicedQty").val())) || 0;
         // Get Qty
         let qty = parseFloat(removeComma(row.find(".JIDNI_Qty").val())) || 0;
 
@@ -1521,10 +1773,14 @@ function calculateTotal() {
 
         // Add to totals
         totalQty += qty;
+        totalOriginalQty += originalQty;
+        totalInvoicedQty += invoicedQty;
         totalAmount += amount;
     });
 
     // Footer totals
+    $("#TotalOriginalQty").val(addComma(totalOriginalQty, "q"));
+    $("#TotalInvoicedQty").val(addComma(totalInvoicedQty, "q"));
     $("#TotalQty").val(addComma(totalQty, "q"));
     $("#TotalAmount").val(addComma(totalAmount, "c"));
 }
@@ -1913,10 +2169,8 @@ function SearchEditItemJIDNI(inputElement) {
                         // ✔ Decimal format (if needed)
                         let decimalPlaces = item.decimalPlaces || 2;
 
-                        let qtyVal = qtyInput.val();
-                        let qtyUnitpriceVal = qtyUnitprice.val();
-                        qtyInput.val(QtyDecimalRupees(qtyVal, decimalPlaces));
-                        qtyUnitprice.val(DecimalIndianRupees(qtyUnitpriceVal || 0, 2));
+                        qtyInput.val(formatIndianQty(removeComma(qtyInput.val())));
+                        qtyUnitprice.val(formatIndianCurrency(removeComma(qtyUnitprice.val())));
                         //#region item grid alignment
                         setTimeout(function () {
 
@@ -1927,6 +2181,9 @@ function SearchEditItemJIDNI(inputElement) {
                                 tableBody: "#TableBody",
                                 searchTable: "#tblsearch"
                             });
+                        
+                            // on screen when tabbing/entering into the next line.
+                            resultsDiv.empty();
                             resultsDiv.hide();
                             $("#RightPane_Item").removeClass("show");
                         }, 200);
@@ -2213,9 +2470,15 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
             BindDeliveryNoteBatchTable();
             BindOtherBatch(fromWarehouse, lineItemNumber, ItemGridindex);
 
+            // NEW: BindDeliveryNoteBatchTable() only appends rows — it never
+            // applied alignment/widths, so Qty Available / Qty Reserved /
+            // Delivered Qty stayed right-aligned (Bootstrap's text-end) until
+            // the user typed into a field and triggered the delegated
+            // input/change/blur handler further down.
+            ApplyBatchFieldWidths("#DeliveryNoteBatchList");
+
             $("#DeliveryNoteBatchModal").modal("show");
         },
-
         error: function (xhr, status, error) {
 
             console.log("Status:", status);
@@ -2457,6 +2720,19 @@ $(document).on('input', ".JIDNI_BCH_QtyInvoice", function (event) {
     CalculateBatchFooter();
 });
 
+
+//#region BATCH VALUE CALCULATION (Edit) - Value = Delivered Qty x Unit Price, same as Create
+$(document).on(
+    "input",
+    ".JIDNI_BCH_QtyInvoice, .JIDNI_BCH_BatchUnitPrice",
+    function () {
+        let row = $(this).closest("tr");
+        let qty = parseFloat(removeComma(row.find(".JIDNI_BCH_QtyInvoice").val())) || 0;
+        let price = parseFloat(removeComma(row.find(".JIDNI_BCH_BatchUnitPrice").val())) || 0;
+        row.find(".JIDNI_BCH_BatchValue").val(addComma(qty * price, "c"));
+        CalculateBatchFooter();
+    });
+//#endregion
 
 //#region VALIDATE EXISTING BATCH ROWS
 
@@ -3107,7 +3383,7 @@ function validateItemGrid_Edit() {
         }
 
         // validate Qty
-        if (!qty || qty.trim() === "" || qty.trim() === "0") {
+        if (!qty || qty.trim() === "" || (parseFloat(removeComma(qty)) || 0) <= 0) {
             showAlert('Qty is required', row.find(".JIDNI_Qty"));
 
             isValid = false;
@@ -3115,7 +3391,7 @@ function validateItemGrid_Edit() {
         }
 
         // validate Unit Price
-        if (!unitPrice || unitPrice.trim() === "" || unitPrice.trim() === "0") {
+        if (!unitPrice || unitPrice.trim() === "" || (parseFloat(removeComma(unitPrice)) || 0) <= 0) {
             showAlert('Unit Price is required', row.find(".JIDNI_UnitPrice"));
 
             isValid = false;

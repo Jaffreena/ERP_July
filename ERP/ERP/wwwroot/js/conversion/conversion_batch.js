@@ -1111,8 +1111,7 @@ function SaveTempBatch() {
             DBCH_Warehouse_Number:
                 parseInt(currentRow.find(".JIDNI_BCH_WH_Number").val()) || 0,
 
-            DBCH_Date:
-                new Date(currentRow.find(".JIDNI_BCH_BatchDate").val()).toISOString(),
+            DBCH_Date: ToLocalDateString(currentRow.find(".JIDNI_BCH_BatchDate").val()),
 
             DBCH_No:
                 currentRow.find(".JIDNI_BCH_BatchNo").val(),
@@ -1120,10 +1119,10 @@ function SaveTempBatch() {
             DBCH_Qty: Qty,
 
             DBCH_UnitPrice:
-                parseFloat(currentRow.find(".JIDNI_BCH_BatchUnitPrice").val()) || 0,
+                parseFloat(removeCommas(currentRow.find(".JIDNI_BCH_BatchUnitPrice").val())) || 0,
 
             DBCH_Value:
-                parseFloat(currentRow.find(".JIDNI_BCH_BatchValue").val()) || 0,
+                parseFloat(removeCommas(currentRow.find(".JIDNI_BCH_BatchValue").val())) || 0,
             JIDNI_NUMBER:
                 parseInt(currentRow.find(".JIDNI_Number").val()) || 0,
 
@@ -1414,7 +1413,7 @@ $(document).on("input", NUMERIC_ONLY, function () {
 //#region batch amount unit price 3 grid
 
 const TABLES = ["#DeliveryNoteBatchTableBody", "#IBatTableBody_P", "#IBatTableBody_S"];
-const DECIMAL_CLASSES = [".JIRNI_BCH_UnitPrice", ".JIRNI_BCH_Amount"];
+const DECIMAL_CLASSES = [".JIRNI_BCH_BatchUnitPrice", ".JIRNI_BCH_BatchValue"];
 
 // Builds: "#table1 .cls1, #table1 .cls2, #table2 .cls1, ..."
 const DECIMAL_ONLY = TABLES
@@ -1455,9 +1454,20 @@ $(document).on("input", DECIMAL_ONLY, function () {
 
 // Optional: format to exactly 2 decimals when leaving the field
 $(document).on("blur", DECIMAL_ONLY, function () {
-    let v = $(this).val();
+    let v = removeCommas($(this).val());
     if (v !== "" && v !== ".") {
-        $(this).val(parseFloat(v).toFixed(2));
+        $(this).val(DecimalIndianRupees(parseFloat(v)));
+    } else {
+        $(this).val("");
+    }
+});
+
+const BATCH_QTY_ONLY = "#IBatTableBody_P .JIRNI_BCH_BatchQty, #IBatTableBody_S .JIRNI_BCH_BatchQty";
+
+$(document).on("blur", BATCH_QTY_ONLY, function () {
+    let v = removeCommas($(this).val());
+    if (v !== "") {
+        $(this).val(QtyDecimalRupees(parseFloat(v), 0));
     } else {
         $(this).val("");
     }

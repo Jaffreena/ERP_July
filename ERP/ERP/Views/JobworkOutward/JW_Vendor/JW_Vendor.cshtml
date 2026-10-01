@@ -1,0 +1,284 @@
+﻿@model ERP_DTO.JobOutwardTransaction.JW_VendorHead_DTO
+@{
+    ViewData["Title"] = "JW Vendor";
+}
+<div class="row align-items-center panel-header gx-2">
+    <div class="col h-100">
+        <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+            JW Vendor
+            <a asp-controller="JobworkOutwardMain" asp-action="Index" class="float-end btn p-0 shadow-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row panel-body gx-2">
+    <div class="col-12 panel-card-fixed h-100">
+        <div class="w-100 rounded-0 border border-primary bg-transparent h-100" id="BodyHeight">
+            <div class="w-100 p-3 text-black border-bottom" id="BodyCardHeader">
+                <form asp-action="JW_Vendor" id="VendorForm">
+                    <div class="row">
+                        <input type="hidden" name="PSize" value="@ViewData["PageSize"]" />
+                        <input type="hidden" name="PageNumber" value="@ViewData["PageNumber"]" />
+                        <input type="hidden" name="Search" value="@ViewData["CurrentFilter"]" />
+                        <partial name="~/Views/JobworkOutward/JW_Vendor/JW_VendorView.cshtml" model="@Model" />
+                    </div>
+
+                    <!-- Withhold Tax modal -->
+                    <div class="modal modal-lg fade" id="WHTModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border">
+                                <div class="modal-header">
+                                    <p class="modal-title text-white">Withhold Tax</p>
+                                    <button type="button" class="btn-close" id="WHTCloseButton" aria-label="Close"></button>
+                                </div>
+                                <div class="card bg-transparent shadow-none h-100">
+                                    <div class="p-2 text-black h-100 nav-tab-fix">
+                                        <ul class="nav nav-tabs tab-header" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="wht-tab" data-bs-toggle="tab" data-bs-target="#wht-tab-pane" type="button" role="tab" aria-controls="wht-tab-pane" aria-selected="true">Overview</button>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content tab-body">
+                                            <div class="tab-pane fade show active pb-0 border border-top-0 h-100" id="wht-tab-pane" role="tabpanel" aria-labelledby="wht-tab" tabindex="0">
+                                                <div class="modal-body p-2 text-dark justify-content-center">
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <partial name="~/Views/JobworkOutward/JW_Vendor/JW_VendorWHTView.cshtml" model="@Model.JWV_WHT_List" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <a id="WHTAddRowButton" class="btn btn-primary">Add Row</a>
+                                    <button type="button" id="WHTOkayButton" class="btn btn-primary px-4" autofocus>Ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GST modal -->
+                    <div class="modal modal-lg fade border" id="GSTModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border">
+                                <div class="modal-header">
+                                    <p class="modal-title text-white">GST</p>
+                                    <button type="button" class="btn-close" id="GSTCloseButton" aria-label="Close"></button>
+                                </div>
+                                <div class="card bg-transparent shadow-none h-100">
+                                    <div class="p-2 text-black h-100 nav-tab-fix">
+                                        <ul class="nav nav-tabs tab-header" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="gst-tab" data-bs-toggle="tab" data-bs-target="#gst-tab-pane" type="button" role="tab" aria-controls="gst-tab-pane" aria-selected="true">Tax Details</button>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content tab-body">
+                                            <div class="tab-pane fade show active pb-0 border border-top-0 h-100" id="gst-tab-pane" role="tabpanel" aria-labelledby="gst-tab" tabindex="0">
+                                                <div class="modal-body p-2 text-dark justify-content-center">
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <partial name="~/Views/JobworkOutward/JW_Vendor/JW_VendorGSTView.cshtml" model="@Model.JWV_GST_List" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <a id="GSTAddRowButton" class="btn btn-primary">Add Row</a>
+                                    <button type="button" id="GSTOkayButton" class="btn btn-primary px-4" autofocus>Ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="w-100" id="BodyCardBody">
+                <div class="card bg-transparent shadow-none overflow-hidden h-100">
+                    <div class="card-body text-black h-100 nav-tab-fix">
+                        <ul class="nav nav-tabs tab-header" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-tab-pane" type="button" role="tab" aria-controls="list-tab-pane" aria-selected="true">Overview</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content tab-body">
+                            <div class="tab-pane fade show active p-3 pb-0 border border-top-0 h-100" id="list-tab-pane" role="tabpanel" aria-labelledby="list-tab" tabindex="0">
+                                <div class="w-100 h-100 table-fixed">
+                                    <div class="w-100 table-header">
+                                        <form asp-action="JW_Vendor" method="get">
+                                            <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+                                            <input type="hidden" name="PageNumber" value="@ViewData["PageNumber"]" />
+                                            <input type="hidden" name="PageFilter" value="PageFilter" />
+                                            <div class="row">
+                                                <div class="col-8">
+                                                    <div class="row gx-0">
+                                                        <div class="col-auto me-3">
+                                                            <select name="PSize" class="form-select w-auto py-1 pe-4" asp-route-PageFilter="PageFilter" asp-items="@ViewBag.Page" onchange="form.submit();"></select>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <input id="Search" name="Search" class="form-control p-1 search-control" autocomplete="off" value="@ViewData["CurrentFilter"]" />
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <input type="submit" name="Mode" value="Search" class="btn btn-primary btn-sm" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="w-100 MenuAction d-none text-end">
+                                                        <a class="DeleteAllButton btn btn-sm btn-danger me-2">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <partial name="~/Views/JobworkOutward/JW_Vendor/JW_VendorListView.cshtml" model="@Model.JW_Vendor_List" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/site.js"></script>
+
+<script>
+    $('.navbar-nav > .nav-item.jobworkoutward > a').addClass("active");
+
+    // ---------- modal helpers (used by the grid partials too) ----------
+    function showModal(id) {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById(id)).show();
+    }
+    function hideModal(id) {
+        var m = bootstrap.Modal.getInstance(document.getElementById(id));
+        if (m) m.hide();
+    }
+    function showAlert(msg) {
+        $("#AlertMessage").text(msg);
+        showModal("AlertModal");
+    }
+    $(document).on("shown.bs.modal", ".modal", function () {
+        $(this).find("[autofocus]").focus();
+    });
+
+    // ---------- duplicate vendor name ----------
+    let ajaxPending = false;
+    function validateTextbox(textbox) {
+        var value = textbox.val().trim();
+        if (value === "" || ajaxPending) return;
+        ajaxPending = true;
+        $.ajax({
+            type: "get",
+            url: "/jobwork/master/jw-vendor/duplicate",
+            data: { Title: value, Number: $(".Number").val() || 0 },
+            traditional: true,
+            success: function (response) {
+                if (response && !$("#DuplicateAlert").is(':visible')) {
+                    showModal("DuplicateAlert");
+                }
+            },
+            complete: function () { ajaxPending = false; }
+        });
+    }
+    $(document).on("blur", ".KeyDup", function () { validateTextbox($(this)); });
+    $(document).on("keydown", ".KeyDup", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            validateTextbox($(this));
+        }
+    });
+    $('#DuplicateAlert').on('hidden.bs.modal', function () {
+        setTimeout(function () { $('#JWV_JW_VendorName').focus(); }, 1);
+    });
+
+    // ---------- Withhold Tax Yes / No ----------
+    function isFilledValue(v) {
+        v = (v === null || v === undefined) ? "" : String(v).trim();
+        return v !== "" && v !== "0";
+    }
+    function whtRowCount() {
+        var count = 0;
+        $("tr.WHTNewRow").each(function () {
+            var row = $(this);
+            if (row.find("input.JWV_WHT_IsDeleted").val() === "1") return;
+            var filled = false;
+            row.find("select, input.JWV_WHT_FromDate, input.JWV_WHT_ToDate").each(function () {
+                if (isFilledValue($(this).val())) { filled = true; return false; }
+            });
+            if (filled) count++;
+        });
+        return count;
+    }
+    $("#JWV_WithholdTax").on("change", function () {
+        if (this.value === "1") {
+            showModal("WHTModal");
+        } else if (whtRowCount() > 0) {
+            alert("There are records available in Withhold Tax grid. Delete them first.");
+            $(this).val("1");
+            showModal("WHTModal");
+        }
+    });
+    $("#WHTButton").on("click", function () {
+        if ($("#JWV_WithholdTax").val() === "1") {
+            showModal("WHTModal");
+        } else {
+            alert("Select Withhold Tax = Yes to enter Withhold Tax details.");
+            $("#JWV_WithholdTax").focus();
+        }
+    });
+
+    // ---------- form submit (Save / Update only) ----------
+    $('#VendorForm').on('submit', function (event) {
+        var submitter = event.originalEvent && event.originalEvent.submitter ? event.originalEvent.submitter.value : "";
+        if (submitter !== "Save" && submitter !== "Update") return true;
+
+        if (!validateAddressGrid() || !validateDuplicateAddressID()) {
+            event.preventDefault();
+            return false;
+        }
+
+        // flag completely empty grid rows as deleted (server ignores them)
+        $("tr.WHTNewRow").each(function () {
+            var r = $(this), empty = true;
+            r.find("select, input.JWV_WHT_FromDate, input.JWV_WHT_ToDate").each(function () {
+                if (isFilledValue($(this).val())) { empty = false; return false; }
+            });
+            if (empty) r.find("input.JWV_WHT_IsDeleted").val(1);
+        });
+        $("tr.GSTNewRow").each(function () {
+            var r = $(this), empty = true;
+            r.find("select, input.JWV_GST_FromDate, input.JWV_GST_ToDate").each(function () {
+                if (isFilledValue($(this).val())) { empty = false; return false; }
+            });
+            if (empty) r.find("input.JWV_GST_IsDeleted").val(1);
+        });
+        $("tr.AddNewRow").each(function () {
+            var r = $(this), empty = true;
+            r.find("select, input[type='text']").each(function () {
+                if (isFilledValue($(this).val())) { empty = false; return false; }
+            });
+            if (empty) r.find("input.JWV_ADD_IsDeleted").val(1);
+        });
+
+        $('select').prop('disabled', false);
+    });
+
+    // ---------- body height ----------
+    document.addEventListener("DOMContentLoaded", function () {
+        const MainDiv = document.getElementById('BodyHeight');
+        const HeadDiv = document.getElementById('BodyCardHeader');
+        const BodyDiv = document.getElementById('BodyCardBody');
+        if (MainDiv && HeadDiv && BodyDiv) {
+            BodyDiv.style.height = (MainDiv.offsetHeight - HeadDiv.offsetHeight) + 'px';
+        }
+    });
+</script>

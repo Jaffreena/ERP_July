@@ -1,0 +1,250 @@
+﻿@{
+    ViewData["Title"] = "Jobwork Outward";
+}
+
+<div class="row align-items-center panel-header h-auto">
+    <div class="col">
+        <div class="card rounded-0 mt-3">
+            <div class="card-body px-2 py-2">
+                <h1 class="h6 fw-light">
+                    Jobwork Outward
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row panel-body">
+    <div class="col-12 panel-card-fixed" id="BodyHeight">
+        <div class="w-100 rounded-0 border border-primary bg-transparent px-3" id="CardBody">
+            <div class="row">
+
+                <!-- LEFT -->
+                <div class="col-4 pt-3">
+
+                    <!-- FAVOURITES -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Favourites</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7"></span>
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-6"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- REPORTS -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Reports</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="/joboutward/transactions/jo-service-order/jwi-summary">
+                                        JO Service Order - Jobwork
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="/joboutward/transactions/jo-service-order/freight-summary">
+                                        JO Service Order - Freight
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="/joboutward/transactions/delivery-note-summary">
+                                        JO Delivery Note - Summary
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="/joboutward/transactions/delivery-note-detailed">
+                                        JO Delivery Note - Detailed
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- SETUP -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Setup</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a href="/joboutward/setup/delivery-note-numbering">
+                                        JO Delivery Note Numbering
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- DEFAULT FORM SETTING -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Default Form Setting</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <ul class="list-unstyled mb-0">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MIDDLE -->
+                <div class="col-4 pt-3">
+
+                    <!-- TRANSACTIONS -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Transactions</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a asp-controller="JO_ServiceOrder" asp-action="Create" asp-route-OrderType="JWI">
+                                        JO Service Order - Jobwork
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JO_ServiceOrder" asp-action="Create" asp-route-OrderType="FREIGHT">
+                                        JO Service Order - Freight
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="/joboutward/transactions/delivery-note">
+                                        JO Delivery Note
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- PERIODIC -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Periodic</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7"></span>
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-6"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- REPORTS -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Reports</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <ul class="list-unstyled mb-0">
+
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-4 pt-3">
+
+                    <!-- MASTER DATA -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Master Data</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <a asp-controller="JW_Vendor" asp-action="JW_Vendor">
+                                        JW Vendor
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JW_VendorGroup" asp-action="JW_VendorGroup">
+                                        JW Vendor Group
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JW_VendorCategory" asp-action="JW_VendorCategory">
+                                        JW Vendor Category
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JO_Shift" asp-action="JO_Shift">
+                                        Shift
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JO_Process" asp-action="JO_Process">
+                                        Process
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JO_WorkCentreGroup" asp-action="JO_WorkCentreGroup">
+                                        Workcentre Group
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-controller="JO_WorkCentre" asp-action="JO_WorkCentre">
+                                        Workcentre
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- INQUIRIES -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Inquiries</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7"></span>
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-6"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SUB MASTER -->
+                    <div class="card rounded-0 mb-3 bg-transparent">
+                        <div class="card-header bg-secondary rounded-0">
+                            <p class="mb-0">Sub-Master Data</p>
+                        </div>
+                        <div class="card-body text-dark">
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7"></span>
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-6"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('.navbar-nav > .nav-item.jobworkoutward > a').addClass("active");
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const MainDiv = document.getElementById('BodyHeight');
+        const BodyDiv = document.getElementById('CardBody');
+
+        const MainHeight = MainDiv.offsetHeight;
+        BodyDiv.style.height = (MainHeight - 10) + 'px';
+    });
+</script>

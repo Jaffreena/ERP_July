@@ -609,7 +609,8 @@ $(document).ready(function () {
                 GetAllowedQty(
                     jisvohNumber,
                     40008,
-                    row.find(".JIFTII_Item_Number").val() || 0,
+                    row.find(".JIFTII_FromWH_Number").val() || 0,
+                    row.find(".JIFTII_ToWH_Number").val() || 0,
                     row.find(".JIFTII_UoM_Number").val() || 0,
                     function (allowedQty) {
 
@@ -688,11 +689,12 @@ $(document).ready(function () {
  
 });
 
-function GetAllowedQty(jisvohNumber, prsNumber, itemNumber, uomNumber, callback) {
-    $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+function GetAllowedQty(jisvohNumber, prsNumber, fromWH, toWH, uomNumber, callback) {
+    $.get("/FreightInvoice/CheckAllowedQtyFreight", {
         jisvohNumber: jisvohNumber,
         prsNumber: prsNumber,
-        itemNumber: itemNumber,
+        fromWH: fromWH,
+        toWH: toWH,
         uomNumber: uomNumber
     }, function (res) {
 
@@ -2126,17 +2128,29 @@ function LoadServiceOrderDropdown(dropdown) {
 //#endregion
 
 //#region SOURCE CATEGORY TOGGLE
-$("#Header_SourceCategory").change(function () {
-    var category = $(this).val();
-
+//#region SOURCE CATEGORY TOGGLE
+function UpdateSourceCategoryUI(category) {
     if (category === "RN") {
         $("#LoadDeliveryNote").hide();
         $("#LoadReceiptNote").show();
+        $("#ColHeader_DNNumber").text("Receipt Note Number");
+        $("#ColHeader_DeliveredQty").text("Received Qty");
     } else {
         $("#LoadReceiptNote").hide();
         $("#LoadDeliveryNote").show();
+        $("#ColHeader_DNNumber").text("Delivery Note Number");
+        $("#ColHeader_DeliveredQty").text("Delivered Qty");
     }
+}
+
+$("#Header_SourceCategory").change(function () {
+    UpdateSourceCategoryUI($(this).val());
 });
+
+// NEW: apply correct labels on initial page load too, in case
+// LoadDefaultFormSetting() or the model already selected RN by default
+UpdateSourceCategoryUI($("#Header_SourceCategory").val());
+//#endregion
 //#endregion
 
 //#region LOAD DELIVERY NOTE ITEMS
@@ -2677,87 +2691,65 @@ function LoadServiceOrders() {
     });
 }
 
-
 function OnServiceOrderChange(ele) {
 
     var row = $(ele).closest("tr");
     row.find(".JIFTII_ServiceOrderHidden").val($(ele).val());
-    row.find(".JIFTII_SVO_AssignFlag").val("INVOICE"); // NEW: manual pick = direct SO invoice
+    row.find(".JIFTII_SVO_AssignFlag").val("INVOICE"); // manual pick = direct SO invoice
+
     var serviceOrderNo = $(ele).val();
-    var prsNumber = 40008;
-    var itemNumber = row.find(".JIFTII_Item_Number").val();
+    var fromWH = row.find(".JIFTII_FromWH_Number").val();
+    var toWH = row.find(".JIFTII_ToWH_Number").val();
     var uomNumber = row.find(".JIFTII_UoM_Number").val();
 
+    var unitPriceBox = row.find(".JIFTII_Rate");
+    var amountBox = row.find(".JIFTII_Amount");
+    var serviceOrderItemBox = row.find(".Freight_ServiceOrder_Number");
+
+    // Unselect / blank: no AJAX (no stale response race). Clear and make editable.
+    if (!serviceOrderNo || serviceOrderNo === "0") {
+        serviceOrderItemBox.val(0);
+        unitPriceBox.off("keydown keypress paste").val(0).prop("readonly", false);
+        amountBox.val(0).prop("readonly", false);
+        return;
+    }
+
     $.ajax({
-        url: '/FreightInvoice/GetServiceOrderItemInfo',
+        url: '/FreightInvoice/GetFreightServiceOrderItemInfo',
         type: 'GET',
         data: {
             Freight_ServiceOrder_Number: serviceOrderNo,
-            PRS_Number: prsNumber,
-            Item_Number: itemNumber,
+            FromWH: fromWH,
+            ToWH: toWH,
             UoM_Number: uomNumber
         },
         success: function (response) {
-            console.log(response);
             console.log(JSON.stringify(response));
 
-            var unitPriceBox = row.find(".JIFTII_Rate");
-            var amountBox = row.find(".JIFTII_Amount");
-            var serviceOrderItemBox = row.find(".Freight_ServiceOrder_Number");
-
             if (!response) {
-
-                serviceOrderItemBox.val(0);   // added
-
-                unitPriceBox.val("")
-                    .prop("readonly", false);
-
-                amountBox.val("")
-                    .prop("readonly", false);
-
+                serviceOrderItemBox.val(0);
+                unitPriceBox.off("keydown keypress paste").val("").prop("readonly", false);
+                amountBox.val("").prop("readonly", false);
                 return;
             }
 
-            // Set Freight_ServiceOrder_Number
             serviceOrderItemBox.val(response.jisvoI_Number || 0);
 
-            // Unit Price
             if (response.unitPrice == null || response.unitPrice === "") {
-                unitPriceBox.val("")
-                    .prop("readonly", false);
+                unitPriceBox.off("keydown keypress paste").val("").prop("readonly", false);
             }
             else {
                 unitPriceBox.val(response.unitPrice);
                 unitPriceBox.trigger("input");
                 unitPriceBox.trigger("change");
                 unitPriceBox.prop("readonly", true);
-                //  row.find(".JIFTII_JISVOH_Number").prop("disabled", true);
                 unitPriceBox.off("keydown keypress paste")
                     .on("keydown keypress paste", function (e) {
                         e.preventDefault();
                     });
-
             }
-
-            // Amount
-            //if (response.amount == null || response.amount === "") {
-            //    amountBox.val("")
-            //        .prop("readonly", false);
-            //}
-            //else {
-            //    amountBox.val(response.amount);
-            //    amountBox.trigger("input");
-            //    amountBox.trigger("change");
-            //    amountBox.prop("readonly", true);
-            //    amountBox.off("keydown keypress paste")
-            //        .on("keydown keypress paste", function (e) {
-            //            e.preventDefault();
-            //        });
-            //}
         },
         error: function (err) {
-            alert(JSON.stringify(err))
-            console.log(err);
             console.log(JSON.stringify(err));
         }
     });
@@ -3562,11 +3554,11 @@ $(document).on("change", ".JIFTII_JISVOH_Number", function () {
     let jisvohNumber = $(this).val();
 
     row.find(".Freight_ServiceOrder_Number").val(jisvohNumber);
-
-    $.get("/DeliveryNote/CheckDeliveredQtyExceededFreight", {
+    $.get("/FreightInvoice/CheckAllowedQtyFreight", {
         jisvohNumber,
         prsNumber: 40008,
-        itemNumber: row.find(".JIFTII_Item_Number").val(),
+        fromWH: row.find(".JIFTII_FromWH_Number").val(),
+        toWH: row.find(".JIFTII_ToWH_Number").val(),
         uomNumber: row.find(".JIFTII_UoM_Number").val()
     }, function (res) {
 

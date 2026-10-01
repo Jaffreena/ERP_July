@@ -33,6 +33,16 @@ namespace ERP.Controllers.JobworkInward
         }
         #endregion
 
+        #region FreightInvoice View (read-only, reuses Edit page)
+        public IActionResult ViewInvoice(long SI_No)
+        {
+            GetFreightInvoiceData();
+            ViewBag.Collapse = true;
+            ViewBag.IsViewMode = true;
+            return View("~/Views/JobworkInward/FreightInvoice/Edit.cshtml");
+        }
+        #endregion
+
         public IActionResult Create()
         {
             GetFreightInvoiceData();
@@ -509,10 +519,10 @@ namespace ERP.Controllers.JobworkInward
 
         #region View
 
-        public ActionResult FreightInvoiceView()
+        public IActionResult FreightInvoiceView(long? SI_No, long? JIFTIH_Number)
         {
-            FreightInvoiceCreate_DTO obj = new FreightInvoiceCreate_DTO();
-            return View("~/Views/JobworkInward/FreightInvoice/FreightInvoiceView.cshtml", obj);
+            long id = SI_No ?? JIFTIH_Number ?? 0;
+            return RedirectToAction("ViewInvoice", new { SI_No = id });
         }
 
         #endregion
@@ -532,6 +542,13 @@ namespace ERP.Controllers.JobworkInward
             if (Mode == "Edit")
             {
                 return RedirectToAction("Edit", new
+                {
+                    SI_No = SI_No
+                });
+            }
+            if (Mode == "View")
+            {
+                return RedirectToAction("ViewInvoice", new
                 {
                     SI_No = SI_No
                 });
@@ -855,6 +872,65 @@ namespace ERP.Controllers.JobworkInward
                 jisvoI_Number = r["JISVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOI_Number"]),
                 unitPrice = r["JISVOI_UnitPrice"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(r["JISVOI_UnitPrice"])
             };
+
+            return new JsonResult(data, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+        }
+
+        #endregion
+        #region GET FREIGHT SERVICE ORDER ITEM INFO (own JIFRT table)
+
+        [HttpGet]
+        public JsonResult GetFreightServiceOrderItemInfo(
+            long Freight_ServiceOrder_Number,
+            long FromWH,
+            long ToWH,
+            long UoM_Number)
+        {
+            DataTable dt = FRT_Inv_DAO.GetFreightServiceOrderItemInfoDB(
+                Freight_ServiceOrder_Number,
+                FromWH,
+                ToWH,
+                UoM_Number
+            ).Tables[0];
+
+            if (dt.Rows.Count == 0)
+            {
+                return new JsonResult(null);
+            }
+
+            var r = dt.Rows[0];
+
+            var data = new
+            {
+                jisvoI_Number = r["JISVOI_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["JISVOI_Number"]),
+                unitPrice = r["JISVOI_UnitPrice"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(r["JISVOI_UnitPrice"])
+            };
+
+            return new JsonResult(data, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+        }
+
+        #endregion
+
+        #region CHECK ALLOWED QTY (Freight Service Order)
+
+        [HttpGet]
+        public JsonResult CheckAllowedQtyFreight(long jisvohNumber, long prsNumber, long fromWH, long toWH, long uomNumber, long frtihNumber = 0)
+        {
+            DataTable dt = FRT_Inv_DAO.CheckAllowedQtyFreightDB(jisvohNumber, prsNumber, fromWH, toWH, uomNumber, frtihNumber).Tables[0];
+
+            var data = dt.AsEnumerable().Select(r => new
+            {
+                jisvoiQty = r["jisvoiQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["jisvoiQty"]),
+                deliveredQty = r["deliveredQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["deliveredQty"])
+            }).ToList();
 
             return new JsonResult(data, new JsonSerializerOptions
             {

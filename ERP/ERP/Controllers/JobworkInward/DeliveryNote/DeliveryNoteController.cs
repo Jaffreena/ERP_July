@@ -304,6 +304,23 @@ namespace ERP.Controllers
         }
 
 
+        // Browser sends picked dates as UTC (e.g. 2026-09-19T18:30:00Z for 20-Sep in IST).
+        // Convert back to server-local so the saved date is the date the user picked.
+        private static DateTime FromBrowserUtc(DateTime d)
+        {
+            return d.Kind == DateTimeKind.Utc ? d.ToLocalTime() : d;
+        }
+
+        private static void FixDeliveryNoteDates(DeliveryNoteCreate_DTO dto)
+        {
+            if (dto?.Header != null)
+                dto.Header.JIDNH_DN_Date = FromBrowserUtc(dto.Header.JIDNH_DN_Date);
+
+            if (dto?.deliveryNoteBatches != null)
+                foreach (var b in dto.deliveryNoteBatches)
+                    b.JIDNI_BCH_BatchDate = FromBrowserUtc(b.JIDNI_BCH_BatchDate);
+        }
+
         #region Delivery Note Create
         public IActionResult Index()
         {
@@ -408,6 +425,7 @@ namespace ERP.Controllers
 
                 DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();
 
+                FixDeliveryNoteDates(dto);
                 dto.Header.DN_Id = 10;
                 //   dto.Header.JIDNH_DN_Date = DateTime.Now;
                 dto.Header.JIDNI_Item_Code = "1";
@@ -938,6 +956,13 @@ namespace ERP.Controllers
         #region delivery note view
         public ActionResult DeliveryNoteView(long JIDNH_Number)
         {
+            // the View button opens the Edit page in read-only mode
+            return RedirectToAction("ViewNote", new { JIDNH_Number = JIDNH_Number });
+        }
+
+        // old preview action - no longer used (its view file never existed); safe to delete later
+        private ActionResult DeliveryNoteViewOld(long JIDNH_Number)
+        {
             List<DeliveryNoteCreate_DTO> DN_List =
                 DeliveryNoteViewGetData(JIDNH_Number);
 
@@ -979,7 +1004,44 @@ namespace ERP.Controllers
 
         #region delivery note edit
 
+        // View page: the batches saved on one item row (read-only)
+        [HttpGet]
+        public JsonResult GetSavedBatchDetails(long JIDNH_Number, long JIDNI_Number)
+        {
+            DeliveryNote_DAO dao = new DeliveryNote_DAO();
+            DataTable dt = dao.GetSavedBatchDetails(JIDNH_Number, JIDNI_Number);
+            var data = dt.AsEnumerable().Select(r => new
+            {
+                LineBatch_Number = r["LineBatch_Number"] == DBNull.Value ? 0 : Convert.ToInt64(r["LineBatch_Number"]),
+                BatchDate = r["BatchDate"] == DBNull.Value
+                    ? ""
+                    : Convert.ToDateTime(r["BatchDate"]).ToString("dd MMM yyyy"),
+                BatchNo = r["BatchNo"] == DBNull.Value ? "" : r["BatchNo"].ToString(),
+                BatchQty = r["BatchQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchQty"]),
+                BatchUnitPrice = r["BatchUnitPrice"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchUnitPrice"]),
+                BatchValue = r["BatchValue"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchValue"]),
+                WareHouseCode = r["WareHouseCode"] == DBNull.Value ? "" : r["WareHouseCode"].ToString()
+            }).ToList();
+            return new JsonResult(data, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+        }
+
         public IActionResult Edit(long JIDNH_Number)
+        {
+            return LoadDeliveryNotePage(JIDNH_Number, false);
+        }
+
+        // Read-only page: same page and same data as Edit, nothing is written to the temp batch table
+        [HttpGet]
+        public IActionResult ViewNote(long JIDNH_Number)
+        {
+            return LoadDeliveryNotePage(JIDNH_Number, true);
+        }
+
+        private IActionResult LoadDeliveryNotePage(long JIDNH_Number, bool isViewMode)
         {
             DeliveryNoteCreate_DTO dto =
                 new DeliveryNoteCreate_DTO();
@@ -1103,7 +1165,9 @@ namespace ERP.Controllers
                         Convert.ToDouble(item["JIDNI_UnitPrice"]),
 
                     JIDNI_Amount =
-                        Convert.ToDouble(item["JIDNI_Amount"]),
+                       Convert.ToDouble(item["JIDNI_Amount"]),
+                    JIDNI_InvoicedQty =
+                        Convert.ToDouble(item["JIDNI_InvoicedQty"]),
 
                     JIDNI_IsJW_InvoiceApplicable =
                         Convert.ToString(item["JIDNI_IsJW_InvoiceApplicable"]),
@@ -1155,10 +1219,14 @@ namespace ERP.Controllers
             }
             DeliveryNote_DAO dao = new DeliveryNote_DAO();
 
-            dao.InsertEditBatchToTempDB(Root_JIDNI_Number);
+            if (!isViewMode)
+            {
+                dao.InsertEditBatchToTempDB(Root_JIDNI_Number);
+            }
 
             ViewBag.Collapse = true;
             var x = dto.Items[0].JIDNI_JIJWI_SVOH_Number;
+            ViewBag.IsViewMode = isViewMode;
             return View("~/Views/JobworkInward/DeliveryNote/Edit.cshtml", dto);
         }
         #endregion
@@ -1584,6 +1652,7 @@ namespace ERP.Controllers
 
             try
             {
+                FixDeliveryNoteDates(dto);
                 Console.Write(dto);
 
                 DeliveryNote_DAO DN_DAO = new DeliveryNote_DAO();

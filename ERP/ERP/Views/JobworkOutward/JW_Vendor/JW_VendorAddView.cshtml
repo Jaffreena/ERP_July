@@ -1,0 +1,216 @@
+﻿@model List<ERP_DTO.JobOutwardTransaction.JW_VendorAdd_DTO>
+
+<div class="w-100 table-fixed h-100">
+    <div class="w-100 table-responsive table-body table-body-f">
+        <table class="table table-bordered align-middle table-hover mb-0 table-grid">
+            <thead>
+                <tr class="table-info">
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_ADD_ADTP_Number)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_ADD_Address_ID)</th>
+                    <th class="table-col-min-lg">@Html.DisplayNameFor(model => model.First().JWV_ADD_Address)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_ADD_City)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_ADD_State)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_ADD_Country)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_ADD_PIN)</th>
+                    <th>@Html.DisplayNameFor(model => model.First().JWV_ADD_GSTIN)</th>
+                    <th class="table-col-sm text-center">@Html.DisplayNameFor(model => model.First().JWV_ADD_Default)</th>
+                    <th class="action text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody id="AddTableBody">
+                <tr id="AddTempRow" style="display: none;">
+                    <td><select class="form-select JWV_ADD_ADTP_Number" asp-items="@ViewBag.AddressType"></select></td>
+                    <td><input class="form-control JWV_ADD_Address_ID" maxlength="25" autocomplete="off" /></td>
+                    <td class="table-col-min-lg"><input class="form-control JWV_ADD_Address" maxlength="250" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_ADD_City" maxlength="25" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_ADD_State" maxlength="25" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_ADD_Country" maxlength="25" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_ADD_PIN" maxlength="10" autocomplete="off" /></td>
+                    <td><input class="form-control JWV_ADD_GSTIN" maxlength="15" autocomplete="off" /></td>
+                    <td class="table-col-sm text-center">
+                        <input type="checkbox" value="true" class="form-check-input JWV_ADD_Default" />
+                    </td>
+                    <td class="action text-center">
+                        <input type="hidden" class="JWV_ADD_IsDeleted" value="0" />
+                        <a class="AddRowRemove btn text-danger p-0 icon-link shadow-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model != null)
+                {
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="AddNewRow" style="@(Model[i].JWV_ADD_IsDeleted == 1 ? "display: none;" : "")">
+                            <td>
+                                <select name="JWV_Add_List[@i].JWV_ADD_ADTP_Number" class="form-select JWV_ADD_ADTP_Number">
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.AddressType)
+                                    {
+                                        <option value="@item.Value" selected="@(item.Value == Model[i].JWV_ADD_ADTP_Number.ToString())">@item.Text</option>
+                                    }
+                                </select>
+                            </td>
+                            <td><input name="JWV_Add_List[@i].JWV_ADD_Address_ID" class="form-control JWV_ADD_Address_ID" maxlength="25" autocomplete="off" value="@Model[i].JWV_ADD_Address_ID" /></td>
+                            <td class="table-col-min-lg"><input name="JWV_Add_List[@i].JWV_ADD_Address" class="form-control JWV_ADD_Address" maxlength="250" autocomplete="off" value="@Model[i].JWV_ADD_Address" /></td>
+                            <td><input name="JWV_Add_List[@i].JWV_ADD_City" class="form-control JWV_ADD_City" maxlength="25" autocomplete="off" value="@Model[i].JWV_ADD_City" /></td>
+                            <td><input name="JWV_Add_List[@i].JWV_ADD_State" class="form-control JWV_ADD_State" maxlength="25" autocomplete="off" value="@Model[i].JWV_ADD_State" /></td>
+                            <td><input name="JWV_Add_List[@i].JWV_ADD_Country" class="form-control JWV_ADD_Country" maxlength="25" autocomplete="off" value="@Model[i].JWV_ADD_Country" /></td>
+                            <td><input name="JWV_Add_List[@i].JWV_ADD_PIN" class="form-control JWV_ADD_PIN" maxlength="10" autocomplete="off" value="@Model[i].JWV_ADD_PIN" /></td>
+                            <td><input name="JWV_Add_List[@i].JWV_ADD_GSTIN" class="form-control JWV_ADD_GSTIN" maxlength="15" autocomplete="off" value="@Model[i].JWV_ADD_GSTIN" /></td>
+                            <td class="table-col-sm text-center">
+                                <input type="checkbox" name="JWV_Add_List[@i].JWV_ADD_Default" value="true" class="form-check-input JWV_ADD_Default" checked="@Model[i].JWV_ADD_Default" />
+                            </td>
+                            <td class="action text-center">
+                                <input name="JWV_Add_List[@i].JWV_ADD_Number" type="hidden" value="@Model[i].JWV_ADD_Number" />
+                                <input type="hidden" name="JWV_Add_List[@i].JWV_ADD_IsDeleted" class="JWV_ADD_IsDeleted" value="@Model[i].JWV_ADD_IsDeleted" />
+                                <a class="AddRowRemove btn text-danger p-0 icon-link shadow-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="w-100 table-footer align-items-center">
+        <a id="AddRowButton" class="btn btn-primary">Add Row</a>
+    </div>
+</div>
+
+<script>
+    // rows that are not removed (tab may be hidden, so no :visible check)
+    function activeAddRows() {
+        return $("#AddTableBody tr.AddNewRow").filter(function () {
+            return $(this).find(".JWV_ADD_IsDeleted").val() !== "1";
+        });
+    }
+
+    // Address Type + Address ID required once anything is entered, PIN = 6 digits
+    function validateAddressGrid() {
+        var ok = true;
+        activeAddRows().each(function () {
+            var row = $(this);
+            var type = row.find(".JWV_ADD_ADTP_Number").val();
+            var id = $.trim(row.find(".JWV_ADD_Address_ID").val());
+            var pin = $.trim(row.find(".JWV_ADD_PIN").val());
+            var started = (type && type !== "0") || id !== "";
+            row.find(".JWV_ADD_Address, .JWV_ADD_City, .JWV_ADD_State, .JWV_ADD_Country, .JWV_ADD_PIN, .JWV_ADD_GSTIN").each(function () {
+                if ($.trim($(this).val()) !== "") { started = true; return false; }
+            });
+            if (!started) return true;
+
+            var typeMissing = !type || type === "0";
+            if (typeMissing || id === "") {
+                var msg = (typeMissing && id === "") ? "Address Type and Address ID are required."
+                        : typeMissing ? "Address Type is required." : "Address ID is required.";
+                showAlert(msg);
+                (typeMissing ? row.find(".JWV_ADD_ADTP_Number") : row.find(".JWV_ADD_Address_ID")).focus();
+                ok = false;
+                return false;
+            }
+            if (pin !== "" && !/^\d{6}$/.test(pin)) {
+                showAlert("PIN Code must be 6 digits.");
+                row.find(".JWV_ADD_PIN").focus();
+                ok = false;
+                return false;
+            }
+        });
+        return ok;
+    }
+
+    // Address ID must be unique in the grid
+    function validateDuplicateAddressID() {
+        var seen = [];
+        var ok = true;
+        activeAddRows().each(function () {
+            var input = $(this).find(".JWV_ADD_Address_ID");
+            var id = $.trim(input.val()).toLowerCase();
+            if (id === "") return true;
+            if (seen.indexOf(id) !== -1) {
+                showAlert("Duplicate Address ID not allowed !");
+                input.focus();
+                ok = false;
+                return false;
+            }
+            seen.push(id);
+        });
+        return ok;
+    }
+
+    $(document).ready(function () {
+        var rowCount = @(Model != null ? Model.Count : 0);
+
+        function rowComplete(row) {
+            var type = row.find(".JWV_ADD_ADTP_Number").val();
+            return type && type !== "0" && $.trim(row.find(".JWV_ADD_Address_ID").val()) !== "";
+        }
+        function rowEmpty(row) {
+            var type = row.find(".JWV_ADD_ADTP_Number").val();
+            if (type && type !== "0") return false;
+            var empty = true;
+            row.find("input[type='text']").each(function () { if ($.trim($(this).val()) !== "") { empty = false; return false; } });
+            return empty;
+        }
+
+        function addRow() {
+            var r = $("#AddTempRow").clone().removeAttr("style").removeAttr("id").addClass("AddNewRow");
+            var n = "JWV_Add_List[" + rowCount + "].";
+            r.find("select.JWV_ADD_ADTP_Number").attr("name", n + "JWV_ADD_ADTP_Number");
+            r.find("input.JWV_ADD_Address_ID").attr("name", n + "JWV_ADD_Address_ID");
+            r.find("input.JWV_ADD_Address").attr("name", n + "JWV_ADD_Address");
+            r.find("input.JWV_ADD_City").attr("name", n + "JWV_ADD_City");
+            r.find("input.JWV_ADD_State").attr("name", n + "JWV_ADD_State");
+            r.find("input.JWV_ADD_Country").attr("name", n + "JWV_ADD_Country");
+            r.find("input.JWV_ADD_PIN").attr("name", n + "JWV_ADD_PIN");
+            r.find("input.JWV_ADD_GSTIN").attr("name", n + "JWV_ADD_GSTIN");
+            r.find("input.JWV_ADD_Default").attr("name", n + "JWV_ADD_Default");
+            r.find("input.JWV_ADD_IsDeleted").attr("name", n + "JWV_ADD_IsDeleted").val(0);
+            $("#AddTableBody").append(r);
+            rowCount++;
+        }
+
+        if (activeAddRows().length === 0) addRow();
+
+        $(document).on("click", ".AddRowRemove", function () {
+            var r = $(this).closest("tr");
+            r.find("input.JWV_ADD_IsDeleted").val(1);
+            r.hide();
+            if (activeAddRows().length === 0) addRow();
+        });
+
+        // auto add a new row when the last row has Type + ID
+        $(document).on("change", "tr.AddNewRow select, tr.AddNewRow input.JWV_ADD_Address_ID", function () {
+            var last = activeAddRows().last();
+            if (last.length && rowComplete(last)) addRow();
+        });
+
+        // duplicate Address ID (live)
+        $(document).on("change", ".JWV_ADD_Address_ID", function () {
+            validateDuplicateAddressID();
+        });
+
+        // only one Default per Address Type
+        $(document).on("change", ".JWV_ADD_Default", function () {
+            if (!this.checked) return;
+            var row = $(this).closest("tr");
+            var type = row.find(".JWV_ADD_ADTP_Number").val();
+            if (!type || type === "0") return;
+            activeAddRows().not(row).each(function () {
+                if ($(this).find(".JWV_ADD_ADTP_Number").val() === type) {
+                    $(this).find(".JWV_ADD_Default").prop("checked", false);
+                }
+            });
+        });
+
+        $("#AddRowButton").click(function () {
+            var last = activeAddRows().last();
+            if (!last.length || rowComplete(last)) { addRow(); }
+            else if (!rowEmpty(last)) { validateAddressGrid(); }
+        });
+    });
+</script>
