@@ -129,7 +129,7 @@ namespace ERP_DAO.JobOutwardTransaction
             {
                 con.Open();
 
-                using (SqlCommand cmd = new SqlCommand(@"SELECT * FROM Temp_JO_DeliveryNoteBatch", con))
+                using (SqlCommand cmd = new SqlCommand(@"SELECT * FROM Temp_DeliveryNoteBatch", con))
                 {
                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                     {
@@ -151,7 +151,7 @@ namespace ERP_DAO.JobOutwardTransaction
                 {
                     try
                     {
-                        using (SqlCommand cmd = new SqlCommand(@"DELETE FROM Temp_JO_DeliveryNoteBatch", con, tr))
+                        using (SqlCommand cmd = new SqlCommand(@"DELETE FROM Temp_DeliveryNoteBatch", con, tr))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -671,7 +671,7 @@ namespace ERP_DAO.JobOutwardTransaction
                         // CLEAR TEMP
                         //-------------------------------------------------
 
-                        using (SqlCommand cmd = new SqlCommand(@"DELETE FROM Temp_JO_DeliveryNoteBatch", con, tr))
+                        using (SqlCommand cmd = new SqlCommand(@"DELETE FROM Temp_DeliveryNoteBatch", con, tr))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -862,10 +862,10 @@ namespace ERP_DAO.JobOutwardTransaction
                 con.Open();
 
                 using (SqlCommand cmd = new SqlCommand(@"
-DELETE FROM Temp_JO_DeliveryNoteBatch
+DELETE FROM Temp_DeliveryNoteBatch
 WHERE DBCH_Index = @DBCH_Index;
 
-INSERT INTO Temp_JO_DeliveryNoteBatch
+INSERT INTO Temp_DeliveryNoteBatch
 (
     DBCH_Index,
     DBCH_DBCH_Number,
@@ -939,7 +939,7 @@ FROM
                         var first = list.First();
 
                         using (SqlCommand delCmd = new SqlCommand(@"
-                    DELETE FROM Temp_JO_DeliveryNoteBatch
+                    DELETE FROM Temp_DeliveryNoteBatch
                     WHERE DBCH_Index = @DBCH_Index
                 ", con, tr))
                         {
@@ -950,7 +950,7 @@ FROM
                         foreach (var obj in list)
                         {
                             using (SqlCommand cmd = new SqlCommand(@"
-                        INSERT INTO Temp_JO_DeliveryNoteBatch
+                        INSERT INTO Temp_DeliveryNoteBatch
                         (
                             DBCH_Index,
                             DBCH_DBCH_Number,
@@ -1035,7 +1035,7 @@ FROM
                     try
                     {
                         using (SqlCommand cmd = new SqlCommand(@"
-                   UPDATE Temp_JO_DeliveryNoteBatch
+                   UPDATE Temp_DeliveryNoteBatch
                    SET DBCH_Warehouse_Number = @DBCH_Warehouse_Number,
                        DBCH_Item_Number = @DBCH_Item_Number,
                        DBCH_Date = GETDATE(),
@@ -1088,7 +1088,7 @@ WHERE
                     {
                         // DELETE INDEX GROUP
                         using (SqlCommand delCmd = new SqlCommand(@"
-                    DELETE FROM Temp_JO_DeliveryNoteBatch
+                    DELETE FROM Temp_DeliveryNoteBatch
                     WHERE DBCH_Index = @DBCH_Index;
                 ", con, tr))
                         {
@@ -1101,7 +1101,7 @@ WHERE
                     ;WITH Grouped AS
                     (
                         SELECT DISTINCT DBCH_Index
-                        FROM Temp_JO_DeliveryNoteBatch
+                        FROM Temp_DeliveryNoteBatch
                     ),
                     Renumber AS
                     (
@@ -1112,7 +1112,7 @@ WHERE
                     )
                     UPDATE t
                     SET t.DBCH_Index = r.NewIndex
-                    FROM Temp_JO_DeliveryNoteBatch t
+                    FROM Temp_DeliveryNoteBatch t
                     JOIN Renumber r
                         ON t.DBCH_Index = r.DBCH_Index;
                 ", con, tr))
@@ -1208,7 +1208,7 @@ WHERE
         DBCH_Warehouse_Number,
         RefBatch_Number,
         SUM(ISNULL(DBCH_Qty,0)) AS TotalQty
-    FROM Temp_JO_DeliveryNoteBatch
+    FROM Temp_DeliveryNoteBatch
     GROUP BY
         DBCH_Item_Number,
         DBCH_Warehouse_Number,
@@ -1220,7 +1220,7 @@ SET T.ReservedQty =
         ISNULL(B.TotalQty,0)
       - ISNULL(T.DBCH_Qty,0)
 
-FROM Temp_JO_DeliveryNoteBatch T
+FROM Temp_DeliveryNoteBatch T
 
 INNER JOIN BatchTotal B
     ON  T.DBCH_Item_Number      = B.DBCH_Item_Number
@@ -1335,7 +1335,7 @@ LEFT JOIN
         RefBatch_Number,
         DBCH_Index,
         SUM(ReservedQty) AS ReservedQty
-    FROM Temp_JO_DeliveryNoteBatch
+    FROM Temp_DeliveryNoteBatch
     GROUP BY
         RefBatch_Number,
         DBCH_Index
@@ -1349,7 +1349,7 @@ LEFT JOIN Warehouse W
 LEFT JOIN
 (
     SELECT DBCH_Qty, RefBatch_Number
-    FROM Temp_JO_DeliveryNoteBatch
+    FROM Temp_DeliveryNoteBatch
     WHERE DBCH_Index = @ItemGridIndex
 ) temp
     ON temp.RefBatch_Number = I.ICB_LineBatch_Number
@@ -1417,7 +1417,7 @@ WHERE I.ICB_Item_Number = @Item_Number
             SELECT
                 DBCH_Index,
                 SUM(ISNULL(DBCH_Qty,0)) AS DBCH_Qty
-            FROM Temp_JO_DeliveryNoteBatch
+            FROM Temp_DeliveryNoteBatch
             WHERE JODNH_Number = @JODNH_Number
             GROUP BY DBCH_Index
         ", con))
