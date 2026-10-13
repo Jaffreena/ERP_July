@@ -1,0 +1,180 @@
+@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JOConversionDetailed_DTO>
+@{
+    ViewData["Title"] = "Conversion Detailed";
+}
+@functions {
+    static string D(object d)
+    {
+        if (d == null) return "";
+        return DateTime.TryParse(d.ToString(), out var dt) ? dt.ToString("dd-MMM-yyyy") : d.ToString();
+    }
+}
+<style>
+    .journal-gap td { border: none !important; background-color: #fff; height: 25px; padding: 0; }
+</style>
+
+<form action="/joboutward/transactions/conversion-detailed" method="post" class="h-100">
+
+    <!-- HEADER -->
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Conversion Detailed
+                <a asp-controller="JobworkOutwardMain" asp-action="Index" class="float-end btn p-0 shadow-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="row panel-body gx-2">
+        <div class="col-12 panel-card-fixed" id="BodyHeight">
+            <div class="w-100 rounded-0 border border-primary bg-transparent h-100">
+                <div class="w-100 h-100" id="BodyCardHeader">
+                    <div class="card rounded-0 bg-transparent shadow-none h-100">
+                        <div class="card-body text-black nav-tab-fix h-100">
+
+                            <ul class="nav nav-tabs tab-header">
+                                <li class="nav-item"><a class="nav-link" href="/joboutward/transactions/conversion-summary">Summary</a></li>
+                                <li class="nav-item"><a class="nav-link active" aria-current="page">Detailed</a></li>
+                            </ul>
+
+                            <div class="tab-content tab-body">
+                                <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100 table-fixed">
+
+                                    <!-- TOP BAR -->
+                                    <div class="row table-header">
+                                        <div class="col">
+                                            <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+                                            <input type="hidden" name="PageNumber" value="@ViewData["PageNumber"]" />
+                                            <input type="hidden" name="PageFilter" value="PageFilter" />
+                                            <div class="row">
+                                                <div class="col-5">
+                                                    <div class="row">
+                                                        <div class="col-auto me-1">
+                                                            <select name="PSize" class="form-select w-auto py-1 pe-4" asp-items="@ViewBag.Page" onchange="form.submit();"></select>
+                                                        </div>
+                                                        <div class="col-auto p-0">
+                                                            <input id="Search" name="Search" class="form-control search-control p-1" autocomplete="off" value="@ViewData["CurrentFilter"]" />
+                                                        </div>
+                                                        <div class="col-auto p-0">
+                                                            <input type="submit" name="Mode" value="Search" class="btn btn-primary btn-sm" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- TABLE -->
+                                    <div class="table-body-h-c w-100 border p-2">
+                                        <div class="col-12 table-body table-responsive h-100">
+                                            <table class="table table-bordered table-hover align-middle mb-0 table-grid small" id="MyTable">
+                                                <thead class="thead table-first-header">
+                                                    <tr class="table-info table-first-header-top">
+                                                    <th colspan="6" class="text-center">Conversion Details</th>
+                                                    <th colspan="11" class="text-center">Consumption Details</th>
+                                                    <th colspan="12" class="text-center">Production Details</th>
+                                                    <th colspan="6" class="text-center">Scrap Details</th>
+                                                    </tr>
+                                                    <tr class="table-info">
+                                                    <th>Journal No</th><th>Date</th><th>Segregation</th><th>Shift</th><th>Work Centre</th><th>Process</th>
+                                                    <th>Item Code</th><th>Description</th><th>Outer Dia</th><th>Thickness</th><th>Length</th><th>Material Grade</th><th>Group</th><th>Warehouse</th><th>UOM</th><th class="text-center">Qty</th><th class="text-center">Qty (Kgs)</th>
+                                                    <th>Item Code</th><th>Description</th><th>Outer Dia</th><th>Thickness</th><th>Length</th><th>Material Grade</th><th>Group</th><th>Warehouse</th><th>UOM</th><th>Status</th><th class="text-center">Qty</th><th class="text-center">Qty (Kgs)</th>
+                                                    <th>Item Code</th><th>Description</th><th>Group</th><th>Warehouse</th><th>UOM</th><th class="text-center">Qty</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in Model)
+                                                    {
+                                                        bool isJournalStart = !string.IsNullOrEmpty(item.JOCNVH_JournalNo);
+                                        if (isJournalStart)
+                                        {
+                                            <tr class="journal-gap"><td colspan="100">&nbsp;</td></tr>
+                                        }
+                                        <tr class="@(isJournalStart ? "journal-start" : "journal-detail")">
+                                                            <td>@item.JOCNVH_JournalNo</td>
+                                                <td>@D(item.JOCNVH_Date)</td>
+                                                <td>@item.Segregation</td>
+                                                <td>@item.SFT_ShiftName</td>
+                                                <td>@item.JWWC_JW_WorkCentre</td>
+                                                <td>@item.JPRS_ProcessName</td>
+                                                <td>@item.Cons_ItemCode</td><td>@item.Cons_ItemDescription</td><td>@item.Cons_OuterDia</td><td>@item.Cons_Thickness</td><td>@item.Cons_Length</td><td>@item.Cons_MaterialGrade</td><td>@item.Cons_ItemGroup</td><td>@item.Cons_WHCode</td><td>@item.Cons_UOMCode</td>
+                                                <td class="text-center JOCNVC_ConsQty">@item.JOCNVC_ConsQty</td>
+                                                <td class="text-center JOCNVC_ConsQty_Kgs">@item.JOCNVC_ConsQty_Kgs</td>
+                                                <td>@item.Prod_ItemCode</td><td>@item.Prod_ItemDescription</td><td>@item.Prod_OuterDia</td><td>@item.Prod_Thickness</td><td>@item.Prod_Length</td><td>@item.Prod_MaterialGrade</td><td>@item.Prod_ItemGroup</td><td>@item.Prod_WHCode</td><td>@item.Prod_UOMCode</td>
+                                                <td>@item.JOCNVP_ItemStatus</td>
+                                                <td class="text-center JOCNVP_ProdQty">@item.JOCNVP_ProdQty</td>
+                                                <td class="text-center JOCNVP_ProdQty_Kgs">@item.JOCNVP_ProdQty_Kgs</td>
+                                                <td>@item.Scrap_ItemCode</td><td>@item.Scrap_ItemDescription</td><td>@item.Scrap_ItemGroup</td><td>@item.Scrap_WHCode</td><td>@item.Scrap_UOMCode</td>
+                                                <td class="text-center JOCNVS_ScrapQty">@item.JOCNVS_ScrapQty</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="table-info">
+                                                    <td colspan="15" class="text-end fw-bold">Total</td>
+                                                <td class="p-1"><input id="Total_ConsumptionQty" class="form-control text-center" readonly /></td>
+                                                <td class="p-1"><input id="Total_ConsumptionQtyKgs" class="form-control text-center" readonly /></td>
+                                                <td colspan="10"></td>
+                                                <td class="p-1"><input id="Total_ProductionQty" class="form-control text-center" readonly /></td>
+                                                <td class="p-1"><input id="Total_ProductionQtyKgs" class="form-control text-center" readonly /></td>
+                                                <td colspan="5"></td>
+                                                <td class="p-1"><input id="Total_ScrapQty" class="form-control text-center" readonly /></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- PAGINATION -->
+                                    @{
+                                        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                                        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                                        Int32 TotalSize = Convert.ToInt32(ViewData["TotalSize"]);
+                                        Int32 PageNumber = Convert.ToInt32(ViewData["PageNumber"]);
+                                        Int32 PageSize = Convert.ToInt32(ViewData["PageSize"]);
+                                        Int32 StartNumber = 1;
+                                        Int32 EndNumber = 0;
+                                        if (PageNumber > 1) { StartNumber = StartNumber + ((PageNumber - 1) * PageSize); }
+                                        EndNumber = (EndNumber + PageSize) + ((PageNumber - 1) * PageSize);
+                                        if (EndNumber > TotalSize) { EndNumber = TotalSize; }
+                                        if (StartNumber > EndNumber) { StartNumber = EndNumber; }
+                                        string pg = "/joboutward/transactions/conversion-detailed?pageNumber=";
+                                    }
+                                    <div class="row table-cal align-items-center">
+                                        <div class="col align-items-center">
+                                            <div class="row align-items-center">
+                                                <div class="col py-1">Showing @StartNumber to @EndNumber</div>
+                                                <div class="col text-center py-1">Total records @TotalSize</div>
+                                                <div class="col">
+                                                    <nav>
+                                                        <ul class="pagination float-end mb-0">
+                                                            <li class="page-item"><a href="@(pg)1" class="page-link @prevDisabled">&lt;&lt;</a></li>
+                                                            <li class="page-item"><a href="@(pg)@(Model.PageIndex - 1)" class="page-link @prevDisabled">&lt;</a></li>
+                                                            <li class="page-item"><a class="page-link">@ViewData["PageNumber"]</a></li>
+                                                            <li class="page-item"><a href="@(pg)@(Model.PageIndex + 1)" class="page-link @nextDisabled">&gt;</a></li>
+                                                            <li class="page-item"><a href="@(pg)@ViewData["PageCount"]" class="page-link @nextDisabled">&gt;&gt;</a></li>
+                                                        </ul>
+                                                    </nav>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/JO_Conversion/JO_Conversion_Detailed.js" asp-append-version="true"></script>
+}

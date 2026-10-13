@@ -1,4 +1,4 @@
-﻿using ERP_DTO;
+using ERP_DTO;
 using ERP_DTO.JobOutwardTransaction;
 using Microsoft.Practices.EnterpriseLibrary.Data;
 using Microsoft.Practices.EnterpriseLibrary.Data.Sql;
@@ -612,6 +612,71 @@ namespace ERP_DAO.JobOutwardTransaction
                                     cmd.Parameters.AddWithValue("@BatchValue", batch.JODNI_BCH_BatchValue);
                                     cmd.Parameters.AddWithValue("@RefBatchNumber", batch.JODNI_BCH_Number);
                                     cmd.Parameters.AddWithValue("@Item_Number", item.ItemMasterNumber);
+
+                                    cmd.ExecuteNonQuery();
+                                }
+
+                                //-------------------------------------------------
+                                // JO IN COMMON BATCH (Vendor / Rexan side stock-in)
+                                //-------------------------------------------------
+
+                                using (SqlCommand cmd = new SqlCommand(@"
+                            INSERT INTO JO_IN_COMMON_BATCH
+                            (
+                                JOICB_TransType,
+                                JOICB_TransDate,
+                                JOICB_Header_Number,
+                                JOICB_LineItem_Number,
+                                JOICB_Item_Number,
+                                JOICB_LineBatch_Number,
+                                JOICB_Warehouse_Number,
+                                JOICB_BatchDate,
+                                JOICB_BatchNo,
+                                JOICB_ItemStatus,
+                                JOICB_BatchQty,
+                                JOICB_BatchUnitPrice,
+                                JOICB_BatchValue,
+                                JOICB_RefBatch_Number,
+                                JOICB_CreatorCode,
+                                JOICB_CreatorDate,
+                                JOICB_EditorCode,
+                                JOICB_EditorDate
+                            )
+                            VALUES
+                            (
+                                @TransType,
+                                @TransDate,
+                                @Header_Number,
+                                @LineItem_Number,
+                                @Item_Number,
+                                NEXT VALUE FOR dbo.JO_IN_LineBatch_Seq,
+                                @Warehouse,
+                                @BatchDate,
+                                @BatchNo,
+                                @ItemStatus,
+                                @BatchQty,
+                                @BatchUnitPrice,
+                                @BatchValue,
+                                @RefBatchNumber,
+                                0,
+                                GETDATE(),
+                                0,
+                                GETDATE()
+                            )", con, tr))
+                                {
+                                    cmd.Parameters.AddWithValue("@TransType", TRANS_TYPE);
+                                    cmd.Parameters.AddWithValue("@TransDate", DN_DTO.Header.JODNH_DN_Date);
+                                    cmd.Parameters.AddWithValue("@Header_Number", DN_Number);
+                                    cmd.Parameters.AddWithValue("@LineItem_Number", item.ItemNumber);
+                                    cmd.Parameters.AddWithValue("@Item_Number", item.ItemMasterNumber);
+                                    cmd.Parameters.AddWithValue("@Warehouse", DN_DTO.Header.JODNH_WH_Number);
+                                    cmd.Parameters.AddWithValue("@BatchDate", batch.JODNI_BCH_BatchDate);
+                                    cmd.Parameters.AddWithValue("@BatchNo", batch.JODNI_BCH_BatchNo);
+                                    cmd.Parameters.AddWithValue("@ItemStatus", "Good");
+                                    cmd.Parameters.AddWithValue("@BatchQty", useQty);
+                                    cmd.Parameters.AddWithValue("@BatchUnitPrice", batch.JODNI_BCH_BatchUnitPrice);
+                                    cmd.Parameters.AddWithValue("@BatchValue", batch.JODNI_BCH_BatchValue);
+                                    cmd.Parameters.AddWithValue("@RefBatchNumber", batch.JODNI_BCH_Number);
 
                                     cmd.ExecuteNonQuery();
                                 }

@@ -30,7 +30,88 @@ namespace ERP.Controllers.JobOutward
 
         #endregion
 
+        #region Default Form Setting (DFS) get
+        // Create page only: loads default values on page load (JWI + Freight panels)
+        [HttpGet]
+        [Route("joboutward/transactions/jo-service-order-dfs/jwi-get")]
+        public IActionResult GetJWIServiceOrderDFS()
+        {
+            JOJWI_SVO_DFS_DAO dao = new JOJWI_SVO_DFS_DAO();
+
+            DataSet ds = dao.JO_JobworkInvoiceServiceOrderGet();
+
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                var row = ds.Tables[0].Rows[0];
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        jojwI_SVO_DFS_Number = row["JOJWI_SVO_DFS_Number"],
+                        jojwI_SVO_DFS_MS_Number = row["JOJWI_SVO_DFS_MS_Number"],
+                        jojwI_SVO_DFS_JW_Vendor_Number = row["JOJWI_SVO_DFS_JW_Vendor_Number"],
+                        jwV_JW_VendorName = row["JWV_JW_VendorName"],
+                        jojwI_SVO_DFS_PaymentTerms = row["JOJWI_SVO_DFS_PaymentTerms"],
+                        jojwI_SVO_DFS_DeliveryTerms = row["JOJWI_SVO_DFS_DeliveryTerms"],
+                        jojwI_SVO_DFS_DeliveryMode = row["JOJWI_SVO_DFS_DeliveryMode"],
+                        jojwI_SVO_DFS_Tax = row["JOJWI_SVO_DFS_Tax"],
+                        jojwI_SVO_DFS_TDC = row["JOJWI_SVO_DFS_TDC"],
+                        jojwI_SVO_DFS_Remarks = row["JOJWI_SVO_DFS_Remarks"]
+                    }
+                });
+            }
+
+            return Json(new { success = false });
+        }
+
+        [HttpGet]
+        [Route("joboutward/transactions/jo-service-order-dfs/freight-get")]
+        public IActionResult GetFreightServiceOrderDFS()
+        {
+            JOFRT_SVO_DFS_DAO dao = new JOFRT_SVO_DFS_DAO();
+
+            DataSet ds = dao.JO_FreightServiceOrderGet();
+
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                var row = ds.Tables[0].Rows[0];
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        jofrT_SVO_DFS_Number = row["JOFRT_SVO_DFS_Number"],
+                        jofrT_SVO_DFS_Category = row["JOFRT_SVO_DFS_Category"],
+                        jofrT_SVO_DFS_JW_Vendor_Number = row["JOFRT_SVO_DFS_JW_Vendor_Number"],
+                        jwV_JW_VendorName = row["JWV_JW_VendorName"],
+                        jofrT_SVO_DFS_PaymentTerms = row["JOFRT_SVO_DFS_PaymentTerms"],
+                        jofrT_SVO_DFS_DeliveryTerms = row["JOFRT_SVO_DFS_DeliveryTerms"],
+                        jofrT_SVO_DFS_DeliveryMode = row["JOFRT_SVO_DFS_DeliveryMode"],
+                        jofrT_SVO_DFS_Tax = row["JOFRT_SVO_DFS_Tax"],
+                        jofrT_SVO_DFS_TDC = row["JOFRT_SVO_DFS_TDC"],
+                        jofrT_SVO_DFS_Remarks = row["JOFRT_SVO_DFS_Remarks"]
+                    }
+                });
+            }
+
+            return Json(new { success = false });
+        }
+        #endregion
+
         #region lookups
+
+        // Process list (fresh from DB, for dropdown refresh)
+        [HttpGet]
+        [Route("joboutward/transactions/jo-service-order/process-list")]
+        public IActionResult JO_ProcessList()
+        {
+            DataSet DS = JO_DAO.JO_ServiceOrderLookupDB(1, "", "", null);
+            var data = Help.GetCat(DS.Tables[2]).Select(x => new { value = x.Value, text = x.Text });
+            return Json(data);
+        }
 
         // JW Vendor search
         [HttpGet]
@@ -257,40 +338,60 @@ namespace ERP.Controllers.JobOutward
         {
             foreach (var s in saved.Items)
             {
-                double usedQty = s.InvoicedQty + s.InvoiceToBeRaised;
+                // Min Amend Qty = RN Assigned + Direct Assigned
+                double usedQty = s.RNAssignedQty + s.DirectAssignedQty;
                 var posted = items.FirstOrDefault(x => x.JOJWI_SVOI_Number == s.JOJWI_SVOI_Number);
 
                 if (posted == null)
                 {
                     if (usedQty > 0)
-                        return "Item " + s.JOJWI_SVOI_Item_Code + " has invoiced / pending invoice qty and cannot be deleted";
+                        return "This row cannot be deleted. Assigned qty " + usedQty + " already exists.";
                     continue;
                 }
 
-                if (posted.JOJWI_SVOI_Qty < usedQty)
-                    return "Amend Qty for item " + s.JOJWI_SVOI_Item_Code + " cannot be less than " + usedQty;
+                if (usedQty > 0)
+                {
+                    if (posted.JOJWI_SVOI_Qty < usedQty)
+                        return "Amend Qty cannot be less than " + usedQty +
+                               " (RN Assigned " + s.RNAssignedQty + " + Direct Assigned " + s.DirectAssignedQty + ").";
+
+                    if (posted.JOJWI_SVOI_JPRS_Number != s.JOJWI_SVOI_JPRS_Number ||
+                        posted.JOJWI_SVOI_Item_Number != s.JOJWI_SVOI_Item_Number ||
+                        posted.JOJWI_SVOI_UoM_Number != s.JOJWI_SVOI_UoM_Number)
+                        return "Item/Process/UoM cannot be changed. Assigned qty already exists.";
+                }
             }
             return null;
         }
 
         private string ValidateFreightAmend(JOFRT_ServiceOrder_DTO saved, List<JOFRT_ServiceOrderItem_DTO> items)
         {
-            int line = 0;
+            // AssignedQty from the Get SP is already DN or RN by the saved Category
+            string label = saved.Header.JOFRT_SVOH_Category == "DELIVERY NOTE" ? "DN" : "RN";
+
             foreach (var s in saved.Items)
             {
-                line++;
-                double usedQty = s.InvoicedQty + s.InvoiceToBeRaised;
+                // Min Amend Qty = (DN or RN) Assigned + Direct Assigned
+                double usedQty = s.AssignedQty + s.DirectAssignedQty;
                 var posted = items.FirstOrDefault(x => x.JOFRT_SVOI_Number == s.JOFRT_SVOI_Number);
 
                 if (posted == null)
                 {
                     if (usedQty > 0)
-                        return "Line " + line + " has invoiced / pending invoice qty and cannot be deleted";
+                        return "This row cannot be deleted. Assigned qty " + usedQty + " already exists.";
                     continue;
                 }
 
-                if (posted.JOFRT_SVOI_Qty < usedQty)
-                    return "Amend Qty for line " + line + " cannot be less than " + usedQty;
+                if (usedQty > 0)
+                {
+                    if (posted.JOFRT_SVOI_Qty < usedQty)
+                        return "Amend Qty cannot be less than " + usedQty +
+                               " (" + label + " Assigned " + s.AssignedQty + " + Direct Assigned " + s.DirectAssignedQty + ").";
+
+                    if (posted.JOFRT_SVOI_JPRS_Number != s.JOFRT_SVOI_JPRS_Number ||
+                        posted.JOFRT_SVOI_UoM_Number != s.JOFRT_SVOI_UoM_Number)
+                        return "Item/Process/UoM cannot be changed. Assigned qty already exists.";
+                }
             }
             return null;
         }
@@ -348,7 +449,7 @@ namespace ERP.Controllers.JobOutward
             {
                 if (i.JOJWI_SVOI_JPRS_Number <= 0) return "Process is required";
                 if (i.JOJWI_SVOI_Item_Number <= 0) return "Item Code is required";
-                if (!i.JOJWI_SVOI_WH_Number.HasValue || i.JOJWI_SVOI_WH_Number.Value <= 0) return "Warehouse is required";
+      
                 if (i.JOJWI_SVOI_UoM_Number <= 0) return "UOM is required";
                 if (i.JOJWI_SVOI_Qty <= 0) return "Qty is required";
                 if (i.JOJWI_SVOI_UnitPrice <= 0) return "Unit Price is required";

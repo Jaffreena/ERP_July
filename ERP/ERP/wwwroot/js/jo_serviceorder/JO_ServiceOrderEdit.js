@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
 
     //#region JW_Vendor – Focus Out
     $(document).on("focusout", ".JW_Vendor_Name", function () {
@@ -171,14 +171,12 @@ const ItemTableFields = [
     { cls: ".OuterDia", min: 8, max: 8, align: "center" },   // Outer Dia
     { cls: ".Thickness", min: 8, max: 8, align: "center" },   // Thickness
     { cls: ".Length", min: 8, max: 8, align: "center" },   // Length
-    { cls: ".Width", min: 8, max: 8, align: "center" },   // Width
     { cls: ".MaterialGrade", min: 10, max: 25, align: "left" },   // Material Grade
     { cls: ".ItemGroup", min: 10, max: 30, align: "left" },   // Item Group
-    { cls: ".JOJWI_SVOI_WH_Number", min: 10, max: 15, align: "center" },   // Warehouse
     { cls: ".JOJWI_SVOI_UoM_Number", min: 10, max: 15, align: "center" },   // UoM
     { cls: ".SVO_Qty", min: 10, max: 20, align: "center" },   // SVO Qty (original)
-    { cls: ".InvoicedQty", min: 10, max: 20, align: "center" },   // Invoiced Qty
-    { cls: ".InvoiceToBeRaised", min: 10, max: 20, align: "center" },   // Invoice To Be Raised
+    { cls: ".RNAssignedQty", min: 10, max: 20, align: "center" },   // RN Assigned
+    { cls: ".DirectAssignedQty", min: 10, max: 20, align: "center" },   // Direct Assigned
     { cls: ".JOJWI_SVOI_Qty", min: 10, max: 20, align: "center" },   // Amend Qty
     { cls: ".JOJWI_SVOI_UnitPrice", min: 10, max: 20, align: "right", extraPadding: 28 },   // Unit Price
     { cls: ".JOJWI_SVOI_Amount", min: 13, max: 25, align: "right", extraPadding: 28 },   // Amount
@@ -191,8 +189,8 @@ const FreightItemTableFields = [
     { cls: ".JOFRT_SVOI_ToWH_Number", min: 10, max: 25, align: "left", extraPadding: 28 },   // To WH
     { cls: ".JOFRT_SVOI_UoM_Number", min: 10, max: 15, align: "center", extraPadding: 28 },   // UoM
     { cls: ".SVO_Qty", min: 10, max: 20, align: "center" },   // SVO Qty (original)
-    { cls: ".InvoicedQty", min: 10, max: 20, align: "center" },   // Invoiced Qty
-    { cls: ".InvoiceToBeRaised", min: 10, max: 20, align: "center" },   // Invoice To Be Raised
+    { cls: ".AssignedQty", min: 10, max: 20, align: "center" },   // RN / DN Assigned
+    { cls: ".DirectAssignedQty", min: 10, max: 20, align: "center" },   // Direct Assigned
     { cls: ".JOFRT_SVOI_Qty", min: 10, max: 20, align: "center" },   // Amend Qty
     { cls: ".JOFRT_SVOI_Rate", min: 10, max: 20, align: "right", extraPadding: 28 },   // Rate
     { cls: ".JOFRT_SVOI_Amount", min: 13, max: 25, align: "right", extraPadding: 28 }    // Amount
@@ -447,19 +445,20 @@ $(document).ready(function () {
     });
     //#endregion
 
-    //#region Amend Qty check (JWI + Freight): Qty cannot go below Invoiced + Invoice To Be Raised
+    //#region Amend Qty check (JWI + Freight): Qty cannot go below (RN or DN) Assigned + Direct Assigned
     $(document).on("blur", ".JOJWI_SVOI_Qty, .JOFRT_SVOI_Qty", function () {
 
         let $row = $(this).closest("tr");
 
-        let invoicedQty = parseFloat(removeComma($row.find(".InvoicedQty").val())) || 0;
-        let invoiceToBeRaised = parseFloat(removeComma($row.find(".InvoiceToBeRaised").val())) || 0;
+        let assignedQty = parseFloat(removeComma($row.find(".RNAssignedQty, .AssignedQty").val())) || 0;
+        let directQty = parseFloat(removeComma($row.find(".DirectAssignedQty").val())) || 0;
         let amendQty = parseFloat(removeComma($(this).val())) || 0;
 
-        let minQty = invoicedQty + invoiceToBeRaised;
+        let minQty = assignedQty + directQty;
+        let label = $(this).hasClass("JOJWI_SVOI_Qty") ? "RN" : GetFreightAssignedLabel();
 
         if (amendQty < minQty) {
-            alert(`Amend Qty cannot be less than ${minQty}`);
+            alert(`Amend Qty cannot be less than ${minQty} (${label} Assigned ${assignedQty} + Direct Assigned ${directQty}).`);
             $(this).val(minQty);
             $(this).focus();
         }
@@ -540,9 +539,6 @@ $(document).ready(function () {
             if (el.hasClass("JOJWI_SVOI_JPRS_Number")) {
                 if (!el.val() || el.val() === "0") { isValid = false; el.focus(); return false; }
             }
-            if (el.hasClass("JOJWI_SVOI_WH_Number")) {
-                if (!el.val() || el.val() === "0") { isValid = false; el.focus(); return false; }
-            }
         });
 
         if (!isValid) {
@@ -575,7 +571,7 @@ $(document).ready(function () {
         });
 
         // new row: no saved qty to compare with
-        $newRow.find(".SVO_Qty, .InvoicedQty, .InvoiceToBeRaised").val("0");
+        $newRow.find(".SVO_Qty, .RNAssignedQty, .DirectAssignedQty").val("0");
 
         $newRow.attr("data-rowid", new Date().getTime());
 
@@ -654,7 +650,7 @@ $(document).ready(function () {
         });
 
         // new row: no saved qty to compare with
-        $newRow.find(".SVO_Qty, .InvoicedQty, .InvoiceToBeRaised").val("0");
+        $newRow.find(".SVO_Qty, .AssignedQty, .DirectAssignedQty").val("0");
 
         $newRow.attr("data-rowid", new Date().getTime());
 
@@ -747,7 +743,7 @@ $(document).ready(function () {
     });
     //#endregion
 
-    //#region remove checked rows (saved row with invoiced / pending qty cannot be deleted)
+    //#region remove checked rows (saved row with RN/DN or Direct Assigned qty cannot be deleted)
     $("#RemoveItemRowButton").on("click", function () {
 
         let checkedRows = $("#ItemTable tbody tr.NewRow:visible").has(".CheckItem:checked");
@@ -763,11 +759,11 @@ $(document).ready(function () {
             let itemNumber = currentRow.find(".JOJWI_SVOI_Number").val();
 
             let usedQty =
-                (parseFloat(removeComma(currentRow.find(".InvoicedQty").val())) || 0) +
-                (parseFloat(removeComma(currentRow.find(".InvoiceToBeRaised").val())) || 0);
+                (parseFloat(removeComma(currentRow.find(".RNAssignedQty").val())) || 0) +
+                (parseFloat(removeComma(currentRow.find(".DirectAssignedQty").val())) || 0);
 
             if (itemNumber && itemNumber !== "0" && usedQty > 0) {
-                alert("This item already has invoiced / pending invoice qty and cannot be deleted.");
+                alert("This row cannot be deleted. Assigned qty " + usedQty + " already exists.");
                 return false;
             }
 
@@ -800,11 +796,11 @@ $(document).ready(function () {
             let itemNumber = currentRow.find(".JOFRT_SVOI_Number").val();
 
             let usedQty =
-                (parseFloat(removeComma(currentRow.find(".InvoicedQty").val())) || 0) +
-                (parseFloat(removeComma(currentRow.find(".InvoiceToBeRaised").val())) || 0);
+                (parseFloat(removeComma(currentRow.find(".AssignedQty").val())) || 0) +
+                (parseFloat(removeComma(currentRow.find(".DirectAssignedQty").val())) || 0);
 
             if (itemNumber && itemNumber !== "0" && usedQty > 0) {
-                alert("This item already has invoiced / pending invoice qty and cannot be deleted.");
+                alert("This row cannot be deleted. Assigned qty " + usedQty + " already exists.");
                 return false;
             }
 
@@ -997,14 +993,12 @@ function JWIAutoAddRow(currentRow) {
 
     let itemCode = currentRow.find(".JOJWI_SVOI_Item_Code").val();
     let jprsNo = currentRow.find(".JOJWI_SVOI_JPRS_Number").val();
-    let whNo = currentRow.find(".JOJWI_SVOI_WH_Number").val();
 
     let isRowValid =
         itemCode &&
         qty > 0 &&
         price > 0 &&
-        jprsNo && jprsNo !== "0" &&
-        whNo && whNo !== "0";
+        jprsNo && jprsNo !== "0";
 
     let isLastRow = currentRow.is("#ItemTable tbody tr.NewRow:last");
 
@@ -1360,7 +1354,6 @@ function JWIValidateItemGrid() {
 
         let process = row.find(".JOJWI_SVOI_JPRS_Number").val();
         let itemCode = row.find(".JOJWI_SVOI_Item_Code").val();
-        let warehouse = row.find(".JOJWI_SVOI_WH_Number").val();
         let uom = row.find(".JOJWI_SVOI_UoM_Number").val();
         let qty = row.find(".JOJWI_SVOI_Qty").val();
         let unitPrice = row.find(".JOJWI_SVOI_UnitPrice").val();
@@ -1368,7 +1361,6 @@ function JWIValidateItemGrid() {
         let isRowStarted =
             (process && process.trim() !== "") ||
             (itemCode && itemCode.trim() !== "") ||
-            (warehouse && warehouse.trim() !== "") ||
             (uom && uom.trim() !== "") ||
             (qty && qty.trim() !== "") ||
             (unitPrice && unitPrice.trim() !== "");
@@ -1386,12 +1378,6 @@ function JWIValidateItemGrid() {
 
         if (!itemCode || itemCode.trim() === "") {
             showAlert('Row ' + rowNumber + ': Item Code is required', row.find(".JOJWI_SVOI_Item_Code"));
-            isValid = false;
-            return false;
-        }
-
-        if (!warehouse || warehouse.trim() === "" || warehouse.trim() === "0") {
-            showAlert('Row ' + rowNumber + ': Warehouse is required', row.find(".JOJWI_SVOI_WH_Number"));
             isValid = false;
             return false;
         }
@@ -1415,12 +1401,13 @@ function JWIValidateItemGrid() {
         }
 
         // Amend Qty check
-        let invoicedQty = parseFloat(removeComma(row.find(".InvoicedQty").val())) || 0;
-        let toBeRaised = parseFloat(removeComma(row.find(".InvoiceToBeRaised").val())) || 0;
-        let minQty = invoicedQty + toBeRaised;
+        let rnAssigned = parseFloat(removeComma(row.find(".RNAssignedQty").val())) || 0;
+        let directAssigned = parseFloat(removeComma(row.find(".DirectAssignedQty").val())) || 0;
+        let minQty = rnAssigned + directAssigned;
 
         if ((parseFloat(removeComma(qty)) || 0) < minQty) {
-            showAlert('Row ' + rowNumber + ': Amend Qty cannot be less than ' + minQty, row.find(".JOJWI_SVOI_Qty"));
+            showAlert('Row ' + rowNumber + ': Amend Qty cannot be less than ' + minQty +
+                ' (RN Assigned ' + rnAssigned + ' + Direct Assigned ' + directAssigned + ')', row.find(".JOJWI_SVOI_Qty"));
             isValid = false;
             return false;
         }
@@ -1505,12 +1492,13 @@ function FreightValidateItemGrid() {
         }
 
         // Amend Qty check
-        let invoicedQty = parseFloat(removeComma(row.find(".InvoicedQty").val())) || 0;
-        let toBeRaised = parseFloat(removeComma(row.find(".InvoiceToBeRaised").val())) || 0;
-        let minQty = invoicedQty + toBeRaised;
+        let assigned = parseFloat(removeComma(row.find(".AssignedQty").val())) || 0;
+        let directAssigned = parseFloat(removeComma(row.find(".DirectAssignedQty").val())) || 0;
+        let minQty = assigned + directAssigned;
 
         if ((parseFloat(removeComma(qty)) || 0) < minQty) {
-            showAlert('Row ' + rowNumber + ': Amend Qty cannot be less than ' + minQty, row.find(".JOFRT_SVOI_Qty"));
+            showAlert('Row ' + rowNumber + ': Amend Qty cannot be less than ' + minQty +
+                ' (' + GetFreightAssignedLabel() + ' Assigned ' + assigned + ' + Direct Assigned ' + directAssigned + ')', row.find(".JOFRT_SVOI_Qty"));
             isValid = false;
             return false;
         }
@@ -1651,6 +1639,18 @@ function BindFreightHeader(h) {
 }
 //#endregion
 
+//#region Freight Assigned label (RN Assigned / DN Assigned by Category)
+function GetFreightAssignedLabel() {
+    return $("#FreightHeader_JOFRT_SVOH_Category").val() === "DN" ? "DN" : "RN";
+}
+
+function UpdateFreightAssignedLabel() {
+    $("#FreightAssignedHeader").text(GetFreightAssignedLabel() + " Assigned");
+}
+
+$(document).on("change", "#FreightHeader_JOFRT_SVOH_Category", UpdateFreightAssignedLabel);
+//#endregion
+
 //#region BIND items
 function BindItems(items) {
 
@@ -1696,9 +1696,15 @@ function BindItems(items) {
 
         // Amend pattern: SVO Qty = saved qty (readonly), Qty = Amend Qty (editable)
         $row.find(".SVO_Qty").val(addComma(qty, "q"));
-        $row.find(".InvoicedQty").val(addComma(it.InvoicedQty || 0, "q"));
-        $row.find(".InvoiceToBeRaised").val(addComma(it.InvoiceToBeRaised || 0, "q"));
+        $row.find(".RNAssignedQty").val(addComma(it.RNAssignedQty || 0, "q"));
+        $row.find(".DirectAssignedQty").val(addComma(it.DirectAssignedQty || 0, "q"));
         $row.find(".JOJWI_SVOI_Qty").val(addComma(qty, "q"));
+
+        // used row (RN + Direct > 0): Item / Process / UoM locked
+        if ((it.RNAssignedQty || 0) + (it.DirectAssignedQty || 0) > 0) {
+            $row.find(".JOJWI_SVOI_JPRS_Number, .JOJWI_SVOI_UoM_Number").prop("disabled", true);
+            $row.find(".JOJWI_SVOI_Item_Code").prop("readonly", true);
+        }
 
         $row.find(".JOJWI_SVOI_UnitPrice").val(addComma(it.JOJWI_SVOI_UnitPrice || 0, "c"));
         $row.find(".JOJWI_SVOI_Amount").val(addComma(it.JOJWI_SVOI_Amount || 0, "c"));
@@ -1744,6 +1750,7 @@ function BindFreightItems(items) {
     $("#FreightTableBody tr.FreightNewRow").remove();
 
     let idx = 0;
+    let anyUsedRow = false;
 
     items.forEach(function (it) {
 
@@ -1769,9 +1776,15 @@ function BindFreightItems(items) {
 
         // Amend pattern (JWI மாதிரியே)
         $row.find(".SVO_Qty").val(addComma(qty, "q"));
-        $row.find(".InvoicedQty").val(addComma(it.InvoicedQty || 0, "q"));
-        $row.find(".InvoiceToBeRaised").val(addComma(it.InvoiceToBeRaised || 0, "q"));
+        $row.find(".AssignedQty").val(addComma(it.AssignedQty || 0, "q"));
+        $row.find(".DirectAssignedQty").val(addComma(it.DirectAssignedQty || 0, "q"));
         $row.find(".JOFRT_SVOI_Qty").val(addComma(qty, "q"));
+
+        // used row (DN/RN + Direct > 0): Process / UoM locked
+        if ((it.AssignedQty || 0) + (it.DirectAssignedQty || 0) > 0) {
+            $row.find(".JOFRT_SVOI_JPRS_Number, .JOFRT_SVOI_UoM_Number").prop("disabled", true);
+            anyUsedRow = true;
+        }
 
         $row.find(".JOFRT_SVOI_Rate").val(addComma(it.JOFRT_SVOI_Rate || 0, "c"));
         $row.find(".JOFRT_SVOI_Amount").val(addComma(it.JOFRT_SVOI_Amount || 0, "c"));
@@ -1784,6 +1797,13 @@ function BindFreightItems(items) {
     });
 
     freightRowIndex = idx;
+
+    UpdateFreightAssignedLabel();
+
+    // OPTIONAL (Category lock was marked "in doubt"): delete these 3 lines to leave Category editable
+    if (anyUsedRow) {
+        $("#FreightHeader_JOFRT_SVOH_Category").prop("disabled", true);
+    }
 
     isBindingItems = false;
 

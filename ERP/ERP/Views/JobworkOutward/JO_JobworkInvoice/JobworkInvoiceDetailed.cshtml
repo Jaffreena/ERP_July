@@ -1,0 +1,242 @@
+﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JO_JobworkInvoiceDetailed_DTO>
+@using System.Globalization;
+@{
+    CultureInfo India = new CultureInfo("hi-IN");
+    ViewData["Title"] = "Jobwork Invoice Detailed";
+
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
+    Int32 TotalSize = Convert.ToInt32(ViewData["TotalSize"]);
+    Int32 PageNumber = Convert.ToInt32(ViewData["PageNumber"]);
+    Int32 PageSize = Convert.ToInt32(ViewData["PageSize"]);
+    Int32 PageCount = Convert.ToInt32(ViewData["PageCount"]);
+    Int32 StartNumber = 1 + ((PageNumber > 1 ? PageNumber - 1 : 0) * PageSize);
+    Int32 EndNumber = PageSize + ((PageNumber > 1 ? PageNumber - 1 : 0) * PageSize);
+    if (EndNumber > TotalSize) EndNumber = TotalSize;
+    if (StartNumber > EndNumber) StartNumber = EndNumber;
+}
+
+<form id="ListForm" method="post" action="/joboutward/transactions/jobwork-invoice-detailed" class="h-100">
+
+    <!-- state used by JO_JobworkInvoiceList.js -->
+    <input type="hidden" id="Mode" name="Mode" value="" />
+    <input type="hidden" id="JOSVIH_No" name="JOSVIH_No" value="" />
+    <input type="hidden" id="PageNumber" name="PageNumber" value="@PageNumber" />
+    <input type="hidden" id="SortOrder" name="SortOrder" value="@ViewData["CurrentSort"]" />
+    <input type="hidden" id="PageFilter" name="PageFilter" value="" />
+
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Jobwork Invoice Detailed
+                <a asp-controller="JobworkOutwardMain" asp-action="Index" class="float-end btn p-0 shadow-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row panel-body gx-2">
+        <div class="col-12 panel-card-fixed" id="BodyHeight">
+            <div class="w-100 rounded-0 border border-primary bg-transparent h-100">
+                <div class="w-100 h-100" id="BodyCardHeader">
+                    <div class="card rounded-0 bg-transparent shadow-none h-100">
+                        <div class="card-body text-black nav-tab-fix h-100">
+
+                            <ul class="nav nav-tabs tab-header">
+                                <li class="nav-item"><a class="nav-link" href="/joboutward/transactions/jobwork-invoice-summary">Summary</a></li>
+                                <li class="nav-item"><a class="nav-link active" aria-current="page">Detailed</a></li>
+                                <li class="ms-auto me-2 mb-1">
+                                    <a href="/joboutward/transactions/jobwork-invoice" class="btn btn-primary btn-sm">New Invoice</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content tab-body">
+                                <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100 table-fixed" tabindex="0">
+
+                                    <!-- search bar -->
+                                    <div class="row table-header">
+                                        <div class="col">
+                                            <div class="row">
+                                                <div class="col-5">
+                                                    <div class="row">
+                                                        <div class="col-auto me-1">
+                                                            <select id="PSize" name="PSize" class="form-select w-auto py-1 pe-4" asp-items="@ViewBag.Page"></select>
+                                                        </div>
+                                                        <div class="col-auto p-0">
+                                                            <input id="Search" name="Search" class="form-control search-control p-1" autocomplete="off" value="@ViewData["CurrentFilter"]" />
+                                                        </div>
+                                                        <div class="col-auto p-0 ms-1">
+                                                            <button type="button" id="BtnSearch" class="btn btn-primary btn-sm">Search</button>
+                                                        </div>
+                                                        <div class="col-auto p-0 ms-1">
+                                                            <button type="button" id="BtnClear" class="btn btn-secondary btn-sm">Clear</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- grid -->
+                                    <div class="table-body-h-c w-100 border p-2">
+                                        <div class="col-12 table-body table-responsive h-100">
+                                            <table class="table table-bordered table-hover align-middle mb-0 table-grid" id="MyTable">
+                                                <thead class="thead table-first-header">
+                                                    <tr class="table-info table-first-header-top">
+                                                        <th colspan="2" class="text-center">Journal</th>
+                                                        <th colspan="2" class="text-center">Vendor Invoice</th>
+                                                        <th colspan="3" class="text-center">Receipt Note</th>
+                                                        <th class="text-center">Service Order</th>
+                                                        <th colspan="5" class="text-center">JW Vendor Details</th>
+                                                        <th colspan="17" class="text-center">Item Details</th>
+                                                        <th></th>
+                                                    </tr>
+                                                    <tr class="table-info">
+                                                        <th class="sort-js" style="cursor:pointer" data-sort="@ViewData["KeySort"]">Number</th>
+                                                        <th class="datetype text-center">Date</th>
+                                                        <th>Number</th>
+                                                        <th class="datetype text-center">Date</th>
+                                                        <th>Number</th>
+                                                        <th class="datetype text-center">Date</th>
+                                                        <th>Vendor DN No</th>
+                                                        <th>Number</th>
+                                                        <th class="table-col-xxl">Group</th>
+                                                        <th class="table-col-xxl">Category</th>
+                                                        <th class="table-col-xxl">Name</th>
+                                                        <th class="table-col-xxl">Currency</th>
+                                                        <th class="table-col-xxl">Tax Cluster</th>
+                                                        <th class="table-col-xxl">Material Segregation</th>
+                                                        <th class="table-col-xxl">Process</th>
+                                                        <th class="table-col-xxl">Item Group</th>
+                                                        <th class="table-col-xxl">Item Code</th>
+                                                        <th class="table-col-xxl">Item Description</th>
+                                                        <th class="table-col-xxl text-end">Outer Dia</th>
+                                                        <th class="table-col-xxl text-end">Thickness</th>
+                                                        <th class="table-col-xxl text-end">Length</th>
+                                                        <th class="table-col-xxl">Material Grade</th>
+                                                        <th class="table-width-md text-center">UOM</th>
+                                                        <th class="table-width-md text-center">Warehouse</th>
+                                                        <th class="table-width-xxl text-center">Qty</th>
+                                                        <th class="table-width-lg text-end">Unit Price</th>
+                                                        <th class="table-width-lg text-end">Invoice Amount</th>
+                                                        <th class="table-width-lg text-end">GST Amount</th>
+                                                        <th class="table-width-lg text-end">WHT %</th>
+                                                        <th class="table-width-lg text-end">WHT Amount</th>
+                                                        <th class="text-center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in Model)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <a href="#" class="btn-view icon-link-hover" data-no="@item.JOSVIH_Number">@item.JOSVIH_JournalNo</a>
+                                                            </td>
+                                                            <td class="datetype text-center">@item.JOSVIH_JournalDate.ToString("dd-MMM-yyyy")</td>
+                                                            <td>@item.JOSVIH_VendorInvoiceNo</td>
+                                                            <td class="datetype text-center">@item.JOSVIH_VendorInvoiceDate.ToString("dd-MMM-yyyy")</td>
+                                                            <td>@item.JORNH_RN_No</td>
+                                                            <td class="datetype text-center">@(item.JORNH_RN_Date.HasValue ? item.JORNH_RN_Date.Value.ToString("dd-MMM-yyyy") : "")</td>
+                                                            <td>@item.JOSVII_Vendor_DN_No</td>
+                                                            <td>@item.ServiceOrderNo</td>
+                                                            <td class="table-col-xxl">@item.VendorGroup</td>
+                                                            <td class="table-col-xxl">@item.VendorCategory</td>
+                                                            <td class="table-col-xxl">@item.JWV_JW_VendorName</td>
+                                                            <td class="table-col-xxl">@item.CurrencyCode</td>
+                                                            <td class="table-col-xxl">@item.TaxCluster</td>
+                                                            <td class="table-col-xxl">@item.Segregation</td>
+                                                            <td class="table-col-xxl">@item.JPRS_ProcessName</td>
+                                                            <td class="table-col-xxl">@item.ItemGroup</td>
+                                                            <td class="table-col-xxl">@item.ItemCode</td>
+                                                            <td class="table-col-xxl">@item.ItemDescription</td>
+                                                            <td class="table-col-xxl text-end">@item.OuterDia</td>
+                                                            <td class="table-col-xxl text-end">@item.Thickness</td>
+                                                            <td class="table-col-xxl text-end">@item.Length</td>
+                                                            <td class="table-col-xxl">@item.MaterialGrade</td>
+                                                            <td class="table-width-md text-center">@item.UOM</td>
+                                                            <td class="table-width-md text-center">@item.WarehouseCode</td>
+                                                            <td class="Qty table-col-xxl text-center">@String.Format(India, "{0:N2}", item.JOSVII_Qty)</td>
+                                                            <td class="text-end">@String.Format(India, "{0:N2}", item.JOSVII_UnitPrice)</td>
+                                                            <td class="Amount text-end">@String.Format(India, "{0:N2}", item.JOSVII_Amount)</td>
+                                                            <td class="GST text-end">@String.Format(India, "{0:N2}", item.JOSVII_GST_Amount)</td>
+                                                            <td class="text-end">@String.Format(India, "{0:N2}", item.JOSVII_WHT_Percent)</td>
+                                                            <td class="WHT text-end">@String.Format(India, "{0:N2}", item.JOSVII_WH_TaxAmount)</td>
+                                                            <td class="text-center text-nowrap">
+                                                                <a href="#" class="btn btn-primary btn-sm py-0 btn-view" data-no="@item.JOSVIH_Number">View</a>
+                                                                <a href="#" class="btn btn-primary btn-sm py-0 btn-edit" data-no="@item.JOSVIH_Number">Edit</a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="table-info">
+                                                        <td colspan="24" class="text-end fw-bold">Total (filtered)</td>
+                                                        <td class="text-center">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfQty ?? 0.0))</td>
+                                                        <td></td>
+                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfAmount ?? 0.0))</td>
+                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfHeadGst ?? 0.0))</td>
+                                                        <td></td>
+                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfWHT ?? 0.0))</td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr class="table-info">
+                                                        <td colspan="24" class="text-end fw-bold">Grand Total (all)</td>
+                                                        <td class="text-center">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandQty ?? 0.0))</td>
+                                                        <td></td>
+                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandAmount ?? 0.0))</td>
+                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandGST ?? 0.0))</td>
+                                                        <td></td>
+                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandWHT ?? 0.0))</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- paging -->
+                                    <div class="row table-cal align-items-center">
+                                        <div class="col align-items-center">
+                                            <div class="row align-items-center">
+                                                <div class="col py-1">Showing @StartNumber to @EndNumber</div>
+                                                <div class="col text-center py-1">Total records @TotalSize</div>
+                                                <div class="col">
+                                                    <nav>
+                                                        <ul class="pagination float-end mb-0">
+                                                            <li class="page-item @prevDisabled">
+                                                                <a href="#" class="page-link page-js" data-page="1">&laquo;</a>
+                                                            </li>
+                                                            <li class="page-item @prevDisabled">
+                                                                <a href="#" class="page-link page-js" data-page="@(Model.PageIndex - 1)">&lsaquo;</a>
+                                                            </li>
+                                                            <li class="page-item"><a class="page-link">@PageNumber</a></li>
+                                                            <li class="page-item @nextDisabled">
+                                                                <a href="#" class="page-link page-js" data-page="@(Model.PageIndex + 1)">&rsaquo;</a>
+                                                            </li>
+                                                            <li class="page-item @nextDisabled">
+                                                                <a href="#" class="page-link page-js" data-page="@PageCount">&raquo;</a>
+                                                            </li>
+                                                        </ul>
+                                                    </nav>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/JO_JobworkInvoice/JO_JobworkInvoiceList.js" asp-append-version="true"></script>
+}

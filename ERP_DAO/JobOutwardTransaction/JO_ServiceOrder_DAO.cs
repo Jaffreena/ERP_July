@@ -605,9 +605,8 @@ namespace ERP_DAO.JobOutwardTransaction
                         MaterialGrade = r["MaterialGrade"] as string,
                         ItemGroup = r["ItemGroup"] as string,
                         WarehouseCode = r["WarehouseCode"] as string,
-                        AssignedQty = r["AssignedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["AssignedQty"]),
-                        InvoicedQty = r["InvoicedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["InvoicedQty"]),
-                        InvoiceToBeRaised = r["InvoiceToBeRaised"] == DBNull.Value ? 0 : Convert.ToDouble(r["InvoiceToBeRaised"])
+                        RNAssignedQty = r["RNAssignedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["RNAssignedQty"]),
+                        DirectAssignedQty = r["DirectAssignedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["DirectAssignedQty"])
                     });
                 }
             }
@@ -662,8 +661,7 @@ namespace ERP_DAO.JobOutwardTransaction
                         JOFRT_SVOI_Rate = Convert.ToDouble(r["JOFRT_SVOI_Rate"]),
                         JOFRT_SVOI_Amount = Convert.ToDouble(r["JOFRT_SVOI_Amount"]),
                         AssignedQty = r["AssignedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["AssignedQty"]),
-                        InvoicedQty = r["InvoicedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["InvoicedQty"]),
-                        InvoiceToBeRaised = r["InvoiceToBeRaised"] == DBNull.Value ? 0 : Convert.ToDouble(r["InvoiceToBeRaised"])
+                        DirectAssignedQty = r["DirectAssignedQty"] == DBNull.Value ? 0 : Convert.ToDouble(r["DirectAssignedQty"])
                     });
                 }
             }

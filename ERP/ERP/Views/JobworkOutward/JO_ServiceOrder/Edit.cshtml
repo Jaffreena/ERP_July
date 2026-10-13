@@ -1,4 +1,4 @@
-﻿@model ERP_DTO.JobOutwardTransaction.JO_ServiceOrderUpdatePage_DTO
+@model ERP_DTO.JobOutwardTransaction.JO_ServiceOrderUpdatePage_DTO
 
 @{
     bool IsViewMode = ViewBag.IsViewMode == true;
@@ -541,14 +541,14 @@
                                                                 <th style="text-align:center;">Outer Dia</th>
                                                                 <th style="text-align:center;">Thickness</th>
                                                                 <th style="text-align:center;">Length</th>
-                                                                <th style="text-align:center;">Width</th>
+                                                                <th style="text-align:center;display:none;">Width</th>
                                                                 <th style="text-align:left;">Material Grade</th>
                                                                 <th style="text-align:left;">Item Group</th>
-                                                                <th style="text-align:center;">Warehouse</th>
+                                                                <th style="text-align:center;display:none;">Warehouse</th>
                                                                 <th style="text-align:center;">UOM</th>
                                                                 <th style="text-align:center;">SVO Qty</th>
-                                                                <th style="text-align:center;">Invoiced Qty</th>
-                                                                <th style="text-align:center;">Invoice to be raised</th>
+                                                                <th style="text-align:center;">RN Assigned</th>
+                                                                <th style="text-align:center;">Direct Assigned</th>
                                                                 <th style="text-align:center;">Amend Qty</th>
                                                                 <th style="text-align:right;">Unit Price</th>
                                                                 <th style="text-align:right;">Amount</th>
@@ -572,18 +572,18 @@
                                                                 <td><input name="JWIItems[0].OuterDia" class="form-control OuterDia text-center" readonly /></td>
                                                                 <td><input name="JWIItems[0].Thickness" class="form-control Thickness text-center" readonly /></td>
                                                                 <td><input name="JWIItems[0].Length" class="form-control Length text-center" readonly /></td>
-                                                                <td><input name="JWIItems[0].Width" class="form-control Width text-center" readonly /></td>
+                                                                <td style="display:none;"><input name="JWIItems[0].Width" class="form-control Width text-center" readonly /></td>
                                                                 <td><input name="JWIItems[0].MaterialGrade" class="form-control MaterialGrade" readonly /></td>
                                                                 <td><input name="JWIItems[0].ItemGroup" class="form-control ItemGroup" readonly /></td>
-                                                                <td>
+                                                                <td style="display:none;">
                                                                     <select name="JWIItems[0].JOJWI_SVOI_WH_Number" class="form-select JOJWI_SVOI_WH_Number text-center" asp-items="@ViewBag.Warehouse"></select>
                                                                 </td>
                                                                 <td>
                                                                     <select name="JWIItems[0].JOJWI_SVOI_UoM_Number" class="form-select JOJWI_SVOI_UoM_Number text-center" asp-items="@ViewBag.UOM"></select>
                                                                 </td>
                                                                 <td><input name="JWIItems[0].SVO_Qty" class="form-control SVO_Qty text-center" readonly /></td>
-                                                                <td><input name="JWIItems[0].InvoicedQty" class="form-control InvoicedQty text-center" readonly /></td>
-                                                                <td><input name="JWIItems[0].InvoiceToBeRaised" class="form-control InvoiceToBeRaised text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].RNAssignedQty" class="form-control RNAssignedQty text-center" readonly /></td>
+                                                                <td><input name="JWIItems[0].DirectAssignedQty" class="form-control DirectAssignedQty text-center" readonly /></td>
                                                                 <td><input name="JWIItems[0].JOJWI_SVOI_Qty" class="form-control JOJWI_SVOI_Qty text-center" /></td>
                                                                 <td><input name="JWIItems[0].JOJWI_SVOI_UnitPrice" class="form-control JOJWI_SVOI_UnitPrice text-end" /></td>
                                                                 <td><input name="JWIItems[0].JOJWI_SVOI_Amount" class="form-control JOJWI_SVOI_Amount text-end" readonly /></td>
@@ -594,7 +594,7 @@
                                                         </tbody>
                                                         <tfoot>
                                                             <tr class="table-info">
-                                                                <td colspan="15" class="text-end py-2"><span class="float-end pe-3">Total</span></td>
+                                                                <td colspan="13" class="text-end py-2"><span class="float-end pe-3">Total</span></td>
                                                                 <td><input id="JWITotalQty" class="form-control text-center" readonly /></td>
                                                                 <td></td>
                                                                 <td><input id="JWITotalAmount" class="form-control text-end" readonly /></td>
@@ -639,8 +639,8 @@
                                                                 <th style="text-align:center;">To WH</th>
                                                                 <th style="text-align:center;">UOM</th>
                                                                 <th style="text-align:center;">SVO Qty</th>
-                                                                <th style="text-align:center;">Invoiced Qty</th>
-                                                                <th style="text-align:center;">Invoice to be raised</th>
+                                                                <th id="FreightAssignedHeader" style="text-align:center;">RN Assigned</th>
+                                                                <th style="text-align:center;">Direct Assigned</th>
                                                                 <th style="text-align:center;">Amend Qty</th>
                                                                 <th style="text-align:right;">Rate</th>
                                                                 <th style="text-align:right;">Amount</th>
@@ -664,8 +664,8 @@
                                                                     <select name="FreightItems[0].JOFRT_SVOI_UoM_Number" class="form-select JOFRT_SVOI_UoM_Number text-center" asp-items="@ViewBag.UOM"></select>
                                                                 </td>
                                                                 <td><input name="FreightItems[0].SVO_Qty" class="form-control SVO_Qty text-center" readonly /></td>
-                                                                <td><input name="FreightItems[0].InvoicedQty" class="form-control InvoicedQty text-center" readonly /></td>
-                                                                <td><input name="FreightItems[0].InvoiceToBeRaised" class="form-control InvoiceToBeRaised text-center" readonly /></td>
+                                                                <td><input name="FreightItems[0].AssignedQty" class="form-control AssignedQty text-center" readonly /></td>
+                                                                <td><input name="FreightItems[0].DirectAssignedQty" class="form-control DirectAssignedQty text-center" readonly /></td>
                                                                 <td><input name="FreightItems[0].JOFRT_SVOI_Qty" class="form-control JOFRT_SVOI_Qty text-center" /></td>
                                                                 <td><input name="FreightItems[0].JOFRT_SVOI_Rate" class="form-control JOFRT_SVOI_Rate text-end" /></td>
                                                                 <td><input name="FreightItems[0].JOFRT_SVOI_Amount" class="form-control JOFRT_SVOI_Amount text-end" readonly /></td>

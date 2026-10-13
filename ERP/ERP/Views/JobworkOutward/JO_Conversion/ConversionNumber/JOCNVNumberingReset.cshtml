@@ -1,0 +1,230 @@
+@model List<ERP_DTO.JobOutwardTransaction.JOConversionNumberReset_DTO>
+
+<div class="col table-fixed h-100">
+    <div class="w-100 table-responsive table-body table-body-f">
+        <table class="table table-one table-striped table-bordered table-hover align-middle w-100">
+            <thead>
+                <tr class="table-info text-center">
+                    <th class="datetype">Start Date</th>
+                    <th class="datetype">End Date</th>
+                    <th style="width:110px;">Start Number</th>
+                    <th style="width:110px;">Number Of Digits</th>
+                    <th>Prefil Zero</th>
+                    <th>Frequency</th>
+                    <th class="table-width-sm"></th>
+                </tr>
+            </thead>
+            <tbody id="ResetTableBody">
+                <tr id="ResetTempRow" style="display: none;">
+                    <td>
+                        <input id="JOCR_Date" class="form-control JOCR_Date datepicker text-center" autocomplete="off" />
+                    </td>
+                    <td>
+                        <input id="JOCR_EndDate" class="form-control JOCR_EndDate datepicker text-center" autocomplete="off" />
+                    </td>
+                    <td style="width:110px;">
+                        <input id="JOCR_StartingNumber" class="form-control JOCR_StartingNumber text-center" autocomplete="off" />
+                    </td>
+                    <td style="width:110px;">
+                        <input id="JOCR_NumberofDigits" class="form-control JOCR_NumberofDigits text-center" autocomplete="off" />
+                    </td>
+                    <td>
+                        <select id="JOCR_PrefilZero" class="form-select JOCR_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
+                    </td>
+                    <td>
+                        <select id="JOCR_Frequency" class="form-select JOCR_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
+                    </td>
+                    <td class="text-center">
+                        <input type="hidden" name="JOCR_IsDeleted" class="JOCR_IsDeleted" value="false" />
+                        <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model != null)
+                {
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="ResetNewRow">
+                            <td>
+                                <input id="JOCR_Date" name="JOCNV_NumberReset[@i].JOCR_Date" class="form-control JOCR_Date datepicker text-center" autocomplete="off" value="@Model[i].JOCR_Date" />
+                            </td>
+                            <td>
+                                <input id="JOCR_EndDate" name="JOCNV_NumberReset[@i].JOCR_EndDate" class="form-control JOCR_EndDate datepicker text-center" autocomplete="off" value="@Model[i].JOCR_EndDate" />
+                            </td>
+                            <td style="width:110px;">
+                                <input id="JOCR_StartingNumber" name="JOCNV_NumberReset[@i].JOCR_StartingNumber" class="form-control JOCR_StartingNumber text-center" autocomplete="off" value="@Model[i].JOCR_StartingNumber" />
+                            </td>
+                            <td style="width:110px;">
+                                <input id="JOCR_NumberofDigits" name="JOCNV_NumberReset[@i].JOCR_NumberofDigits" class="form-control JOCR_NumberofDigits text-center" autocomplete="off" value="@Model[i].JOCR_NumberofDigits" />
+                            </td>
+                            <td>
+                                <select id="JOCR_PrefilZero" name="JOCNV_NumberReset[@i].JOCR_PrefilZero" class="form-select JOCR_PrefilZero text-center">
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Prefil)
+                                    {
+                                        if (item.Value == Model[i].JOCR_PrefilZero.ToString())
+                                        {
+                                            <option value="@item.Value" selected>@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <select id="JOCR_Frequency" name="JOCNV_NumberReset[@i].JOCR_Frequency" class="form-select JOCR_Frequency text-center">
+                                    <option value="1" selected="@(Model[i].JOCR_Frequency.ToString() == "1")">Monthly</option>
+                                    <option value="2" selected="@(Model[i].JOCR_Frequency.ToString() == "2")">Yearly</option>
+                                </select>
+                            </td>
+                            <td class="text-center">
+                                @if (@Model[i].JOCR_Number != 0)
+                                {
+                                    <input name="JOCNV_NumberReset[@i].JOCR_Number" type="hidden" class="JOCR_Number" value="@Model[i].JOCR_Number" />
+                                }
+                                <input type="hidden" name="JOCNV_NumberReset[@i].JOCR_IsDeleted" value="false" class="JOCR_IsDeleted" />
+                                <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row table-footer align-items-center">
+    <div class="col">
+        <a id="ResetNewRowButton" class="btn btn-primary">Add Row</a>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        function ResetInitializeFlatpickrs() {
+            $(".datepicker").flatpickr({
+                dateFormat: "d-M-Y",
+                altInput: false,
+            });
+        }
+
+        var rowCount = @(Model != null ? Model.Count : 0);
+        var isAddingRow = false;
+
+        function ResetaddRow() {
+            var NewRow = $("#ResetTempRow").clone().removeAttr("style").removeAttr("id").addClass("ResetNewRow");
+            NewRow.find("input.JOCR_Date").attr("name", "JOCNV_NumberReset[" + rowCount + "].JOCR_Date").val();
+            NewRow.find("input.JOCR_EndDate").attr("name", "JOCNV_NumberReset[" + rowCount + "].JOCR_EndDate").val();
+            NewRow.find("input.JOCR_StartingNumber").attr("name", "JOCNV_NumberReset[" + rowCount + "].JOCR_StartingNumber");
+            NewRow.find("input.JOCR_NumberofDigits").attr("name", "JOCNV_NumberReset[" + rowCount + "].JOCR_NumberofDigits");
+            NewRow.find("select.JOCR_PrefilZero").attr("name", "JOCNV_NumberReset[" + rowCount + "].JOCR_PrefilZero");
+            NewRow.find("select.JOCR_Frequency").attr("name", "JOCNV_NumberReset[" + rowCount + "].JOCR_Frequency");
+            NewRow.find("input.JOCR_IsDeleted").attr("name", "JOCNV_NumberReset[" + rowCount + "].JOCR_IsDeleted");
+
+            NewRow.find("input[name='JOCNV_NumberReset[" + rowCount + "].JOCR_IsDeleted']").val(false);
+
+            $("#ResetTableBody").append(NewRow);
+            rowCount++;
+            NewRow.data("isValid", false);
+            isAddingRow = false;
+
+            ResetInitializeFlatpickrs();
+        }
+
+        if ($("tr.ResetNewRow").length == 0) {
+            ResetaddRow();
+        }
+
+        $(document).on('click', '.ResetRowRemove', function () {
+            $(this).closest('tr').find("input[name*='JOCR_IsDeleted']").val(true);
+            $(this).closest('tr').hide();
+        });
+
+
+
+    $("#ResetNewRowButton").click(function () {
+            var lastRow = $("tr.ResetNewRow").last();
+            if (ResetCheckAllFieldsValid(lastRow)) {
+                ResetaddRow();
+            }
+            else {
+                var startingNumberInvalid = false;
+                var numberOfDigitsInvalid = false;
+                var otherInvalid = false;
+                var firstInvalidField = null;
+
+                lastRow.find("select, input, input[type='text']").each(function () {
+                    if (!ResetValidateField($(this))) {
+                        if (firstInvalidField == null) {
+                            firstInvalidField = $(this);
+                        }
+                        if ($(this).hasClass("JOCR_StartingNumber")) {
+                            startingNumberInvalid = true;
+                        } else if ($(this).hasClass("JOCR_NumberofDigits")) {
+                            numberOfDigitsInvalid = true;
+                        } else {
+                            otherInvalid = true;
+                        }
+                    }
+                });
+
+                if (firstInvalidField != null) {
+                    var message;
+                    if (startingNumberInvalid && numberOfDigitsInvalid) {
+                        message = "Start Number must be greater than 0, and Number Of Digits must be a single digit between 3 and 9.";
+                    } else if (startingNumberInvalid) {
+                        message = "Start Number must be greater than 0. Negative numbers, 0, or blank are not allowed.";
+                    } else if (numberOfDigitsInvalid) {
+                        message = "Number Of Digits must be a single digit between 3 and 9.";
+                    } else {
+                        message = "Please complete all fields !";
+                    }
+                    alert(message);
+                    firstInvalidField.focus();
+                }
+            }
+        });
+        function ResetCheckAllFieldsValid(currentRow) {
+            var allFieldsValid = true;
+            $("tr.ResetNewRow:visible").each(function () {
+                $(this).find("select, input, input[type='text']").each(function () {
+                    if (!ResetValidateField($(this))) {
+                        allFieldsValid = false;
+                        return false;
+                    }
+                });
+                if (!allFieldsValid) return false;
+            });
+            return allFieldsValid;
+        }
+      function ResetValidateField(currentInput) {
+            var inputValue = currentInput.val();
+
+        if (inputValue === null || String(inputValue).trim() === "") {
+                return false;
+            }
+
+            if (currentInput.hasClass("JOCR_StartingNumber")) {
+                var numValue = parseInt(inputValue, 10);
+                if (isNaN(numValue) || numValue <= 0) {
+                    return false;
+                }
+            }
+
+            if (currentInput.hasClass("JOCR_NumberofDigits")) {
+             if (!/^[3-9]$/.test(String(inputValue).trim())) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        ResetInitializeFlatpickrs();
+    });
+</script>

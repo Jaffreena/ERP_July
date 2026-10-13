@@ -1,0 +1,168 @@
+@model ERP_DTO.JobOutwardTransaction.JO_ConversionDFS_DTO
+@{
+    ViewData["Title"] = "JO Conversion";
+}
+<style>
+    .match-row td { color: blue !important; font-weight: 600; }
+    .current-row td { background: #dbeafe !important; }
+
+    form { height: calc(100vh - 60px); display: flex; flex-direction: column; }
+    .panel-body { flex: 1 1 auto; min-height: 0; }
+    .row.align-items-center { padding: 2px 0; }
+    .col-form-label {
+        padding-top: 4px; padding-bottom: 4px; padding-right: 8px; margin-bottom: 0;
+        white-space: nowrap; font-family: Arial, sans-serif !important;
+        font-size: 12px !important; font-weight: 400 !important; border: none !important;
+    }
+    .row.align-items-center > div[class*="col-"] { padding-left: 8px; padding-right: 8px; }
+    .form-control, .form-select, textarea.form-control {
+        height: 25px !important; min-height: 25px !important; border-radius: 4px !important;
+        font-size: 13px !important; font-family: Arial, sans-serif; font-weight: 400;
+        resize: vertical; overflow: auto;
+    }
+    textarea.form-control { min-height: 60px !important; }
+</style>
+
+<form>
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                JO Conversion
+                <a asp-controller="JobworkInwardMain" asp-action="Index" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row panel-body gx-2 position-relative">
+        <div class="col-12 panel-card-fixed h-100">
+            <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
+                <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
+                        <div class="row ps-2">
+                            @if (Model.JOCNV_DFS_Number != 0)
+                            {
+                                <input asp-for="JOCNV_DFS_Number" type="hidden" class="Number" />
+                            }
+
+                            <div class="col-auto left-menu text-black">
+                                <div class="row">
+
+                                    <!-- Column 1 -->
+                                    <div class="col-12 col-md-5 col-lg-5">
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOCNV_DFS_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JOCNV_DFS_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Column 2 -->
+                                    <div class="col-12 col-md-5 col-lg-5">
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOCNV_DFS_JSFT_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JOCNV_DFS_JSFT_Number" class="form-select" asp-items="@ViewBag.Shift"></select>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOCNV_DFS_JPRS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JOCNV_DFS_JPRS_Number" class="form-select" asp-items="@ViewBag.Process"></select>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOCNV_DFS_JWWC_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JOCNV_DFS_JWWC_Number" class="form-select" asp-items="@ViewBag.WorkCentre"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-auto right-menu text-center border-start">
+                                <input type="submit" name="Mode" value="Save" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                                <input type="submit" name="Mode" value="Clear All" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+
+    <script>
+        const fitIds = {
+            JOCNV_DFS_MS_Number: [20, 30],
+            JOCNV_DFS_JSFT_Number: [20, 30],
+            JOCNV_DFS_JPRS_Number: [20, 30],
+            JOCNV_DFS_JWWC_Number: [20, 30]
+        };
+
+        function AutoFit() {
+            Object.keys(fitIds).forEach(function (id) {
+                fitInputWidth(id, fitIds[id][0], fitIds[id][1]);
+            });
+        }
+
+        $(document).ready(function () {
+            AutoFit();
+
+            $(document).on("change", "#JOCNV_DFS_MS_Number, #JOCNV_DFS_JSFT_Number, #JOCNV_DFS_JPRS_Number, #JOCNV_DFS_JWWC_Number", function () {
+                fitInputWidth(this, fitIds[this.id][0], fitIds[this.id][1]);
+            });
+        });
+
+        function GetConversionDFSDTO() {
+            return {
+                JOCNV_DFS_Number: $("input.Number").val() || 0,
+                JOCNV_DFS_MS_Number: $("#JOCNV_DFS_MS_Number").val() || 0,
+                JOCNV_DFS_JSFT_Number: $("#JOCNV_DFS_JSFT_Number").val() || 0,
+                JOCNV_DFS_JPRS_Number: $("#JOCNV_DFS_JPRS_Number").val() || 0,
+                JOCNV_DFS_JWWC_Number: $("#JOCNV_DFS_JWWC_Number").val() || 0
+            };
+        }
+
+        $(document).on("click", "input[name='Mode'][value='Save']", function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "/jobout/transactions/jo-conversion-dfs/save",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(GetConversionDFSDTO()),
+                success: function (res) {
+                    if (res.success) {
+                        location.reload();
+                    } else {
+                        console.error(res.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $(document).on("click", "input[name='Mode'][value='Clear All']", function (e) {
+            e.preventDefault();
+            location.reload();
+        });
+
+        // block native form submit
+        $(document).on("submit", "form", function (e) {
+            e.preventDefault();
+        });
+    </script>
+}

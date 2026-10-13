@@ -133,8 +133,17 @@
     <Folder Include="Views\JobworkInward\Reports\DNFreightInvoicePendingQty\" />
     <Folder Include="Views\JobworkInward\ServiceOrder_JobWork\" />
     <Folder Include="Views\JobworkInward\ServiceOrder_Freight\" />
+    <Folder Include="Views\JobworkOutward\JO_Conversion\DFS\" />
+    <Folder Include="Views\JobworkOutward\JO_FreightInvoice\JOFTI_Number\" />
+    <Folder Include="Views\JobworkOutward\JO_FreightInvoice\DFS\" />
+    <Folder Include="Views\JobworkOutward\JO_JobworkInvoice\JOJWI_Number\" />
+    <Folder Include="Views\JobworkOutward\JO_JobworkInvoice\DFS\" />
+    <Folder Include="Views\JobworkOutward\JO_ReceiptNote\DFS\" />
     <Folder Include="Views\JobworkOutward\NewFolder\" />
     <Folder Include="Views\JWInvoicePendingQty\" />
+    <Folder Include="Views\JO_FreightInvoice\" />
+    <Folder Include="wwwroot\js\JO_Conversion\" />
+    <Folder Include="wwwroot\js\JO_ReceiptNote\" />
   </ItemGroup>
 
 </Project>

@@ -295,6 +295,44 @@ namespace ERP.Controllers.JobworkOutward
         }
         #endregion
 
+        #region Default Form Setting (DFS) get
+        // Create page only: loads default values on page load
+        [HttpGet]
+        [Route("joboutward/transactions/delivery-note-dfs/get")]
+        public IActionResult GetDeliveryNoteDFS()
+        {
+            JODN_DFS_DAO dao = new JODN_DFS_DAO();
+
+            DataSet ds = dao.JO_DeliveryNoteDFSGet();
+
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                var row = ds.Tables[0].Rows[0];
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        jodN_DFS_Number = row["JODN_DFS_Number"],
+                        jodN_DFS_MS_Number = row["JODN_DFS_MS_Number"],
+                        jodN_DFS_JW_Vendor_Number = row["JODN_DFS_JW_Vendor_Number"],
+                        jwV_JW_VendorName = row["JWV_JW_VendorName"],
+                        jodN_DFS_IsFreightApplicable = row["JODN_DFS_IsFreightApplicable"],
+                        jodN_DFS_PaymentTerms = row["JODN_DFS_PaymentTerms"],
+                        jodN_DFS_DeliveryTerms = row["JODN_DFS_DeliveryTerms"],
+                        jodN_DFS_DeliveryMode = row["JODN_DFS_DeliveryMode"],
+                        jodN_DFS_DespatchDocumentNo = row["JODN_DFS_DespatchDocumentNo"],
+                        jodN_DFS_DespatchedThrough = row["JODN_DFS_DespatchedThrough"],
+                        jodN_DFS_Remarks = row["JODN_DFS_Remarks"]
+                    }
+                });
+            }
+
+            return Json(new { success = false });
+        }
+        #endregion
+
         #region Delivery Note Create
         [Route("joboutward/transactions/delivery-note")]
         public IActionResult Index()

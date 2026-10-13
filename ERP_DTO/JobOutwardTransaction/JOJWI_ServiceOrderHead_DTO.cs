@@ -46,9 +46,8 @@ namespace ERP_DTO.JobOutwardTransaction
         public string WarehouseCode { get; set; }   // Display only
 
         // Edit-page only (from Get SP, not stored) - amend qty pattern
-        public double AssignedQty { get; set; }
-        public double InvoicedQty { get; set; }
-        public double InvoiceToBeRaised { get; set; }
+        public double RNAssignedQty { get; set; }       // SUM(JORNI_Qty) for this SO item
+        public double DirectAssignedQty { get; set; }   // SUM(JOSVII_Qty) where JOSVII_JORNI_Number = 0
     }
 
     public class JOJWI_ServiceOrder_DTO
@@ -89,9 +88,8 @@ namespace ERP_DTO.JobOutwardTransaction
         public double JOFRT_SVOI_Amount { get; set; }
 
         // Edit-page only (from Get SP, not stored) - amend qty pattern
-        public double AssignedQty { get; set; }
-        public double InvoicedQty { get; set; }
-        public double InvoiceToBeRaised { get; set; }
+        public double AssignedQty { get; set; }         // DN or RN qty, by header Category
+        public double DirectAssignedQty { get; set; }   // SUM(JOFTII_Qty_Kgs) where JOFTII_SVO_Assign = 'INVOICE'
     }
 
     public class JOFRT_ServiceOrder_DTO

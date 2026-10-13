@@ -1,0 +1,372 @@
+@model ERP_DTO.JobOutwardTransaction.JO_JobworkInvoiceDFS_DTO
+@{
+    ViewData["Title"] = "JO Jobwork Invoice";
+}
+<style>
+    .match-row td { color: blue !important; font-weight: 600; }
+    .current-row td { background: #dbeafe !important; }
+
+    form { height: calc(100vh - 60px); display: flex; flex-direction: column; }
+    .panel-body { flex: 1 1 auto; min-height: 0; }
+    .row.align-items-center { padding: 2px 0; }
+    .col-form-label {
+        padding-top: 4px; padding-bottom: 4px; padding-right: 8px; margin-bottom: 0;
+        white-space: nowrap; font-family: Arial, sans-serif !important;
+        font-size: 12px !important; font-weight: 400 !important; border: none !important;
+    }
+    .row.align-items-center > div[class*="col-"] { padding-left: 8px; padding-right: 8px; }
+    .form-control, .form-select, textarea.form-control {
+        height: 25px !important; min-height: 25px !important; border-radius: 4px !important;
+        font-size: 13px !important; font-family: Arial, sans-serif; font-weight: 400;
+        resize: vertical; overflow: auto;
+    }
+    textarea.form-control { min-height: 60px !important; }
+</style>
+
+<form>
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                JO Jobwork Invoice
+                <a asp-controller="JobworkInwardMain" asp-action="Index" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row panel-body gx-2 position-relative">
+        <div class="col-12 panel-card-fixed h-100">
+            <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
+                <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
+                    <div class="card-body pb-0" style="margin-top: -10px !important;">
+                        <div class="row ps-2">
+                            @if (Model.JOSVI_DFS_Number != 0)
+                            {
+                                <input asp-for="JOSVI_DFS_Number" type="hidden" class="Number" />
+                            }
+
+                            <div class="col-auto left-menu text-black">
+                                <div class="row">
+
+                                    <!-- Column 1 -->
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOSVI_DFS_MS_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <select asp-for="JOSVI_DFS_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Column 2 -->
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOSVI_DFS_JW_Vendor_Number" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JOSVI_DFS_JW_Vendor_Number" type="hidden" />
+                                                <input asp-for="JOSVI_DFS_JW_Vendor_Name" class="form-control" autocomplete="off"
+                                                       onfocus="ShowVendorPane();OnVendorSelectCall(this)"
+                                                       oninput="OnVendorInput(this)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Column 3 -->
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOSVI_DFS_PaymentTerms" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JOSVI_DFS_PaymentTerms" class="form-control" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2">
+                                            <label asp-for="JOSVI_DFS_PaymentMethod" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <input asp-for="JOSVI_DFS_PaymentMethod" class="form-control" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-start gx-2">
+                                            <label asp-for="JOSVI_DFS_Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
+                                            <div class="col-md-6 col-lg-7">
+                                                <textarea asp-for="JOSVI_DFS_Remarks" maxlength="250" class="form-control" autocomplete="off"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-auto right-menu text-center border-start">
+                                <input type="submit" name="Mode" value="Save" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                                <input type="submit" name="Mode" value="Clear All" class="btn btn-primary btn-sm px-2 w-100 mb-1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="RightPane">
+            <div class="p-2">
+                <div class="buyer-search-results"></div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+
+    <script>
+        let isMouseSelectingVendor = false;
+
+        function AutoFit() {
+            fitInputWidth("JOSVI_DFS_MS_Number", 20, 30);
+            fitInputWidth("JOSVI_DFS_JW_Vendor_Name", 35, 45);
+            fitInputWidth("JOSVI_DFS_PaymentTerms", 30, 40);
+            fitInputWidth("JOSVI_DFS_PaymentMethod", 30, 40);
+        }
+
+        function ClosePane() {
+            $("#RightPane").removeClass("show").find(".buyer-search-results").hide().empty();
+        }
+
+        $(document).ready(function () {
+            AutoFit();
+
+            $(document).on("keyup change input",
+                "#JOSVI_DFS_MS_Number, #JOSVI_DFS_JW_Vendor_Name, #JOSVI_DFS_PaymentTerms, #JOSVI_DFS_PaymentMethod",
+                function () {
+                    const widths = {
+                        JOSVI_DFS_MS_Number: [20, 30],
+                        JOSVI_DFS_JW_Vendor_Name: [35, 45],
+                        JOSVI_DFS_PaymentTerms: [30, 40],
+                        JOSVI_DFS_PaymentMethod: [30, 40]
+                    };
+                    const [min, max] = widths[this.id];
+                    fitInputWidth(this, min, max);
+                });
+
+            // name cleared -> Vendor Number = 0
+            $(document).on("input", "#JOSVI_DFS_JW_Vendor_Name", function () {
+                if ($(this).val().trim() === "") {
+                    $("#JOSVI_DFS_JW_Vendor_Number").val(0);
+                }
+            });
+
+            $(document).on("focusout", "#JOSVI_DFS_JW_Vendor_Name", function () {
+                if (isMouseSelectingVendor) return;
+
+                if ($(this).val().trim() === "") {
+                    $("#JOSVI_DFS_JW_Vendor_Number").val(0);
+                    $("#BuyerMessage").hide().text("");
+                    ClosePane();
+                    return;
+                }
+                HandleVendorSelection($(this), $("#RightPane .buyer-search-results tbody tr"),
+                    "#BuyerMessage", "#RightPane", "#RightPane .buyer-search-results");
+            });
+
+            $(document).on("keydown", "#JOSVI_DFS_JW_Vendor_Name", function (e) {
+                if (e.key === "Escape" || e.key === "Tab") {
+                    ClosePane();
+                    $("#BuyerMessage").hide().text("");
+                    return;
+                }
+                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    HandleSearchKeyDown(e, this, "#RightPane", ".buyer-search-results", "#BuyerMessage");
+                }
+            });
+        });
+
+        function ShowVendorPane() {
+            $("#RightPane").show().addClass("show");
+            $("#RightPane .buyer-search-results").show();
+        }
+
+        function OnVendorSelectCall(inputElement) {
+            var rightPane = $("#RightPane");
+            var resultsDiv = rightPane.find(".buyer-search-results");
+
+            if (resultsDiv.find("tbody tr").length > 0) {
+                rightPane.addClass("show");
+                resultsDiv.show();
+                if (resultsDiv.find("tbody tr").filter(".current-row").length === 0) {
+                    $(inputElement).removeData("selectedIndex");
+                }
+            } else {
+                SearchVendor(inputElement);
+            }
+        }
+
+        function OnVendorInput(inputElement) {
+            if (inputElement.selectionStart !== inputElement.selectionEnd) return;
+            SearchVendor(inputElement);
+        }
+
+        function SelectVendor(v) {
+            $("#JOSVI_DFS_JW_Vendor_Name").val(v.vendorName);
+            $("#JOSVI_DFS_JW_Vendor_Number").val(v.vendorNumber);
+            ClosePane();
+            setTimeout(function () { $("#JOSVI_DFS_PaymentTerms").focus(); }, 100);
+        }
+
+        function SearchVendor(inputElement) {
+            var vendor = (inputElement.value || "").trim();
+            var resultsDiv = $("#RightPane").find(".buyer-search-results");
+
+            $.ajax({
+                url: '/jobout/transactions/jo-jobwork-invoice-dfs/vendor',
+                type: 'GET',
+                data: { Vendor: vendor },
+                success: function (data) {
+                    resultsDiv.empty();
+                    $("#BuyerMessage").hide().text("");
+
+                    if (data && data.length > 0) {
+                        $("#RightPane").addClass("show");
+                        resultsDiv.show();
+
+                        var table = $(`
+                            <div class="card-body modal-content batchPopup p-0" style="z-index:999;">
+                                <table class="table table-bordered table-hover table-fixed table-grid mb-0 w-100">
+                                    <thead><tr class="table-info"><th>JW Vendor Name</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>`);
+
+                        $.each(data, function (i, v) {
+                            var row = $("<tr></tr>").css("height", "24px");
+                            row.data("vendor", v);
+                            row.append("<td>" + v.vendorName + "</td>");
+                            row.on("click", function () { SelectVendor($(this).data("vendor")); });
+                            table.find("tbody").append(row);
+                        });
+
+                        table.find("tbody").on("mousedown", "tr", function (e) {
+                            e.preventDefault();
+                            $("#BuyerMessage").hide().text("");
+                            isMouseSelectingVendor = true;
+                            SelectVendor($(this).data("vendor"));
+                            setTimeout(function () { isMouseSelectingVendor = false; }, 200);
+                        });
+
+                        resultsDiv.append(table);
+
+                        resultsDiv.append(`
+                            <div id="BuyerMessage" style="display:none;background:#bdbdbd;border-top:1px solid #ced4da;color:#dc3545;font-weight:bold;text-align:center;padding:4px 52px;font-size:18px;position:absolute;bottom:0;left:-2px;right:0;z-index:10;box-sizing:border-box;"></div>`);
+
+                        // start-with match highlight
+                        let rows = resultsDiv.find("tbody tr");
+                        rows.removeClass("match-row current-row");
+                        $(inputElement).removeData("selectedIndex");
+
+                        let searchText = vendor.toLowerCase();
+                        let firstMatch = -1, lastMatch = -1;
+
+                        rows.each(function (i) {
+                            let name = $(this).find("td:first").text().trim().toLowerCase();
+                            if (searchText !== "" && name.startsWith(searchText)) {
+                                $(this).addClass("match-row");
+                                if (firstMatch === -1) firstMatch = i;
+                                lastMatch = i;
+                            }
+                        });
+
+                        if (firstMatch >= 0) {
+                            $(inputElement).data("firstMatch", firstMatch);
+                            $(inputElement).data("lastMatch", lastMatch);
+                        } else {
+                            $(inputElement).removeData("firstMatch");
+                            $(inputElement).removeData("lastMatch");
+                        }
+                    } else {
+                        resultsDiv.append(GetBuyerEmptyView());
+                        $("#RightPane").addClass("show");
+                        resultsDiv.show();
+                    }
+                },
+                error: function () {
+                    resultsDiv.text("Error loading data.").show();
+                }
+            });
+        }
+
+        function HandleVendorSelection(input, rows, messageSelector, rightPane, resultsSelector) {
+            input = $(input);
+            rows = $(rows);
+
+            if (rows.length === 1) { rows.eq(0).trigger("click"); return; }
+
+            let currentRow = rows.filter(".current-row");
+            if (currentRow.length === 1) { currentRow.trigger("click"); return; }
+
+            let matchedRows = rows.filter(".match-row");
+            if (matchedRows.length === 1) { matchedRows.trigger("click"); return; }
+
+            if (rows.length === 0) {
+                input.removeData("selectedIndex");
+                $(messageSelector).html("No records found.").show();
+                input.focus();
+                $(rightPane).addClass("show");
+                $(resultsSelector).show();
+                return;
+            }
+
+            if (matchedRows.length > 1 || rows.length > 1) {
+                input.removeData("selectedIndex");
+                $(messageSelector).html("Too many Choices!<br/>Select any one.").show();
+                input.focus();
+                $(rightPane).addClass("show");
+                $(resultsSelector).show();
+            }
+        }
+
+        // ---------- Save / Clear ----------
+        function GetServiceOrderDFSDTO() {
+            return {
+                JOSVI_DFS_Number: $("input.Number").val() || 0,
+                JOSVI_DFS_MS_Number: $("#JOSVI_DFS_MS_Number").val() || 0,
+                JOSVI_DFS_JW_Vendor_Number: $("#JOSVI_DFS_JW_Vendor_Number").val() || 0,
+                JOSVI_DFS_PaymentTerms: $("#JOSVI_DFS_PaymentTerms").val(),
+                JOSVI_DFS_PaymentMethod: $("#JOSVI_DFS_PaymentMethod").val(),
+                JOSVI_DFS_Remarks: $("#JOSVI_DFS_Remarks").val()
+            };
+        }
+
+        $(document).on("click", "input[name='Mode'][value='Save']", function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "/jobout/transactions/jo-jobwork-invoice-dfs/save",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(GetServiceOrderDFSDTO()),
+                success: function (res) {
+                    if (res.success) {
+                        location.reload();
+                    } else {
+                        console.error(res.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+
+        $(document).on("click", "input[name='Mode'][value='Clear All']", function (e) {
+            e.preventDefault();
+            location.reload();
+        });
+
+        // block native form submit
+        $(document).on("submit", "form", function (e) {
+            e.preventDefault();
+        });
+    </script>
+}

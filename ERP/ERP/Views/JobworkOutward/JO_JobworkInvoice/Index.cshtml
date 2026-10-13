@@ -1,0 +1,389 @@
+@{
+    ViewData["Title"] = "Jobwork Invoice Create";
+}
+<style>
+    .row.align-items-center { padding: 2px 0; }
+    .col-form-label {
+        padding: 4px 8px 4px 0; margin-bottom: 0; white-space: nowrap;
+        font-family: Arial, sans-serif !important; font-size: 12px !important; font-weight: 400 !important;
+        border: none !important; text-decoration: none !important;
+    }
+    .row.align-items-center > div[class*="col-"] { padding-left: 8px; padding-right: 8px; }
+       /* label width per column (same as old Jobwork Invoice) */
+    .left-menu > .row > div:nth-child(1) .col-form-label { flex: 0 0 173px; max-width: 173px; }
+    .left-menu > .row > div:nth-child(2) .col-form-label { flex: 0 0 201px; max-width: 201px; }
+    .left-menu > .row > div:nth-child(3) .col-form-label { flex: 0 0 150px; max-width: 150px; }   
+    .form-control, .flatpickr-input, .form-select, textarea.form-control {
+        height: 25px !important; min-height: 25px !important; border-radius: 4px !important;
+        font-size: 13px; font-family: Arial, sans-serif; font-weight: 400;
+    }
+    textarea.form-control { min-height: 60px !important; height: auto !important; resize: vertical; overflow: auto; }
+    input.datepicker, input.flatpickr-input.form-control { width: 15ch !important; max-width: 15ch !important; cursor: pointer; }
+
+    /* vendor search list */
+    /* vendor search right pane */
+    #RightPane { position: fixed; top: 80px; bottom: 0; right: calc(-1 * (50ch + 4px)); width: calc(50ch + 4px);
+                 background: #c6e0e7; border: 1px solid #6c757d; overflow: hidden; opacity: 0; visibility: hidden;
+                 z-index: 9999; transition: right .25s ease, opacity .25s ease; }
+    #RightPane.show { right: 2px; opacity: 1; visibility: visible; }
+    #RightPane .p-2 { padding: 0 !important; }
+    #RightPane .buyer-search-results { width: 50ch; max-height: 100%; overflow-y: auto; }
+    #RightPane .buyer-search-results table { border: 0; margin: 0; }
+    #RightPane .buyer-search-results td, #RightPane .buyer-search-results th { border: 0; font-size: 13px; cursor: pointer; }
+    #RightPane .match-row td { color: blue; font-weight: 600; }
+    #RightPane .current-row td { background: #dbeafe; }
+    #JOSVIH_JW_Vendor_Name { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 16 16'><path fill='gray' d='M8 11L2 5h12z'/></svg>");
+                             background-repeat: no-repeat; background-position: right 6px center; padding-right: 20px; }
+
+    /* item grid */
+    #ItemTable th, #ItemTable td { font-size: 12px; white-space: nowrap; }
+    #ItemTable .qty { min-width: 90px; }
+    #ItemTable .gst-link { text-decoration: underline; cursor: pointer; }
+    .batchPopup thead th, #ItemTable thead th { position: sticky; top: 0; z-index: 10; }
+</style>
+
+<div id="JWI_Page">
+
+    <!-- GST Popup -->
+    <div class="modal modal-xl fade" id="GSTModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title">GST</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="table-info">
+                                <th>Tax Category</th>
+                                <th>Tax Type</th>
+                                <th class="text-center">Tax Index</th>
+                                <th>Tax Element</th>
+                                <th class="text-end">Assessable Value</th>
+                                <th class="text-end">Tax Rate</th>
+                                <th class="text-end">Tax Amount</th>
+                                <th class="text-center">Load on Inventory</th>
+                                <th class="text-end">Load on Inventory %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="GSTTableBody"></tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <td colspan="6" class="text-end">Total</td>
+                                <td class="text-end"><span id="GSTTotal">0.00</span></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Note Popup -->
+    <div class="modal modal-lg fade" id="RNModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title">Receipt Note</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height:420px; overflow:auto;">
+                    <table class="table table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="table-info">
+                                <th class="text-center"><input type="checkbox" id="RNCheckAll" class="form-check-input"></th>
+                                <th>RN No</th>
+                                <th>RN Date</th>
+                                <th>Vendor DC No</th>
+                                <th class="text-end">Total Qty</th>
+                                <th class="text-end">Invoiced Qty</th>
+                                <th class="text-end">Remaining Qty</th>
+                                <th class="text-center">Recover Deleted Item</th>
+                            </tr>
+                        </thead>
+                        <tbody id="RNTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="RNInsertBtn" class="btn btn-primary px-4">Insert</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Popup -->
+    <div class="modal modal-sm fade" id="AlertModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title mb-0">Warning</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4 text-dark fs-6 text-center">
+                    <img src="~/img/danger.png" class="img-fluid mb-2" />
+                    <div id="AlertMessage"></div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Popup -->
+    <div class="modal modal-xl fade" id="AddressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="modal-title">Address</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-hover mb-0">
+                        <thead>
+                            <tr class="table-info">
+                                <th>Type</th>
+                                <th>Address ID</th>
+                                <th style="min-width:300px;">Address</th>
+                                <th>City</th>
+                                <th>State</th>
+                                <th>Country</th>
+                                <th>PIN</th>
+                                <th>GSTIN</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="AddressTableBody"></tbody>
+                    </table>
+                    <!-- template for Address Type dropdown (cloned by JS) -->
+                    <select id="AddressTypeSelect" style="display:none" asp-items="@ViewBag.AddressType"></select>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" id="BtnAddAddressRow" class="btn btn-primary">Add Row</button>
+                    <button type="button" id="BtnSaveAddress" class="btn btn-primary px-4">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Title bar -->
+    <div class="row align-items-center panel-header gx-2">
+        <div class="col h-100 align-items-center">
+            <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
+                Jobwork Invoice
+                <a href="/joboutward/transactions/jobwork-invoice-summary" class="float-end btn p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row panel-body gx-2">
+        <div class="col-12 panel-card-fixed h-100">
+            <div class="w-100 rounded-0 h-100 border border-primary bg-transparent" id="BodyHeight">
+
+                <!-- HEADER -->
+                <div class="card rounded-0 bg-transparent shadow-none" id="CardHeader">
+                    <div class="card-body pb-0" style="margin-top:-10px !important;">
+                        <div class="row">
+                            <div class="col-auto left-menu text-black">
+                                <div class="row">
+
+                                    <!-- COLUMN 1 -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-4 col-form-label ps-0" for="JOSVIH_JournalNo">Journal No.</label>
+                                            <div class="col-md-7">
+                                                <input id="JOSVIH_JournalNo" class="form-control" maxlength="25" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-4 col-form-label ps-0" for="JOSVIH_JournalDate">Date</label>
+                                            <div class="col-md-7">
+<input id="JOSVIH_JournalDate" type="date" class="form-control datepicker" autocomplete="off" value="@DateTime.Today.ToString("yyyy-MM-dd")" />                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-4 col-form-label ps-0" for="JOSVIH_VendorInvoiceNo">Vendor Invoice No.</label>
+                                            <div class="col-md-7">
+                                                <input id="JOSVIH_VendorInvoiceNo" class="form-control" maxlength="25" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-4 col-form-label ps-0" for="JOSVIH_VendorInvoiceDate">Vendor Inv. Date</label>
+                                            <div class="col-md-7">
+                                                <input id="JOSVIH_VendorInvoiceDate" type="date" class="form-control datepicker" autocomplete="off" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-md-4 col-form-label ps-0" for="JOSVIH_MS_Number">Material Segregation</label>
+                                            <div class="col-md-7">
+                                                <select id="JOSVIH_MS_Number" class="form-select" asp-items="@ViewBag.MaterialSegregation"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 2 -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-form-label ps-0" for="JOSVIH_JW_Vendor_Name">JW Vendor</label>
+                                            <div class="col-sm-7">
+                                                <input type="hidden" id="JOSVIH_JW_Vendor_Number" value="0" />
+                                                <input id="JOSVIH_JW_Vendor_Name" class="form-control" autocomplete="off"
+                                                       onfocus="ShowVendorPane();OnBuyerSelectCall(this)"
+                                                       oninput="OnBuyerInput(this)" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-form-label ps-0" for="JOSVIH_Currency_Number">Currency</label>
+                                            <div class="col-sm-7">
+                                                <select id="JOSVIH_Currency_Number" class="form-select" asp-items="@ViewBag.Currency"></select>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-form-label ps-0" for="JOSVIH_TCT_Number">Tax Cluster</label>
+                                            <div class="col-sm-7">
+                                                <select id="JOSVIH_TCT_Number" class="form-select"></select>
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-form-label ps-0" for="JOSVIH_WHT_Number">WH Tax Code</label>
+                                            <div class="col-sm-7">
+                                                <select id="JOSVIH_WHT_Number" class="form-select" asp-items="@ViewBag.WHTCode"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COLUMN 3 -->
+                                    <div class="col-12 col-md-4">
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-form-label ps-0" for="JOSVIH_PaymentTerms">Payment Terms</label>
+                                            <div class="col-sm-7">
+                                                <input id="JOSVIH_PaymentTerms" class="form-control" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-form-label ps-0" for="JOSVIH_PaymentMethod">Method of Payment</label>
+                                            <div class="col-sm-7">
+                                                <input id="JOSVIH_PaymentMethod" class="form-control" maxlength="50" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row align-items-center gx-2 mb-0">
+                                            <label class="col-sm-4 col-form-label ps-0" for="JOSVIH_Remarks">Remarks</label>
+                                            <div class="col-sm-7">
+                                                <textarea id="JOSVIH_Remarks" class="form-control" maxlength="250"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- RIGHT MENU -->
+                            <div class="col-auto right-menu text-center border-start">
+                                <button type="button" id="BtnSave" class="btn btn-primary btn-sm px-2 w-100 mb-1">Save</button>
+                                <a href="/joboutward/transactions/jobwork-invoice" class="btn btn-primary btn-sm px-2 w-100 mb-1">Clear All</a>
+                                <button type="button" id="BtnAddress" class="btn btn-primary btn-sm px-1 w-100 mb-1">Address</button>
+                                <button type="button" id="BtnAddRN" class="btn btn-primary btn-sm px-2 w-100 mb-1">Receipt Note</button>
+                            </div>
+                        </div>
+
+                        <!-- hidden state used by JS -->
+                        <input type="hidden" id="JOSVIH_Number" value="0" />
+                        <input type="hidden" id="WHT_Percent" value="0" />
+                        <input type="hidden" id="WHT_IncludeTax" value="0" />
+                        <input type="hidden" id="WHT_Flag" value="0" />
+                    </div>
+                </div>
+
+                <!-- ITEM GRID -->
+                <div class="card rounded-0 bg-transparent shadow-none" id="CardBody">
+                    <div class="card-body h-100">
+                        <div class="row h-100">
+                        <div class="col-auto left-menu h-100">
+                        <ul class="nav nav-tabs tab-header d-flex align-items-end">
+                            <li class="nav-item"><a class="nav-link active" aria-current="page">Item</a></li>
+                            <li class="ms-auto me-2 mb-2">
+                                <button type="button" id="BtnDeleteRow" class="btn btn-danger btn-sm">Delete Row</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content tab-body tab-body-h-o">
+                            <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" tabindex="0">
+                                <div class="table-responsive table-body table-body-f" style="height:480px;">
+                                    <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="ItemTable">
+                                        <thead>
+                                            <tr class="table-info">
+                                                <th class="px-2 del text-center"><input type="checkbox" id="JWI_ChkAll" class="form-check-input border-white"></th>
+                                                <th>Service Order No.</th>
+                                                <th>Vendor Delivery Note No.</th>
+                                                <th>Process</th>
+                                                <th>Item Code</th>
+                                                <th>Description</th>
+                                                <th class="text-center">Outer dia</th>
+                                                <th class="text-center">Thickness</th>
+                                                <th class="text-center">Length</th>
+                                                <th>Material Grade</th>
+                                                <th>Item Group</th>
+                                                <th class="text-center">UoM</th>
+                                                <th class="text-center">Delivered Qty</th>
+                                                <th class="text-center">Previously Invoiced Qty</th>
+                                                <th class="text-center">Current Invoice Qty</th>
+                                                <th class="text-end">Unit Price</th>
+                                                <th class="text-end">Amount</th>
+                                                <th>SAC</th>
+                                                <th class="text-end">GST Amount</th>
+                                                <th class="text-end">WHT_Percent</th>
+                                                <th class="text-end">WH_Tax Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="TableBody"></tbody>
+                                        <tfoot>
+                                            <tr class="table-info">
+                                                <td colspan="12" class="text-end py-2 pe-3">Total</td>
+                                                <td class="text-center"><span id="TotalDelivered">0</span></td>
+                                                <td class="text-center"><span id="TotalPrev">0</span></td>
+                                                <td class="text-center"><span id="TotalQty">0</span></td>
+                                                <td></td>
+                                                <td class="text-end"><span id="TotalAmount">0.00</span></td>
+                                                <td></td>
+                                                <td class="text-end"><span id="TotalGST">0.00</span></td>
+                                                <td></td>
+                                                <td class="text-end"><span id="TotalWHT">0.00</span></td>
+                                            </tr>
+                                          
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="col-auto right-menu text-center border-start">
+                            <button type="button" id="BtnGST" class="btn btn-primary btn-sm px-2 w-100 mb-1 mt-5">GST</button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="RightPane">
+    <div class="p-2">
+        <div class="buyer-search-results"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
+    <script src="~/js/code/ItemGrid.js" asp-append-version="true"></script>
+    <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
+    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+    <script src="~/js/JO_JobworkInvoice/JO_JobworkInvoice.js" asp-append-version="true"></script>
+    <script src="~/js/code/JWC_ItemSearch_Functionality.js" asp-append-version="true"></script>
+}

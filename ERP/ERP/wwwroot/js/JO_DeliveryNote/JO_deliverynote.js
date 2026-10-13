@@ -210,7 +210,7 @@ const ItemTableFields = [
     { cls: ".JODNI_OuterDia", min: 8, max: 8, align: "center" },  // Outer Dia
     { cls: ".JODNI_Thickness", min: 8, max: 8, align: "center" },  // Thickness
     { cls: ".JODNI_Length", min: 8, max: 8, align: "center" },  // Length
-    { cls: ".JODNI_Width", min: 8, max: 8, align: "center" },  // Width
+ 
     { cls: ".JODNI_MaterialGrade", min: 10, max: 25, align: "left" },    // Material Grade
     { cls: ".JODNI_ItemGroup", min: 10, max: 30, align: "left" },    // Item Group
     { cls: ".JODNI_WH_Number", min: 10, max: 25, align: "left" },    // Warehouse
@@ -230,6 +230,12 @@ const ItemTableFields = [
 let isMouseSelectingBuyer = false;
 
 var addressIndex = 0;
+
+// Hide Width column (8th column) in UI only. New rows are covered too.
+$("<style>" +
+    "#ItemTable thead th:nth-child(8), " +
+    "#ItemTable tbody td:nth-child(8) { display: none !important; }" +
+    "</style>").appendTo("head");
 //#region batch grid alignment
 function GetTableWidth(container = "#DeliveryNoteBatchList") {
 
@@ -490,6 +496,70 @@ function ResizeAddressColumns() {
         tableBody: "#AddTableBody"
     });
 }
+function LoadDefaultFormSetting() {
+    $.ajax({
+        url: '/joboutward/transactions/delivery-note-dfs/get',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response && response.success && response.data) {
+                var data = response.data;
+
+                if (data.jodN_DFS_MS_Number) {
+                    $('#Header_JODNH_MS_Number').val(data.jodN_DFS_MS_Number).trigger('change');
+                }
+                if (data.jodN_DFS_JW_Vendor_Number) {
+                    var vendorNo = data.jodN_DFS_JW_Vendor_Number;
+                    var $vName = $('#Header_JODNH_JW_Vendor_Name');
+
+                    $('#Header_JODNH_JW_Vendor_Number').val(vendorNo);
+                    $vName.val(data.jwV_JW_VendorName);
+
+                    // load vendor list, then select the default vendor row
+                    // (same logic as manual select: fills Currency + Warehouse)
+                    SearchBuyer($vName[0]);
+
+                    setTimeout(function () {
+                        var $row = $("#RightPane .buyer-search-results tbody tr").filter(function () {
+                            var c = $(this).data("customer");
+                            return c && c.jwV_Number == vendorNo;
+                        }).first();
+
+                        if ($row.length) {
+                            $row.trigger("mousedown");
+                        }
+                    }, 600);
+                }
+                if (data.jodN_DFS_PaymentTerms) {
+                    $('#Header_JODNH_PaymentTerms').val(data.jodN_DFS_PaymentTerms);
+                }
+                if (data.jodN_DFS_DeliveryTerms) {
+                    $('#Header_JODNH_DeliveryTerms').val(data.jodN_DFS_DeliveryTerms);
+                }
+                if (data.jodN_DFS_DeliveryMode) {
+                    $('#Header_JODNH_DeliveryMode').val(data.jodN_DFS_DeliveryMode);
+                }
+                if (data.jodN_DFS_DespatchDocumentNo) {
+                    $('#Header_JODNH_DespatchDocumentNo').val(data.jodN_DFS_DespatchDocumentNo);
+                }
+                if (data.jodN_DFS_DespatchedThrough) {
+                    $('#Header_JODNH_DespatchedThrough').val(data.jodN_DFS_DespatchedThrough);
+                }
+                if (data.jodN_DFS_Remarks) {
+                    $('#Header_JODNH_Remarks').val(data.jodN_DFS_Remarks);
+                }
+                if (data.jodN_DFS_IsFreightApplicable) {
+                    $('#Header_Freight_Applicable')
+                        .prop('checked', data.jodN_DFS_IsFreightApplicable === 'Yes')
+                        .trigger('change');
+                }
+            }
+        },
+        error: function (xhr) {
+            console.error('Failed to load default form setting', xhr);
+        }
+    });
+}
 function OpenItemCodeSearch(inputElement) {
 
     if ($.trim($("#Header_JODNH_MS_Number").val()) === "" || $("#Header_JODNH_MS_Number").val() === "0") {
@@ -575,12 +645,59 @@ $(document).ready(function () {
             $(freightCols).hide();
         }
     }
-
     $(document).on("change", "#Header_Freight_Applicable", function () {
+
+        // ticked -> just show columns
+        if ($(this).is(":checked")) {
+            ToggleFreightColumns_DN();
+            return;
+        }
+
+        // unticked -> does any row have Freight data?
+        let hasFreightData = false;
+
+        $("#ItemTable tbody tr.NewRow").each(function () {
+            let row = $(this);
+
+            if (row.find(".JODNI_IsFreightApplicable").is(":checked") ||
+                (row.find(".JODNI_JOFRT_SVOH_Number").val() || "0") !== "0" ||
+                row.find(".JODNI_FromWH_Number").val() ||
+                row.find(".JODNI_ToWH_Number").val()) {
+
+                hasFreightData = true;
+                return false;
+            }
+        });
+
+        // no freight data -> untick directly, no popup
+        if (!hasFreightData) {
+            ToggleFreightColumns_DN();
+            return;
+        }
+
+        // warning popup
+        if (!confirm("Freight details in the grid will be cleared. Do you want to continue?")) {
+            // Cancel -> header stays ticked, nothing changes
+            $(this).prop("checked", true);
+            return;
+        }
+
+        // Ok -> clear freight values in every row
+        $("#ItemTable tbody tr.NewRow").each(function () {
+            let row = $(this);
+
+            row.find(".JODNI_IsFreightApplicable").prop("checked", false);
+            row.find(".JODNI_FromWH_Number").val("");
+            row.find(".JODNI_ToWH_Number").val("");
+            row.find(".JODNI_JOFRT_SVOH_Number").html('<option value="0"></option>').val("0");
+            row.find(".JODNI_JOFRT_SVOI_Number_Row").val(0);
+        });
+
         ToggleFreightColumns_DN();
     });
-
     ToggleFreightColumns_DN();
+
+    LoadDefaultFormSetting();
 
     //#region Header_JODNH_JW_Vendor_Name
     // JW_Customer – Focus Out: moved to <script> block
@@ -1522,7 +1639,6 @@ $(document).ready(function () {
     });
     //#endregion remove checked rows
 
-
     $(document).on(
         "change",
         ".JODNI_IsFreightApplicable, .JODNI_UoM_Number, .JODNI_FromWH_Number, .JODNI_ToWH_Number",
@@ -1531,16 +1647,18 @@ $(document).ready(function () {
             let row = $(this).closest("tr");
 
             if (row.find(".JODNI_IsFreightApplicable").is(":checked")) {
-
-                BindFreightServiceOrder(
-                    $("#Header_JODNH_JW_Vendor_Number").val(),
-                    row.find(".JODNI_UoM_Number").val(),
-                    row.find(".JODNI_FromWH_Number").val(),
-                    row.find(".JODNI_ToWH_Number").val()
-                );
-
+                // each row reloads with its own params
+                BindFreightSVORow(row);
             } else {
-                row.find(".JODNI_JOFRT_SVOH_Number").html('<option value="0"></option>');
+                // row untick -> clear this row's freight values
+                row.find(".JODNI_JOFRT_SVOH_Number").html('<option value="0"></option>').val("0");
+                row.find(".JODNI_JOFRT_SVOI_Number_Row").val(0);
+
+                // untick itself clears From WH / To WH too
+                if ($(this).hasClass("JODNI_IsFreightApplicable")) {
+                    row.find(".JODNI_FromWH_Number").val("");
+                    row.find(".JODNI_ToWH_Number").val("");
+                }
             }
         }
     );
@@ -1868,12 +1986,21 @@ function SearchBuyer(inputElement) {
                     $("#AddTableBody tr.NewRow").find(".JODNA_IsDeleted").val("1");
                     $("#AddTableBody tr.NewRow").hide();
 
+                    $("#BuyerMessage").hide().text("");
                     $("#RightPane").removeClass("show");
                     $("#RightPane .buyer-search-results").hide();
 
+                    // same as common SelectBuyer: focus goes to Currency
+                    setTimeout(function () {
+                        $("#Header_JODNH_Currency_Number").focus();
+                        $(document).trigger("click");
+                    }, 100);
+
+                    // keep flag true until focus has moved, so focusout
+                    // does not run HandleSearchSelection again
                     setTimeout(function () {
                         isMouseSelectingBuyer = false;
-                    }, 100);
+                    }, 300);
                 });
 
                 resultsDiv.append(table);
@@ -2096,6 +2223,59 @@ function BindFreightServiceOrder(customerId, uomNumber = null, fromWHNumber = nu
             )
         })
     );
+}
+
+// Row-specific Freight SVO bind: only THIS row's dropdown is reloaded,
+// using THIS row's UOM / From WH / To WH. Old value stays if still in list.
+function BindFreightSVORow(row) {
+
+    let $dd = row.find(".JODNI_JOFRT_SVOH_Number");
+    let $svoi = row.find(".JODNI_JOFRT_SVOI_Number_Row");
+    let oldVal = $dd.val() || "0";
+    let vendorId = $("#Header_JODNH_JW_Vendor_Number").val();
+
+    // latest request per row only
+    let reqId = (row.data("svoReq") || 0) + 1;
+    row.data("svoReq", reqId);
+
+    if (!vendorId) {
+        $dd.html('<option value="0"></option>').val("0");
+        $svoi.val(0);
+        return;
+    }
+
+    $.get("/joboutward/transactions/delivery-note/get-freight-service-order", {
+        vendorId: vendorId,
+        uomNumber: row.find(".JODNI_UoM_Number").val(),
+        fromWHNumber: row.find(".JODNI_FromWH_Number").val(),
+        toWHNumber: row.find(".JODNI_ToWH_Number").val()
+    }, function (data) {
+
+        if (row.data("svoReq") !== reqId) return;
+
+        $dd.html('<option value="0"></option>');
+
+        let added = {};
+        $.each(data, function (_, item) {
+            if (!item.value || item.value === "0" || added[item.value]) return;
+            added[item.value] = true;
+            $dd.append(
+                `<option value="${item.value}" data-svoi="${item.svoiNumber || 0}">${item.text}</option>`
+            );
+        });
+
+        let $old = $dd.find('option[value="' + oldVal + '"]');
+
+        if (oldVal !== "0" && $old.length) {
+            // old value still valid -> keep it
+            $dd.val(oldVal);
+            $svoi.val($old.attr("data-svoi") || 0);
+        } else {
+            // not in list -> blank
+            $dd.val("0");
+            $svoi.val(0);
+        }
+    });
 }
 
 //#region Calculate Total

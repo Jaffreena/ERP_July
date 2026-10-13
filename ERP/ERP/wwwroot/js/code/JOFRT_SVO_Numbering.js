@@ -1,6 +1,6 @@
-﻿function validateDateRange(dateClass, endDateClass, sectionName) {
+function validateDateRange(dateClass, endDateClass, sectionName) {
 
-    // remember the values already rendered (saved rows)
+    // Initialize prevVal with whatever's already rendered (existing rows)
     $(`${dateClass}, ${endDateClass}`).each(function () {
         $(this).data("prevVal", $(this).val());
     });
@@ -22,13 +22,14 @@
         let start = new Date(startDate);
         let end = new Date(endDate);
 
+        // End Date Validation
         if (end < start) {
             alert("End Date must be greater than or equal to Start Date.");
             revertField($changedField);
             return;
         }
 
-        // overlap check against the other visible rows
+        // Validate against current table rows
         let overlap = false;
 
         $(dateClass).each(function () {
@@ -38,6 +39,7 @@
             if (row.is(currentRow))
                 return;
 
+            // Skip removed/hidden rows
             if (row.is(":hidden"))
                 return;
 
@@ -69,12 +71,13 @@
             return;
         }
 
-        // valid: this becomes the new known-good value
+        // Validation passed - this becomes the new "known good" value
         $changedField.data("prevVal", $changedField.val());
+
     });
 }
 
-// put the field back to its last valid value
+// Restores the field to its last valid value (prevVal)
 function revertField($field) {
     let prevVal = $field.data("prevVal") || "";
     let fp = $field[0]._flatpickr;

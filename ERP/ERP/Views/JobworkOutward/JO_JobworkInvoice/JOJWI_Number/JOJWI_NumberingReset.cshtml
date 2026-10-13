@@ -1,0 +1,201 @@
+@model List<ERP_DTO.JobOutwardTransaction.JOJWI_NumberReset_DTO>
+
+<div class="col table-fixed h-100">
+    <div class="w-100 table-responsive table-body table-body-f">
+        <table class="table table-one table-striped table-bordered table-hover align-middle w-100">
+            <thead>
+                <tr class="table-info text-center">
+                    <th class="datetype">Start Date</th>
+                    <th class="datetype">End Date</th>
+                    <th style="width:110px;">Start Number</th>
+                    <th style="width:110px;">Number Of Digits</th>
+                    <th>Prefil Zero</th>
+                    <th>Frequency</th>
+                    <th class="table-width-sm"></th>
+                </tr>
+            </thead>
+            <tbody id="ResetTableBody">
+                <tr id="ResetTempRow" style="display: none;">
+                    <td>
+                        <input class="form-control JOJWI_NRS_StartDate datepicker text-center" autocomplete="off" />
+                    </td>
+                    <td>
+                        <input class="form-control JOJWI_NRS_EndDate datepicker text-center" autocomplete="off" />
+                    </td>
+                    <td style="width:110px;">
+                        <input class="form-control JOJWI_NRS_StartingNumber text-center" autocomplete="off" />
+                    </td>
+                    <td style="width:110px;">
+                        <input class="form-control JOJWI_NRS_NumberofDigits text-center" autocomplete="off" />
+                    </td>
+                    <td>
+                        <select class="form-select JOJWI_NRS_PrefilZero text-center" asp-items="@ViewBag.Prefil"></select>
+                    </td>
+                    <td>
+                        <select class="form-select JOJWI_NRS_Frequency text-center" asp-items="@ViewBag.Frequency"></select>
+                    </td>
+                    <td class="text-center">
+                        <input type="hidden" class="JOJWI_NRS_IsDeleted" value="false" />
+                        <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model != null)
+                {
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="ResetNewRow">
+                            <td>
+                                <input name="JOJWI_NumberReset[@i].JOJWI_NRS_StartDate" class="form-control JOJWI_NRS_StartDate datepicker text-center" autocomplete="off" value="@Model[i].JOJWI_NRS_StartDate" />
+                            </td>
+                            <td>
+                                <input name="JOJWI_NumberReset[@i].JOJWI_NRS_EndDate" class="form-control JOJWI_NRS_EndDate datepicker text-center" autocomplete="off" value="@Model[i].JOJWI_NRS_EndDate" />
+                            </td>
+                            <td style="width:110px;">
+                                <input name="JOJWI_NumberReset[@i].JOJWI_NRS_StartingNumber" class="form-control JOJWI_NRS_StartingNumber text-center" autocomplete="off" value="@Model[i].JOJWI_NRS_StartingNumber" />
+                            </td>
+                            <td style="width:110px;">
+                                <input name="JOJWI_NumberReset[@i].JOJWI_NRS_NumberofDigits" class="form-control JOJWI_NRS_NumberofDigits text-center" autocomplete="off" value="@Model[i].JOJWI_NRS_NumberofDigits" />
+                            </td>
+                            <td>
+                                <select name="JOJWI_NumberReset[@i].JOJWI_NRS_PrefilZero" class="form-select JOJWI_NRS_PrefilZero text-center">
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Prefil)
+                                    {
+                                        <option value="@item.Value" selected="@(item.Value == Model[i].JOJWI_NRS_PrefilZero)">@item.Text</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <select name="JOJWI_NumberReset[@i].JOJWI_NRS_Frequency" class="form-select JOJWI_NRS_Frequency text-center">
+                                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Frequency)
+                                    {
+                                        <option value="@item.Value" selected="@(item.Value == Model[i].JOJWI_NRS_Frequency)">@item.Text</option>
+                                    }
+                                </select>
+                            </td>
+                            <td class="text-center">
+                                @if (Model[i].JOJWI_NRS_Number != 0)
+                                {
+                                    <input name="JOJWI_NumberReset[@i].JOJWI_NRS_Number" type="hidden" value="@Model[i].JOJWI_NRS_Number" />
+                                }
+                                <input type="hidden" name="JOJWI_NumberReset[@i].JOJWI_NRS_IsDeleted" class="JOJWI_NRS_IsDeleted" value="false" />
+                                <a class="ResetRowRemove btn btn-sm btn-danger p-1 icon-link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row table-footer align-items-center">
+    <div class="col">
+        <a id="ResetNewRowButton" class="btn btn-primary">Add Row</a>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+
+        function ResetInitFlatpickr() {
+            $(".datepicker").flatpickr({ dateFormat: "d-M-Y", altInput: false });
+        }
+
+        var rowCount = @(Model != null ? Model.Count : 0);
+
+        function ResetAddRow() {
+            var NewRow = $("#ResetTempRow").clone().removeAttr("style").removeAttr("id").addClass("ResetNewRow");
+            NewRow.find("input.JOJWI_NRS_StartDate").attr("name", "JOJWI_NumberReset[" + rowCount + "].JOJWI_NRS_StartDate");
+            NewRow.find("input.JOJWI_NRS_EndDate").attr("name", "JOJWI_NumberReset[" + rowCount + "].JOJWI_NRS_EndDate");
+            NewRow.find("input.JOJWI_NRS_StartingNumber").attr("name", "JOJWI_NumberReset[" + rowCount + "].JOJWI_NRS_StartingNumber");
+            NewRow.find("input.JOJWI_NRS_NumberofDigits").attr("name", "JOJWI_NumberReset[" + rowCount + "].JOJWI_NRS_NumberofDigits");
+            NewRow.find("select.JOJWI_NRS_PrefilZero").attr("name", "JOJWI_NumberReset[" + rowCount + "].JOJWI_NRS_PrefilZero");
+            NewRow.find("select.JOJWI_NRS_Frequency").attr("name", "JOJWI_NumberReset[" + rowCount + "].JOJWI_NRS_Frequency");
+            NewRow.find("input.JOJWI_NRS_IsDeleted").attr("name", "JOJWI_NumberReset[" + rowCount + "].JOJWI_NRS_IsDeleted").val(false);
+
+            $("#ResetTableBody").append(NewRow);
+            rowCount++;
+            ResetInitFlatpickr();
+        }
+
+        function ResetValidateField(el) {
+            var v = el.val();
+
+            if (v === null || $.trim(v) === "") {
+                return false;
+            }
+
+            if (el.hasClass("JOJWI_NRS_StartingNumber")) {
+                var n = parseInt(v, 10);
+                if (isNaN(n) || n <= 0) return false;
+            }
+
+            if (el.hasClass("JOJWI_NRS_NumberofDigits")) {
+                if (!/^[3-9]$/.test($.trim(v))) return false;
+            }
+
+            return true;
+        }
+
+        function ResetAllValid() {
+            var ok = true;
+            $("tr.ResetNewRow:visible").each(function () {
+                $(this).find("select, input[type='text'], input:not([type])").each(function () {
+                    if (!ResetValidateField($(this))) {
+                        ok = false;
+                        return false;
+                    }
+                });
+                if (!ok) return false;
+            });
+            return ok;
+        }
+
+        if ($("tr.ResetNewRow").length == 0) {
+            ResetAddRow();
+        }
+
+        $(document).on("click", ".ResetRowRemove", function () {
+            $(this).closest("tr").find("input[name*='JOJWI_NRS_IsDeleted']").val(true);
+            $(this).closest("tr").hide();
+        });
+
+        $("#ResetNewRowButton").click(function () {
+            if (ResetAllValid()) {
+                ResetAddRow();
+                return;
+            }
+
+            var startBad = false, digitsBad = false, first = null;
+
+            $("tr.ResetNewRow:visible").last().find("select, input[type='text'], input:not([type])").each(function () {
+                if (!ResetValidateField($(this))) {
+                    if (!first) first = $(this);
+                    if ($(this).hasClass("JOJWI_NRS_StartingNumber")) startBad = true;
+                    else if ($(this).hasClass("JOJWI_NRS_NumberofDigits")) digitsBad = true;
+                }
+            });
+
+            var msg;
+            if (startBad && digitsBad)
+                msg = "Start Number must be greater than 0, and Number Of Digits must be a single digit between 3 and 9.";
+            else if (startBad)
+                msg = "Start Number must be greater than 0. Negative numbers, 0, or blank are not allowed.";
+            else if (digitsBad)
+                msg = "Number Of Digits must be a single digit between 3 and 9.";
+            else
+                msg = "Please complete all fields !";
+
+            alert(msg);
+            if (first) first.focus();
+        });
+
+        ResetInitFlatpickr();
+    });
+</script>
