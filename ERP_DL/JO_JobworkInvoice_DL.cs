@@ -1,4 +1,4 @@
-﻿using ERP_DTO.JobOutwardTransaction;
+using ERP_DTO.JobOutwardTransaction;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -163,6 +163,38 @@ namespace ERP_DL
         }
         #endregion
 
+        #region Service Order dropdown (invoice grid)
+        public List<JO_JobworkInvoiceServiceOrder_DTO> ServiceOrderList(DataTable dt)
+        {
+            var list = new List<JO_JobworkInvoiceServiceOrder_DTO>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new JO_JobworkInvoiceServiceOrder_DTO
+                {
+                    JOJWI_SVOH_Number = L(dr, "JOJWI_SVOH_Number"),
+                    JOJWI_SVOH_ServiceOrderNo = S(dr, "JOJWI_SVOH_ServiceOrderNo"),
+                    JOJWI_SVOI_Number = L(dr, "JOJWI_SVOI_Number")
+                });
+            }
+            return list;
+        }
+
+        public JO_JobworkInvoiceServiceOrderInfo_DTO ServiceOrderInfo(DataTable dt)
+        {
+            var info = new JO_JobworkInvoiceServiceOrderInfo_DTO();
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                DataRow dr = dt.Rows[0];
+                info.JOJWI_SVOI_Number = L(dr, "JOJWI_SVOI_Number");
+                info.JOJWI_SVOI_UnitPrice = D(dr, "JOJWI_SVOI_UnitPrice");
+                info.JOJWI_SVOI_Amount = D(dr, "JOJWI_SVOI_Amount");
+                info.JOJWI_SVOI_Qty = D(dr, "JOJWI_SVOI_Qty");
+                info.PrevInvoiceQty = D(dr, "PrevInvoiceQty");
+            }
+            return info;
+        }
+        #endregion
+
         #region Edit / View  (Get SP : 0 Header, 1 Items, 2 Address, 3 GST)
         public JO_JobworkInvoiceHead_DTO HeaderRow(DataTable dt)
         {
@@ -204,6 +236,7 @@ namespace ERP_DL
                     JOSVII_JOJWI_SVOH_Number = L(dr, "JOSVII_JOJWI_SVOH_Number"),
                     JOSVII_JOJWI_SVOI_Number = L(dr, "JOSVII_JOJWI_SVOI_Number"),
                     JOSVII_Vendor_DN_No = S(dr, "JOSVII_Vendor_DN_No"),
+                    JOSVII_SVO_Assign = S(dr, "JOSVII_SVO_Assign"),
                     JOSVII_JPRS_Number = L(dr, "JOSVII_JPRS_Number"),
                     JOSVII_Item_Number = L(dr, "JOSVII_Item_Number"),
                     JOSVII_UoM_Number = L(dr, "JOSVII_UoM_Number"),
@@ -314,9 +347,12 @@ namespace ERP_DL
                     VendorCategory = S(dr, "VendorCategory"),
                     CurrencyCode = S(dr, "CurrencyCode"),
                     TaxCluster = S(dr, "TaxCluster"),
+                    WH_TaxCode = S(dr, "WH_TaxCode"),
                     Segregation = S(dr, "Segregation"),
                     WarehouseCode = S(dr, "WarehouseCode"),
+                    NoOfLineItems = I(dr, "NoOfLineItems"),
                     TotalQty = D(dr, "TotalQty"),
+                    TotalQty_Kgs = D(dr, "TotalQty_Kgs"),
                     Amount = D(dr, "Amount"),
                     GST_Amount = D(dr, "GST_Amount"),
                     WH_TaxAmount = D(dr, "WH_TaxAmount")
@@ -332,6 +368,7 @@ namespace ERP_DL
             {
                 DataRow dr = dt.Rows[0];
                 t.GrandTotalQty = D(dr, "GrandTotalQty");
+                t.GrandTotalQtyKgs = D(dr, "GrandTotalQtyKgs");
                 t.GrandTotalAmount = D(dr, "GrandTotalAmount");
                 t.GrandTotalGST = D(dr, "GrandTotalGST");
                 t.GrandTotalWHT = D(dr, "GrandTotalWHT");
@@ -358,12 +395,14 @@ namespace ERP_DL
                     JORNH_RN_No = S(dr, "JORNH_RN_No"),
                     JORNH_RN_Date = DTN(dr, "JORNH_RN_Date"),
                     JOSVII_Vendor_DN_No = S(dr, "JOSVII_Vendor_DN_No"),
+                    Vendor_DN_Date = DTN(dr, "Vendor_DN_Date"),
 
                     JWV_JW_VendorName = S(dr, "JWV_JW_VendorName"),
                     VendorGroup = S(dr, "VendorGroup"),
                     VendorCategory = S(dr, "VendorCategory"),
                     CurrencyCode = S(dr, "CurrencyCode"),
                     TaxCluster = S(dr, "TaxCluster"),
+                    WH_TaxCode = S(dr, "WH_TaxCode"),
 
                     JOSVII_Number = Has(dr, "JOSVII_Number") ? Convert.ToInt64(dr["JOSVII_Number"]) : (long?)null,
                     JOSVII_JOSVIH_Number = Has(dr, "JOSVII_JOSVIH_Number") ? Convert.ToInt64(dr["JOSVII_JOSVIH_Number"]) : (long?)null,
@@ -381,6 +420,7 @@ namespace ERP_DL
                     WarehouseCode = S(dr, "WarehouseCode"),
 
                     JOSVII_Qty = D(dr, "JOSVII_Qty"),
+                    JOSVII_Qty_Kgs = D(dr, "JOSVII_Qty_Kgs"),
                     JOSVII_UnitPrice = D(dr, "JOSVII_UnitPrice"),
                     JOSVII_Amount = D(dr, "JOSVII_Amount"),
                     JOSVII_GST_Amount = D(dr, "JOSVII_GST_Amount"),
@@ -398,6 +438,7 @@ namespace ERP_DL
             {
                 DataRow dr = dt.Rows[0];
                 t.TotalQty = D(dr, "TotalQty");
+                t.TotalQtyKgs = D(dr, "TotalQtyKgs");
                 t.TotalAmount = D(dr, "TotalAmount");
                 t.TotalGST = D(dr, "TotalGST");
                 t.TotalWHT = D(dr, "TotalWHT");

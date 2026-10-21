@@ -95,8 +95,8 @@
                                                     <tr class="table-info table-first-header-top">
                                                         <th class="px-2 del"></th>
                                                         <th colspan="2" class="text-center">Service Order</th>
-                                                        <th colspan="4" class="text-center">JW Vendor Details</th>
-                                                        <th colspan="4" class="text-center">Item Details</th>
+                                                        <th colspan="3" class="text-center">JW Vendor Details</th>
+                                                        <th colspan="5" class="text-center">Item Details</th>
                                                     </tr>
                                                     <tr class="table-info">
                                                         <th class="px-2 del">
@@ -105,9 +105,9 @@
                                                         <th>SO No</th>
                                                         <th class="text-center">SO Date</th>
                                                         <th>Group</th>
-                                                        <th>Category</th>
                                                         <th>Name</th>
                                                         <th>Currency</th>
+                                                        <th>Material Segregation</th>
                                                         <th>Process</th>
                                                         <th class="text-center">No Of Items</th>
                                                         <th class="text-end">Qty</th>
@@ -125,9 +125,9 @@
                                                         <td>@item.JOJWI_SVOH_ServiceOrderNo</td>
                                                         <td class="text-center">@item.JOJWI_SVOH_ServiceOrderDate.ToString("dd-MMM-yyyy")</td>
                                                         <td>@item.JVG_JW_VendorGroup</td>
-                                                        <td>@item.JVC_JW_VendorCategory</td>
                                                         <td>@item.JWV_JW_VendorName</td>
                                                         <td>@item.CurrencyCode</td>
+                                                        <td>@item.MaterialSegregation</td>
                                                         <td>@item.Process</td>
                                                         <td class="text-center">@item.NoOfLineItems</td>
                                                         <td class="text-end">@String.Format(India, "{0:#,0.##}", Convert.ToDouble(item.Qty))</td>

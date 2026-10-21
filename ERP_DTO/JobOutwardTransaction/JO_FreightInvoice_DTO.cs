@@ -200,10 +200,13 @@ namespace ERP_DTO.JobOutwardTransaction
         public string CurrencyCode { get; set; }
         public string TaxCluster { get; set; }
         public string WarehouseCode { get; set; }
+        public string WH_TaxCode { get; set; }
+        public int NoOfLineItems { get; set; }
         public decimal TotalQty { get; set; }
         public decimal Amount { get; set; }
         public decimal GST_Amount { get; set; }
         public decimal WHT_Amount { get; set; }
+        public decimal TotalQtyKgs { get; set; }
     }
 
     public class JO_FreightInvoiceSummaryTotal_DTO
@@ -212,6 +215,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public decimal GrandTotalAmount { get; set; }
         public decimal GrandTotalGST { get; set; }
         public decimal GrandTotalWHT { get; set; }
+        public decimal GrandTotalQtyKgs { get; set; }
     }
 
     // ===================== DETAILED LIST =====================
@@ -225,6 +229,8 @@ namespace ERP_DTO.JobOutwardTransaction
         public string JOFTIH_Category { get; set; }
         public string SourceNo { get; set; }
         public string SourceDate { get; set; }
+        public string Vendor_DN_No { get; set; }
+        public string Vendor_DN_Date { get; set; }
         public string ServiceOrderNo { get; set; }
         public string ServiceOrderDate { get; set; }
         public string JWV_JW_VendorName { get; set; }
@@ -232,6 +238,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public string VendorCategory { get; set; }
         public string CurrencyCode { get; set; }
         public string TaxCluster { get; set; }
+        public string WH_TaxCode { get; set; }
         public string JPRS_ProcessName { get; set; }
         public string ItemGroup { get; set; }
         public string ItemCode { get; set; }
@@ -245,6 +252,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public string FromWH { get; set; }
         public string ToWH { get; set; }
         public long JOFTII_Number { get; set; }
+        public decimal JOFTII_Qty { get; set; }
         public decimal JOFTII_Qty_Kgs { get; set; }
         public decimal JOFTII_Rate { get; set; }
         public decimal JOFTII_Amount { get; set; }
@@ -257,6 +265,7 @@ namespace ERP_DTO.JobOutwardTransaction
     public class JO_FreightInvoiceDetailTotal_DTO
     {
         public decimal TotalQty { get; set; }
+        public decimal TotalQtyKgs { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalGST { get; set; }
         public decimal TotalWHT { get; set; }

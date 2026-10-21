@@ -1,4 +1,4 @@
-﻿@model ERP_DTO.JobOutwardTransaction.JO_JobworkInvoiceCreate_DTO
+@model ERP_DTO.JobOutwardTransaction.JO_JobworkInvoiceCreate_DTO
 @{
     bool isView = ViewBag.IsViewMode == true;
     ViewData["Title"] = isView ? "Jobwork Invoice View" : "Jobwork Invoice Edit";
@@ -37,13 +37,25 @@
                     <table class="table table-bordered table-hover mb-0">
                         <thead>
                             <tr class="table-info">
-                                <th>Tax Index</th>
+                                <th>Tax Category</th>
+                                <th>Tax Type</th>
+                                <th class="text-center">Index</th>
+                                <th>Tax Element</th>
                                 <th class="text-end">Assessable Value</th>
                                 <th class="text-end">%</th>
                                 <th class="text-end">GST Amount</th>
+                                <th class="text-center">Load on Inventory</th>
+                                <th class="text-end">Load %</th>
                             </tr>
                         </thead>
                         <tbody id="GSTTableBody"></tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <td colspan="6" class="text-end">Total</td>
+                                <td class="text-end"><span id="GSTTotal">0.00</span></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -257,6 +269,8 @@
                                 <a href="/joboutward/transactions/jobwork-invoice-summary" class="btn btn-primary btn-sm px-2 w-100 mb-1">Back</a>
                                 <button type="button" id="BtnAddress" class="btn btn-primary btn-sm px-1 w-100 mb-1">Address</button>
                                 <button type="button" id="BtnAddRN" class="btn btn-primary btn-sm px-2 w-100 mb-1">Receipt Note</button>
+                                <button type="button" id="BtnGST" class="btn btn-primary btn-sm px-2 w-100 mb-1">GST</button>
+                                <button type="button" id="BtnDeleteRow" class="btn btn-danger btn-sm px-2 w-100 mb-1">Delete</button>
                             </div>
                         </div>
 
@@ -278,24 +292,27 @@
                             <div class="tab-pane fade show active p-2 pb-0 border border-top-0 h-100" tabindex="0">
                                 <div class="table-responsive table-body table-body-f" style="height:480px;">
                                     <table class="table table-one table-striped table-bordered table-hover align-middle w-100" id="ItemTable">
+                                        <!-- 21 columns : header order = row cell order built in AddItemRow (JO_JobworkInvoice.js) -->
                                         <thead>
                                             <tr class="table-info">
-                                                <th class="text-center">#</th>
-                                                <th class="text-center">Del</th>
-                                                <th>Receipt Note No</th>
+                                                <th class="px-2 del text-center"><input type="checkbox" id="JWI_ChkAll" class="form-check-input" /></th>
                                                 <th>Service Order No</th>
                                                 <th>Vendor DN No</th>
                                                 <th>Process</th>
                                                 <th>Item Code</th>
                                                 <th>Description</th>
+                                                <th class="text-end">Outer Dia</th>
+                                                <th class="text-end">Thickness</th>
+                                                <th class="text-end">Length</th>
+                                                <th>Material Grade</th>
+                                                <th>Item Group</th>
                                                 <th class="text-center">UoM</th>
-                                                <th>SAC</th>
                                                 <th class="text-end">Delivered Qty</th>
                                                 <th class="text-end">Prev. Invoiced Qty</th>
-                                                <th class="text-end">Remaining Qty</th>
                                                 <th class="text-end">Current Invoice Qty</th>
                                                 <th class="text-end">Unit Price</th>
                                                 <th class="text-end">Amount</th>
+                                                <th>SAC</th>
                                                 <th class="text-end">GST Amount</th>
                                                 <th class="text-end">WHT %</th>
                                                 <th class="text-end">WHT Amount</th>
@@ -304,17 +321,20 @@
                                         <tbody id="TableBody"></tbody>
                                         <tfoot>
                                             <tr class="table-info">
-                                                <td colspan="13" class="text-end py-2 pe-3">Total</td>
-                                                <td class="text-end"><span id="TotalQty">0.00</span></td>
+                                                <td colspan="12" class="text-end py-2 pe-3">Total</td>
+                                                <td class="text-end"><span id="TotalDelivered">0</span></td>
+                                                <td class="text-end"><span id="TotalPrev">0</span></td>
+                                                <td class="text-end"><span id="TotalQty">0</span></td>
                                                 <td></td>
                                                 <td class="text-end"><span id="TotalAmount">0.00</span></td>
+                                                <td></td>
                                                 <td class="text-end"><span id="TotalGST">0.00</span></td>
                                                 <td></td>
                                                 <td class="text-end"><span id="TotalWHT">0.00</span></td>
                                             </tr>
                                             <tr class="table-info">
-                                                <td colspan="15" class="text-end py-2 pe-3">Net Total (Amount + GST - WHT)</td>
-                                                <td colspan="4" class="text-end"><b><span id="NetTotal">0.00</span></b></td>
+                                                <td colspan="16" class="text-end py-2 pe-3">Net Total (Amount + GST - WHT)</td>
+                                                <td colspan="5" class="text-start"><b><span id="NetTotal">0.00</span></b></td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -331,6 +351,9 @@
 
 @section Scripts {
     <script>var JWI_IsView = @(isView ? "true" : "false");</script>
+    <script src="~/js/code/NumberFormat.js" asp-append-version="true"></script>
+    <script src="~/js/code/common_itemtable_functions.js" asp-append-version="true"></script>
+    <script src="~/js/code/Header.js" asp-append-version="true"></script>
     <script src="~/js/JO_JobworkInvoice/JO_JobworkInvoice.js" asp-append-version="true"></script>
     <script src="~/js/JO_JobworkInvoice/JO_JobworkInvoiceEdit.js" asp-append-version="true"></script>
 }

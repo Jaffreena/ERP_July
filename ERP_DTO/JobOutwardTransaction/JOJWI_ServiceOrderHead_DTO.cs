@@ -279,6 +279,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public string? JVC_JW_VendorCategory { get; set; }
         public string? JWV_JW_VendorName { get; set; }
         public string? CurrencyCode { get; set; }
+        public string? MaterialSegregation { get; set; }
         public string? Process { get; set; }
         public int NoOfLineItems { get; set; }
         public double Qty { get; set; }
@@ -298,6 +299,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public string? JVC_JW_VendorCategory { get; set; }
         public string? JWV_JW_VendorName { get; set; }
         public string? CurrencyCode { get; set; }
+        public string? MaterialSegregation { get; set; }
         public long JOJWI_SVOI_JPRS_Number { get; set; }
         public long JOJWI_SVOI_Item_Number { get; set; }
         public string? JPRS_ProcessName { get; set; }
@@ -331,6 +333,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public string? JVC_JW_VendorCategory { get; set; }
         public string? JWV_JW_VendorName { get; set; }
         public string? CurrencyCode { get; set; }
+        public string? Process { get; set; }
         public int NoOfLineItems { get; set; }
         public double Qty { get; set; }
         public double Amount { get; set; }

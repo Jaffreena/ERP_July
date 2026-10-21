@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -123,6 +123,10 @@ namespace ERP_DTO.JobOutwardTransaction
         [Display(Name = "WH Tax Amount")]
         public double JOSVII_WH_TaxAmount { get; set; }
 
+        // RECEIPT NOTE = SO came from RN item, INVOICE = SO picked in invoice grid
+        [StringLength(20)]
+        public string? JOSVII_SVO_Assign { get; set; }
+
         // ---- display only (not saved) ----
         public string? JORNH_RN_No { get; set; }
         public DateTime? JORNH_RN_Date { get; set; }
@@ -241,6 +245,23 @@ namespace ERP_DTO.JobOutwardTransaction
         public double TaxPercentage { get; set; }
     }
 
+    // ===================== SERVICE ORDER DROPDOWN / ITEM INFO =====================
+    public class JO_JobworkInvoiceServiceOrder_DTO        // JO_ServiceOrder_GetByVendor_SP
+    {
+        public long JOJWI_SVOH_Number { get; set; }
+        public string? JOJWI_SVOH_ServiceOrderNo { get; set; }
+        public long JOJWI_SVOI_Number { get; set; }
+    }
+
+    public class JO_JobworkInvoiceServiceOrderInfo_DTO    // JO_ServiceOrderItem_Info_SP
+    {
+        public long JOJWI_SVOI_Number { get; set; }
+        public double JOJWI_SVOI_UnitPrice { get; set; }
+        public double JOJWI_SVOI_Amount { get; set; }
+        public double JOJWI_SVOI_Qty { get; set; }          // SO item total qty
+        public double PrevInvoiceQty { get; set; }          // other invoices only (this invoice excluded by SP)
+    }
+
     // ===================== RN POPUP =====================
     public class JO_JobworkInvoiceRN_DTO                  // JO_ReceiptNote_GroupItem_SP
     {
@@ -279,6 +300,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public long JORNI_JOJWI_SVOH_Number { get; set; }
         public long JORNI_JOJWI_SVOI_Number { get; set; }
         public string? ServiceOrderNo { get; set; }
+        public int HasServiceOrder => JORNI_JOJWI_SVOH_Number > 0 ? 1 : 0;
 
         public string? ItemCode { get; set; }
         public string? ItemDescription { get; set; }
@@ -307,9 +329,12 @@ namespace ERP_DTO.JobOutwardTransaction
         public string? VendorCategory { get; set; }
         public string? CurrencyCode { get; set; }
         public string? TaxCluster { get; set; }
+        public string? WH_TaxCode { get; set; }
         public string? Segregation { get; set; }
         public string? WarehouseCode { get; set; }
+        public int NoOfLineItems { get; set; }
         public double TotalQty { get; set; }
+        public double TotalQty_Kgs { get; set; }
         public double Amount { get; set; }
         public double GST_Amount { get; set; }
         public double WH_TaxAmount { get; set; }
@@ -318,6 +343,7 @@ namespace ERP_DTO.JobOutwardTransaction
     public class JO_JobworkInvoiceTotals_DTO
     {
         public double GrandTotalQty { get; set; }
+        public double GrandTotalQtyKgs { get; set; }
         public double GrandTotalAmount { get; set; }
         public double GrandTotalGST { get; set; }
         public double GrandTotalWHT { get; set; }
@@ -336,12 +362,14 @@ namespace ERP_DTO.JobOutwardTransaction
         public string? JORNH_RN_No { get; set; }
         public DateTime? JORNH_RN_Date { get; set; }
         public string? JOSVII_Vendor_DN_No { get; set; }
+        public DateTime? Vendor_DN_Date { get; set; }
 
         public string? JWV_JW_VendorName { get; set; }
         public string? VendorGroup { get; set; }
         public string? VendorCategory { get; set; }
         public string? CurrencyCode { get; set; }
         public string? TaxCluster { get; set; }
+        public string? WH_TaxCode { get; set; }
 
         public long? JOSVII_Number { get; set; }
         public long? JOSVII_JOSVIH_Number { get; set; }
@@ -359,6 +387,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public string? WarehouseCode { get; set; }
 
         public double JOSVII_Qty { get; set; }
+        public double JOSVII_Qty_Kgs { get; set; }
         public double JOSVII_UnitPrice { get; set; }
         public double JOSVII_Amount { get; set; }
         public double JOSVII_GST_Amount { get; set; }
@@ -369,6 +398,7 @@ namespace ERP_DTO.JobOutwardTransaction
     public class JO_JobworkInvoiceDetailedTotals_DTO
     {
         public double TotalQty { get; set; }
+        public double TotalQtyKgs { get; set; }
         public double TotalAmount { get; set; }
         public double TotalGST { get; set; }
         public double TotalWHT { get; set; }

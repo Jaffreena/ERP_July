@@ -62,10 +62,13 @@ namespace ERP_DL
                     CurrencyCode = S(dr, "CurrencyCode"),
                     TaxCluster = S(dr, "TaxCluster"),
                     WarehouseCode = S(dr, "WarehouseCode"),
+                    WH_TaxCode = S(dr, "WH_TaxCode"),
+                    NoOfLineItems = (int)L(dr, "NoOfLineItems"),
                     TotalQty = M(dr, "TotalQty"),
                     Amount = M(dr, "Amount"),
                     GST_Amount = M(dr, "GST_Amount"),
-                    WHT_Amount = M(dr, "WHT_Amount")
+                    WHT_Amount = M(dr, "WHT_Amount"),
+                    TotalQtyKgs = M(dr, "TotalQtyKgs")
                 });
             }
             return list;
@@ -78,6 +81,7 @@ namespace ERP_DL
             {
                 DataRow dr = Dt.Rows[0];
                 t.GrandTotalQty = M(dr, "GrandTotalQty");
+                t.GrandTotalQtyKgs = M(dr, "GrandTotalQtyKgs");
                 t.GrandTotalAmount = M(dr, "GrandTotalAmount");
                 t.GrandTotalGST = M(dr, "GrandTotalGST");
                 t.GrandTotalWHT = M(dr, "GrandTotalWHT");
@@ -101,6 +105,8 @@ namespace ERP_DL
                     JOFTIH_Category = S(dr, "JOFTIH_Category"),
                     SourceNo = S(dr, "SourceNo"),
                     SourceDate = D(dr, "SourceDate"),
+                    Vendor_DN_No = S(dr, "Vendor_DN_No"),
+                    Vendor_DN_Date = D(dr, "Vendor_DN_Date"),
                     ServiceOrderNo = S(dr, "ServiceOrderNo"),
                     ServiceOrderDate = D(dr, "ServiceOrderDate"),
                     JWV_JW_VendorName = S(dr, "JWV_JW_VendorName"),
@@ -108,6 +114,7 @@ namespace ERP_DL
                     VendorCategory = S(dr, "VendorCategory"),
                     CurrencyCode = S(dr, "CurrencyCode"),
                     TaxCluster = S(dr, "TaxCluster"),
+                    WH_TaxCode = S(dr, "WH_TaxCode"),
                     JPRS_ProcessName = S(dr, "JPRS_ProcessName"),
                     ItemGroup = S(dr, "ItemGroup"),
                     ItemCode = S(dr, "ItemCode"),
@@ -121,6 +128,7 @@ namespace ERP_DL
                     FromWH = S(dr, "FromWH"),
                     ToWH = S(dr, "ToWH"),
                     JOFTII_Number = L(dr, "JOFTII_Number"),
+                    JOFTII_Qty = M(dr, "JOFTII_Qty"),
                     JOFTII_Qty_Kgs = M(dr, "JOFTII_Qty_Kgs"),
                     JOFTII_Rate = M(dr, "JOFTII_Rate"),
                     JOFTII_Amount = M(dr, "JOFTII_Amount"),
@@ -140,6 +148,7 @@ namespace ERP_DL
             {
                 DataRow dr = Dt.Rows[0];
                 t.TotalQty = M(dr, "TotalQty");
+                t.TotalQtyKgs = M(dr, "TotalQtyKgs");
                 t.TotalAmount = M(dr, "TotalAmount");
                 t.TotalGST = M(dr, "TotalGST");
                 t.TotalWHT = M(dr, "TotalWHT");

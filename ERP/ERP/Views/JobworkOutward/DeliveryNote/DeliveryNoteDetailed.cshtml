@@ -1,4 +1,4 @@
-﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JO_DeliveryNoteDetailed_DTO>
+@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JO_DeliveryNoteDetailed_DTO>
 
 @using System.Globalization;
 
@@ -207,10 +207,7 @@
                                                         <th colspan="5" class="text-center">
                                                             JW Vendor Details
                                                         </th>
-                                                        <th colspan="2" class="text-center">
-                                                            Delivery Details
-                                                        </th>
-                                                        <th colspan="15" class="text-center">
+                                                        <th colspan="18" class="text-center">
                                                             Item Details
                                                         </th>
 
@@ -246,7 +243,7 @@
                                                         <th>Name</th>
                                                         <th>Currency</th>
                                                         <th>Warehouse</th>
-                                                        <th class="text-center">Warehouse</th>
+
                                                         <th>Material Segregation</th>
                                                         <th>Process</th>
                                                         <th>Group</th>
@@ -255,7 +252,6 @@
                                                         <th class="text-end">Outer Dia</th>
                                                         <th class="text-end">Thickness</th>
                                                         <th class="text-end">Length</th>
-                                                        <th class="text-end">Width</th>
                                                         <th>Material Grade</th>
                                                         <th>Warehouse</th>
                                                         <th>UoM</th>
@@ -263,6 +259,9 @@
                                                         <th class="text-end">Qty (Kgs)</th>
                                                         <th class="text-end">Amount</th>
                                                         <th class="text-center">Freight Applicable</th>
+                                                        <th class="text-center">From WH</th>
+                                                        <th class="text-center">To WH</th>
+                                                        <th>Freight SVO No.</th>
 
                                                     </tr>
 
@@ -305,7 +304,6 @@
                                                             <td>@item.JWV_JW_VendorName</td>
                                                             <td>@item.CurrencyCode</td>
                                                             <td>@item.VendorWareHouse</td>
-                                                            <td class="text-center">@item.ItemWareHouse</td>
                                                             <td>@item.Segregation</td>
                                                             <td>@item.Process</td>
                                                             <td>@item.ItemGroup</td>
@@ -314,9 +312,8 @@
                                                             <td class="text-end">@item.OuterDia</td>
                                                             <td class="text-end">@item.Thickness</td>
                                                             <td class="text-end">@item.ItemLength</td>
-                                                            <td class="text-end">@item.ITM_Width</td>
                                                             <td>@item.MaterialGrade</td>
-                                                            <td>@item.Warehouse</td>
+                                                            <td>@item.ItemWareHouse</td>
                                                             <td>@item.UOM</td>
                                                             <td class="text-end">@item.JODNI_Qty</td>
                                                             <td class="text-end">@item.JODNI_Qty_Kgs</td>
@@ -324,6 +321,9 @@
                                                                 @String.Format(India, "{0:N2}", Convert.ToDouble(item.JODNI_Amount))
                                                             </td>
                                                             <td class="text-center">@item.JODNI_IsFreightApplicable</td>
+                                                            <td class="text-center">@item.FromWH</td>
+                                                            <td class="text-center">@item.ToWH</td>
+                                                            <td>@item.Freight_SO_No</td>
 
                                                         </tr>
                                                     }
@@ -335,7 +335,7 @@
 
                                                     <tr class="table-info">
 
-                                                        <td colspan="21"
+                                                        <td colspan="19"
                                                             class="text-end fw-bold">
 
                                                             Total
@@ -353,6 +353,12 @@
                                                         <td class="text-end fw-bold">
                                                             @String.Format(India, "{0:#,0.##}", Convert.ToDouble(ViewBag.SumOfAmount))
                                                         </td>
+
+                                                        <td></td>
+
+                                                        <td></td>
+
+                                                        <td></td>
 
                                                         <td></td>
 

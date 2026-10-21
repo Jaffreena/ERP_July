@@ -4,6 +4,7 @@ using ERP_DTO.JobOutwardTransaction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
+using System.Text.Json;
 
 namespace ERP.Controllers.JobOutward
 {
@@ -43,6 +44,13 @@ namespace ERP.Controllers.JobOutward
             ViewBag.Shift = ToList(dd.Tables[0]);
             ViewBag.Process = ToList(dd.Tables[1]);
             ViewBag.WorkCentre = ToList(dd.Tables[2]);
+
+            // Work Centre -> Process mapping for the DFS page JS (same rule as the Conversion page)
+            ViewBag.WorkCentreJson = JsonSerializer.Serialize(dd.Tables[2].AsEnumerable().Select(r => new
+            {
+                number = Convert.ToInt64(r["Id"]),
+                processNumber = r["ProcessNumber"] == DBNull.Value ? 0L : Convert.ToInt64(r["ProcessNumber"])
+            }));
 
             DataSet ds = dao.JO_ConversionDFSGet();
 

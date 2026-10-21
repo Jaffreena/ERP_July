@@ -1,4 +1,5 @@
-﻿using ERP.DataList;
+using System.Linq;
+using ERP.DataList;
 using ERP.Models;
 using ERP_DAO;
 using ERP_DAO.JobOutwardTransaction;
@@ -184,6 +185,38 @@ namespace ERP.Controllers.JobOutward
         {
             DataSet DS = JWI_DAO.GetReceiptNote_ForInvoice(VendorNumber, RNNumbers ?? "");
             return Json(JWI_DL.ReceiptNoteItemList(DS.Tables[0]));
+        }
+
+        // Service Order dropdown for one invoice row (Vendor + Process + Item + UoM)
+        [HttpGet]
+        [Route("joboutward/transactions/jobwork-invoice/service-order")]
+        public IActionResult GetServiceOrderList(long VendorNumber, long JPRS_Number, long Item_Number, long UoM_Number, long? JOSVIH_Number = null)
+        {
+            DataSet DS = JWI_DAO.GetServiceOrderByVendor(VendorNumber, JPRS_Number, Item_Number, UoM_Number, JOSVIH_Number);
+            var list = JWI_DL.ServiceOrderList(DS.Tables[0]);
+            return Json(list.Select(x => new
+            {
+                value = x.JOJWI_SVOH_Number,
+                text = x.JOJWI_SVOH_ServiceOrderNo,
+                svoiNumber = x.JOJWI_SVOI_Number
+            }));
+        }
+
+        // Unit price + previously invoiced qty of the selected Service Order
+        [HttpGet]
+        [Route("joboutward/transactions/jobwork-invoice/service-order-item-info")]
+        public IActionResult GetServiceOrderItemInfo(long SVOH_Number, long JPRS_Number, long Item_Number, long UoM_Number, long? JOSVIH_Number = null)
+        {
+            DataSet DS = JWI_DAO.GetServiceOrderItemInfo(SVOH_Number, JPRS_Number, Item_Number, UoM_Number, JOSVIH_Number);
+            var info = JWI_DL.ServiceOrderInfo(DS.Tables[0]);
+            return Json(new
+            {
+                svoiNumber = info.JOJWI_SVOI_Number,
+                unitPrice = info.JOJWI_SVOI_UnitPrice,
+                amount = info.JOJWI_SVOI_Amount,
+                svoiQty = info.JOJWI_SVOI_Qty,                 // SO item total qty
+                prevInvoiceQty = info.PrevInvoiceQty           // other invoices only (this invoice excluded)
+            });
         }
 
         // saved address of one invoice
@@ -416,6 +449,7 @@ namespace ERP.Controllers.JobOutward
 
             // filtered-grid totals (Amount now sums Amount, not Qty)
             ViewBag.SumOfQty = result.Sum(x => x.TotalQty);
+            ViewBag.SumOfQtyKgs = result.Sum(x => x.TotalQty_Kgs);
             ViewBag.SumOfAmount = result.Sum(x => x.Amount);
             ViewBag.SumOfHeadGst = result.Sum(x => x.GST_Amount);
             ViewBag.SumOfWHT = result.Sum(x => x.WH_TaxAmount);
@@ -425,6 +459,7 @@ namespace ERP.Controllers.JobOutward
             {
                 var g = JWI_DL.SummaryTotals(DS.Tables[1]);
                 ViewBag.GrandQty = g.GrandTotalQty;
+                ViewBag.GrandQtyKgs = g.GrandTotalQtyKgs;
                 ViewBag.GrandAmount = g.GrandTotalAmount;
                 ViewBag.GrandGST = g.GrandTotalGST;
                 ViewBag.GrandWHT = g.GrandTotalWHT;

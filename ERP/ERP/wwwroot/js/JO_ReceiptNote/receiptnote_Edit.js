@@ -1423,8 +1423,9 @@ $(document).ready(function () {
     });
     //#endregion onkeypress qty and unitS
 
-    //#region validate Received Qty against Used Qty
-    // RULE: Received Qty cannot go below Used Qty -> alert + reset to Used Qty
+    //#region validate Amend Qty against Invoiced Qty
+    // RULE: Amend Qty cannot go below Invoiced Qty -> alert + reset to Invoiced Qty
+    // (grid column JORNI_UsedQty holds the invoiced qty)
     $(document).on("change", ".JORNI_Qty", function () {
 
         let row = $(this).closest("tr");
@@ -1432,12 +1433,12 @@ $(document).ready(function () {
         let amendQty = parseFloat(removeComma($(this).val())) || 0;
         let usedQty = parseFloat(removeComma(row.find(".JORNI_UsedQty").val())) || 0;
 
-        if (amendQty < usedQty) {
-            alert("Received Qty cannot be less than Used Qty (" + usedQty + ")");
-            $(this).val(addComma(usedQty, "q"));
+        if (usedQty > 0 && amendQty < usedQty) {
+            alert("Amend Qty cannot be less than Invoiced Qty (" + usedQty + ")");
+            $(this).val(addComma(usedQty, "q")).trigger("input").trigger("keyup");
         }
     });
-    //#endregion validate Received Qty against Used Qty
+    //#endregion validate Amend Qty against Invoiced Qty
 
     //#region auto add row function
     function autoAddRow(currentRow) {
@@ -1678,7 +1679,7 @@ $(document).ready(function () {
             return false;
         }
         if (IsRowLocked(checkedRows.first())) {
-            alert("This row is already used (Used Qty > 0). It cannot be deleted.");
+            alert("This row is already invoiced (Invoiced Qty > 0). It cannot be deleted.");
             return false;
         }
 
@@ -3314,6 +3315,18 @@ function validateItemGrid_Edit() {
         // validate Qty
         if (!qty || qty.trim() === "" || (parseFloat(removeComma(qty)) || 0) <= 0) {
             showAlert('Qty is required', row.find(".JORNI_Qty"));
+
+            isValid = false;
+            return false;
+        }
+
+        // Amend Qty cannot be less than Invoiced Qty
+        let invoicedQtyRow = parseFloat(removeComma(row.find(".JORNI_UsedQty").val())) || 0;
+        if (invoicedQtyRow > 0 && (parseFloat(removeComma(qty)) || 0) < invoicedQtyRow) {
+            showAlert(
+                'Amend Qty cannot be less than Invoiced Qty (' + invoicedQtyRow + ')',
+                row.find(".JORNI_Qty")
+            );
 
             isValid = false;
             return false;

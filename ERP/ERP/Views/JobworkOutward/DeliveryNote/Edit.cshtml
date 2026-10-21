@@ -1,4 +1,4 @@
-﻿@using ERP_DTO.JobOutwardTransaction
+@using ERP_DTO.JobOutwardTransaction
 @model ERP_DTO.JobOutwardTransaction.JO_DeliveryNoteCreate_DTO
 
 @{
@@ -313,6 +313,10 @@
                                         </th>
 
                                         <th class="table-width-xl text-end">
+                                            Used Qty
+                                        </th>
+
+                                        <th class="table-width-xl text-end">
                                             Qty Reserved
                                         </th>
 
@@ -383,6 +387,14 @@
                                         <td class="table-width-xl">
 
                                             <input type="text"
+                                                   class="form-control text-end JODNI_BCH_UsedQty"
+                                                   readonly>
+
+                                        </td>
+
+                                        <td class="table-width-xl">
+
+                                            <input type="text"
                                                    class="form-control text-end JODNI_BCH_QtyReserved"
                                                    readonly>
 
@@ -431,6 +443,14 @@
                                         <td>
 
                                             <input id="TotalAvailableQty"
+                                                   class="form-control text-center"
+                                                   readonly>
+
+                                        </td>
+
+                                        <td>
+
+                                            <input id="TotalUsedQty"
                                                    class="form-control text-center"
                                                    readonly>
 
@@ -1145,6 +1165,7 @@
                                                             <th>Warehouse</th>
                                                             <th class="text-center">UOM</th>
                                                             <th>Original Qty</th>
+                                                            <th>Used Qty</th>
                                                             <th>Amend Qty</th>
                                                             <th>Qty (Kgs)</th>
                                                             <th>Unit Price</th>
@@ -1291,6 +1312,15 @@
 
                                                                 </td>
 
+                                                                <!-- USED QTY -->
+                                                                <td>
+
+                                                                    <input asp-for="Items[i].JODNI_UsedQty"
+                                                                           autocomplete="off" readonly
+                                                                           class="form-control JODNI_UsedQty" />
+
+                                                                </td>
+
                                                                 
                                                                 <!-- QTY -->
                                                                 <td>
@@ -1373,6 +1403,9 @@
                                                             <td colspan="12" class="text-end">Total</td>
                                                             <td>
                                                                 <input id="TotalOriginalQty" class="form-control text-center" readonly />
+                                                            </td>
+                                                            <td>
+                                                                <input id="TotalUsedQty_Item" class="form-control text-center" readonly />
                                                             </td>
                                                             <td>
                                                                 <input id="TotalQty" class="form-control text-center" readonly />

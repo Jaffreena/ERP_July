@@ -228,6 +228,7 @@ namespace ERP_DTO.JobOutwardTransaction
 
         public int NoOfLineItems { get; set; }
         public string? Qty { get; set; }
+        public string? Qty_Kgs { get; set; }
         public double Amount { get; set; }
 
         public string? VendorWareHouse { get; set; }
@@ -286,5 +287,8 @@ namespace ERP_DTO.JobOutwardTransaction
         public DateTime? JW_SO_Date { get; set; }
         public string? Freight_SO_No { get; set; }
         public DateTime? Freight_SO_Date { get; set; }
+
+        public string? FromWH { get; set; }
+        public string? ToWH { get; set; }
     }
 }

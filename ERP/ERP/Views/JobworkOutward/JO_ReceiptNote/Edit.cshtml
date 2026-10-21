@@ -1,4 +1,4 @@
-﻿@using ERP_DTO.JobOutwardTransaction
+@using ERP_DTO.JobOutwardTransaction
 @model ERP_DTO.JobOutwardTransaction.JO_ReceiptNoteCreate_DTO
 
 @{
@@ -311,9 +311,6 @@
                                         <th class="table-width-xl text-end">
                                             Received Qty
                                         </th>
-                                        <th class="table-width-xl text-end">
-                                            Used Qty
-                                        </th>
 
                                         <th class="table-width-xl text-end">
                                             Unit Price
@@ -388,11 +385,6 @@
                                             <input type="text" autocomplete="off"
                                                    class="form-control text-end JORNI_BCH_QtyReceived">
                                         </td>
-                                        <td class="table-width-xl">
-                                            <input type="text"
-                                                   class="form-control text-end JORNI_BCH_UsedQty"
-                                                   readonly tabindex="-1">
-                                        </td>
 
                                         <td class="table-width-xl">
 
@@ -449,7 +441,6 @@
                                                    class="form-control text-center"
                                                    readonly>
                                         </td>
-                                        <td></td>
 
                                         <td></td>
 
@@ -939,8 +930,8 @@
                                                             <th>Warehouse</th>
                                                             <th class="text-center">UOM</th>
                                                             <th class="text-end">Original Qty</th>
-                                                            <th class="text-end">Used Qty</th>
-                                                            <th class="text-end">Received Qty</th>
+                                                            <th class="text-end">Invoiced Qty</th>
+                                                            <th class="text-end">Amend Qty</th>
                                                             <th class="text-end">Qty (Kgs)</th>
                                                             <th>Unit Price</th>
                                                             <th>Amount</th>

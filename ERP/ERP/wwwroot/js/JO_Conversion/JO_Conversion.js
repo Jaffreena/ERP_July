@@ -761,12 +761,11 @@ function LoadDefaultFormSetting() {
                 if (data.jocnV_DFS_JSFT_Number) {
                     $('#Header_JOCNVH_JSFT_Number').val(data.jocnV_DFS_JSFT_Number).trigger('change');
                 }
-                // Process first (filters the Work Centre list), then Work Centre
-                if (data.jocnV_DFS_JPRS_Number) {
-                    $('#Header_JOCNVH_JPRS_Number').val(data.jocnV_DFS_JPRS_Number).trigger('change');
-                }
+                // Work Centre first - its change event sets the Process automatically
                 if (data.jocnV_DFS_JWWC_Number) {
                     $('#Header_JOCNVH_JWWC_Number').val(data.jocnV_DFS_JWWC_Number).trigger('change');
+                } else if (data.jocnV_DFS_JPRS_Number) {
+                    $('#Header_JOCNVH_JPRS_Number').val(data.jocnV_DFS_JPRS_Number).trigger('change');
                 }
             }
         },

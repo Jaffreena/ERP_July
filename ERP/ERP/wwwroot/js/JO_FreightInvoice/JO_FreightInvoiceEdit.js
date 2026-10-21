@@ -407,6 +407,40 @@ function GetAllowedQty(svoh, jprs, fromWH, toWH, uom, callback) {
     });
 }
 
+// Max allowed qty check of one row : Balance (Delivered - Prev Invoiced, this invoice excluded by SP)
+// + Freight SO allowed qty (this invoice excluded by check-allowed-qty). Then RecalcRow.
+function ValidateRowQty(row) {
+    const q = row.find(".JOFTII_Qty_Kgs");
+    let cur = JN(q.val());
+    const balance = JN(row.find(".JOFTII_DeliveredQty").val()) - JN(row.find(".JOFTII_PrevInvoiceQty").val());
+
+    if (cur < 0) { cur = 0; q.val(addComma(0, "q")); }
+    if (cur > balance) {
+        alert("Current Invoice Qty cannot exceed Balance Qty (" + balance + ")");
+        q.val(addComma(balance, "q"));
+        RecalcRow(row);
+        return;
+    }
+
+    const svoh = row.find(".JOFTII_JOFRT_SVOH_Number").val() || 0;
+    if (svoh > 0) {
+        GetAllowedQty(svoh, FREIGHT_JPRS,
+            row.find(".JOFTII_FromWH_Number").val() || 0,
+            row.find(".JOFTII_ToWH_Number").val() || 0,
+            row.find(".JOFTII_UoM_Number").val() || 0,
+            function (allowed) {
+                const real = allowed - GetOtherRowsQtyForSO(svoh, row);
+                if (JN(q.val()) > real) {
+                    q.val(addComma(Math.max(0, real), "q"));
+                    alert("Qty Allowed: " + real);
+                }
+                RecalcRow(row);
+            });
+        return;
+    }
+    RecalcRow(row);
+}
+
 function CalculateTotals() {
     let dQ = 0, pQ = 0, iQ = 0, cQ = 0, amt = 0, gst = 0, wht = 0;
     $("#TableBody tr.NewRow").each(function () {
@@ -511,6 +545,7 @@ function InsertSourceItems(numbers) {
     const category = CurrentCategory();
 
     $.get(JOFT_URL + "/source-items", { VendorNumber: vendorNo, Category: category, Numbers: numbers }, function (items) {
+        const added = [];
         $.each(items || [], function (i, it) {
 
             // skip item already in grid
@@ -519,10 +554,14 @@ function InsertSourceItems(numbers) {
             }).length > 0;
             if (exists) return;
 
-            $("#TableBody").append(BuildRow(RowFromSource(it, category)));
+            const $new = $(BuildRow(RowFromSource(it, category)));
+            $("#TableBody").append($new);
+            added.push($new);
         });
 
         $("#TableBody tr.NewRow").each(function () { RecalcRow($(this)); });
+        // new rows that already carry a Freight SO -> SO allowed qty check
+        added.forEach(function ($r) { if ((parseInt($r.find(".JOFTII_JOFRT_SVOH_Number").val()) || 0) > 0) ValidateRowQty($r); });
         ApplyRcmUI(true);
         CalculateTotals();
     });
@@ -688,7 +727,7 @@ function OnServiceOrderChange(ele) {
             rateBox.val(addComma(res.unitPrice, "c")).prop("readonly", true)
                 .off("keydown keypress paste").on("keydown keypress paste", function (e) { e.preventDefault(); });
         }
-        RecalcRow(row);
+        ValidateRowQty(row);           // SO changed -> Balance + SO allowed qty check, then recalc
     });
 }
 //#endregion
@@ -1014,35 +1053,7 @@ $(document).ready(function () {
 
     // qty validation (Balance + Freight SO allowed qty) then recalc
     $(document).on("keyup change", ".JOFTII_Qty_Kgs", function () {
-        const row = $(this).closest("tr");
-        let cur = JN($(this).val());
-        const balance = JN(row.find(".JOFTII_DeliveredQty").val()) - JN(row.find(".JOFTII_PrevInvoiceQty").val());
-
-        if (cur < 0) { cur = 0; $(this).val(addComma(0, "q")); }
-        if (cur > balance) {
-            alert("Current Invoice Qty cannot exceed Balance Qty (" + balance + ")");
-            cur = balance;
-            $(this).val(addComma(balance, "q"));
-        }
-        else {
-            const svoh = row.find(".JOFTII_JOFRT_SVOH_Number").val() || 0;
-            if (svoh > 0) {
-                GetAllowedQty(svoh, FREIGHT_JPRS,
-                    row.find(".JOFTII_FromWH_Number").val() || 0,
-                    row.find(".JOFTII_ToWH_Number").val() || 0,
-                    row.find(".JOFTII_UoM_Number").val() || 0,
-                    function (allowed) {
-                        const real = allowed - GetOtherRowsQtyForSO(svoh, row);
-                        if (JN(row.find(".JOFTII_Qty_Kgs").val()) > real) {
-                            row.find(".JOFTII_Qty_Kgs").val(addComma(Math.max(0, real), "q"));
-                            alert("Qty Allowed: " + real);
-                        }
-                        RecalcRow(row);
-                    });
-                return;
-            }
-        }
-        RecalcRow(row);
+        ValidateRowQty($(this).closest("tr"));
     });
 
     $(document).on("keyup change", ".JOFTII_Rate", function () { RecalcRow($(this).closest("tr")); });

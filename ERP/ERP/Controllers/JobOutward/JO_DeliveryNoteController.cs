@@ -531,6 +531,7 @@ namespace ERP.Controllers.JobworkOutward
 
             ViewBag.SumOfItem = Key.Sum(item => Convert.ToDouble(item.NoOfLineItems));
             ViewBag.SumOfQty = Key.Sum(item => Convert.ToDouble(item.Qty));
+            ViewBag.SumOfQtyKgs = Key.Sum(item => Convert.ToDouble(item.Qty_Kgs));
             ViewBag.SumOfAmount = Key.Sum(item => Convert.ToDouble(item.Amount));
 
             ViewBag.Page = Help.PageSize(PSize.ToString());
@@ -775,6 +776,9 @@ namespace ERP.Controllers.JobworkOutward
                         : 0,
                     JODNI_UnitPrice = Convert.ToDouble(item["JODNI_UnitPrice"]),
                     JODNI_Amount = Convert.ToDouble(item["JODNI_Amount"]),
+                    JODNI_UsedQty = item["JODNI_UsedQty"] != DBNull.Value
+                        ? Convert.ToDouble(item["JODNI_UsedQty"])
+                        : 0,
 
                     // Freight
                     JODNI_IsFreightApplicable =
@@ -909,6 +913,7 @@ namespace ERP.Controllers.JobworkOutward
                 BatchNo = r["BatchNo"] == DBNull.Value ? "" : r["BatchNo"].ToString(),
                 BatchQty = r["BatchQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchQty"]),
                 ReservedQty = r["ReservedQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["ReservedQty"]),
+                UsedQty = r["UsedQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["UsedQty"]),
                 DeliveredQty = r["DeliveredQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["DeliveredQty"]),
                 AvailableQty = r["AvailableQty"] == DBNull.Value ? 0 : Convert.ToDecimal(r["AvailableQty"]),
                 BatchUnitPrice = r["BatchUnitPrice"] == DBNull.Value ? 0 : Convert.ToDecimal(r["BatchUnitPrice"]),

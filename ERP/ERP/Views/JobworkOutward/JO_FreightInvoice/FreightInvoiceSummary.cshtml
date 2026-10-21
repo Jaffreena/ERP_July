@@ -72,11 +72,9 @@
                                                 <thead class="thead table-first-header">
                                                     <tr class="table-info table-first-header-top">
                                                         <th class="px-2 del"></th>
-                                                        <th colspan="6" class="text-center">Freight Invoice</th>
-                                                        <th colspan="2" class="text-center">Delivery / Receipt Note</th>
-                                                        <th colspan="2" class="text-center">Service Order</th>
-                                                        <th colspan="5" class="text-center">JW Vendor Details</th>
-                                                        <th colspan="6" class="text-center">Item Details</th>
+                                                        <th colspan="2" class="text-center">Journal</th>
+                                                        <th colspan="9" class="text-center">JW Vendor Details</th>
+                                                        <th colspan="5" class="text-center">Item Details</th>
                                                     </tr>
                                                     <tr class="table-info">
                                                         <th class="px-2 del">
@@ -86,54 +84,25 @@
                                                             <a asp-action="FreightInvoiceSummary" asp-route-sortOrder="@ViewData["KeySort"]" asp-route-Search="@ViewData["CurrentFilter"]" asp-route-PSize="@ViewData["PageSize"]" asp-route-PageNumber="@ViewData["PageNumber"]">Journal No</a>
                                                         </th>
                                                         <th class="datetype text-center">Journal Date</th>
-                                                        <th>Vendor Invoice No</th>
-                                                        <th class="datetype text-center">Vendor Invoice Date</th>
-                                                        <th>Category</th>
-                                                        <th class="text-center">RCM</th>
-                                                        <th>Number</th>
-                                                        <th class="datetype text-center">Date</th>
-                                                        <th>Number</th>
-                                                        <th class="datetype text-center">Date</th>
                                                         <th class="table-col-xxl">Group</th>
                                                         <th class="table-col-xxl">Category</th>
                                                         <th class="table-col-xxl">Name</th>
                                                         <th class="table-col-xxl">Currency</th>
                                                         <th class="table-col-xxl">Tax Cluster</th>
-                                                        <th class="table-col-xxl">No. of Line Item</th>
-                                                        <th class="table-col-xxl text-center">Warehouse</th>
+                                                        <th class="table-col-xxl">WH_Tax Code</th>
+                                                        <th>Invoice No</th>
+                                                        <th class="datetype text-center">Invoice Date</th>
+                                                        <th class="text-center">RCM</th>
+                                                        <th class="table-col-xxl">Category</th>
+                                                        <th class="table-col-xxl text-center">No. of Line Item</th>
                                                         <th class="table-width-xxl text-center">Qty</th>
-                                                        <th class="table-width-lg text-center">Invoice Amount</th>
-                                                        <th class="table-width-lg text-center">GST Amount</th>
-                                                        <th class="table-width-lg text-center">WH_Tax Amount</th>
+                                                        <th class="table-width-xxl text-center">Qty (Kgs)</th>
+                                                        <th class="table-width-lg text-center">Amount</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach (var item in Model)
                                                     {
-                                                        string DNNo = "";
-                                                        string DNDate = "";
-
-                                                        if (Convert.ToInt32( item.DN_Count) > 1)
-                                                        {
-                                                            var FirstDN = item.DN_List?
-                                                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                                                .FirstOrDefault()
-                                                                ?.Trim();
-
-                                                            var DN = FirstDN?.Split('|', StringSplitOptions.RemoveEmptyEntries);
-
-                                                            DNNo = DN != null && DN.Length > 0 ? DN[0].Trim() : "";
-                                                            DNDate = DN != null && DN.Length > 1 ? DN[1].Trim() : "";
-                                                        }
-                                                        else
-                                                        {
-                                                            var DN = item.DN_List?
-                                                                .Split('|', StringSplitOptions.RemoveEmptyEntries);
-
-                                                            DNNo = DN != null && DN.Length > 0 ? DN[0].Trim() : "";
-                                                            DNDate = DN != null && DN.Length > 1 ? DN[1].Trim() : "";
-                                                        }
-
                                                         <tr>
                                                             <td class="p-2 del">
                                                                 <input type="checkbox"
@@ -149,71 +118,29 @@
                                                                 </a>
                                                             </td>
                                                             <td class="datetype text-center">@item.JOFTIH_JournalDate</td>
-                                                            <td>@item.JOFTIH_VendorInvoiceNo</td>
-                                                            <td class="datetype text-center">@item.JOFTIH_VendorInvoiceDate</td>
-                                                            <td>@item.JOFTIH_Category</td>
-                                                            <td class="text-center">@(item.JOFTIH_RCM == "1" || item.JOFTIH_RCM == "True" ? "Yes" : "No")</td>
-
-                                                            <td>
-                                                                @if (Convert.ToInt32(  item.DN_Count) > 1)
-                                                                {
-                                                                    <a tabindex="0"
-                                                                           role="button"
-                                                                           data-bs-toggle="popover"
-                                                                           data-bs-title="Source Documents"
-                                                                           data-bs-trigger="focus"
-                                                                           data-bs-html="true"
-                                                                           data-bs-content="@Html.Raw(item.DN_List.Replace(",", "</br>"))">
-
-                                                                        @DNNo
-
-                                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                                             width="16"
-                                                                             height="16"
-                                                                             fill="currentColor"
-                                                                             class="bi bi-arrow-right-short"
-                                                                             viewBox="0 0 16 16">
-                                                                            <path fill-rule="evenodd"
-                                                                                  d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
-                                                                        </svg>
-                                                                    </a>
-                                                                }
-                                                                else
-                                                                {
-                                                                    @DNNo
-                                                                }
-                                                            </td>
-
-                                                            <td class="datetype text-center">
-                                                                @if (!string.IsNullOrEmpty(DNDate))
-                                                                {
-                                                                    @Convert.ToDateTime(DNDate).ToString("dd-MMM-yyyy")
-                                                                }
-                                                            </td>
-                                                            <td>@item.SO_List</td>
-                                                            <td></td>
-
                                                             <td class="table-col-xxl">@item.VendorGroup</td>
                                                             <td class="table-col-xxl">@item.VendorCategory</td>
                                                             <td class="table-col-xxl">@item.JWV_JW_VendorName</td>
                                                             <td class="table-col-xxl">@item.CurrencyCode</td>
                                                             <td class="table-col-xxl">@item.TaxCluster</td>
-                                                            <td class="table-col-xxl text-center">@item.DN_Count</td>
-                                                            <td class="table-col-xxl text-center">@item.WarehouseCode</td>
-                                                            <td class="Qty table-col-xxl text-center">@item.TotalQty</td>
+                                                            <td class="table-col-xxl">@item.WH_TaxCode</td>
+                                                            <td>@item.JOFTIH_VendorInvoiceNo</td>
+                                                            <td class="datetype text-center">@item.JOFTIH_VendorInvoiceDate</td>
+                                                            <td class="text-center">@(item.JOFTIH_RCM == "1" || item.JOFTIH_RCM == "True" ? "Yes" : "No")</td>
+                                                            <td class="table-col-xxl">@item.JOFTIH_Category</td>
+                                                            <td class="table-col-xxl text-center">@item.NoOfLineItems</td>
+                                                            <td class="Qty table-col-xxl text-center">@String.Format(India, "{0:N2}", item.TotalQty)</td>
+                                                            <td class="QtyKgs table-col-xxl text-center">@String.Format(India, "{0:N2}", item.TotalQtyKgs)</td>
                                                             <td class="Amount table-width-xxl text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(item.Amount))</td>
-                                                            <td class="GST table-width-xxl text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(item.GST_Amount))</td>
-                                                            <td class="WHT table-width-xxl text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(item.WHT_Amount))</td>
                                                         </tr>
                                                     }
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="table-info">
-                                                        <td colspan="18" class="text-end fw-bold">Total</td>
-                                                        <td><input id="TotalQty" class="form-control text-center" value="@ViewBag.SumOfQty" readonly /></td>
-                                                        <td><input id="TotalAmount" class="form-control text-end" value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfAmount))" readonly /></td>
-                                                        <td><input id="TotalGST" class="form-control text-end" value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfGST))" readonly /></td>
-                                                        <td><input id="TotalWHT" class="form-control text-end" value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfWHT))" readonly /></td>
+                                                        <td colspan="14" class="text-end fw-bold">Total</td>
+                                                    <td><input id="TotalQty" class="form-control text-center" value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfQty ?? 0.0))" readonly /></td>
+                                                    <td><input id="TotalQtyKgs" class="form-control text-center" value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfQtyKgs ?? 0.0))" readonly /></td>
+                                                    <td><input id="TotalAmount" class="form-control text-end" value="@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfAmount ?? 0.0))" readonly /></td>
                                                     </tr>
                                                 </tfoot>
                                             </table>

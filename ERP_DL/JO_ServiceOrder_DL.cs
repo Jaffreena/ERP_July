@@ -166,6 +166,7 @@ namespace ERP_DL
                     JVC_JW_VendorCategory = S(dr, "JVC_JW_VendorCategory"),
                     JWV_JW_VendorName = S(dr, "JWV_JW_VendorName"),
                     CurrencyCode = S(dr, "CurrencyCode"),
+                    MaterialSegregation = S(dr, "MaterialSegregation"),
                     Process = S(dr, "Process"),
                     NoOfLineItems = I(dr, "NoOfLineItems"),
                     Qty = D(dr, "Qty"),
@@ -193,6 +194,7 @@ namespace ERP_DL
                     JVC_JW_VendorCategory = S(dr, "JVC_JW_VendorCategory"),
                     JWV_JW_VendorName = S(dr, "JWV_JW_VendorName"),
                     CurrencyCode = S(dr, "CurrencyCode"),
+                    MaterialSegregation = S(dr, "MaterialSegregation"),
                     JOJWI_SVOI_JPRS_Number = L(dr, "JOJWI_SVOI_JPRS_Number"),
                     JOJWI_SVOI_Item_Number = L(dr, "JOJWI_SVOI_Item_Number"),
                     JPRS_ProcessName = S(dr, "JPRS_ProcessName"),
@@ -236,6 +238,7 @@ namespace ERP_DL
                     JVC_JW_VendorCategory = S(dr, "JVC_JW_VendorCategory"),
                     JWV_JW_VendorName = S(dr, "JWV_JW_VendorName"),
                     CurrencyCode = S(dr, "CurrencyCode"),
+                    Process = S(dr, "Process"),
                     NoOfLineItems = I(dr, "NoOfLineItems"),
                     Qty = D(dr, "Qty"),
                     Amount = D(dr, "Amount")

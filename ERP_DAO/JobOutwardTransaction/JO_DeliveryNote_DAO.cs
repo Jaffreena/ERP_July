@@ -1339,11 +1339,11 @@ INNER JOIN BatchTotal B
         }
 
         public DataTable GetBatchStockDetails(
-            long Item_Number,
-            long Warehouse,
-            long Header_Number,
-            long LineItem_Number,
-            int ItemGridIndex)
+       long Item_Number,
+       long Warehouse,
+       long Header_Number,
+       long LineItem_Number,
+       int ItemGridIndex)
         {
             DataTable dt = new DataTable();
 
@@ -1370,6 +1370,9 @@ SELECT DISTINCT
 
     -- Reserved Qty from other grid rows
     ISNULL(R.ReservedQty,0) AS ReservedQty,
+
+    -- Used Qty (JO_OUT consumption / receipt note against this note's JO_IN batch)
+    ISNULL(UQ.UsedQty,0) AS UsedQty,
 
     -- Final Available Qty
     ISNULL(I.ICB_BatchQty,0) - ISNULL(T.TotalDeliveredQty,0) AS AvailableQty,
@@ -1411,6 +1414,28 @@ LEFT JOIN
 LEFT JOIN Warehouse W
     ON W.WarehouseNumber = I.ICB_Warehouse_Number
 
+-- Used Qty from JO_OUT_COMMON_BATCH (via this note's JO_IN_COMMON_BATCH row)
+LEFT JOIN
+(
+    SELECT
+        B.JODNI_BCH_Ref_Batch AS RefBatch_Number,
+        SUM(O.JOOCB_BatchQty) AS UsedQty
+    FROM JO_DeliveryNoteBatch B
+    INNER JOIN JO_IN_COMMON_BATCH IC
+            ON IC.JOICB_TransType       = 'JO Delivery Note'
+           AND IC.JOICB_Header_Number   = B.JODNI_BCH_JODNH_Number
+           AND IC.JOICB_LineItem_Number = B.JODNI_BCH_JODNI_Number
+           AND IC.JOICB_RefBatch_Number = B.JODNI_BCH_Ref_Batch
+    INNER JOIN JO_OUT_COMMON_BATCH O
+            ON O.JOOCB_RefBatch_Number = IC.JOICB_LineBatch_Number
+           AND (O.JOOCB_TransType LIKE '%Consumption%'
+             OR O.JOOCB_TransType LIKE '%Receipt Note%')
+    WHERE B.JODNI_BCH_JODNH_Number = @Header_Number
+      AND B.JODNI_BCH_JODNI_Number = @LineItem_Number
+    GROUP BY B.JODNI_BCH_Ref_Batch
+) UQ
+    ON UQ.RefBatch_Number = I.ICB_LineBatch_Number
+
 LEFT JOIN
 (
     SELECT DBCH_Qty, RefBatch_Number
@@ -1426,6 +1451,8 @@ WHERE I.ICB_Item_Number = @Item_Number
                     cmd.Parameters.AddWithValue("@Item_Number", Item_Number);
                     cmd.Parameters.AddWithValue("@Warehouse", Warehouse);
                     cmd.Parameters.AddWithValue("@ItemGridIndex", ItemGridIndex);
+                    cmd.Parameters.AddWithValue("@Header_Number", Header_Number);
+                    cmd.Parameters.AddWithValue("@LineItem_Number", LineItem_Number);
 
                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                     {

@@ -100,6 +100,10 @@
                                                 <input asp-for="JODN_DFS_DeliveryMode" class="form-control" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <!-- Column 4 -->
+                                    <div class="col-12 col-md-3 col-lg-3">
                                         <div class="row align-items-center gx-2">
                                             <label asp-for="JODN_DFS_DespatchDocumentNo" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
@@ -112,10 +116,6 @@
                                                 <input asp-for="JODN_DFS_DespatchedThrough" class="form-control" maxlength="50" autocomplete="off" />
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Column 4 -->
-                                    <div class="col-12 col-md-3 col-lg-3">
                                         <div class="row align-items-start gx-2">
                                             <label asp-for="JODN_DFS_Remarks" class="col-md-6 col-lg-5 col-form-label ps-0"></label>
                                             <div class="col-md-6 col-lg-7">
@@ -154,7 +154,7 @@
 
         function AutoFit() {
             fitInputWidth("JODN_DFS_MS_Number", 20, 30);
-            fitInputWidth("JODN_DFS_JW_Vendor_Name", 35, 45);
+            fitInputWidth("JODN_DFS_JW_Vendor_Name", 25, 35);
             fitInputWidth("JODN_DFS_PaymentTerms", 30, 40);
             fitInputWidth("JODN_DFS_DespatchDocumentNo", 30, 40);
             fitInputWidth("JODN_DFS_DespatchedThrough", 30, 40);
@@ -174,7 +174,7 @@
                 function () {
                     const widths = {
                         JODN_DFS_MS_Number: [20, 30],
-                        JODN_DFS_JW_Vendor_Name: [35, 45],
+                        JODN_DFS_JW_Vendor_Name: [25, 35],
                         JODN_DFS_PaymentTerms: [30, 40],
                         JODN_DFS_DeliveryTerms: [30, 40],
                         JODN_DFS_DeliveryMode: [30, 40],

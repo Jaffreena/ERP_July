@@ -159,6 +159,9 @@ namespace ERP_DTO.JobOutwardTransaction
 
         public string? JODNI_IsDeleted { get; set; }
         public long? VendorNumber { get; set; }
+
+        // Used Qty (JO_OUT consumption / receipt note) - Edit page display only
+        public double JODNI_UsedQty { get; set; }
     }
 
     public class JO_DeliveryNoteAddress_DTO
@@ -219,6 +222,7 @@ namespace ERP_DTO.JobOutwardTransaction
         public string? Segregation { get; set; }
         public int NoOfLineItems { get; set; }
         public string Qty { get; set; }
+        public string? Qty_Kgs { get; set; }
         public double Amount { get; set; }
         public string? VendorWareHouse { get; set; }
         public string? ItemWareHouse { get; set; }
@@ -269,6 +273,9 @@ namespace ERP_DTO.JobOutwardTransaction
         public decimal JODNI_Amount { get; set; }
 
         public string JODNI_IsFreightApplicable { get; set; }
+        public string FromWH { get; set; }
+        public string ToWH { get; set; }
+        public string Freight_SO_No { get; set; }
     }
 
     public class JO_DeliveryNoteBatch_DTO

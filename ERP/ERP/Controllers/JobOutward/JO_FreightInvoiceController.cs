@@ -375,7 +375,8 @@ namespace ERP.Controllers.JobworkOutward
                     (K.JWV_JW_VendorName ?? "").ToLower().Contains(s) ||
                     (K.CurrencyCode ?? "").ToLower().Contains(s) ||
                     (K.DN_List ?? "").ToLower().Contains(s) ||
-                    (K.SO_List ?? "").ToLower().Contains(s) ||
+                                    (K.SO_List ?? "").ToLower().Contains(s) ||
+                    (K.WH_TaxCode ?? "").ToLower().Contains(s) ||
                     K.Amount.ToString().Contains(s) ||
                     K.TotalQty.ToString().Contains(s));
             }
@@ -391,6 +392,7 @@ namespace ERP.Controllers.JobworkOutward
 
             var t = DS.Tables.Count > 1 ? DL.FreightInvoiceSummaryTotal(DS.Tables[1]) : new JO_FreightInvoiceSummaryTotal_DTO();
             ViewBag.SumOfQty = (double)t.GrandTotalQty;
+            ViewBag.SumOfQtyKgs = (double)t.GrandTotalQtyKgs;
             ViewBag.SumOfAmount = (double)t.GrandTotalAmount;
             ViewBag.SumOfGST = (double)t.GrandTotalGST;
             ViewBag.SumOfWHT = (double)t.GrandTotalWHT;
@@ -449,7 +451,9 @@ namespace ERP.Controllers.JobworkOutward
                     (K.JOFTIH_VendorInvoiceNo ?? "").ToLower().Contains(s) ||
                     (K.JOFTIH_VendorInvoiceDate ?? "").ToLower().Contains(s) ||
                     (K.JOFTIH_Category ?? "").ToLower().Contains(s) ||
-                    (K.SourceNo ?? "").ToLower().Contains(s) ||
+                                   (K.SourceNo ?? "").ToLower().Contains(s) ||
+                    (K.WH_TaxCode ?? "").ToLower().Contains(s) ||
+                    (K.Vendor_DN_No ?? "").ToLower().Contains(s) ||
                     (K.ServiceOrderNo ?? "").ToLower().Contains(s) ||
                     (K.JWV_JW_VendorName ?? "").ToLower().Contains(s) ||
                     (K.CurrencyCode ?? "").ToLower().Contains(s) ||
@@ -469,6 +473,7 @@ namespace ERP.Controllers.JobworkOutward
 
             var t = DS.Tables.Count > 1 ? DL.FreightInvoiceDetailTotal(DS.Tables[1]) : new JO_FreightInvoiceDetailTotal_DTO();
             ViewBag.SumOfQty = (double)t.TotalQty;
+            ViewBag.SumOfQtyKgs = (double)t.TotalQtyKgs;
             ViewBag.SumOfAmount = (double)t.TotalAmount;
             ViewBag.SumOfGST = (double)t.TotalGST;
             ViewBag.SumOfWHT = (double)t.TotalWHT;

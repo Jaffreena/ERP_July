@@ -3,24 +3,61 @@
     ViewData["Title"] = "JO Conversion";
 }
 <style>
-    .match-row td { color: blue !important; font-weight: 600; }
-    .current-row td { background: #dbeafe !important; }
+    .match-row td {
+        color: blue !important;
+        font-weight: 600;
+    }
 
-    form { height: calc(100vh - 60px); display: flex; flex-direction: column; }
-    .panel-body { flex: 1 1 auto; min-height: 0; }
-    .row.align-items-center { padding: 2px 0; }
+    .current-row td {
+        background: #dbeafe !important;
+    }
+
+    form {
+        height: calc(100vh - 60px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-body {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .row.align-items-center {
+        padding: 2px 0;
+    }
+
     .col-form-label {
-        padding-top: 4px; padding-bottom: 4px; padding-right: 8px; margin-bottom: 0;
-        white-space: nowrap; font-family: Arial, sans-serif !important;
-        font-size: 12px !important; font-weight: 400 !important; border: none !important;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 8px;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        border: none !important;
     }
-    .row.align-items-center > div[class*="col-"] { padding-left: 8px; padding-right: 8px; }
+
+    .row.align-items-center > div[class*="col-"] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
     .form-control, .form-select, textarea.form-control {
-        height: 25px !important; min-height: 25px !important; border-radius: 4px !important;
-        font-size: 13px !important; font-family: Arial, sans-serif; font-weight: 400;
-        resize: vertical; overflow: auto;
+        height: 25px !important;
+        min-height: 25px !important;
+        border-radius: 4px !important;
+        font-size: 13px !important;
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        resize: vertical;
+        overflow: auto;
     }
-    textarea.form-control { min-height: 60px !important; }
+
+    textarea.form-control {
+        min-height: 60px !important;
+    }
 </style>
 
 <form>
@@ -103,11 +140,39 @@
     <script src="~/js/code/Header.js" asp-append-version="true"></script>
 
     <script>
+        // Work Centre -> Process mapping (same rule as the Conversion page)
+        var WC_MAP = @Html.Raw(ViewBag.WorkCentreJson ?? "[]");
+        var WC_ALL = null;
+
+        function WcProcess(id) {
+            for (var i = 0; i < WC_MAP.length; i++) {
+                if (String(WC_MAP[i].number) === String(id)) return Number(WC_MAP[i].processNumber) || 0;
+            }
+            return 0;
+        }
+
+        // show only the Work Centres of the selected Process
+        function FilterWorkCentres() {
+            var $wc = $("#JOCNV_DFS_JWWC_Number");
+            if (!WC_ALL) WC_ALL = $wc.find("option").clone();
+
+            var p = $("#JOCNV_DFS_JPRS_Number").val(), cur = $wc.val();
+            $wc.empty();
+            WC_ALL.each(function () {
+                var v = $(this).val();
+                if (!v || v === "0" || !p || p === "0" || String(WcProcess(v)) === String(p)) {
+                    $wc.append($(this).clone());
+                }
+            });
+            if (cur && $wc.find('option[value="' + cur + '"]').length) $wc.val(cur); else $wc.val("0");
+            fitInputWidth("JOCNV_DFS_JWWC_Number", 20, 30);
+        }
+
         const fitIds = {
             JOCNV_DFS_MS_Number: [20, 30],
             JOCNV_DFS_JSFT_Number: [20, 30],
-            JOCNV_DFS_JPRS_Number: [20, 30],
-            JOCNV_DFS_JWWC_Number: [20, 30]
+            JOCNV_DFS_JWWC_Number: [20, 30],
+            JOCNV_DFS_JPRS_Number: [20, 30]
         };
 
         function AutoFit() {
@@ -119,8 +184,28 @@
         $(document).ready(function () {
             AutoFit();
 
-            $(document).on("change", "#JOCNV_DFS_MS_Number, #JOCNV_DFS_JSFT_Number, #JOCNV_DFS_JPRS_Number, #JOCNV_DFS_JWWC_Number", function () {
+            $(document).on("change", "#JOCNV_DFS_MS_Number, #JOCNV_DFS_JSFT_Number, #JOCNV_DFS_JWWC_Number, #JOCNV_DFS_JPRS_Number", function () {
                 fitInputWidth(this, fitIds[this.id][0], fitIds[this.id][1]);
+            });
+
+            // Work Centre -> sets its Process
+            $(document).on("change", "#JOCNV_DFS_JWWC_Number", function () {
+                var wc = $(this).val();
+                if (!wc || wc === "0") return;
+
+                var p = WcProcess(wc);
+                if (p > 0 && $("#JOCNV_DFS_JPRS_Number option[value='" + p + "']").length) {
+                    $("#JOCNV_DFS_JPRS_Number").val(String(p));
+                    fitInputWidth("JOCNV_DFS_JPRS_Number", 20, 30);
+                } else {
+                    alert("The Process of this Work Centre is not available. Please correct the Work Centre master.");
+                    $(this).val("0");
+                }
+            });
+
+            // Process -> shows only its Work Centres
+            $(document).on("change", "#JOCNV_DFS_JPRS_Number", function () {
+                FilterWorkCentres();
             });
         });
 
@@ -136,6 +221,14 @@
 
         $(document).on("click", "input[name='Mode'][value='Save']", function (e) {
             e.preventDefault();
+
+            var wc = $("#JOCNV_DFS_JWWC_Number").val(), pr = $("#JOCNV_DFS_JPRS_Number").val();
+            if (wc && wc !== "0") {
+                if (!pr || pr === "0" || String(WcProcess(wc)) !== String(pr)) {
+                    alert("The selected Work Centre belongs to a different Process. Please select the matching Process.");
+                    return;
+                }
+            }
 
             $.ajax({
                 url: "/jobout/transactions/jo-conversion-dfs/save",

@@ -413,6 +413,7 @@ namespace ERP.Controllers.JobOutward
 
             ViewBag.SumOfItem = result.Sum(item => Convert.ToDouble(item.NoOfLineItems));
             ViewBag.SumOfQty = result.Sum(item => ToD(item.Qty));
+            ViewBag.SumOfQtyKgs = result.Sum(item => ToD(item.Qty_Kgs));
             ViewBag.SumOfAmount = result.Sum(item => item.Amount);
 
             return result;

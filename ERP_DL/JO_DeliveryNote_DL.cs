@@ -364,7 +364,16 @@ namespace ERP_DL
                             dr["JODNI_Amount"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["JODNI_Amount"]),
 
                         JODNI_IsFreightApplicable =
-                            dr["JODNI_IsFreightApplicable"] == DBNull.Value ? "" : Convert.ToString(dr["JODNI_IsFreightApplicable"])
+                                                      dr["JODNI_IsFreightApplicable"] == DBNull.Value ? "" : Convert.ToString(dr["JODNI_IsFreightApplicable"]),
+
+                        FromWH =
+                            dr["FromWH"] == DBNull.Value ? "" : Convert.ToString(dr["FromWH"]),
+
+                        ToWH =
+                            dr["ToWH"] == DBNull.Value ? "" : Convert.ToString(dr["ToWH"]),
+
+                        Freight_SO_No =
+                            dr["Freight_SO_No"] == DBNull.Value ? "" : Convert.ToString(dr["Freight_SO_No"])
                     });
             }
 

@@ -419,6 +419,8 @@ function AddItemRow(it) {
         JOSVII_JOJWI_SVOH_Number: num(g(it, 'JORNI_JOJWI_SVOH_Number')),
         JOSVII_JOJWI_SVOI_Number: num(g(it, 'JORNI_JOJWI_SVOI_Number')),
         JOSVII_Vendor_DN_No: g(it, 'JORNH_VendorDC_No') || '',
+        JOSVII_SVO_Assign: 'RECEIPT NOTE',
+        HasSO: num(g(it, 'HasServiceOrder')) === 1 || num(g(it, 'JORNI_JOJWI_SVOH_Number')) > 0,
         JOSVII_JPRS_Number: num(g(it, 'JORNI_JPRS_Number')),
         JOSVII_Item_Number: num(g(it, 'JORNI_Item_Number')),
         JOSVII_UoM_Number: num(g(it, 'JORNI_UoM_Number')),
@@ -435,7 +437,7 @@ function AddItemRow(it) {
     };
     $tr.append(
         '<td class="p-2 del text-center"><input type="checkbox" class="JWI_RowChk form-check-input"></td>' +
-        ro('JOSVII_SO_No', g(it, 'ServiceOrderNo')) +
+        SoCell(item, g(it, 'ServiceOrderNo')) +
         ro('JOSVII_DN_No', item.JOSVII_Vendor_DN_No) +
         ro('JOSVII_Process', g(it, 'JPRS_ProcessName')) +
         ro('JOSVII_ItemCode', g(it, 'ItemCode')) +
@@ -456,8 +458,71 @@ function AddItemRow(it) {
         ro('JOSVII_WHT_Percent whtp', '0.00') +
         ro('JOSVII_WH_TaxAmount wht', '0.00'));
     $('#TableBody').append($tr);
+    if (!item.HasSO) LoadSoDropdown($tr);
     return $tr;
 }
+
+/* ---- Service Order cell : label (RN item already has SO) / dropdown (no SO) ---- */
+function SoCell(item, soNo) {
+    if (item.HasSO) {
+        return '<td><input class="form-control JOSVII_SO_No" value="' +
+            String(soNo === undefined || soNo === null ? '' : soNo).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;') +
+            '" readonly autocomplete="off"></td>';
+    }
+    return '<td><select class="form-control JOSVII_SO_No so-select" autocomplete="off">' +
+        '<option value="0" data-svoi="0"></option></select></td>';
+}
+
+// Vendor + Process + Item + UoM matching Service Orders
+function LoadSoDropdown($tr) {
+    var item = $tr.data('item'), $s = $tr.find('.so-select');
+    $.get(JWI_URL + '/service-order', {
+        VendorNumber: num($('#JOSVIH_JW_Vendor_Number').val()),
+        JPRS_Number: item.JOSVII_JPRS_Number,
+        Item_Number: item.JOSVII_Item_Number,
+        UoM_Number: item.JOSVII_UoM_Number,
+        JOSVIH_Number: num($('#JOSVIH_Number').val()) || ''
+    }, function (list) {
+        (list || []).forEach(function (o) {
+            $s.append($('<option></option>').val(o.value).attr('data-svoi', o.svoiNumber).text(o.text));
+        });
+    }).fail(function (xhr) {
+        // was silent before : a server error looked like an empty dropdown
+        console.error('Service Order dropdown failed', xhr.status, xhr.responseText);
+        showAlert('Service Order list could not be loaded.');
+    });
+}
+
+// SO selected -> SVOH/SVOI, unit price (readonly), assign flag, recalc row
+$(document).on('change', '#TableBody .so-select', function () {
+    var $s = $(this), $tr = $s.closest('tr'), item = $tr.data('item');
+    var svoh = num($s.val());
+
+    if (!svoh) {                                   // blank -> clear
+        item.JOSVII_JOJWI_SVOH_Number = 0;
+        item.JOSVII_JOJWI_SVOI_Number = 0;
+        item.JOSVII_UnitPrice = 0;
+        item.JOSVII_SVO_Assign = 'RECEIPT NOTE';
+        $tr.find('.up').val(fmt(0));
+        RecalcRow($tr);
+        return;
+    }
+
+    $.get(JWI_URL + '/service-order-item-info', {
+        SVOH_Number: svoh,
+        JPRS_Number: item.JOSVII_JPRS_Number,
+        Item_Number: item.JOSVII_Item_Number,
+        UoM_Number: item.JOSVII_UoM_Number,
+        JOSVIH_Number: num($('#JOSVIH_Number').val()) || ''
+    }, function (r) {
+        item.JOSVII_JOJWI_SVOH_Number = svoh;
+        item.JOSVII_JOJWI_SVOI_Number = num(g(r, 'svoiNumber')) || num($s.find('option:selected').attr('data-svoi'));
+        item.JOSVII_UnitPrice = num(g(r, 'unitPrice'));
+        item.JOSVII_SVO_Assign = 'INVOICE';
+        $tr.find('.up').val(fmt(item.JOSVII_UnitPrice));   // unit price stays readonly
+        RecalcRow($tr);
+    }).fail(function () { showAlert('Service Order price could not be loaded.'); });
+});
 
 /* ---- checkbox / delete row ---- */
 $(document).on('change', '#JWI_ChkAll', function () {
@@ -670,6 +735,7 @@ function CreateModel() {
             JOSVII_JORNH_Number: it.JOSVII_JORNH_Number, JOSVII_JORNI_Number: it.JOSVII_JORNI_Number,
             JOSVII_JOJWI_SVOH_Number: it.JOSVII_JOJWI_SVOH_Number, JOSVII_JOJWI_SVOI_Number: it.JOSVII_JOJWI_SVOI_Number,
             JOSVII_Vendor_DN_No: it.JOSVII_Vendor_DN_No,
+            JOSVII_SVO_Assign: it.JOSVII_SVO_Assign || 'RECEIPT NOTE',
             JOSVII_JPRS_Number: it.JOSVII_JPRS_Number, JOSVII_Item_Number: it.JOSVII_Item_Number,
             JOSVII_UoM_Number: it.JOSVII_UoM_Number,
             JOSVII_Qty: num($r.find('.qty').val()), JOSVII_UnitPrice: it.JOSVII_UnitPrice,

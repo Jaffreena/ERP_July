@@ -1,4 +1,4 @@
-﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JO_DeliveryNoteSummary_DTO>
+@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JO_DeliveryNoteSummary_DTO>
 
 @using System.Globalization;
 
@@ -205,7 +205,6 @@
                                                         <th colspan="5" class="text-center">
                                                             JW Vendor Details
                                                         </th>
-
                                                         <th colspan="5" class="text-center">
                                                             Item Details
                                                         </th>
@@ -236,46 +235,18 @@
 
                                                         </th>
 
-                                                        <th class="text-center">
-                                                            Date
-                                                        </th>
-                                                        <th>
-                                                            Group
-                                                        </th>
-                                                        <th>
-                                                            Category
-                                                        </th>
+                                                        <th class="text-center">Date</th>
+                                                        <th>Group</th>
+                                                        <th>Category</th>
+                                                        <th>Name</th>
+                                                        <th>Currency</th>
+                                                        <th>Warehouse</th>
 
-                                                        <th>
-                                                            Name
-                                                        </th>
-
-                                                        <th>
-                                                            Currency
-                                                        </th>
-
-                                                        <th>
-                                                            Warehouse
-                                                        </th>
-
-                                                        <th>
-                                                            Material Segregation
-                                                        </th>
-
-                                                        <th class="text-center">
-                                                            No Of Items
-                                                        </th>
-                                                        <th class="text-center">
-                                                            Warehouse
-                                                        </th>
-                                                  
-                                                        <th class="text-end">
-                                                            Qty
-                                                        </th>
-
-                                                        <th class="text-end">
-                                                            Amount
-                                                        </th>
+                                                        <th>Material Segregation</th>
+                                                        <th class="text-center">No. of Line Item</th>
+                                                        <th class="text-end">Qty</th>
+                                                        <th class="text-end">Qty (Kgs)</th>
+                                                        <th class="text-end">Amount</th>
 
                                                     </tr>
 
@@ -313,47 +284,17 @@
                                                                 @Convert.ToDateTime(item.JODNH_DN_Date).ToString("dd-MMM-yyyy")
 
                                                             </td>
-                                                            <td>
-                                                                @item.JVG_JW_VendorGroup
-                                                            </td>
-                                                            <td>
-                                                                @item.JVC_JW_VendorCategory
-                                                            </td>
-                                                            <td>
-                                                                @item.JWV_JW_VendorName
-                                                            </td>
-
-                                                            <td>
-                                                                @item.CurrencyCode
-                                                            </td>
-
-                                                            <td>
-                                                                @item.VendorWareHouse
-                                                            </td>
-
-                                                            <td>
-                                                                @item.Segregation
-                                                            </td>
-                                                            <td class="text-center">
-                                                                @item.NoOfLineItems
-                                                            </td>
-                                                           
-                                                            <td class="text-center">
-                                                                @item.ItemWareHouse
-                                                            </td>
-                                                          
+                                                            <td>@item.JVG_JW_VendorGroup</td>
+                                                            <td>@item.JVC_JW_VendorCategory</td>
+                                                            <td>@item.JWV_JW_VendorName</td>
+                                                            <td>@item.CurrencyCode</td>
+                                                            <td>@item.VendorWareHouse</td>
+                                                            <td>@item.Segregation</td>
+                                                            <td class="text-center">@item.NoOfLineItems</td>
+                                                            <td class="text-end">@item.Qty</td>
+                                                            <td class="text-end">@item.Qty_Kgs</td>
                                                             <td class="text-end">
-                                                                @item.Qty
-                                                            </td>
-
-                                                            <td class="text-end">
-
-                                                                @String.Format(
-                                                                    India,
-                                                                    "{0:N2}",
-                                                                    Convert.ToDouble(item.Amount)
-                                                                )
-
+                                                                @String.Format(India, "{0:N2}", Convert.ToDouble(item.Amount))
                                                             </td>
 
                                                         </tr>
@@ -377,26 +318,16 @@
                                                             @ViewBag.SumOfItem
                                                         </td>
 
-                                                        <td></td>
-
                                                         <td class="text-end fw-bold">
-
-                                                            @String.Format(
-                                                                India,
-                                                                "{0:#,0.##}",
-                                                                Convert.ToDouble(ViewBag.SumOfQty)
-                                                            )
-
+                                                            @String.Format(India, "{0:#,0.##}", Convert.ToDouble(ViewBag.SumOfQty))
                                                         </td>
 
                                                         <td class="text-end fw-bold">
+                                                            @String.Format(India, "{0:#,0.##}", Convert.ToDouble(ViewBag.SumOfQtyKgs))
+                                                        </td>
 
-                                                            @String.Format(
-                                                                India,
-                                                                "{0:#,0.##}",
-                                                                Convert.ToDouble(ViewBag.SumOfAmount)
-                                                            )
-
+                                                        <td class="text-end fw-bold">
+                                                            @String.Format(India, "{0:#,0.##}", Convert.ToDouble(ViewBag.SumOfAmount))
                                                         </td>
 
                                                     </tr>

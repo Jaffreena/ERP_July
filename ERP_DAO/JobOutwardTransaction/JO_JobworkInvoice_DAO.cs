@@ -46,6 +46,55 @@ namespace ERP_DAO.JobOutwardTransaction
         }
         #endregion
 
+        #region Service Order dropdown + item info (row level, like old JI)
+        // SO list for one grid row : vendor + process + item + UoM
+        // josvihNumber : Edit mode only (this invoice's own INVOICE qty is not counted)
+        public DataSet GetServiceOrderByVendor(
+            long vendorNumber,
+            long? jprsNumber = null,
+            long? itemNumber = null,
+            long? uomNumber = null,
+            long? josvihNumber = null)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JO_ServiceOrder_GetByVendor_SP");
+
+            db.AddInParameter(cmd, "@VendorId", DbType.Int64, vendorNumber);
+            db.AddInParameter(cmd, "@JPRS_Number", DbType.Int64,
+                jprsNumber.HasValue ? (object)jprsNumber.Value : DBNull.Value);
+            db.AddInParameter(cmd, "@Item_Number", DbType.Int64,
+                itemNumber.HasValue ? (object)itemNumber.Value : DBNull.Value);
+            db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
+                uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
+            db.AddInParameter(cmd, "@JOSVIH_Number", DbType.Int64,
+                josvihNumber.HasValue ? (object)josvihNumber.Value : DBNull.Value);
+
+            return db.ExecuteDataSet(cmd);
+        }
+
+        // SO item info : SVOI number, unit price, amount, previously invoiced qty
+        // NOTE : SP parameter name is @JOSVOI_SVOH_Number (as created in Step 6)
+        public DataSet GetServiceOrderItemInfo(
+            long svohNumber,
+            long jprsNumber,
+            long itemNumber,
+            long uomNumber,
+            long? josvihNumber = null)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JO_ServiceOrderItem_Info_SP");
+
+            db.AddInParameter(cmd, "@JOSVOI_SVOH_Number", DbType.Int64, svohNumber);
+            db.AddInParameter(cmd, "@JPRS_Number", DbType.Int64, jprsNumber);
+            db.AddInParameter(cmd, "@Item_Number", DbType.Int64, itemNumber);
+            db.AddInParameter(cmd, "@UoM_Number", DbType.Int64, uomNumber);
+            db.AddInParameter(cmd, "@JOSVIH_Number", DbType.Int64,
+                josvihNumber.HasValue ? (object)josvihNumber.Value : DBNull.Value);
+
+            return db.ExecuteDataSet(cmd);
+        }
+        #endregion
+
         #region Receipt Note popup
         // RN list (one row per RN)
         public DataSet GetReceiptNote_GroupItem(long vendorNumber, long msNumber, long? josvihNumber = null)
@@ -168,7 +217,7 @@ namespace ERP_DAO.JobOutwardTransaction
             }
         }
 
-        // TVP table - column ORDER must match dbo.JO_JobworkInvoiceItemType
+        // TVP table - column ORDER must match dbo.JO_JobworkInvoiceItemType (18 columns)
         private DataTable BuildItemTable(long josvihNumber, List<JO_JobworkInvoiceItem_DTO> items)
         {
             DataTable dt = new DataTable();
@@ -189,6 +238,7 @@ namespace ERP_DAO.JobOutwardTransaction
             dt.Columns.Add("JOSVII_GST_Amount", typeof(double));
             dt.Columns.Add("JOSVII_WHT_Percent", typeof(double));
             dt.Columns.Add("JOSVII_WH_TaxAmount", typeof(double));
+            dt.Columns.Add("JOSVII_SVO_Assign", typeof(string));      // NEW (18th)
 
             foreach (var i in items)
             {
@@ -209,7 +259,8 @@ namespace ERP_DAO.JobOutwardTransaction
                     i.JOSVII_SAC_Number,
                     i.JOSVII_GST_Amount,
                     i.JOSVII_WHT_Percent,
-                    i.JOSVII_WH_TaxAmount);
+                    i.JOSVII_WH_TaxAmount,
+                    string.IsNullOrWhiteSpace(i.JOSVII_SVO_Assign) ? "RECEIPT NOTE" : i.JOSVII_SVO_Assign);
             }
             return dt;
         }

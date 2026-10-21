@@ -177,11 +177,8 @@
                                                     <tr class="table-info table-first-header-top">
                                                         <th class="px-2 del"></th>
                                                         <th colspan="2" class="text-center">Receipt Note</th>
-                                                        <th colspan="2" class="text-center">Vendor DC</th>
-                                                        <th colspan="6" class="text-center">JW Vendor Details</th>
-                                                        <th colspan="3" class="text-center">Item Details</th>
-                                                        <th colspan="2" class="text-center">JW Invoice SO</th>
-                                                        <th colspan="2" class="text-center">Freight SO</th>
+                                                        <th colspan="7" class="text-center">JW Vendor Details</th>
+                                                        <th colspan="5" class="text-center">Item Details</th>
                                                     </tr>
                                                     <tr class="table-info">
                                                         <th class="px-2 del">
@@ -199,21 +196,18 @@
                                                             </a>
                                                         </th>
                                                         <th class="text-center">Date</th>
-                                                        <th>Number</th>
-                                                        <th class="text-center">Date</th>
-                                                        <th>Name</th>
                                                         <th>Group</th>
                                                         <th>Category</th>
+                                                        <th>Name</th>
                                                         <th>Currency</th>
                                                         <th>Warehouse</th>
+                                                        <th>Delivery Challan No</th>
+                                                        <th class="text-center">Delivery Challan Date</th>
                                                         <th>Material Segregation</th>
-                                                        <th class="text-center">No Of Items</th>
+                                                        <th class="text-center">No. of Line Item</th>
                                                         <th class="text-end">Qty</th>
+                                                        <th class="text-end">Qty (Kgs)</th>
                                                         <th class="text-end">Amount</th>
-                                                        <th>Number</th>
-                                                        <th>Date</th>
-                                                        <th>Number</th>
-                                                        <th>Date</th>
                                                     </tr>
                                                 </thead>
                                                 <!-- TABLE BODY -->
@@ -236,18 +230,19 @@
                                                             <td class="text-center">
                                                                 @Convert.ToDateTime(item.JORNH_RN_Date).ToString("dd-MMM-yyyy")
                                                             </td>
+                                                            <td>@item.JVG_JW_VendorGroup</td>
+                                                            <td>@item.JVC_JW_VendorCategory</td>
+                                                            <td>@item.JWV_JW_VendorName</td>
+                                                            <td>@item.CurrencyCode</td>
+                                                            <td>@item.WarehouseCode</td>
                                                             <td>@item.JORNH_VendorDC_No</td>
                                                             <td class="text-center">
                                                                 @(item.JORNH_VendorDC_Date.HasValue ? item.JORNH_VendorDC_Date.Value.ToString("dd-MMM-yyyy") : "")
                                                             </td>
-                                                            <td>@item.JWV_JW_VendorName</td>
-                                                            <td>@item.JVG_JW_VendorGroup</td>
-                                                            <td>@item.JVC_JW_VendorCategory</td>
-                                                            <td>@item.CurrencyCode</td>
-                                                            <td>@item.WarehouseCode</td>
                                                             <td>@item.Segregation</td>
                                                             <td class="text-center">@item.NoOfLineItems</td>
                                                             <td class="text-end">@item.Qty</td>
+                                                            <td class="text-end">@item.Qty_Kgs</td>
                                                             <td class="text-end">
                                                                 @String.Format(
                                                                     India,
@@ -255,10 +250,6 @@
                                                                     Convert.ToDouble(item.Amount)
                                                                 )
                                                             </td>
-                                                            <td>@item.JW_SO_No</td>
-                                                            <td>@item.JW_SO_Date</td>
-                                                            <td>@item.Freight_SO_No</td>
-                                                            <td>@item.Freight_SO_Date</td>
                                                         </tr>
                                                     }
                                                 </tbody>
@@ -268,23 +259,14 @@
                                                         <td colspan="11" class="text-end fw-bold">Total</td>
                                                         <td class="text-center fw-bold">@ViewBag.SumOfItem</td>
                                                         <td class="text-end fw-bold">
-                                                            @String.Format(
-                                                                India,
-                                                                "{0:#,0.##}",
-                                                                Convert.ToDouble(ViewBag.SumOfQty)
-                                                            )
+                                                            @String.Format(India, "{0:#,0.##}", Convert.ToDouble(ViewBag.SumOfQty))
                                                         </td>
                                                         <td class="text-end fw-bold">
-                                                            @String.Format(
-                                                                India,
-                                                                "{0:#,0.##}",
-                                                                Convert.ToDouble(ViewBag.SumOfAmount)
-                                                            )
+                                                            @String.Format(India, "{0:#,0.##}", Convert.ToDouble(ViewBag.SumOfQtyKgs))
                                                         </td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                        <td class="text-end fw-bold">
+                                                            @String.Format(India, "{0:#,0.##}", Convert.ToDouble(ViewBag.SumOfAmount))
+                                                        </td>
                                                     </tr>
                                                 </tfoot>
 </table>

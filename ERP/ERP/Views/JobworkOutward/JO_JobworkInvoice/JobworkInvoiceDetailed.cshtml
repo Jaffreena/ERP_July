@@ -1,4 +1,4 @@
-﻿@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JO_JobworkInvoiceDetailed_DTO>
+@model ERP_DTO.PaginatedList_DTO<ERP_DTO.JobOutwardTransaction.JO_JobworkInvoiceDetailed_DTO>
 @using System.Globalization;
 @{
     CultureInfo India = new CultureInfo("hi-IN");
@@ -77,6 +77,17 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <!-- RIGHT : View / Edit (enabled when exactly one row is ticked) -->
+                                                <div class="col-7">
+                                                    <div class="row justify-content-end gx-0">
+                                                        <div class="col-auto me-1">
+                                                            <button type="button" id="BtnViewSel" class="btn btn-primary btn-sm" disabled>View</button>
+                                                        </div>
+                                                        <div class="col-auto me-1">
+                                                            <button type="button" id="BtnEditSel" class="btn btn-primary btn-sm" disabled>Edit</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -87,68 +98,69 @@
                                             <table class="table table-bordered table-hover align-middle mb-0 table-grid" id="MyTable">
                                                 <thead class="thead table-first-header">
                                                     <tr class="table-info table-first-header-top">
-                                                        <th colspan="2" class="text-center">Journal</th>
-                                                        <th colspan="2" class="text-center">Vendor Invoice</th>
-                                                        <th colspan="3" class="text-center">Receipt Note</th>
-                                                        <th class="text-center">Service Order</th>
-                                                        <th colspan="5" class="text-center">JW Vendor Details</th>
+                                                        <th class="px-2 del"></th>
+                                                        <th colspan="2" class="text-center">Receipt Note</th>
+                                                        <th colspan="8" class="text-center">JW Vendor Details</th>
                                                         <th colspan="17" class="text-center">Item Details</th>
-                                                        <th></th>
                                                     </tr>
                                                     <tr class="table-info">
-                                                        <th class="sort-js" style="cursor:pointer" data-sort="@ViewData["KeySort"]">Number</th>
-                                                        <th class="datetype text-center">Date</th>
+                                                        <th class="px-2 del"><input type="checkbox" class="selectAllCheckbox form-check-input border-white" id="selectAllCheckbox"></th>
                                                         <th>Number</th>
                                                         <th class="datetype text-center">Date</th>
-                                                        <th>Number</th>
-                                                        <th class="datetype text-center">Date</th>
-                                                        <th>Vendor DN No</th>
-                                                        <th>Number</th>
                                                         <th class="table-col-xxl">Group</th>
                                                         <th class="table-col-xxl">Category</th>
                                                         <th class="table-col-xxl">Name</th>
                                                         <th class="table-col-xxl">Currency</th>
                                                         <th class="table-col-xxl">Tax Cluster</th>
+                                                        <th class="table-col-xxl">WH_Tax Code</th>
+                                                        <th>Invoice No</th>
+                                                        <th class="datetype text-center">Invoice Date</th>
                                                         <th class="table-col-xxl">Material Segregation</th>
+                                                        <th>Jobwork SVO No.</th>
+                                                        <th>Vendor DN No</th>
+                                                        <th class="datetype text-center">Vendor DN Date</th>
                                                         <th class="table-col-xxl">Process</th>
-                                                        <th class="table-col-xxl">Item Group</th>
+                                                        <th class="table-col-xxl">Group</th>
                                                         <th class="table-col-xxl">Item Code</th>
-                                                        <th class="table-col-xxl">Item Description</th>
+                                                        <th class="table-col-xxl">Description</th>
                                                         <th class="table-col-xxl text-end">Outer Dia</th>
                                                         <th class="table-col-xxl text-end">Thickness</th>
                                                         <th class="table-col-xxl text-end">Length</th>
                                                         <th class="table-col-xxl">Material Grade</th>
-                                                        <th class="table-width-md text-center">UOM</th>
                                                         <th class="table-width-md text-center">Warehouse</th>
+                                                        <th class="table-width-md text-center">UOM</th>
                                                         <th class="table-width-xxl text-center">Qty</th>
-                                                        <th class="table-width-lg text-end">Unit Price</th>
-                                                        <th class="table-width-lg text-end">Invoice Amount</th>
-                                                        <th class="table-width-lg text-end">GST Amount</th>
-                                                        <th class="table-width-lg text-end">WHT %</th>
-                                                        <th class="table-width-lg text-end">WHT Amount</th>
-                                                        <th class="text-center">Action</th>
+                                                        <th class="table-width-xxl text-center">Qty (Kgs)</th>
+                                                        <th class="table-width-lg text-end">Amount</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    @{ long prevInvoiceNo = 0; }
                                                     @foreach (var item in Model)
                                                     {
+                                                        bool isInvoiceStart = item.JOSVIH_Number != prevInvoiceNo;
+                                                        prevInvoiceNo = item.JOSVIH_Number;
                                                         <tr>
-                                                            <td>
-                                                                <a href="#" class="btn-view icon-link-hover" data-no="@item.JOSVIH_Number">@item.JOSVIH_JournalNo</a>
+                                                            <td class="p-2 del">
+                                                                @if (isInvoiceStart)
+                                                                {
+                                                                    <input type="checkbox" class="DeleteNumber form-check-input" value="@item.JOSVIH_Number">
+                                                                }
                                                             </td>
-                                                            <td class="datetype text-center">@item.JOSVIH_JournalDate.ToString("dd-MMM-yyyy")</td>
-                                                            <td>@item.JOSVIH_VendorInvoiceNo</td>
-                                                            <td class="datetype text-center">@item.JOSVIH_VendorInvoiceDate.ToString("dd-MMM-yyyy")</td>
                                                             <td>@item.JORNH_RN_No</td>
                                                             <td class="datetype text-center">@(item.JORNH_RN_Date.HasValue ? item.JORNH_RN_Date.Value.ToString("dd-MMM-yyyy") : "")</td>
-                                                            <td>@item.JOSVII_Vendor_DN_No</td>
-                                                            <td>@item.ServiceOrderNo</td>
                                                             <td class="table-col-xxl">@item.VendorGroup</td>
                                                             <td class="table-col-xxl">@item.VendorCategory</td>
                                                             <td class="table-col-xxl">@item.JWV_JW_VendorName</td>
                                                             <td class="table-col-xxl">@item.CurrencyCode</td>
                                                             <td class="table-col-xxl">@item.TaxCluster</td>
+                                                            <td class="table-col-xxl">@item.WH_TaxCode</td>
+                                                            <td>@item.JOSVIH_VendorInvoiceNo</td>
+                                                            <td class="datetype text-center">@item.JOSVIH_VendorInvoiceDate.ToString("dd-MMM-yyyy")</td>
                                                             <td class="table-col-xxl">@item.Segregation</td>
+                                                            <td>@item.ServiceOrderNo</td>
+                                                            <td>@item.JOSVII_Vendor_DN_No</td>
+                                                            <td class="datetype text-center">@(item.Vendor_DN_Date.HasValue ? item.Vendor_DN_Date.Value.ToString("dd-MMM-yyyy") : "")</td>
                                                             <td class="table-col-xxl">@item.JPRS_ProcessName</td>
                                                             <td class="table-col-xxl">@item.ItemGroup</td>
                                                             <td class="table-col-xxl">@item.ItemCode</td>
@@ -157,41 +169,26 @@
                                                             <td class="table-col-xxl text-end">@item.Thickness</td>
                                                             <td class="table-col-xxl text-end">@item.Length</td>
                                                             <td class="table-col-xxl">@item.MaterialGrade</td>
-                                                            <td class="table-width-md text-center">@item.UOM</td>
                                                             <td class="table-width-md text-center">@item.WarehouseCode</td>
+                                                            <td class="table-width-md text-center">@item.UOM</td>
                                                             <td class="Qty table-col-xxl text-center">@String.Format(India, "{0:N2}", item.JOSVII_Qty)</td>
-                                                            <td class="text-end">@String.Format(India, "{0:N2}", item.JOSVII_UnitPrice)</td>
+                                                            <td class="QtyKgs table-col-xxl text-center">@String.Format(India, "{0:N2}", item.JOSVII_Qty_Kgs)</td>
                                                             <td class="Amount text-end">@String.Format(India, "{0:N2}", item.JOSVII_Amount)</td>
-                                                            <td class="GST text-end">@String.Format(India, "{0:N2}", item.JOSVII_GST_Amount)</td>
-                                                            <td class="text-end">@String.Format(India, "{0:N2}", item.JOSVII_WHT_Percent)</td>
-                                                            <td class="WHT text-end">@String.Format(India, "{0:N2}", item.JOSVII_WH_TaxAmount)</td>
-                                                            <td class="text-center text-nowrap">
-                                                                <a href="#" class="btn btn-primary btn-sm py-0 btn-view" data-no="@item.JOSVIH_Number">View</a>
-                                                                <a href="#" class="btn btn-primary btn-sm py-0 btn-edit" data-no="@item.JOSVIH_Number">Edit</a>
-                                                            </td>
                                                         </tr>
                                                     }
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="table-info">
-                                                        <td colspan="24" class="text-end fw-bold">Total (filtered)</td>
+                                                        <td colspan="25" class="text-end fw-bold">Total (filtered)</td>
                                                         <td class="text-center">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfQty ?? 0.0))</td>
-                                                        <td></td>
+                                                        <td class="text-center">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfQtyKgs ?? 0.0))</td>
                                                         <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfAmount ?? 0.0))</td>
-                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfHeadGst ?? 0.0))</td>
-                                                        <td></td>
-                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.SumOfWHT ?? 0.0))</td>
-                                                        <td></td>
                                                     </tr>
                                                     <tr class="table-info">
-                                                        <td colspan="24" class="text-end fw-bold">Grand Total (all)</td>
+                                                        <td colspan="25" class="text-end fw-bold">Grand Total (all)</td>
                                                         <td class="text-center">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandQty ?? 0.0))</td>
-                                                        <td></td>
+                                                        <td class="text-center">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandQtyKgs ?? 0.0))</td>
                                                         <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandAmount ?? 0.0))</td>
-                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandGST ?? 0.0))</td>
-                                                        <td></td>
-                                                        <td class="text-end">@String.Format(India, "{0:N2}", Convert.ToDouble(ViewBag.GrandWHT ?? 0.0))</td>
-                                                        <td></td>
                                                     </tr>
                                                 </tfoot>
                                             </table>

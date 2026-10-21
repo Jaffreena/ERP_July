@@ -62,6 +62,17 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <!-- RIGHT -->
+                                                <div class="col-7">
+                                                    <div class="row justify-content-end gx-0">
+                                                        <div class="col-auto me-1">
+                                                            <input type="submit" name="Mode" id="View" disabled value="View" class="btn btn-primary" />
+                                                        </div>
+                                                        <div class="col-auto me-1">
+                                                            <input type="submit" name="Mode" id="Edit" disabled value="Edit" class="btn btn-primary" />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -72,12 +83,14 @@
                                             <table class="table table-bordered table-hover align-middle mb-0 table-grid small" id="MyTable_Summary">
                                                 <thead class="thead table-first-header">
                                                     <tr class="table-info table-first-header-top">
+                                                    <th class="px-2 del"></th>
                                                     <th colspan="6" class="text-center">Conversion Summary</th>
                                                     <th colspan="4" class="text-center">Consumption</th>
                                                     <th colspan="4" class="text-center">Production</th>
                                                     <th colspan="3" class="text-center">Scrap</th>
                                                     </tr>
                                                     <tr class="table-info">
+                                                    <th class="px-2 del"><input type="checkbox" class="selectAllCheckbox form-check-input border-white" id="selectAllCheckbox"></th>
                                                     <th>Journal No</th><th>Date</th><th>Segregation</th><th>Shift</th><th>Work Centre</th><th>Process</th>
                                                     <th>No of Line Items</th><th>UOM</th><th class="text-center">Qty</th><th class="text-center">Qty (Kgs)</th>
                                                     <th>No of Line Items</th><th>UOM</th><th class="text-center">Qty</th><th class="text-center">Qty (Kgs)</th>
@@ -88,6 +101,7 @@
                                                     @foreach (var item in Model)
                                                     {
                                                         <tr>
+                                                            <td class="p-2 del"><input type="checkbox" class="DeleteNumber form-check-input" name="DeleteNumber" value="@item.JOCNVH_Number"></td>
                                                             <td>@item.JOCNVH_JournalNo</td>
                                                 <td>@D(item.JOCNVH_Date)</td>
                                                 <td>@item.Segregation</td>
@@ -110,7 +124,7 @@
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="table-info">
-                                                    <td colspan="8" class="text-end fw-bold">Total</td>
+                                                    <td colspan="9" class="text-end fw-bold">Total</td>
                                                 <td class="text-center fw-bold" id="Total_Summary_Consumption"></td>
                                                 <td class="text-center fw-bold" id="Total_Summary_ConsumptionKgs"></td>
                                                 <td colspan="2"></td>
@@ -171,4 +185,37 @@
 
 @section Scripts {
     <script src="~/js/JO_Conversion/JO_Conversion_Detailed.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tbody = document.querySelector('table.table-grid tbody');
+            var viewBtn = document.getElementById('View');
+            var editBtn = document.getElementById('Edit');
+            var all = document.getElementById('selectAllCheckbox');
+
+            function updateButtons() {
+                var one = document.querySelectorAll('.DeleteNumber:checked').length === 1;
+                [viewBtn, editBtn].forEach(function (b) { if (b) b.disabled = !one; });
+            }
+
+            if (tbody) {
+                // row click -> tick / untick its checkbox
+                tbody.addEventListener('click', function (e) {
+                    if (e.target.closest('input[type="checkbox"], a, button')) return;
+                    var tr = e.target.closest('tr');
+                    var cb = tr ? tr.querySelector('.DeleteNumber') : null;
+                    if (cb) { cb.checked = !cb.checked; updateButtons(); }
+                });
+                tbody.addEventListener('change', function (e) {
+                    if (e.target.classList.contains('DeleteNumber')) updateButtons();
+                });
+            }
+
+            if (all) all.addEventListener('change', function () {
+                document.querySelectorAll('.DeleteNumber').forEach(function (c) { c.checked = all.checked; });
+                updateButtons();
+            });
+
+            updateButtons();
+        });
+    </script>
 }

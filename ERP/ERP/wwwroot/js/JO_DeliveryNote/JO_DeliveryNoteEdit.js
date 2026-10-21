@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
     //#region JW_Customer – Focus In
     // Handled via inline onfocus="ShowCustomerPane();OnBuyerSelectCall(this)"
     // in the .cshtml — no delegated binding needed.
@@ -385,8 +385,8 @@ function ApplyViewMode() {
                 BindDeliveryNoteBatchTable();
 
                 // stock columns mean nothing on a saved note; nothing in the popup is editable
-                $("#DeliveryNoteBatchTableBody .JODNI_BCH_QtyAvailable, #DeliveryNoteBatchTableBody .JODNI_BCH_QtyReserved").val("");
-                $("#TotalAvailableQty, #TotalReservedQty").val("");
+                $("#DeliveryNoteBatchTableBody .JODNI_BCH_QtyAvailable, #DeliveryNoteBatchTableBody .JODNI_BCH_QtyReserved, #DeliveryNoteBatchTableBody .JODNI_BCH_UsedQty").val("");
+                $("#TotalAvailableQty, #TotalReservedQty, #TotalUsedQty").val("");
                 $("#DeliveryNoteBatchTableBody input").prop("readonly", true);
                 ApplyBatchFieldWidths("#DeliveryNoteBatchList");
 
@@ -462,8 +462,10 @@ const ItemTableFields = [
     { cls: ".JODNI_UoM_Number", min: 10, max: 15, align: "center" },
 
     { cls: ".JODNI_OriginalQty", min: 10, max: 20, align: "center" }, // Extra field
+    { cls: ".JODNI_UsedQty", min: 10, max: 20, align: "center" },
     { cls: ".JODNI_InvoicedQty", min: 10, max: 20, align: "center" }, // Extra field
     { cls: ".JODNI_Qty", min: 10, max: 20, align: "center" },
+    { cls: ".JODNI_Qty_Kgs", min: 10, max: 20, align: "right" },
 
     { cls: ".JODNI_UnitPrice", min: 10, max: 20, align: "right" },
     { cls: ".JODNI_Amount", min: 13, max: 25, align: "right" },
@@ -538,6 +540,7 @@ function ApplyBatchFieldWidths(container = "#DeliveryNoteBatchList") {
         { cls: ".JODNI_BCH_BatchDate", min: 10, max: 10, align: "center" },
         { cls: ".JODNI_BCH_BatchNo", min: 20, max: 50, align: "left" },
         { cls: ".JODNI_BCH_QtyAvailable", min: 10, max: 20, align: "center" },
+        { cls: ".JODNI_BCH_UsedQty", min: 10, max: 20, align: "center" },
         { cls: ".JODNI_BCH_QtyReserved", min: 10, max: 20, align: "center" },
         { cls: ".JODNI_BCH_QtyInvoice", min: 10, max: 20, align: "center" },
         { cls: ".JODNI_BCH_BatchUnitPrice", min: 11, max: 20, align: "right" },
@@ -913,7 +916,7 @@ $(document).ready(function () {
             kgs.val("");
         }
 
-        row.find(".JODNI_Qty, .JODNI_OriginalQty").each(function () {
+        row.find(".JODNI_Qty, .JODNI_OriginalQty, .JODNI_UsedQty").each(function () {
             if ($.trim($(this).val()) !== "") {
                 $(this).val(addComma($(this).val(), "q"));
             }
@@ -1238,6 +1241,49 @@ $(document).ready(function () {
         autoAddRow(row);
     });
     //#endregion onkeypress qty and unitS
+
+    //#region alert on change (leaving the field) - Amend Qty / Delivered Qty less than Used Qty
+    $(document).on("change", ".JODNI_Qty", function () {
+        let row = $(this).closest("tr");
+        let used = parseFloat(removeComma(row.find(".JODNI_UsedQty").val())) || 0;
+        let qty = parseFloat(removeComma($(this).val())) || 0;
+
+        if (used > 0 && qty < used) {
+            if (window._usedQtyAlerting) return;   // stop re-entry (flicker)
+            window._usedQtyAlerting = true;
+
+            let $input = $(this);
+            // reset first so any focus event fired by the alert sees a valid value
+            $input.val(addComma(used, "q")).trigger("input").trigger("keyup");
+            alert("Amend Qty cannot be less than Used Qty (" + used + ")");
+
+            setTimeout(function () {
+                $input.focus().select();
+                window._usedQtyAlerting = false;
+            }, 100);
+        }
+    });
+
+    $(document).on("change", ".JODNI_BCH_QtyInvoice", function () {
+        let row = $(this).closest("tr");
+        let used = parseFloat(removeComma(row.find(".JODNI_BCH_UsedQty").val())) || 0;
+        let qty = parseFloat(removeComma($(this).val())) || 0;
+
+        if (used > 0 && qty < used) {
+            if (window._usedQtyAlerting) return;   // stop re-entry (flicker)
+            window._usedQtyAlerting = true;
+
+            let $input = $(this);
+            $input.val(addComma(used, "q")).trigger("input");
+            alert("Delivered Qty cannot be less than Used Qty (" + used + ")");
+
+            setTimeout(function () {
+                $input.focus().select();
+                window._usedQtyAlerting = false;
+            }, 100);
+        }
+    });
+    //#endregion
 
     //#region validate amend qty against invoiced qty
     // FORMULA: if AmendQty < InvoicedQty -> alert + reset AmendQty = InvoicedQty
@@ -1618,6 +1664,15 @@ function calculateTotal() {
 
     // Footer totals
     $("#TotalOriginalQty").val(addComma(totalOriginalQty, "q"));
+
+    let totalUsedQtyItems = 0;
+    $("#ItemTable tbody tr.NewRow").each(function () {
+        let r = $(this);
+        if (r.find(".JODNI_IsDeleted").val() === "1" ||
+            r.find(".JODNI_IsDeleted").val() === "true") return;
+        totalUsedQtyItems += parseFloat(removeComma(r.find(".JODNI_UsedQty").val())) || 0;
+    });
+    $("#TotalUsedQty_Item").val(addComma(totalUsedQtyItems, "q"));
     $("#TotalInvoicedQty").val(addComma(totalInvoicedQty, "q"));
     $("#TotalQty").val(addComma(totalQty, "q"));
     $("#TotalAmount").val(addComma(totalAmount, "c"));
@@ -2327,6 +2382,7 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
                         JODNI_BCH_BatchNo: batch.batchNo,
                         JODNI_BCH_QtyAvailable: batch.availableQty,
                         JODNI_BCH_QtyReserved: batch.reservedQty,
+                        JODNI_BCH_UsedQty: batch.usedQty,
                         JODNI_BCH_QtyInvoice: batch.deliveredQty,
                         JODNI_BCH_BatchUnitPrice: batch.batchUnitPrice,
                         JODNI_BCH_BatchValue: batch.batchValue,
@@ -2435,6 +2491,7 @@ function BindDeliveryNoteBatchTable() {
 
             row.find(".JODNI_BCH_QtyAvailable").val(addComma(data.JODNI_BCH_QtyAvailable, "q"));
             row.find(".JODNI_BCH_QtyReserved").val(addComma(data.JODNI_BCH_QtyReserved, "q"));
+            row.find(".JODNI_BCH_UsedQty").val(addComma(data.JODNI_BCH_UsedQty || 0, "q"));
             row.find(".JODNI_BCH_QtyInvoice").val(addComma(data.JODNI_BCH_QtyInvoice, "q"));
             row.find(".JODNI_BCH_BatchUnitPrice").val(addComma(data.JODNI_BCH_BatchUnitPrice, "c"));
             row.find(".JODNI_BCH_BatchValue").val(addComma(data.JODNI_BCH_BatchValue, "c"));
@@ -2473,6 +2530,12 @@ function CalculateBatchFooter() {
     $("#TotalBatchQty").val(addComma(totalQty, "q"));
     $("#TotalBatchValue").val(addComma(totalValue, "c"));
     $("#TotalAvailableQty").val(addComma(totalAvailableQty, "q"));
+
+    let totalUsedQty = 0;
+    $("#DeliveryNoteBatchTableBody tr.DeliveryNoteBatchRow").each(function () {
+        totalUsedQty += parseFloat(removeComma($(this).find(".JODNI_BCH_UsedQty").val())) || 0;
+    });
+    $("#TotalUsedQty").val(addComma(totalUsedQty, "q"));
 }
 //#endregion
 
@@ -3266,6 +3329,18 @@ function validateItemGrid_Edit() {
             return false;
         }
 
+        // validate Qty should not be less than Used Qty
+        let usedQtyItem = parseFloat(removeComma(row.find(".JODNI_UsedQty").val())) || 0;
+        if ((parseFloat(removeComma(qty)) || 0) < usedQtyItem) {
+            showAlert(
+                'Qty cannot be less than Used Qty (' + usedQtyItem + ')',
+                row.find(".JODNI_Qty")
+            );
+
+            isValid = false;
+            return false;
+        }
+
         // validate Unit Price
         if (!unitPrice || unitPrice.trim() === "" || (parseFloat(removeComma(unitPrice)) || 0) <= 0) {
             showAlert('Unit Price is required', row.find(".JODNI_UnitPrice"));
@@ -3317,6 +3392,29 @@ function validateDeliveryNoteBatchList_Edit() {
             .not("#DeliveryNoteBatchTemplateRow");
 
     let hasValidQty = false;
+    let usedError = false;
+
+    // Delivered Qty should not be less than Used Qty
+    batchRows.each(function () {
+
+        let row = $(this);
+        if (row.attr("id") === "DeliveryNoteBatchTemplateRow") return;
+
+        let dq = parseFloat(removeComma(row.find(".JODNI_BCH_QtyInvoice").val())) || 0;
+        let uq = parseFloat(removeComma(row.find(".JODNI_BCH_UsedQty").val())) || 0;
+
+        if (uq > 0 && dq < uq) {
+            usedError = true;
+            let input = row.find(".JODNI_BCH_QtyInvoice");
+            showAlert(
+                "Delivered Qty cannot be less than Used Qty (" + uq + ")",
+                input
+            );
+            return false;
+        }
+    });
+
+    if (usedError) return false;
 
     batchRows.each(function () {
 

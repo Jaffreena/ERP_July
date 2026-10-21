@@ -1,4 +1,4 @@
-﻿using ERP_DTO;
+using ERP_DTO;
 using ERP_DTO.JobOutwardTransaction;
 using Microsoft.Practices.EnterpriseLibrary.Data;
 using Microsoft.Practices.EnterpriseLibrary.Data.Sql;
@@ -796,6 +796,20 @@ namespace ERP_DAO.JobOutwardTransaction
 
                                 if (Convert.ToInt32(chk.ExecuteScalar()) > 0)
                                     throw new Exception("This row has used qty. It cannot be deleted.");
+                            }
+
+                            // invoiced row -> cannot be deleted
+                            using (SqlCommand chkInv = new SqlCommand(@"
+                                SELECT COUNT(*)
+                                FROM JO_JobworkInvoiceItem
+                                WHERE JOSVII_JORNH_Number = @JORNH_Number
+                                  AND JOSVII_JORNI_Number = @JORNI_Number", con, tr))
+                            {
+                                chkInv.Parameters.AddWithValue("@JORNI_Number", item.JORNI_Number);
+                                chkInv.Parameters.AddWithValue("@JORNH_Number", item.JORNH_Number);
+
+                                if (Convert.ToInt32(chkInv.ExecuteScalar()) > 0)
+                                    throw new Exception("This row has invoiced qty. It cannot be deleted.");
                             }
 
                             // IN_COMMON_BATCH rows of this line

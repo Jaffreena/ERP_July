@@ -1,4 +1,4 @@
-﻿/* =====================================================================
+/* =====================================================================
    JO_JobworkInvoiceList.js  -  SUMMARY + DETAILED pages
    Both pages post to their own route (Mode / JOSVIH_No handled in Controller)
    ===================================================================== */
@@ -7,8 +7,7 @@
 
     function submitList() { $form.trigger('submit'); }
 
-    // ---- View / Edit : set Mode + invoice number, post same page
-    //      Controller redirects to /view or /edit
+    // ---- Journal No link : open the invoice in View mode
     $(document).on('click', '.btn-view, .btn-edit', function (e) {
         e.preventDefault();
         var $b = $(this);
@@ -16,6 +15,39 @@
         $('#JOSVIH_No').val($b.data('no'));
         submitList();
     });
+
+    // ---- Checkbox selection : View / Edit buttons work only when exactly one row is ticked
+    function updateButtons() {
+        var one = $('.DeleteNumber:checked').length === 1;
+        $('#BtnViewSel, #BtnEditSel').prop('disabled', !one);
+    }
+
+    function openSelected(mode) {
+        var $c = $('.DeleteNumber:checked');
+        if ($c.length !== 1) return;
+        $('#Mode').val(mode);
+        $('#JOSVIH_No').val($c.val());
+        submitList();
+    }
+
+    $(document).on('click', '#BtnViewSel', function (e) { e.preventDefault(); openSelected('View'); });
+    $(document).on('click', '#BtnEditSel', function (e) { e.preventDefault(); openSelected('Edit'); });
+
+    // row click -> tick / untick its checkbox
+    $(document).on('click', '#MyTable tbody tr', function (e) {
+        if ($(e.target).closest('input[type="checkbox"], a, button').length) return;
+        var $cb = $(this).find('.DeleteNumber');
+        if ($cb.length) { $cb.prop('checked', !$cb.prop('checked')); updateButtons(); }
+    });
+
+    $(document).on('change', '.DeleteNumber', updateButtons);
+
+    $(document).on('change', '#selectAllCheckbox', function () {
+        $('.DeleteNumber').prop('checked', this.checked);
+        updateButtons();
+    });
+
+    $(updateButtons);
 
     // ---- Search : Enter key or Search button
     $(document).on('keydown', '#Search', function (e) {
