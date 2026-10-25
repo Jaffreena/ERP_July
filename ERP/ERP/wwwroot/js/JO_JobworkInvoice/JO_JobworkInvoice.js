@@ -41,9 +41,19 @@ function dateISO(id) {            // for save payload -> UTC ISO (controller Fro
     var p = parseDate($('#' + id).val());
     return p ? new Date(p.y, p.m - 1, p.d).toISOString() : null;
 }
-function showAlert(msg) {
-    if ($('#AlertModal').length) { $('#AlertMessage').html(msg); $('#AlertModal').modal('show'); }
-    else alert(msg.replace(/<br\s*\/?>/g, '\n'));
+function showAlert(msg, focusTarget) {
+    var back = function () {
+        if (!focusTarget) return;
+        var $t = $(focusTarget);
+        if ($t.length) { $t.focus(); if ($t[0].select) $t[0].select(); }
+    };
+    if ($('#AlertModal').length) {
+        $('#AlertMessage').html(msg);
+        $('#AlertModal').off('hidden.bs.modal.jwiFocus');
+        if (focusTarget) $('#AlertModal').one('hidden.bs.modal.jwiFocus', back);
+        $('#AlertModal').modal('show');
+    }
+    else { alert(msg.replace(/<br\s*\/?>/g, '\n')); back(); }
 }
 
 /* =====================================================================
@@ -493,6 +503,26 @@ function LoadSoDropdown($tr) {
     });
 }
 
+// qty of the OTHER active rows that use the same SO item (INVOICE assign)
+function OtherRowsQtyForSO($cur) {
+    var svoi = $cur.data('item').JOSVII_JOJWI_SVOI_Number, total = 0;
+    if (!svoi) return 0;
+    ActiveRows().each(function () {
+        if (this === $cur[0]) return;
+        var it = $(this).data('item');
+        if (it && it.JOSVII_SVO_Assign === 'INVOICE' && it.JOSVII_JOJWI_SVOI_Number === svoi)
+            total += num($(this).find('.qty').val());
+    });
+    return total;
+}
+// Qty Allowed of one row = SO Qty - RN assigned - other invoices (SoMax) - other rows in this grid
+// null = row has no SO limit
+function RowSoAllowed($tr) {
+    var it = $tr.data('item');
+    if (it.SoMax === undefined || it.SoMax === null) return null;
+    return Math.max(0, it.SoMax - OtherRowsQtyForSO($tr));
+}
+
 // SO selected -> SVOH/SVOI, unit price (readonly), assign flag, recalc row
 $(document).on('change', '#TableBody .so-select', function () {
     var $s = $(this), $tr = $s.closest('tr'), item = $tr.data('item');
@@ -503,6 +533,7 @@ $(document).on('change', '#TableBody .so-select', function () {
         item.JOSVII_JOJWI_SVOI_Number = 0;
         item.JOSVII_UnitPrice = 0;
         item.JOSVII_SVO_Assign = 'RECEIPT NOTE';
+        item.SoMax = undefined;
         $tr.find('.up').val(fmt(0));
         RecalcRow($tr);
         return;
@@ -519,7 +550,14 @@ $(document).on('change', '#TableBody .so-select', function () {
         item.JOSVII_JOJWI_SVOI_Number = num(g(r, 'svoiNumber')) || num($s.find('option:selected').attr('data-svoi'));
         item.JOSVII_UnitPrice = num(g(r, 'unitPrice'));
         item.JOSVII_SVO_Assign = 'INVOICE';
+        item.SoMax = Math.max(0, num(g(r, 'svoiQty')) - num(g(r, 'prevInvoiceQty')));
         $tr.find('.up').val(fmt(item.JOSVII_UnitPrice));   // unit price stays readonly
+        var qNow = num($tr.find('.qty').val());
+        var allowed = RowSoAllowed($tr);
+        if (qNow > allowed) {
+            showAlert('Qty Allowed: ' + fmtQ(allowed), $tr.find('.qty'));
+            $tr.find('.qty').val(fmtQ(allowed));
+        }
         RecalcRow($tr);
     }).fail(function () { showAlert('Service Order price could not be loaded.'); });
 });
@@ -553,8 +591,13 @@ $(document).on('click', '#BtnDeleteRow', function () {
 });
 
 $(document).on('input', '#TableBody .qty', function () {
-    var $tr = $(this).closest('tr'), rem = $tr.data('item').Remaining, q = num(this.value);
-    if (q > rem) { showAlert('Qty cannot exceed Remaining Qty (' + fmtQ(rem) + ').'); this.value = fmtQ(rem); }
+    var $tr = $(this).closest('tr'), it = $tr.data('item'), rem = it.Remaining, q = num(this.value);
+    if (q > rem) { showAlert('Qty cannot exceed Remaining Qty (' + fmtQ(rem) + ').', this); this.value = fmtQ(rem); return; }
+    var allowed = RowSoAllowed($tr);
+    if (allowed !== null && q > allowed) {
+        showAlert('Qty Allowed: ' + fmtQ(allowed), this);
+        this.value = fmtQ(allowed);
+    }
 });
 $(document).on('change', '#TableBody .qty', function () {
     this.value = fmtQ(this.value);
@@ -706,6 +749,8 @@ function ValidateItems() {
         var $r = $(this), q = num($r.find('.qty').val()), rem = $r.data('item').Remaining;
         if (q <= 0) e.push('Row ' + (i + 1) + ': Qty must be greater than 0.');
         else if (q > rem) e.push('Row ' + (i + 1) + ': Qty exceeds Remaining Qty.');
+        var so = RowSoAllowed($r);
+        if (so !== null && q > so) e.push('Row ' + (i + 1) + ': Qty exceeds Qty Allowed (' + fmtQ(so) + ') of the Service Order.');
         if (!$r.data('item').JOSVII_SAC_Number) e.push('Row ' + (i + 1) + ': SAC missing.');
     });
     return e;
@@ -836,4 +881,32 @@ $(function () { CalculateTotals(); setTimeout(function () { AutoFit(); ResizeCol
 
 // default form setting (Create page only)
 $(function () { LoadDefaultFormSetting(); });
+
+// Journal No. from Number Setup (Create page only; Edit page loads the saved number)
+function LoadJournalNumber(silent) {
+    var $no = $('#JOSVIH_JournalNo');
+    var d = dateYMD('JOSVIH_JournalDate');
+    if (!d) return;
+
+    $.get(JWI_URL + '/next-journal-number', { JournalDate: d }, function (res) {
+        if (res && res.success) {
+            $no.val(res.number).prop('readonly', true);
+            if (typeof fitInputWidth === 'function') fitInputWidth($no[0], 20, 25);
+        } else {
+            $no.val('').prop('readonly', true);   // no number from Number Setup -> cannot type manually
+            showAlert((res && res.message) || 'Journal Number is not configured for the selected date.');
+        }
+    }).fail(function () {
+        $no.val('').prop('readonly', true);
+        showAlert('Unable to get Journal Number.');
+    });
+}
+$(document).on('change', '#JOSVIH_JournalDate', function () {
+    if (window.JWI_IsView || $('#JOSVIH_Number').val() > 0) return;   // not on Edit/View
+    LoadJournalNumber(false);
+});
+$(function () {
+    if (window.JWI_IsView || num($('#JOSVIH_Number').val()) > 0) return;
+    setTimeout(function () { LoadJournalNumber(true); }, 400);        // after the date picker is ready
+});
 $(window).on("load", function () { setTimeout(function () { AutoFit(); ResizeColumns(); }, 300); });

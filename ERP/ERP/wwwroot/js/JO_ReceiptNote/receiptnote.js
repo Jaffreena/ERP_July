@@ -294,7 +294,7 @@ function ApplyOtherBatchFieldWidths(container = "#ReceiptNoteOtherBatchList") {
 
         const controls = $container.find(
             "#ReceiptNoteOtherBatchTableBody > #ReceiptNoteOtherBatchTemplateRow " + f.cls +
-            ", #ReceiptNoteOtherBatchTableBody > tr.ReceiptNoteOtherBatchNewRow " + f.cls
+            ", #ReceiptNoteOtherBatchTableBody > tr.ReceiptNoteOtherBatchRow " + f.cls
         );
 
         if (!controls.length) return;
@@ -676,6 +676,11 @@ $(document).ready(function () {
     );
 
     ApplyOtherBatchFieldWidths("#ReceiptNoteOtherBatchList");
+
+    // Other WH tab: measure widths when the tab is visible and the rows are filled
+    $(document).on("shown.bs.tab", "#Other-tab", function () {
+        ApplyOtherBatchFieldWidths("#ReceiptNoteOtherBatchList");
+    });
     //#endregion
     //#region item grid alignment
     $(document).on("input", "#ItemTable input", function () {
@@ -1655,6 +1660,7 @@ $(document).on("change", ".JORNI_JOFRT_SVOH_Number", function () {
                     .focus()
                     .select();
                 row.find(".JORNI_JOFRT_SVOH_Number").val("0");
+                row.find(".JORNI_JOFRT_SVOI_Number_Row").val(0);
             }, 300);
         }
     });
@@ -1700,7 +1706,7 @@ $(document).on("focusout", ".JORNI_Qty", function () {
                 jwiDeferred.resolve({
                     // FORMULA: AllowedQty = SVO_Qty − RealReceivedQty
                     message: "Qty Allowed: " + (jisvoiQty - realReceivedQty),
-                    clear: function () { row.find(".JORNI_JOJWI_SVOH_Number").val("0"); }
+                    clear: function () { row.find(".JORNI_JOJWI_SVOH_Number").val("0"); row.find(".JORNI_JOJWI_SVOI_Number_Row").val(0); }
                 });
             } else {
                 jwiDeferred.resolve(null);
@@ -1736,7 +1742,7 @@ $(document).on("focusout", ".JORNI_Qty", function () {
                 freightDeferred.resolve({
                     // FORMULA: AllowedQty = SVO_Qty − RealReceivedQty
                     message: "Freight Qty Allowed: " + (jisvoiQty - realReceivedQty),
-                    clear: function () { row.find(".JORNI_JOFRT_SVOH_Number").val("0"); }
+                    clear: function () { row.find(".JORNI_JOFRT_SVOH_Number").val("0"); row.find(".JORNI_JOFRT_SVOI_Number_Row").val(0); }
                 });
             } else {
                 freightDeferred.resolve(null);
@@ -1804,6 +1810,7 @@ $(document).on("change", ".JORNI_JOJWI_SVOH_Number", function () {
                     .focus()
                     .select();
                 row.find(".JORNI_JOJWI_SVOH_Number").val("0");
+                row.find(".JORNI_JOJWI_SVOI_Number_Row").val(0);
             }, 300);
 
 
@@ -1819,6 +1826,15 @@ $(document).on("change", ".JORNI_JOJWI_SVOH_Number", function () {
 function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
     let total = 0;
 
+    // current row's SO + SO item (JW and Freight kept separate)
+    let curJwSO = currentRow.find(".JORNI_JOJWI_SVOH_Number").val() || "0";
+    let curFrtSO = currentRow.find(".JORNI_JOFRT_SVOH_Number").val() || "0";
+    let curJwSvoi = currentRow.find(".JORNI_JOJWI_SVOI_Number_Row").val() || "0";
+    let curFrtSvoi = currentRow.find(".JORNI_JOFRT_SVOI_Number_Row").val() || "0";
+
+    let isJW = (curJwSO == jisvohNumber);
+    let isFrt = (curFrtSO == jisvohNumber);
+
     $("#ItemTable tbody tr.NewRow").each(function () {
         let row = $(this);
 
@@ -1826,13 +1842,18 @@ function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
         if (row.find(".JORNI_IsDeleted").val() === "1" ||
             row.find(".JORNI_IsDeleted").val() === "true") return;
 
-        // CHANGED: also check the Freight SO field — a row's qty could
-        // be booked against a Service Order via either dropdown.
-        let rowSO = row.find(".JORNI_JOJWI_SVOH_Number").val() || 0;
-        let rowFreightSO = row.find(".JORNI_JOFRT_SVOH_Number").val() || 0;
+        let rowQty = parseFloat(removeComma(row.find(".JORNI_Qty").val())) || 0;
 
-        if (rowSO == jisvohNumber || rowFreightSO == jisvohNumber) {
-            total += parseFloat(removeComma(row.find(".JORNI_Qty").val())) || 0;
+        let rowSO = row.find(".JORNI_JOJWI_SVOH_Number").val() || "0";
+        let rowSvoi = row.find(".JORNI_JOJWI_SVOI_Number_Row").val() || "0";
+        let rowFrtSO = row.find(".JORNI_JOFRT_SVOH_Number").val() || "0";
+        let rowFrtSvoi = row.find(".JORNI_JOFRT_SVOI_Number_Row").val() || "0";
+
+        // same SO AND same SO item only
+        if (isJW && rowSO == jisvohNumber && rowSvoi == curJwSvoi) {
+            total += rowQty;
+        } else if (isFrt && rowFrtSO == jisvohNumber && rowFrtSvoi == curFrtSvoi) {
+            total += rowQty;
         }
     });
 

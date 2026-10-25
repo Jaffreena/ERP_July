@@ -142,8 +142,32 @@
         }
 
         $(document).on('click', '.ResetRowRemove', function () {
-            $(this).closest('tr').find("input[name*='JOJWI_SVO_NRS_IsDeleted']").val(true);
-            $(this).closest('tr').hide();
+            var row = $(this).closest('tr');
+            var numberId = parseInt(row.find("input.JOJWI_SVO_NRS_Number").val(), 10) || 0;
+
+            function markDeleted() {
+                row.find("input[name*='JOJWI_SVO_NRS_IsDeleted']").val(true);
+                row.hide();
+            }
+
+            // new unsaved row: nothing to protect, delete directly
+            if (numberId === 0) {
+                markDeleted();
+                return;
+            }
+
+            // saved row: server checks for transactions in its date range
+            $.post("/JOJWI_SVO_Number/ValidateNumberDelete", { NumberId: numberId },
+                function (res) {
+                    if (res && res.success) {
+                        markDeleted();
+                    } else {
+                        alert(res && res.message ? res.message : "This row cannot be deleted.");
+                    }
+                }
+            ).fail(function () {
+                alert("Could not validate the delete. Please try again.");
+            });
         });
 
 

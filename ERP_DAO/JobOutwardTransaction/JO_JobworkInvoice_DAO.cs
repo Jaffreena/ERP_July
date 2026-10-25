@@ -575,5 +575,30 @@ namespace ERP_DAO.JobOutwardTransaction
             return result;
         }
         #endregion
+
+        public string GetNextJournalNumber(DateTime journalDate)
+        {
+            Database db = new SqlDatabase(DB.Connection());
+            DbCommand cmd = db.GetStoredProcCommand("JO_JobworkInvoice_GetNextNumber_SP");
+
+            db.AddInParameter(cmd, "@Id", DbType.Int32, 101);
+            db.AddInParameter(cmd, "@JournalDate", DbType.Date, journalDate);
+            db.AddOutParameter(cmd, "@NextNumber", DbType.Int32, 4);
+            db.AddOutParameter(cmd, "@Prefix", DbType.String, 30);
+            db.AddOutParameter(cmd, "@Suffix", DbType.String, 30);
+            db.AddOutParameter(cmd, "@NumberOfDigits", DbType.Int32, 4);
+            db.AddOutParameter(cmd, "@PrefilZero", DbType.Boolean, 1);
+
+            db.ExecuteNonQuery(cmd);
+
+            int next = Convert.ToInt32(db.GetParameterValue(cmd, "@NextNumber"));
+            string prefix = Convert.ToString(db.GetParameterValue(cmd, "@Prefix")) ?? "";
+            string suffix = Convert.ToString(db.GetParameterValue(cmd, "@Suffix")) ?? "";
+            int digits = Convert.ToInt32(db.GetParameterValue(cmd, "@NumberOfDigits"));
+            object pz = db.GetParameterValue(cmd, "@PrefilZero");
+            bool prefill = pz != DBNull.Value && Convert.ToBoolean(pz);
+
+            return prefix + (prefill ? next.ToString("D" + digits) : next.ToString()) + suffix;
+        }
     }
 }

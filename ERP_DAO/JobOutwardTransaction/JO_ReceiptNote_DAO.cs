@@ -267,12 +267,13 @@ namespace ERP_DAO.JobOutwardTransaction
         #endregion
 
         #region Batch popup data
-        public DataSet GetBatchDetailsDB(long fromWarehouse, long itemNumber, int ItemGridIndex)
+        public DataSet GetBatchDetailsDB(long fromWarehouse, long itemNumber, int ItemGridIndex, long JORNH_Number = 0)
         {
             try
             {
                 Database db = new SqlDatabase(DB.Connection());
                 DbCommand cmd = db.GetStoredProcCommand("JO_ReceiptNote_InCommonBatch_GetBatchDetails_SP");
+                db.AddInParameter(cmd, "@JORNH_Number", DbType.Int64, JORNH_Number);
                 db.AddInParameter(cmd, "@FromWarehouse", DbType.Int64, fromWarehouse);
                 db.AddInParameter(cmd, "@Item_Number", DbType.Int64, itemNumber);
                 db.AddInParameter(cmd, "@ItemGridIndex", DbType.Int64, ItemGridIndex);
@@ -473,13 +474,13 @@ namespace ERP_DAO.JobOutwardTransaction
                                 cmd.Parameters.AddWithValue("@JORNI_UnitPrice", item.JORNI_UnitPrice);
                                 cmd.Parameters.AddWithValue("@JORNI_Amount", item.JORNI_Amount);
                                 cmd.Parameters.AddWithValue("@JORNI_IsJW_InvoiceApplicable", item.JORNI_IsJW_InvoiceApplicable ?? "No");
-                                cmd.Parameters.AddWithValue("@JORNI_JOJWI_SVOH_Number", isJWIRow ? (item.JORNI_JOJWI_SVOH_Number ?? 0) : 0);
-                                cmd.Parameters.AddWithValue("@JORNI_JOJWI_SVOI_Number", isJWIRow ? (item.JORNI_JOJWI_SVOI_Number ?? 0) : 0);
+                                cmd.Parameters.AddWithValue("@JORNI_JOJWI_SVOH_Number", (isJWIRow && (item.JORNI_JOJWI_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOJWI_SVOH_Number ?? 0) : 0);
+                                cmd.Parameters.AddWithValue("@JORNI_JOJWI_SVOI_Number", (isJWIRow && (item.JORNI_JOJWI_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOJWI_SVOI_Number ?? 0) : 0);
                                 cmd.Parameters.AddWithValue("@JORNI_IsFreightApplicable", item.JORNI_IsFreightApplicable ?? "No");
                                 cmd.Parameters.AddWithValue("@JORNI_FromWH_Number", isFreightRow ? (item.JORNI_FromWH_Number ?? 0) : 0);
                                 cmd.Parameters.AddWithValue("@JORNI_ToWH_Number", isFreightRow ? (item.JORNI_ToWH_Number ?? 0) : 0);
-                                cmd.Parameters.AddWithValue("@JORNI_JOFRT_SVOH_Number", isFreightRow ? (item.JORNI_JOFRT_SVOH_Number ?? 0) : 0);
-                                cmd.Parameters.AddWithValue("@JORNI_JOFRT_SVOI_Number", isFreightRow ? (item.JORNI_JOFRT_SVOI_Number ?? 0) : 0);
+                                cmd.Parameters.AddWithValue("@JORNI_JOFRT_SVOH_Number", (isFreightRow && (item.JORNI_JOFRT_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOFRT_SVOH_Number ?? 0) : 0);
+                                cmd.Parameters.AddWithValue("@JORNI_JOFRT_SVOI_Number", (isFreightRow && (item.JORNI_JOFRT_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOFRT_SVOI_Number ?? 0) : 0);
 
                                 insertedItemNumber = Convert.ToInt64(cmd.ExecuteScalar());
                             }
@@ -737,13 +738,13 @@ namespace ERP_DAO.JobOutwardTransaction
                     item.JORNI_UnitPrice,
                     item.JORNI_Amount,
                     item.JORNI_IsJW_InvoiceApplicable ?? "No",
-                    isJWIRow ? (item.JORNI_JOJWI_SVOH_Number ?? 0) : 0,
-                    isJWIRow ? (item.JORNI_JOJWI_SVOI_Number ?? 0) : 0,
+                    (isJWIRow && (item.JORNI_JOJWI_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOJWI_SVOH_Number ?? 0) : 0,
+                    (isJWIRow && (item.JORNI_JOJWI_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOJWI_SVOI_Number ?? 0) : 0,
                     item.JORNI_IsFreightApplicable ?? "No",
                     isFreightRow ? (item.JORNI_FromWH_Number ?? 0) : 0,
                     isFreightRow ? (item.JORNI_ToWH_Number ?? 0) : 0,
-                    isFreightRow ? (item.JORNI_JOFRT_SVOH_Number ?? 0) : 0,
-                    isFreightRow ? (item.JORNI_JOFRT_SVOI_Number ?? 0) : 0
+                              (isFreightRow && (item.JORNI_JOFRT_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOFRT_SVOH_Number ?? 0) : 0,
+                    (isFreightRow && (item.JORNI_JOFRT_SVOH_Number ?? 0) > 0) ? (item.JORNI_JOFRT_SVOI_Number ?? 0) : 0
                 );
             }
 

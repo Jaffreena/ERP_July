@@ -173,10 +173,12 @@ function GetMaxQty(it) {
 function CheckMaxQty($tr) {
     var it = $tr.data('item');
     if (!it) return true;
-    var q = num($tr.find('.qty').val()), max = GetMaxQty(it);
+    var q = num($tr.find('.qty').val());
+    var so = RowSoAllowed($tr);                    // SO Qty - RN - other invoices - other rows in this grid
+    var bySo = (so !== null && so < it.Remaining);
+    var max = Math.max(0, bySo ? so : it.Remaining);
     if (q > max) {
-        var bySo = (it.SoMax !== undefined && it.SoMax !== null && it.SoMax < it.Remaining);
-        showAlert('Qty cannot exceed Max Allowed Qty (' + fmtQ(max) + ')' + (bySo ? ' of the Service Order.' : '.'));
+        showAlert(bySo ? 'Qty Allowed: ' + fmtQ(max) : 'Qty cannot exceed Max Allowed Qty (' + fmtQ(max) + ').', $tr.find('.qty'));
         $tr.find('.qty').val(fmtQ(max));
         RecalcRow($tr);
         return false;
@@ -226,12 +228,7 @@ $(document).on('change', '#TableBody .so-select', function () {
 var _ValidateItemsBase = ValidateItems;
 ValidateItems = function () {
     var e = _ValidateItemsBase();
-    ActiveRows().each(function (i) {
-        var it = $(this).data('item');
-        if (it.SoMax !== undefined && it.SoMax !== null && num($(this).find('.qty').val()) > it.SoMax)
-            e.push('Row ' + (i + 1) + ': Qty exceeds Service Order Max Allowed Qty (' + fmtQ(it.SoMax) + ').');
-    });
-    return e;
+    return e;   // SO Qty Allowed (including other rows) is checked in the base ValidateItems
 };
 
 // Receipt Note insert -> rows come from /receipt-note-items : check every active row once they are in the grid

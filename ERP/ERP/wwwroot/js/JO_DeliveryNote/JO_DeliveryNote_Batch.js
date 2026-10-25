@@ -1266,6 +1266,9 @@ $(document).on('input', ".JODNI_BCH_QtyInvoice", function (event) {
         QtyInvoiceInput.val(addComma(BalanceQty, "q"));
         QtyInvoice = BalanceQty;
 
+        // re-run Batch Value / footer calculation for the reset qty
+        QtyInvoiceInput.trigger("input");
+
         QtyInvoiceInput.focus().select();
     }
 

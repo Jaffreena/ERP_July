@@ -162,6 +162,9 @@ namespace ERP_DTO.JobOutwardTransaction
 
         // Used Qty (JO_OUT consumption / receipt note) - Edit page display only
         public double JODNI_UsedQty { get; set; }
+
+        // Freight-invoiced Qty (JO_FreightInvoiceItem, DELIVERY NOTE) - Edit page min Amend Qty
+        public double JODNI_FreightInvoicedQty { get; set; }
     }
 
     public class JO_DeliveryNoteAddress_DTO

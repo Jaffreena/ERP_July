@@ -118,7 +118,7 @@
     // mousedown -> (re)open the item pane and load/refresh the search.
     $(document).on("mousedown", ".JOJWI_SVOI_Item_Code", function (e) {
 
-        let $msField = $(this).closest(".card").find('[name="JWIHeader.JOJWI_SVOH_MS_Number"]');
+        let $msField = $('[name="JWIHeader.JOJWI_SVOH_MS_Number"]');
 
         if ($.trim($msField.val()) === "") {
             $msField.prop("selectedIndex", 1);
@@ -141,7 +141,7 @@
         if (isSelectingItem)
             return;
 
-        let $msField = $(this).closest(".card").find('[name="JWIHeader.JOJWI_SVOH_MS_Number"]');
+        let $msField = $('[name="JWIHeader.JOJWI_SVOH_MS_Number"]');
 
         if ($.trim($msField.val()) === "") {
             return;
@@ -519,6 +519,17 @@ function OnFocusItem(inputElement) {
         $("#RightPane_Item .search-results").hide();
 
         showAlert('Please select Material Segregation before searching for an item.', '[name="JWIHeader.JOJWI_SVOH_MS_Number"]');
+        return;
+    }
+
+    // pane already open (list or message showing) -> do not re-search, keep message steady
+    let resultsDiv = $("#RightPane_Item").find(".search-results");
+    let messageVisible = $("#ItemMessage").is(":visible") ||
+        $("#ItemEmptyView").is(":visible");
+    let alreadyOpen = $("#RightPane_Item").hasClass("show") &&
+        (resultsDiv.find("tbody tr").length > 0 || messageVisible);
+
+    if (alreadyOpen) {
         return;
     }
 

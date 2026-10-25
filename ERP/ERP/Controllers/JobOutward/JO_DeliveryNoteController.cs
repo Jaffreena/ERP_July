@@ -779,6 +779,11 @@ namespace ERP.Controllers.JobworkOutward
                     JODNI_UsedQty = item["JODNI_UsedQty"] != DBNull.Value
                         ? Convert.ToDouble(item["JODNI_UsedQty"])
                         : 0,
+                    JODNI_FreightInvoicedQty =
+                        item.Table.Columns.Contains("JODNI_FreightInvoicedQty")
+                        && item["JODNI_FreightInvoicedQty"] != DBNull.Value
+                            ? Convert.ToDouble(item["JODNI_FreightInvoicedQty"])
+                            : 0,
 
                     // Freight
                     JODNI_IsFreightApplicable =
@@ -1107,10 +1112,10 @@ namespace ERP.Controllers.JobworkOutward
         #region freight
         [HttpGet]
         [Route("joboutward/transactions/delivery-note/get-freight-service-order")]
-        public JsonResult GetFreightServiceOrder(long vendorId, long? uomNumber = null, long? fromWHNumber = null, long? toWHNumber = null)
+        public JsonResult GetFreightServiceOrder(long vendorId, long? uomNumber = null, long? fromWHNumber = null, long? toWHNumber = null, long excludeJODNHNumber = 0)
         {
             var dt = DN_DAO
-                .GetFreightServiceOrderDB(vendorId, uomNumber, fromWHNumber, toWHNumber)
+                               .GetFreightServiceOrderDB(vendorId, uomNumber, fromWHNumber, toWHNumber, excludeJODNHNumber)
                 .Tables[0];
 
             return new JsonResult(
@@ -1125,10 +1130,10 @@ namespace ERP.Controllers.JobworkOutward
 
         [HttpGet]
         [Route("joboutward/transactions/delivery-note/check-delivered-qty-exceeded-freight")]
-        public JsonResult CheckDeliveredQtyExceededFreight(long svohNumber, long? uomNumber = null, long? fromWHNumber = null, long? toWHNumber = null)
+        public JsonResult CheckDeliveredQtyExceededFreight(long svohNumber, long? uomNumber = null, long? fromWHNumber = null, long? toWHNumber = null, long excludeJODNHNumber = 0)
         {
             var dt = DN_DAO
-                .CheckDeliveredQtyExceededFreightDB_New(svohNumber, uomNumber, fromWHNumber, toWHNumber)
+                            .CheckDeliveredQtyExceededFreightDB_New(svohNumber, uomNumber, fromWHNumber, toWHNumber, excludeJODNHNumber)
                 .Tables[0];
 
             var result = dt.AsEnumerable().Select(r => new

@@ -323,6 +323,26 @@ namespace ERP.Controllers.JobworkOutward
 
         #endregion
 
+        #region Next Journal No (Number Setup)
+
+        // Create page only: next Journal No by Journal Date
+        [HttpGet]
+        [Route("joboutward/transactions/jo-freight-invoice/next-journal-number")]
+        public IActionResult GetNextJournalNumber(string? JournalDate)
+        {
+            try
+            {
+                string number = DAO.GetNextJournalNumber(ParseDate(JournalDate ?? ""));
+                return Json(new { success = true, number = number });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "Journal Number is not configured for the selected date." });
+            }
+        }
+
+        #endregion
+
         #region Summary
 
         [Route("joboutward/transactions/jo-freight-invoice/summary")]

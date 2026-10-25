@@ -1374,8 +1374,8 @@ SELECT DISTINCT
     -- Used Qty (JO_OUT consumption / receipt note against this note's JO_IN batch)
     ISNULL(UQ.UsedQty,0) AS UsedQty,
 
-    -- Final Available Qty
-    ISNULL(I.ICB_BatchQty,0) - ISNULL(T.TotalDeliveredQty,0) AS AvailableQty,
+    -- Final Available Qty = regular available + this note's own delivered qty
+    ISNULL(I.ICB_BatchQty,0) - ISNULL(T.TotalDeliveredQty,0) + ISNULL(CUR.CurrentDNQty,0) AS AvailableQty,
 
     ISNULL(I.ICB_BatchUnitPrice,0) AS BatchUnitPrice,
     ISNULL(temp.DBCH_Qty,0) * ISNULL(I.ICB_BatchUnitPrice,0) AS BatchValue,
@@ -1413,6 +1413,20 @@ LEFT JOIN
 
 LEFT JOIN Warehouse W
     ON W.WarehouseNumber = I.ICB_Warehouse_Number
+
+-- This Delivery Note's own saved qty (added back so Edit shows the original Available)
+LEFT JOIN
+(
+    SELECT
+        OCB_RefBatch_Number AS RefBatch_Number,
+        SUM(OCB_BatchQty) AS CurrentDNQty
+    FROM OUT_COMMON_BATCH
+    WHERE OCB_TransType = 'JO Delivery Note'
+      AND OCB_Header_Number = @Header_Number
+      AND OCB_LineItem_Number = @LineItem_Number
+    GROUP BY OCB_RefBatch_Number
+) CUR
+    ON CUR.RefBatch_Number = I.ICB_LineBatch_Number
 
 -- Used Qty from JO_OUT_COMMON_BATCH (via this note's JO_IN_COMMON_BATCH row)
 LEFT JOIN
@@ -1539,16 +1553,18 @@ WHERE I.ICB_Item_Number = @Item_Number
 
         // Freight SO list (FromWH/ToWH based, JOFRT tables)
         public DataSet GetFreightServiceOrderDB(
-            long vendorId,
-            long? uomNumber = null,
-            long? fromWHNumber = null,
-            long? toWHNumber = null)
+         long vendorId,
+         long? uomNumber = null,
+         long? fromWHNumber = null,
+         long? toWHNumber = null,
+         long excludeJODNHNumber = 0)
         {
             try
             {
                 Database db = new SqlDatabase(DB.Connection());
                 DbCommand cmd = db.GetStoredProcCommand("JOFRT_ServiceOrder_GetByVendor_DN_SP");
 
+                db.AddInParameter(cmd, "@Exclude_JODNH_Number", DbType.Int64, excludeJODNHNumber);
                 db.AddInParameter(cmd, "@VendorId", DbType.Int64, vendorId);
                 db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
                     uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);
@@ -1571,16 +1587,18 @@ WHERE I.ICB_Item_Number = @Item_Number
         }
 
         public DataSet CheckDeliveredQtyExceededFreightDB_New(
-            long jofrtSvohNumber,
-            long? uomNumber = null,
-            long? fromWHNumber = null,
-            long? toWHNumber = null)
+           long jofrtSvohNumber,
+           long? uomNumber = null,
+           long? fromWHNumber = null,
+           long? toWHNumber = null,
+           long excludeJODNHNumber = 0)
         {
             try
             {
                 Database db = new SqlDatabase(DB.Connection());
                 DbCommand cmd = db.GetStoredProcCommand("USP_CheckDeliveredQtyExceeded_Freight_JODN_SP");
 
+                db.AddInParameter(cmd, "@Exclude_JODNH_Number", DbType.Int64, excludeJODNHNumber);
                 db.AddInParameter(cmd, "@JOFRT_SVOH_Number", DbType.Int64, jofrtSvohNumber);
                 db.AddInParameter(cmd, "@UoM_Number", DbType.Int64,
                     uomNumber.HasValue ? (object)uomNumber.Value : DBNull.Value);

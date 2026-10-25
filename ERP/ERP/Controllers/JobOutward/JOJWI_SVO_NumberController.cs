@@ -71,6 +71,31 @@ namespace ERP.Controllers.JobOutward
 
             SON_DTO.CreatorCode = 1;
 
+            // ---- Number tab: block if a transaction exists in the removed date part ----
+            // Check 1: Number rows being deleted (Id 55)
+            SON_DTO.DeleteNumbers = ResetIds;
+            SON_DTO.Id = 55;
+            DataSet dsDel = SON_DAO.JOJWI_SVO_NumberingDB(SON_DTO);
+            if (Convert.ToInt32(dsDel.Tables[0].Rows[0]["ExistsFlag"]) == 1)
+            {
+                return Content("<script>alert('Cannot delete this Number date range. Service Order transactions exist in that period.');window.location.href='/joboutward/setup/jojwi-serviceorder-numbering';</script>", "text/html");
+            }
+
+            // Check 2: saved Number rows whose Start/End date is being changed (Id 54)
+            foreach (var Reset in Reset_DTO.Where(x => x.JOJWI_SVO_NRS_Number != 0))
+            {
+                SON_DTO.JOJWI_SVO_Number = Reset.JOJWI_SVO_NRS_Number;
+                SON_DTO.JOJWI_SVO_Date = Convert.ToDateTime(Reset.JOJWI_SVO_NRS_StartDate).ToString("yyyyMMdd");
+                SON_DTO.JOJWI_SVO_EndDate = Convert.ToDateTime(Reset.JOJWI_SVO_NRS_EndDate).ToString("yyyyMMdd");
+                SON_DTO.Id = 54;
+                DataSet dsEdit = SON_DAO.JOJWI_SVO_NumberingDB(SON_DTO);
+                if (Convert.ToInt32(dsEdit.Tables[0].Rows[0]["ExistsFlag"]) == 1)
+                {
+                    return Content("<script>alert('Cannot change this Number date range. Service Order transactions exist in the period being removed.');window.location.href='/joboutward/setup/jojwi-serviceorder-numbering';</script>", "text/html");
+                }
+            }
+            // ---- end check ----
+
             SON_DTO.DeleteNumbers = ResetIds;
             SON_DTO.Id = 31;
             SON_DAO.JOJWI_SVO_NumberingDB(SON_DTO);
@@ -157,6 +182,46 @@ namespace ERP.Controllers.JobOutward
 
             GetJOJWI_SVO_Number();
             return View(ViewPath, SON_DTO);
+        }
+
+        [HttpPost]
+        public JsonResult ValidateNumberDelete(long NumberId)
+        {
+            var dto = new JOJWI_SVO_Numbering_DTO
+            {
+                JOJWI_SVO_Number = NumberId,
+                Id = 56
+            };
+
+            DataSet ds = SON_DAO.JOJWI_SVO_NumberingDB(dto);
+            bool blocked = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
+
+            return Json(new
+            {
+                success = !blocked,
+                message = blocked ? "Cannot delete this Number date range. Service Order transactions exist in that period." : ""
+            });
+        }
+
+        [HttpPost]
+        public JsonResult ValidateNumberEdit(long NumberId, string StartDate, string EndDate)
+        {
+            var dto = new JOJWI_SVO_Numbering_DTO
+            {
+                JOJWI_SVO_Number = NumberId,
+                JOJWI_SVO_Date = DateTime.ParseExact(StartDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture).ToString("yyyyMMdd"),
+                JOJWI_SVO_EndDate = DateTime.ParseExact(EndDate, "dd-MMM-yyyy", CultureInfo.InvariantCulture).ToString("yyyyMMdd"),
+                Id = 54
+            };
+
+            DataSet ds = SON_DAO.JOJWI_SVO_NumberingDB(dto);
+            bool blocked = Convert.ToInt32(ds.Tables[0].Rows[0]["ExistsFlag"]) == 1;
+
+            return Json(new
+            {
+                success = !blocked,
+                message = blocked ? "Cannot change this date range. Service Order transactions exist in the period being removed." : ""
+            });
         }
 
         [HttpPost]

@@ -230,7 +230,7 @@ namespace ERP_DL
                 list.Add(new JO_FreightServiceOrderDropdown_DTO
                 {
                     JOFRT_SVOH_Number = L(dr, "JOFRT_SVOH_Number"),
-                    ServiceOrderNo = S(dr, "ServiceOrderNo"),
+                    ServiceOrderNo = S(dr, "JOFRT_SVOH_ServiceOrderNo"),
                     JOFRT_SVOI_Number = L(dr, "JOFRT_SVOI_Number")
                 });
             }

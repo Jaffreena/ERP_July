@@ -676,7 +676,6 @@ function LoadServiceOrderDropdown(dropdown) {
         $(dropdown).html(o).val(prev);
     });
 }
-
 function OnServiceOrderChange(ele) {
     const row = $(ele).closest("tr");
     const so = $(ele).val();
@@ -691,20 +690,40 @@ function OnServiceOrderChange(ele) {
 
     if (!so || so === "0") { unlock(); rateBox.val(addComma(0, "c")); RecalcRow(row); return; }
 
-    $.get(JOFT_URL + "/freight-so-item", {
-        JOFRT_SVOH_Number: so,
-        FromWH: row.find(".JOFTII_FromWH_Number").val() || 0,
-        ToWH: row.find(".JOFTII_ToWH_Number").val() || 0,
-        UoM_Number: row.find(".JOFTII_UoM_Number").val() || 0
-    }, function (res) {
-        if (!res) { unlock(); rateBox.val(""); return; }
-        row.find(".JOFTII_JOFRT_SVOI_Number").val(res.jofrtSvoiNumber || 0);
-        if (res.unitPrice == null) { rateBox.off("keydown keypress paste").prop("readonly", false); }
-        else {
-            rateBox.val(addComma(res.unitPrice, "c")).prop("readonly", true)
-                .off("keydown keypress paste").on("keydown keypress paste", function (e) { e.preventDefault(); });
+    const fromWH = row.find(".JOFTII_FromWH_Number").val() || 0;
+    const toWH = row.find(".JOFTII_ToWH_Number").val() || 0;
+    const uom = row.find(".JOFTII_UoM_Number").val() || 0;
+
+    // Qty allowed check when SO is picked
+    GetAllowedQty(so, FREIGHT_JPRS, fromWH, toWH, uom, function (allowed) {
+        const real = Math.max(0, allowed - GetOtherRowsQtyForSO(so, row));
+
+        if (JN(row.find(".JOFTII_Qty_Kgs").val()) > real) {
+            alert("Qty Allowed: " + real);
+            $(ele).val("0");
+            row.find(".JOFTII_JOFRT_SVOH_Number").val(0);
+            unlock();
+            rateBox.val(addComma(0, "c"));
+            RecalcRow(row);
+            row.find(".JOFTII_Qty_Kgs").focus();
+            return;
         }
-        RecalcRow(row);
+
+        $.get(JOFT_URL + "/freight-so-item", {
+            JOFRT_SVOH_Number: so,
+            FromWH: fromWH,
+            ToWH: toWH,
+            UoM_Number: uom
+        }, function (res) {
+            if (!res) { unlock(); rateBox.val(""); return; }
+            row.find(".JOFTII_JOFRT_SVOI_Number").val(res.jofrtSvoiNumber || 0);
+            if (res.unitPrice == null) { rateBox.off("keydown keypress paste").prop("readonly", false); }
+            else {
+                rateBox.val(addComma(res.unitPrice, "c")).prop("readonly", true)
+                    .off("keydown keypress paste").on("keydown keypress paste", function (e) { e.preventDefault(); });
+            }
+            RecalcRow(row);
+        });
     });
 }
 //#endregion
@@ -935,6 +954,28 @@ function CreateModel() {
 }
 //#endregion
 
+//#region ---------- JOURNAL NO (Number Setup) ----------
+// Create page only. Edit page shows the saved number.
+function LoadJournalNumber() {
+    const $no = $("#Header_JOFTIH_JournalNo");
+    const d = ToIsoDate($("#Header_JOFTIH_JournalDate").val());
+    if (!d) return;
+
+    $.get(JOFT_URL + "/next-journal-number", { JournalDate: d }, function (res) {
+        if (res && res.success) {
+            $no.val(res.number).prop("readonly", true);
+            fitInputWidth($no[0], 20, 25);
+        } else {
+            $no.val("").prop("readonly", true);   // no setup -> cannot type manually, Save is blocked
+            showAlert((res && res.message) || "Journal Number is not configured for the selected date.");
+        }
+    }).fail(function () {
+        $no.val("").prop("readonly", true);
+        showAlert("Unable to get Journal Number.");
+    });
+}
+//#endregion
+
 //#region ---------- READY ----------
 $(document).ready(function () {
 
@@ -951,6 +992,7 @@ $(document).ready(function () {
     setTimeout(ResizeColumns, 200);
 
     LoadDefaultFormSetting();
+    setTimeout(LoadJournalNumber, 400);   // after the date picker is ready
 
     //#region header events
     $(document).on("keyup change input", Object.keys(HeaderWidths).map(function (i) { return "#" + i; }).join(","), function () {
@@ -958,7 +1000,10 @@ $(document).ready(function () {
         if (w) fitInputWidth(this, w[0], w[1]);
     });
 
-    $("#Header_JOFTIH_JournalDate").on("change", RefreshVendorByDate);
+    $("#Header_JOFTIH_JournalDate").on("change", function () {
+        RefreshVendorByDate();
+        LoadJournalNumber();
+    });
 
     $("#Header_JOFTIH_TCT_Number").on("change", function () {
         $("#TableBody tr.NewRow").each(function () { RecalcRow($(this)); });

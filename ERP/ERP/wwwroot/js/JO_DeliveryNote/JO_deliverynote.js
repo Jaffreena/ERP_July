@@ -1288,7 +1288,12 @@ $(document).ready(function () {
 
             let itemBatch = this;
 
-            // Skip empty batch list
+            // Skip batches of rows that no longer exist in the grid
+            if ($("#ItemTable tbody tr.NewRow[data-rowid='" + itemBatch.RowID + "']").length === 0) {
+                return true;
+            }
+
+        // Skip empty batch list
             if (!itemBatch.BatchList || itemBatch.BatchList.length <= 0) {
                 return true;
             }
@@ -1621,6 +1626,22 @@ $(document).ready(function () {
                 data: { index: ItemGridindex },
 
                 success: function (response) {
+
+                    let deletedRowID = currentRow.attr("data-rowid");
+
+                    // 1. drop saved batch data of the deleted row
+                    DeliveryNoteItemBatchList =
+                        DeliveryNoteItemBatchList.filter(x => x.RowID != deletedRowID);
+
+                    // 2. drop mismatch entry of the deleted row and shift the
+                    //    position-based rowIds of the rows below it
+                    batchMismatchData = batchMismatchData
+                        .filter(x => x.rowId !== ItemGridindex)
+                        .map(x => {
+                            if (x.rowId > ItemGridindex) x.rowId = x.rowId - 1;
+                            return x;
+                        });
+
                     // remove selected row
                     currentRow.remove();
                     calculateTotal();

@@ -76,7 +76,9 @@
             return;
         }
 
-        // Validation passed - this becomes the new "known good" value
+     
+
+        // valid: this becomes the new known-good value
         $changedField.data("prevVal", $changedField.val());
 
     });

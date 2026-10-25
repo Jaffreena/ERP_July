@@ -402,8 +402,8 @@
 
                                         <td class="table-width-xl">
                                                 
-                                            <input type="number" autocomplete="off"
-                                                   class="form-control text-end JODNI_BCH_QtyInvoice">
+                                         <input type="text" autocomplete="off"
+       class="form-control text-end JODNI_BCH_QtyInvoice">
 
                                         </td>
 
@@ -794,7 +794,7 @@
     <div class="col h-100 align-items-center">
         <div class="h6 fw-light text-white h-100 align-content-center bg-secondary px-2">
             Delivery Note
-            <a asp-controller="JobworkOutwardMain" asp-action="Index" class="float-end btn p-0">
+           <a asp-controller="JO_DeliveryNote" asp-action="DeliveryNoteSummary" class="float-end btn p-0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                     <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
                 </svg>
@@ -1315,9 +1315,11 @@
                                                                 <!-- USED QTY -->
                                                                 <td>
 
-                                                                    <input asp-for="Items[i].JODNI_UsedQty"
+                                                                                                                                   <input asp-for="Items[i].JODNI_UsedQty"
                                                                            autocomplete="off" readonly
                                                                            class="form-control JODNI_UsedQty" />
+                                                                    <input asp-for="Items[i].JODNI_FreightInvoicedQty"
+                                                                           type="hidden" class="JODNI_FreightInvoicedQty" />
 
                                                                 </td>
 

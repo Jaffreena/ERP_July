@@ -595,9 +595,9 @@ namespace ERP.Controllers.JobOutward
 
         [HttpGet]
         [Route("joboutward/transactions/receipt-note/get-batch-details")]
-        public JsonResult GetBatchDetails(long FromWarehouse, long LineItem_Number, int ItemGridIndex)
+        public JsonResult GetBatchDetails(long FromWarehouse, long LineItem_Number, int ItemGridIndex, long JORNH_Number = 0)
         {
-            DataTable dt = RN_DAO.GetBatchDetailsDB(FromWarehouse, LineItem_Number, ItemGridIndex).Tables[0];
+            DataTable dt = RN_DAO.GetBatchDetailsDB(FromWarehouse, LineItem_Number, ItemGridIndex, JORNH_Number).Tables[0];
             var data = dt.AsEnumerable().Select(r => BatchRow(dt, r)).ToList();
             return new JsonResult(data, CamelJson);
         }

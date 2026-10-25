@@ -1181,6 +1181,15 @@ $(document).ready(function () {
     function GetOtherRowsQtyForSO(jisvohNumber, currentRow) {
         let total = 0;
 
+        // current row's SO + SO item (JW and Freight kept separate)
+        let curJwSO = currentRow.find(".JORNI_JOJWI_SVOH_Number").val() || "0";
+        let curFrtSO = currentRow.find(".JORNI_JOFRT_SVOH_Number").val() || "0";
+        let curJwSvoi = currentRow.find(".JORNI_JOJWI_SVOI_Number_Row").val() || "0";
+        let curFrtSvoi = currentRow.find(".JORNI_JOFRT_SVOI_Number_Row").val() || "0";
+
+        let isJW = (curJwSO == jisvohNumber);
+        let isFrt = (curFrtSO == jisvohNumber);
+
         $("#ItemTable tbody tr.NewRow").each(function () {
             let row = $(this);
 
@@ -1188,11 +1197,18 @@ $(document).ready(function () {
             if (row.find(".JORNI_IsDeleted").val() === "1" ||
                 row.find(".JORNI_IsDeleted").val() === "true") return;
 
-            let rowSO = row.find(".JORNI_JOJWI_SVOH_Number").val() || 0;
-            let rowFreightSO = row.find(".JORNI_JOFRT_SVOH_Number").val() || 0;
+            let rowQty = parseFloat(removeComma(row.find(".JORNI_Qty").val())) || 0;
 
-            if (rowSO == jisvohNumber || rowFreightSO == jisvohNumber) {
-                total += parseFloat(removeComma(row.find(".JORNI_Qty").val())) || 0;
+            let rowSO = row.find(".JORNI_JOJWI_SVOH_Number").val() || "0";
+            let rowSvoi = row.find(".JORNI_JOJWI_SVOI_Number_Row").val() || "0";
+            let rowFrtSO = row.find(".JORNI_JOFRT_SVOH_Number").val() || "0";
+            let rowFrtSvoi = row.find(".JORNI_JOFRT_SVOI_Number_Row").val() || "0";
+
+            // same SO AND same SO item only
+            if (isJW && rowSO == jisvohNumber && rowSvoi == curJwSvoi) {
+                total += rowQty;
+            } else if (isFrt && rowFrtSO == jisvohNumber && rowFrtSvoi == curFrtSvoi) {
+                total += rowQty;
             }
         });
 
@@ -2435,7 +2451,7 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
 
     $.ajax({
 
-        url: "/joboutward/transactions/receipt-note/get-batch-details",
+        url: "/joboutward/transactions/receipt-note/get-batch-details?JORNH_Number=" + (parseInt(p_JORNH_Number) || 0),
 
         type: "GET",
 
@@ -2467,7 +2483,7 @@ $(document).on("click", ".OpenBatchPopup", function (e) {
                         JORNI_BCH_QtyReceived: batch.receivedQty,
                         JORNI_BCH_UsedQty: batch.usedQty || 0,
                         JORNI_BCH_BatchUnitPrice: batch.batchUnitPrice,
-                        JORNI_BCH_BatchValue: batch.batchValue,
+                        JORNI_BCH_BatchValue: (parseFloat(batch.receivedQty) || 0) * (parseFloat(batch.batchUnitPrice) || 0),
                         JORNI_BCH_Number: batch.lineBatch_Number,
                         JORNI_Number: G_JINI_Number,
                         JORNH_Number: G_JINH_Number,
@@ -2651,16 +2667,31 @@ function BindReceiptNoteOtherBatchTable(response) {
             .val(addComma(data.availableQty, "q"));
 
         row.find(".JORNI_BCH_BatchUnitPrice")
-            .val(data.batchUnitPrice);
+            .val(addComma(data.batchUnitPrice, "c"));
 
         row.find(".JORNI_BCH_BatchValue")
-            .val(data.batchValue);
+            .val(addComma(data.batchValue, "c"));
 
         tbody.append(row);
 
     });
 
-    // CalculateOtherBatchFooter();
+    CalculateOtherBatchFooter();
+}
+
+// Other WH footer totals (Available Qty, Batch Value)
+function CalculateOtherBatchFooter() {
+
+    let totalQty = 0;
+    let totalValue = 0;
+
+    $("#ReceiptNoteOtherBatchTableBody .ReceiptNoteOtherBatchRow").each(function () {
+        totalQty += parseFloat(removeComma($(this).find(".JORNI_BCH_AvailableQty").val())) || 0;
+        totalValue += parseFloat(removeComma($(this).find(".JORNI_BCH_BatchValue").val())) || 0;
+    });
+
+    $("#TotalBatchQtyOther").val(addComma(totalQty, "q"));
+    $("#TotalBatchValueOther").val(addComma(totalValue, "c"));
 }
 
 

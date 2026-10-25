@@ -219,6 +219,22 @@ namespace ERP.Controllers.JobOutward
             });
         }
 
+        // next Journal No from Number Setup (by Journal Date)
+        [HttpGet]
+        [Route("joboutward/transactions/jobwork-invoice/next-journal-number")]
+        public IActionResult GetNextJournalNumber(String? JournalDate)
+        {
+            try
+            {
+                string number = JWI_DAO.GetNextJournalNumber(ParseDate(JournalDate));
+                return Json(new { success = true, number = number });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "Journal Number is not configured for the selected date." });
+            }
+        }
+
         // saved address of one invoice
         [HttpGet]
         [Route("joboutward/transactions/jobwork-invoice/address")]

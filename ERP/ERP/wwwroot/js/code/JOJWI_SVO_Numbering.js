@@ -68,6 +68,26 @@
             revertField($changedField);
             return;
         }
+        // Number (Reset) tab only: saved rows must not lose dates that have transactions
+        let numberId = parseInt(currentRow.find("input.JOJWI_SVO_NRS_Number").val(), 10) || 0;
+
+        if (sectionName === "Reset" && numberId > 0) {
+            $.post("/JOJWI_SVO_Number/ValidateNumberEdit",
+                { NumberId: numberId, StartDate: startDate, EndDate: endDate },
+                function (res) {
+                    if (res && res.success) {
+                        $changedField.data("prevVal", $changedField.val());
+                    } else {
+                        alert(res && res.message ? res.message : "Date change is not allowed.");
+                        revertField($changedField);
+                    }
+                }
+            ).fail(function () {
+                alert("Could not validate the date change. Please try again.");
+                revertField($changedField);
+            });
+            return;
+        }
 
         // valid: this becomes the new known-good value
         $changedField.data("prevVal", $changedField.val());

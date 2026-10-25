@@ -1072,7 +1072,10 @@ $(document).ready(function () {
         if (!customerId) return;
 
         $.get("/joboutward/transactions/delivery-note/get-freight-service-order",
-            { vendorId: customerId, uomNumber, fromWHNumber, toWHNumber },
+            {
+                vendorId: customerId, uomNumber, fromWHNumber, toWHNumber,
+                excludeJODNHNumber: parseInt($("#Header_JODNH_Number").val()) || 0
+            },
             data => {
                 // Reset again right here, immediately before appending —
                 // guards against duplicate options from overlapping calls
@@ -1128,12 +1131,12 @@ $(document).ready(function () {
         let fromWHNumber = row.find(".JODNI_FromWH_Number").val();
         let toWHNumber = row.find(".JODNI_ToWH_Number").val();
         let originalQty = parseFloat(removeComma(row.find(".JODNI_Qty").val())) || 0;
-
         $.get("/joboutward/transactions/delivery-note/check-delivered-qty-exceeded-freight", {
             svohNumber: freightSO,
             uomNumber,
             fromWHNumber,
-            toWHNumber
+            toWHNumber,
+            excludeJODNHNumber: parseInt($("#Header_JODNH_Number").val()) || 0
         }, function (res) {
 
             if (!res || res.length === 0) return;
@@ -1151,6 +1154,47 @@ $(document).ready(function () {
                         .focus()
                         .select();
                     row.find(".JODNI_JOFRT_SVOH_Number").val("0");
+                    row.find(".JODNI_JOFRT_SVOI_Number_Row").val("0");
+                }, 300);
+            }
+        });
+    });
+    //#endregion
+
+    //#region Freight Qty check on Qty focusout (same as Create)
+    $(document).on("focusout", ".JODNI_Qty", function () {
+
+        let row = $(this).closest("tr");
+        let originalQty = parseFloat(removeComma(row.find(".JODNI_Qty").val())) || 0;
+        let freightSO = row.find(".JODNI_JOFRT_SVOH_Number").val();
+
+        if (!freightSO || freightSO === "0") return;
+
+        let uomNumber = row.find(".JODNI_UoM_Number").val();
+        let fromWHNumber = row.find(".JODNI_FromWH_Number").val();
+        let toWHNumber = row.find(".JODNI_ToWH_Number").val();
+
+        $.get("/joboutward/transactions/delivery-note/check-delivered-qty-exceeded-freight", {
+            svohNumber: freightSO,
+            uomNumber,
+            fromWHNumber,
+            toWHNumber,
+            excludeJODNHNumber: parseInt($("#Header_JODNH_Number").val()) || 0
+        }, function (res) {
+            if (!res || res.length === 0) return;
+
+            let deliveredQty = parseFloat(res[0].deliveredQty) || 0;
+            let svoiQty = parseFloat(res[0].svoiQty) || 0;
+
+            let otherRowsQty = GetOtherRowsQtyForSO(freightSO, row);
+            let realDeliveredQty = deliveredQty + otherRowsQty;
+
+            if ((realDeliveredQty + originalQty) > svoiQty) {
+                row.find(".JODNI_JOFRT_SVOH_Number").val("0");
+                row.find(".JODNI_JOFRT_SVOI_Number_Row").val("0");
+                alert("Freight Qty Allowed: " + (svoiQty - realDeliveredQty));
+                setTimeout(function () {
+                    row.find(".JODNI_Qty").focus().select();
                 }, 300);
             }
         });
@@ -1292,11 +1336,13 @@ $(document).ready(function () {
         let row = $(this).closest("tr");
 
         let amendQty = parseFloat(removeComma($(this).val())) || 0;
-        let invoicedQty = parseFloat(removeComma(row.find(".JODNI_InvoicedQty").val())) || 0;
+        let invoicedQty = parseFloat(removeComma(row.find(".JODNI_FreightInvoicedQty").val())) || 0;
 
-        if (amendQty < invoicedQty) {
-            alert("Amend Qty cannot be less than Invoiced Qty (" + invoicedQty + ")");
-            $(this).val(addComma(invoicedQty, "q"));
+        if (invoicedQty > 0 && amendQty < invoicedQty) {
+            alert("Amend Qty cannot be less than Freight Invoiced Qty (" + invoicedQty + ")");
+            $(this).val(addComma(invoicedQty, "q")).trigger("input").trigger("keyup");
+            let $qty = $(this);
+            setTimeout(function () { $qty.focus().select(); }, 100);
         }
     });
     //#endregion validate amend qty against invoiced qty
@@ -3334,6 +3380,18 @@ function validateItemGrid_Edit() {
         if ((parseFloat(removeComma(qty)) || 0) < usedQtyItem) {
             showAlert(
                 'Qty cannot be less than Used Qty (' + usedQtyItem + ')',
+                row.find(".JODNI_Qty")
+            );
+
+            isValid = false;
+            return false;
+        }
+
+        // validate Qty should not be less than Freight Invoiced Qty
+        let frtInvQtyItem = parseFloat(removeComma(row.find(".JODNI_FreightInvoicedQty").val())) || 0;
+        if (frtInvQtyItem > 0 && (parseFloat(removeComma(qty)) || 0) < frtInvQtyItem) {
+            showAlert(
+                'Qty cannot be less than Freight Invoiced Qty (' + frtInvQtyItem + ')',
                 row.find(".JODNI_Qty")
             );
 
